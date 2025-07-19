@@ -5,7 +5,7 @@ import Support from "./Pages/resources/Support.jsx";
 
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import './App.css';
-import About from "./Pages/About.jsx";
+// import About from "./Pages/About.jsx";
 import AboutMediLink from "./Pages/about/AboutMediLink.jsx";
 import Mission from "./Pages/about/Mission.jsx";
 import Story from "./Pages/about/Story.jsx";
@@ -31,7 +31,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        {/* <Route path="/about" element={<About />} /> */}
         <Route path="/about/aboutmedilink" element={<AboutMediLink />} />
         <Route path="/about/story" element={<Story />} />
         <Route path="/about/team" element={<Team />} />
