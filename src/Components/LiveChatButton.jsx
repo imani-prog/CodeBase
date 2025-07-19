@@ -32,8 +32,8 @@ const LiveChatButton = () => {
     <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end">
       {/* Chat Popup */}
       {open && (
-        <div className="mb-4 w-80 bg-white rounded-2xl shadow-2xl border border-blue-200 flex flex-col overflow-hidden animate-fade-in">
-          <div className="bg-blue-600 text-white px-4 py-3 font-bold flex justify-between items-center">
+        <div className="mb-4 w-80 max-w-full bg-white rounded-2xl shadow-2xl border border-blue-200 flex flex-col overflow-hidden animate-fade-in">
+          <div className="bg-blue-600 text-white px-3 py-2 font-bold flex justify-between items-center">
             <span>Live Chat</span>
             <button
               className="text-white hover:text-blue-200 text-xl font-bold"
@@ -43,7 +43,7 @@ const LiveChatButton = () => {
               ×
             </button>
           </div>
-          <div className="flex-1 px-4 py-2 h-64 overflow-y-auto bg-blue-50">
+          <div className="flex-1 px-4 py-2 bg-blue-50" style={{ maxHeight: '320px', overflowY: 'auto' }}>
             {messages.map((msg, idx) => (
               <div key={idx} className={`mb-2 flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`px-3 py-2 rounded-xl max-w-[70%] ${msg.sender === "user" ? "bg-blue-600 text-white" : "bg-white text-blue-800 border border-blue-200"}`}>
