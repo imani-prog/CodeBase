@@ -1,5 +1,6 @@
 import Footer from "../Components/Footer.jsx";
 import Navbar from "../Components/Navbar.jsx";
+import React from "react";
 
 const Services = () => {
   return (
