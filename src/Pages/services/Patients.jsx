@@ -1,4 +1,4 @@
-import HealthTechTraining from "../../assets/Health Tech Training.jpg";
+import HealthTechTraining from "../../assets/HealthTechTraining.jpg";
 import patientsHomecareImg from "../../assets/PatientService.jpg";
 import PaymentsInsurance from "../../assets/PaymentsInsurance.png";
 import TelemedicinePatientsImg from "../../assets/Telehealth.jpg";
