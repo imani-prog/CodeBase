@@ -102,7 +102,7 @@ const AboutMediLink = () => {
             <div className="flex-1 flex items-stretch justify-center">
               <img src={Workers} alt="Workers" className="w-full h-full rounded-2xl shadow object-cover" style={{ minHeight: '100%', minWidth: '100%' }} />
             </div>
-            <div className="flex-1 rounded-2xl shadow border border-blue-100  p-6">
+            <div className="flex-1 rounded-2xl shadow border border-blue-300  p-6">
               <h2 className="text-2xl font-bold text-blue-700 mb-4">Our Broader Vision</h2>
               <p className="mb-4">At its heart, MediLink is more than software. We are a movement for health equity, built on the belief that no one should be left behind. We work closely with:</p>
               <ul className="list-disc ml-6 mb-4">
@@ -121,7 +121,7 @@ const AboutMediLink = () => {
           <blockquote className="border-l-4 pl-4 italic text-blue-800">“Healing Begins with Connection.”</blockquote>
         </section>
       </main>
-      
+
       <Footer />
     </div>
   );
