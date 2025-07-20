@@ -91,15 +91,15 @@ const Home = () => {
         </section>
 
       {/* Mission & Vision - Enhanced Cards */}
-      <section className="mb-16 w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="group bg-gradient-to-br from-blue-50 to-white rounded-3xl shadow-xl border border-blue-200 p-10 flex flex-col items-start hover:transform hover:scale-105 transition-all duration-300 relative overflow-hidden">
+      <section className="mb-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="mb-5 w-full text-left">
           <h2 className="text-3xl md:text-4xl font-bold text-blue-800 mb-6">Our Mission</h2>
           <p className="text-lg md:text-xl leading-relaxed">
             To revolutionize healthcare access in Africa by connecting communities, clinics, and caregivers through a smart digital platform that simplifies access to quality, affordable, and timely medical services.
           </p>
         </div>
         
-        <div className="group bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-xl border border-blue-200 p-10 flex flex-col items-start hover:transform hover:scale-105 transition-all duration-300 relative overflow-hidden">
+        <div className="mb-5 w-full text-left">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200 to-transparent rounded-full blur-2xl opacity-50"></div>
           <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-blue-800 mb-6">Our Vision</h2>
@@ -197,7 +197,7 @@ const Home = () => {
         {/* Two Column Section: Slogan & Swahili Tagline */}
         <section className="mb-0 w-full flex flex-col md:flex-row gap-8 items-stretch">
           {/* Left: Slogan & Inspirational Verse */}
-          <div className="flex-1 p-5 text-center relative overflow-hidden flex flex-col justify-center bg-gradient-to-br from-blue-50 to-white rounded-3xl shadow-xl border border-blue-200">
+          <div className="flex-1 p-2 text-center relative overflow-hidden flex flex-col justify-center bg-gradient-to-br from-blue-50 to-white rounded-3xl shadow-xl border border-blue-200">
             <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
             <div className="relative z-10">
               <div className="mb-8">
