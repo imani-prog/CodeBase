@@ -5,6 +5,12 @@ import Support from "./Pages/resources/Support.jsx";
 
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import './App.css';
+import Accessibility from "./Pages/Accessibility.jsx";
+import DataProtection from "./Pages/DataProtection.jsx";
+import GDPR from "./Pages/GDPR.jsx";
+import Newsletter from "./Pages/Newsletter.jsx";
+import Privacy from "./Pages/Privacy.jsx";
+import Terms from "./Pages/Terms.jsx";
 // import About from "./Pages/About.jsx";
 import AboutMediLink from "./Pages/about/AboutMediLink.jsx";
 import Mission from "./Pages/about/Mission.jsx";
@@ -31,7 +37,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* <Route path="/about" element={<About />} /> */}
+        {/* ...existing code... */}
         <Route path="/about/aboutmedilink" element={<AboutMediLink />} />
         <Route path="/about/story" element={<Story />} />
         <Route path="/about/team" element={<Team />} />
@@ -53,9 +59,14 @@ function App() {
         <Route path="/support" element={<Support />} />
         <Route path="/partners/join" element={<BecomePartner />} />
         <Route path="/partners/sponsors" element={<Sponsors />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/support" element={<Support />} />
         <Route path="/careers" element={<Careers />} />
+        {/* Footer legal/info pages */}
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/dataprotection" element={<DataProtection />} />
+        <Route path="/gdpr" element={<GDPR />} />
+        <Route path="/accessibility" element={<Accessibility />} />
+        <Route path="/newsletter" element={<Newsletter />} />
       </Routes>
     </Router>
   );
