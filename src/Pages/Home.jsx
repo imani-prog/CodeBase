@@ -4,6 +4,7 @@ import DocUsingMedilink from "../assets/DocUsingMedilink.jpg";
 import HomepageImg from "../assets/Homepage.png";
 import MediLinkLogo from "../assets/mediLink.png";
 import MedilinkHomePageSlider from "../assets/MedilinkHomePageSlider.jpeg";
+import EventGamified from "../Components/EventGamified.jsx";
 import Footer from "../Components/Footer.jsx";
 import LiveChatButton from "../Components/LiveChatButton.jsx";
 import Navbar from "../Components/Navbar.jsx";
@@ -23,72 +24,83 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [sliderImages.length]);
 
-  return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start font-sans bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      <LiveChatButton />
 
+  return (
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+      <LiveChatButton />
       {/* Navbar */}
       <Navbar />
 
+
       <main className="flex flex-col items-center w-full px-4 py-8 max-w-[1600px] mx-auto">
-        
-        {/* Hero Section: Image Slider with Overlayed Text */}
-        <section className="mb-16 w-full relative aspect-[16/9] rounded-3xl shadow-2xl border border-blue-200 overflow-hidden flex items-center justify-center">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-blue-400 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500 rounded-full blur-3xl"></div>
+        <section className="relative w-full aspect-[16/9] mb-16 rounded-3xl overflow-hidden shadow-2xl border border-blue-200 bg-blue-950 text-white">
+          {/* Background Blobs */}
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            <div className="absolute -top-16 -left-16 w-64 h-64 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+            <div className="absolute bottom-10 right-10 w-72 h-72 bg-blue-600 rounded-full blur-3xl opacity-30 animate-pulse"></div>
           </div>
 
           {/* Image Slider */}
-          <div className="absolute inset-0 w-full h-full">
+          <div className="absolute inset-0 z-0 transition-opacity duration-700">
             <img
               src={sliderImages[currentSlide]}
-              alt="MediLink Slide"
-              className="w-full h-full object-cover transition-all duration-700"
-              style={{ transition: "opacity 0.7s" }}
+              alt={`MediLink Slide ${currentSlide + 1}`}
+              className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent"></div>
           </div>
 
-          {/* Overlayed Text and Logo */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-8">
+          {/* Overlayed Content */}
+          <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
+            {/* Logo Glow */}
             <div className="relative mb-8">
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full blur-lg opacity-30"></div>
+              <div className="absolute -inset-4 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full blur-xl opacity-40"></div>
               <img
                 src={MediLinkLogo}
                 alt="MediLink Logo"
-                className="relative w-36 h-36 rounded-full shadow-2xl border-4 border-white bg-gradient-to-br from-blue-50 to-white"
+                className="relative w-32 h-32 md:w-40 md:h-40 rounded-full shadow-xl border-4 border-white bg-gradient-to-br from-blue-50 to-white"
               />
             </div>
-            <div className="text-center">
-              <h1 className="text-5xl md:text-7xl font-extrabold text-blue-50 mb-6 leading-tight drop-shadow-lg">
-                Karibu{" "}
-                <span className="bg-gradient-to-r from-blue-300 to-blue-500 bg-clip-text text-transparent">
-                  MediLink!
-                </span>
-              </h1>
-              <p className="text-2xl md:text-3xl font-medium text-blue-100 mb-8 leading-relaxed drop-shadow">
-                Healing Begins with Connection.
-              </p>
-              {/* Mini Stats */}
-              <div className="flex flex-wrap justify-center gap-6 mb-8">
-                <div className="bg-white/70 backdrop-blur rounded-xl px-4 py-2 shadow-lg border border-blue-200">
-                  <div className="text-lg font-bold text-blue-800">10K+</div>
-                  <div className="text-sm text-blue-600">Patients</div>
+
+            {/* Hero Title */}
+            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-xl">
+              Karibu{" "}
+              <span className="bg-gradient-to-r from-blue-200 to-blue-400 bg-clip-text text-transparent">
+                MediLink
+              </span>
+            </h1>
+
+            <p className="text-xl md:text-2xl font-medium text-blue-100 mb-6 max-w-2xl leading-relaxed drop-shadow">
+              Healing Begins with Connection.
+            </p>
+
+            {/* CTA Button (Optional) */}
+            <a
+              href="/register"
+              className="inline-block text-sm md:text-base px-6 py-3 rounded-full border border-white text-white hover:bg-white hover:text-blue-900 transition-all duration-300 font-semibold shadow-sm mb-8"
+            >
+              Get Started
+            </a>
+
+            {/* Stats */}
+            <div className="flex flex-wrap justify-center gap-6">
+              {[
+                { value: "10K+", label: "Patients" },
+                { value: "200+", label: "CHWs" },
+                { value: "50+", label: "Facilities" },
+              ].map(({ value, label }) => (
+                <div
+                  key={label}
+                  className="bg-white/70 backdrop-blur-xl border border-blue-200 rounded-xl px-5 py-3 shadow-lg w-28 text-center"
+                >
+                  <div className="text-lg font-bold text-blue-800">{value}</div>
+                  <div className="text-sm text-blue-700">{label}</div>
                 </div>
-                <div className="bg-white/70 backdrop-blur rounded-xl px-4 py-2 shadow-lg border border-blue-200">
-                  <div className="text-lg font-bold text-blue-800">200+</div>
-                  <div className="text-sm text-blue-600">CHWs</div>
-                </div>
-                <div className="bg-white/70 backdrop-blur rounded-xl px-4 py-2 shadow-lg border border-blue-200">
-                  <div className="text-lg font-bold text-blue-800">50+</div>
-                  <div className="text-sm text-blue-600">Facilities</div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
+
 
       {/* Mission & Vision - Enhanced Cards */}
       <section className="mb-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -195,18 +207,18 @@ const Home = () => {
         </section>
 
         {/* Two Column Section: Slogan & Swahili Tagline */}
-        <section className="mb-0 w-full flex flex-col md:flex-row gap-8 items-stretch">
+        <section className="mb-5 w-full flex flex-col md:flex-row gap-8 items-stretch">
           {/* Left: Slogan & Inspirational Verse */}
-          <div className="flex-1 p-2 text-center relative overflow-hidden flex flex-col justify-center bg-gradient-to-br from-blue-50 to-white rounded-3xl shadow-xl border border-blue-200">
+          <div className="flex-1 min-w-[280px] max-w-[400px] mx-auto text-center relative overflow-hidden flex flex-col justify-center bg-gradient-to-br  p-4 md:p-6 h-[320px] md:h-[340px]">
             <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
-            <div className="relative z-10">
-              <div className="mb-8">
-                <h3 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
+            <div className="relative z-10 flex flex-col justify-center h-full">
+              <div className="mb-4">
+                <h3 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">
                   "Health Within Reach."
                 </h3>
               </div>
-              <div className="backdrop-blur p-8 max-w-3xl mx-auto">
-                <blockquote className="italic text-xl md:text-2xl leading-relaxed">
+              <div className="backdrop-blur p-1 max-w-xs mx-auto pb-0">
+                <blockquote className="italic text-base md:text-lg leading-relaxed">
                   <span className="text-blue-800 font-semibold">Jeremiah 33:6 (NIV)</span>
                   <br />
                   <br />
@@ -216,26 +228,57 @@ const Home = () => {
             </div>
           </div>
 
+          {/* Divider with icon and message */}
+          <div className="hidden md:flex flex-col items-center justify-center mx-2 animate-fade-in" style={{animation: 'fadeIn 1s ease-in'}}>
+            <div className="w-[2px] h-32 bg-blue-200 mb-3 animate-pulse"></div>
+            <div className="flex flex-col items-center">
+              <span className="bg-blue-100 text-blue-700 rounded-full p-3 shadow mb-2 animate-bounce" style={{animation: 'bounce 2s infinite'}}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              </span>
+              <span className="text-blue-700 text-sm font-semibold text-center max-w-[120px] animate-fade-in" style={{animation: 'fadeIn 1.5s ease-in'}}>
+                Connecting Faith & Care
+              </span>
+            </div>
+          </div>
+          <style>
+            {`
+              @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+              }
+              @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+              }
+            `}
+          </style>
+
           {/* Right: Swahili tagline */}
-          <div className="flex-1 text-center flex flex-col justify-center bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-xl border border-blue-200 p-5">
-            <div className="relative z-10">
-              <div className="backdrop-blur p-4 max-w-2xl mx-auto">
-                <p className="text-blue-900 font-bold text-2xl md:text-3xl mb-4 leading-relaxed">
+          <div className="flex-1 min-w-[260px] max-w-[370px] mx-auto text-center flex flex-col justify-center bg-gradient-to-brp-3 md:p-4 h-[270px] md:h-[290px]">
+            <div className="relative z-10 flex flex-col justify-center h-full">
+              <div className="backdrop-blur p-1 max-w-xs mx-auto flex flex-col justify-center h-full">
+                <p className="text-blue-900 font-bold text-lg md:text-xl mb-1 leading-relaxed">
                   Services Close to the People
                 </p>
-                <p className="font-bold text-xl md:text-2xl leading-relaxed mb-4">
+                <p className="font-bold text-base md:text-lg leading-relaxed mb-1">
                   Healthcare for Everyone
                 </p>
-                <p className="text-lg md:text-xl leading-relaxed mb-2">
-                  We take pride in providing quality healthcare services that reach every individual without discrimination. Our digital platform brings together communities, health workers, and health facilities to ensure everyone receives treatment easily and quickly.
+                <p className="text-sm md:text-base leading-relaxed mb-1">
+                  We provide quality healthcare for all, connecting communities, health workers, and facilities so everyone gets care quickly and easily.
                 </p>
-                <p className="text-lg md:text-xl leading-relaxed">
-                  Join us on the journey to improve the lives and health of all Kenyans. Health is a fundamental right, and we are here to make sure it is accessible to everyone.
+                <p className="text-sm md:text-base leading-relaxed">
+                  Health is a right. We help make it accessible to every Kenyan.
                 </p>
               </div>
             </div>
           </div>
         </section>
+
+
+      <EventGamified />
+
       </main>
 
       <Footer />

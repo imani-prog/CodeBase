@@ -66,12 +66,19 @@ const Navbar = () => {
     <Link
       to="/"
       className="text-2xl font-bold text-blue-900 hover:text-blue-700 tracking-tight"
+      aria-label="Go to homepage"
     >
       MediLink
     </Link>
 
     {/* Desktop Menu */}
     <div className="hidden md:flex items-center gap-6 text-[15px]">
+      <Link
+        to="/"
+        className="font-semibold hover:text-blue-700 px-2 py-1 rounded transition duration-200"
+      >
+        Home
+      </Link>
       {menuGroups.map((group) => (
         <DropdownMenu key={group.title} title={group.title} items={group.items} />
       ))}
@@ -80,13 +87,13 @@ const Navbar = () => {
     {/* Auth Buttons */}
     <div className="hidden md:flex gap-2 items-center">
       <Link
-        to=""
+        to="/login"
         className="px-3 py-1 text-blue-800 text-sm font-medium rounded transition duration-200 hover:border hover:border-blue-500 hover:text-blue-900"
       >
         Login
       </Link>
       <Link
-        to=""
+        to="/register"
         className="px-3 py-1 text-blue-800 text-sm font-medium rounded transition duration-200 hover:border hover:border-blue-500 hover:text-blue-900"
       >
         Register
@@ -114,7 +121,7 @@ const Navbar = () => {
   {mobileOpen && (
     <div className="fixed inset-0 bg-blue-50 z-50 flex flex-col">
       <div className="flex justify-between items-center px-6 py-4 border-b border-blue-200">
-        <Link to="/" className="text-2xl font-bold text-blue-900">MediLink</Link>
+        <Link to="/" className="text-2xl font-bold text-blue-900" aria-label="Go to homepage">MediLink</Link>
         <button onClick={() => setMobileOpen(false)} aria-label="Close menu">
           <svg
             className="w-7 h-7 text-blue-900"
@@ -139,13 +146,13 @@ const Navbar = () => {
         ))}
         <div className="flex gap-4 mt-8">
           <Link
-            to=""
+            to="/login"
             className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
           >
             Login
           </Link>
           <Link
-            to=""
+            to="/register"
             className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
           >
             Register
