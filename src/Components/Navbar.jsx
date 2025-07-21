@@ -87,13 +87,13 @@ const Navbar = () => {
     {/* Auth Buttons */}
     <div className="hidden md:flex gap-2 items-center">
       <Link
-        to="/login"
+        to=""
         className="px-3 py-1 text-blue-800 text-sm font-medium rounded transition duration-200 hover:border hover:border-blue-500 hover:text-blue-900"
       >
         Login
       </Link>
       <Link
-        to="/register"
+        to=""
         className="px-3 py-1 text-blue-800 text-sm font-medium rounded transition duration-200 hover:border hover:border-blue-500 hover:text-blue-900"
       >
         Register
@@ -146,13 +146,13 @@ const Navbar = () => {
         ))}
         <div className="flex gap-4 mt-8">
           <Link
-            to="/login"
+            to=""
             className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
           >
             Login
           </Link>
           <Link
-            to="/register"
+            to=""
             className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
           >
             Register
