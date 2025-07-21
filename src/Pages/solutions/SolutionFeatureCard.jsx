@@ -1,4 +1,3 @@
-// Reusable feature card for Solutions pages
 
 const SolutionFeatureCard = ({ icon, title, description }) => (
   <div className="bg-white/80 rounded-2xl shadow-lg border border-blue-200 p-6 flex flex-col items-center text-center space-y-3">

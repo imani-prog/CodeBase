@@ -4,12 +4,12 @@ import SolutionFeatureCard from "./SolutionFeatureCard.jsx";
 import SolutionTestimonial from "./SolutionTestimonial.jsx";
 
 const features = [
-  { icon: "📋", title: "Assigned Patient Requests", description: "View and manage patient requests easily." },
-  { icon: "📍", title: "Live GPS Tracking", description: "Push your live location during visits." },
-  { icon: "🚗", title: "Mileage & Visit Logging", description: "Log mileage, visits, and service status." },
-  { icon: "🎓", title: "E-learning & Certification", description: "Access e-learning modules and track certification." },
-  { icon: "🔎", title: "QR Scanner Access", description: "Scan patient QR codes for fast record access." },
-  { icon: "📈", title: "Performance & Salary Reports", description: "Auto-generated performance and salary reports." },
+  { icon: "", title: "Assigned Patient Requests", description: "View and manage patient requests easily." },
+  { icon: "", title: "Live GPS Tracking", description: "Push your live location during visits." },
+  { icon: "", title: "Mileage & Visit Logging", description: "Log mileage, visits, and service status." },
+  { icon: "", title: "E-learning & Certification", description: "Access e-learning modules and track certification." },
+  { icon: "", title: "QR Scanner Access", description: "Scan patient QR codes for fast record access." },
+  { icon: "", title: "Performance & Salary Reports", description: "Auto-generated performance and salary reports." },
 ];
 
 const CHWs = () => (
