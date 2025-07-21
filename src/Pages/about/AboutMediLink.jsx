@@ -2,11 +2,12 @@ import Footer from "../../Components/Footer.jsx";
 import Navbar from "../../Components/Navbar.jsx";
 import MedilinkHomePageSlider from "../../assets/MedilinkHomePageSlider.jpeg";
 import Workers from "../../assets/Workers.jpg";
-;
+import LiveChatButton from "../../Components/LiveChatButton.jsx";
 
 const AboutMediLink = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+      <LiveChatButton />
       <Navbar />
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="w-full flex flex-col items-center mb-8">

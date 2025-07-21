@@ -4,9 +4,13 @@ import PatientReferals from "../../assets/PatientReferals.jpg";
 import Footer from "../../Components/Footer.jsx";
 import Navbar from "../../Components/Navbar.jsx";
 import PatientReferralSlider from "../../Components/PatientReferralSlider.jsx";
+import LiveChatButton from "../../Components/LiveChatButton.jsx";
+
+
 const Clinics = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+      <LiveChatButton />
       <Navbar />
       <main className="flex flex-col w-full px-4 py-10 max-w-[1200px] mx-auto">
         {/* Hero Section */}

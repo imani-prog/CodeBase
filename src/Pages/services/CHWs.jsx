@@ -4,10 +4,12 @@ import Navbar from "../../Components/Navbar.jsx";
 import CommunityTogetherness from "../../assets/CommunityTogetherness.jpg";
 import CommunityWorkerOutreach from "../../assets/CommunityWorkerOutreach.jpeg";
 import WorkersTogetherness from "../../assets/WorkersTogetherness3.jpeg";
+import LiveChatButton from "../../Components/LiveChatButton.jsx";
 
 const CHWs = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+      <LiveChatButton />
       <Navbar />
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="mb-5 w-full p-2 flex flex-col items-center">

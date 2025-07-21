@@ -4,10 +4,12 @@ import PaymentsInsurance from "../../assets/PaymentsInsurance.png";
 import TelemedicinePatientsImg from "../../assets/Telehealth.jpg";
 import Footer from "../../Components/Footer.jsx";
 import Navbar from "../../Components/Navbar.jsx";
+import LiveChatButton from "../../Components/LiveChatButton.jsx";
 
 const Patients = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+      <LiveChatButton />
       <Navbar />
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="mb-10 w-full items-center">
