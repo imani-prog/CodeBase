@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import SolutionTestimonial from "../Pages/solutions/SolutionTestimonial.jsx";
 import PeterImg from "../assets/Brian Wekesa.jpeg";
@@ -116,8 +117,8 @@ function TestimonialsCarousel() {
           &#60;
         </button>
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-5xl overflow-hidden">
-          {testimonials.slice(index, index + 2).map((t) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl overflow-hidden">
+          {testimonials.slice(index, index + 2).map((t, i) => (
             <SolutionTestimonial
               key={t.name + t.location}
               quote={t.quote}
@@ -125,7 +126,7 @@ function TestimonialsCarousel() {
               role={t.role}
               location={t.location}
               avatar={t.avatar}
-              className="p-10 min-h-[340px] min-w-[400px] text-lg"
+              className="p-4 md:p-10 min-h-[320px] w-full md:min-w-[400px] text-base md:text-lg"
             />
           ))}
         </div>

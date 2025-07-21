@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const PatientsReview = () => {
   const [reviews, setReviews] = useState([
@@ -9,7 +9,8 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "2 days ago",
       category: "Booking Experience",
-      categoryColor: "blue"
+      categoryColor: "blue",
+      likes: 20
     },
     {
       id: 2,
@@ -18,7 +19,8 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "1 week ago",
       category: "Lab Services",
-      categoryColor: "green"
+      categoryColor: "green",
+      likes: 12
     },
     {
       id: 3,
@@ -27,7 +29,8 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "3 days ago",
       category: "Home Visits",
-      categoryColor: "purple"
+      categoryColor: "purple",
+      likes: 8
     },
     {
       id: 4,
@@ -36,7 +39,8 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "5 days ago",
       category: "Telemedicine",
-      categoryColor: "indigo"
+      categoryColor: "indigo",
+      likes: 15
     },
     {
       id: 5,
@@ -45,16 +49,18 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "1 day ago",
       category: "App Features",
-      categoryColor: "orange"
+      categoryColor: "orange",
+      likes: 10
     },
     {
-        id: 6,
-        name: "John D.",
-        comment: "The app is user-friendly and the support team is very responsive.",
-        rating: 5,
-        timeAgo: "2 days ago",
-        category: "App Features",
-        categoryColor: "orange"
+      id: 6,
+      name: "John D.",
+      comment: "The app is user-friendly and the support team is very responsive.",
+      rating: 5,
+      timeAgo: "2 days ago",
+      category: "App Features",
+      categoryColor: "orange",
+      likes: 5
     }
   ]);
 
@@ -91,16 +97,18 @@ const PatientsReview = () => {
         rating: formData.rating,
         timeAgo: "Just now",
         category: "New Review",
-        categoryColor: "green"
+        categoryColor: "green",
+        likes: 0
       };
-      
       setReviews(prev => [newReview, ...prev]);
       setFormData({ name: '', comment: '', rating: 5 });
-      
-      // Show success notification
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 3000);
     }
+  };
+
+  const handleLike = (id) => {
+    setReviews(prev => prev.map(r => r.id === id ? { ...r, likes: r.likes + 1 } : r));
   };
 
   const renderStars = (rating, interactive = false, onStarClick = null) => {
@@ -122,7 +130,7 @@ const PatientsReview = () => {
   const getRandomGradient = (index) => gradientColors[index % gradientColors.length];
 
   return (
-    <section className="mb-12">
+    <section className="mb-12 px-2 md:px-6">
       {/* Success Notification */}
       {showNotification && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg z-50 transform transition-transform duration-300">
@@ -154,97 +162,119 @@ const PatientsReview = () => {
       
       {/* Reviews Grid */}
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
           {reviews.map((review, index) => (
             <div 
               key={review.id} 
-              className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[220px] flex flex-col justify-between"
+              style={{ minWidth: '260px', maxWidth: '340px' }}
             >
-              <div className="flex items-center mb-4">
-                <div className={`w-12 h-12 bg-gradient-to-r ${getRandomGradient(index)} rounded-full flex items-center justify-center text-white font-bold text-lg`}>
+              <div className="flex items-center mb-2">
+                <div className={`w-10 h-10 bg-gradient-to-r ${getRandomGradient(index)} rounded-full flex items-center justify-center text-white font-bold text-base`}>
                   {getInitial(review.name)}
                 </div>
-                <div className="ml-4">
-                  <h4 className="font-semibold text-gray-800">{review.name}</h4>
+                <div className="ml-3">
+                  <h4 className="font-semibold text-gray-800 text-base">{review.name}</h4>
                   <div className="flex items-center space-x-1">
                     <div className="flex space-x-1">
                       {renderStars(review.rating)}
                     </div>
-                    <span className="text-gray-500 text-sm">{review.rating}.0</span>
+                    <span className="text-gray-500 text-xs">{review.rating}.0</span>
                   </div>
                 </div>
-                <div className="ml-auto text-gray-400 text-sm">{review.timeAgo}</div>
+                <div className="ml-auto text-gray-400 text-xs">{review.timeAgo}</div>
               </div>
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-gray-700 leading-relaxed mb-2 text-sm">
                 "{review.comment}"
               </p>
-              <div className="flex items-center text-sm">
+              <div className="flex items-center text-xs mb-2">
                 <span className={`px-2 py-1 rounded-full ${categoryColors[review.categoryColor] || categoryColors.green}`}>
                   {review.category}
                 </span>
+              </div>
+              <div className="flex items-center justify-between mt-2">
+                <button
+                  className={`flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors text-sm px-2 py-1 rounded-full border border-gray-200 bg-gray-50`}
+                  onClick={() => handleLike(review.id)}
+                  aria-label="Like review"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 122.88 113.41">
+                    <path fill="#065fd4" d="M4.29,47.64h19.3A4.31,4.31,0,0,1,27.88,52V109.1a4.31,4.31,0,0,1-4.29,4.31H4.29A4.31,4.31,0,0,1,0,109.1V52a4.31,4.31,0,0,1,4.29-4.31ZM59,4.77c2.27-11.48,21.07-.91,22.31,17.6A79.82,79.82,0,0,1,79.68,42h26.87c11.17.44,20.92,8.44,14,21.58,1.57,5.72,1.81,12.44-2.45,15.09.53,9-2,14.64-6.65,19.06-.31,4.52-1.27,8.53-3.45,11.62-3.61,5.09-6.54,3.88-12.22,3.88H50.45c-7.19,0-11.11-2-15.81-7.88V54.81C48.16,51.16,55.35,32.66,59,20.51V4.77Z"/>
+                  </svg>
+                  <span>{review.likes}</span>
+                </button>
+                <span className="text-gray-400 text-xs">{review.likes} people found this helpful</span>
               </div>
             </div>
           ))}
         </div>
       </div>
       
-      {/* Add Review Form */}
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-purple-700 rounded-3xl p-8 text-white relative overflow-hidden">
-          {/* Background decorative elements */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="w-32 h-32 bg-white rounded-full -top-8 -right-8 absolute"></div>
-            <div className="w-24 h-24 bg-white rounded-full top-20 -left-4 absolute"></div>
-          </div>
-          
-          <div className="relative z-10">
-            <div className="text-center mb-8">
-              <h4 className="text-2xl font-bold mb-2">Share Your Experience</h4>
-              <p className="text-blue-100">Help others by sharing your experience with MediLink</p>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-blue-100">Your Name</div>
-                  <input 
-                    type="text" 
-                    placeholder="Enter your name" 
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-300" 
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-blue-100">Rating</div>
-                  <div className="flex space-x-1">
-                    {renderStars(formData.rating, true, (rating) => 
-                      setFormData(prev => ({ ...prev, rating }))
-                    )}
+      {/* Add Review Form & Video */}
+      <div className="max-w-4xl mx-auto w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+          {/* Review Form */}
+          <div className="w-full">
+            <div className="bg-blue-50 rounded-2xl p-6 shadow-md">
+              <div className="text-left mb-6">
+                <h4 className="text-xl font-bold mb-1 text-gray-800">Share Your Experience</h4>
+                <p className="text-gray-500">Help others by sharing your experience with MediLink</p>
+              </div>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium text-gray-700">Your Name</div>
+                    <input 
+                      type="text" 
+                      placeholder="Enter your name" 
+                      value={formData.name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium text-gray-700">Rating</div>
+                    <div className="flex space-x-1">
+                      {renderStars(formData.rating, true, (rating) => 
+                        setFormData(prev => ({ ...prev, rating }))
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium text-gray-700">Your Review</div>
+                    <textarea 
+                      placeholder="Tell us about your experience..." 
+                      rows="4"
+                      value={formData.comment}
+                      onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300 resize-none" 
+                    />
+                  </div>
+                  <div className="text-left">
+                    <button 
+                      onClick={handleSubmit} 
+                      className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-all duration-300 shadow"
+                    >
+                      Submit Review
+                    </button>
                   </div>
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <div className="text-sm font-medium text-blue-100">Your Review</div>
-                <textarea 
-                  placeholder="Tell us about your experience..." 
-                  rows="4"
-                  value={formData.comment}
-                  onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-300 resize-none" 
-                />
-              </div>
-              
-              <div className="text-center">
-                <button 
-                  onClick={handleSubmit} 
-                  className="bg-white text-purple-600 px-8 py-3 rounded-xl font-bold hover:bg-blue-50 transform hover:scale-105 transition-all duration-300 shadow-lg"
-                >
-                  Submit Review
-                </button>
-              </div>
+            </div>
+          </div>
+          {/* YouTube Video */}
+          <div className="w-full flex justify-center md:justify-end">
+            <div className="w-full md:w-[520px] h-[320px] md:h-[440px] rounded-2xl overflow-hidden shadow-md bg-black">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/cM4aep7VXb8?start=5"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ minHeight: '320px', borderRadius: '1rem' }}
+              ></iframe>
             </div>
           </div>
         </div>
