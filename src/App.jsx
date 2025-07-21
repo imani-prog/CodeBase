@@ -37,7 +37,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* ...existing code... */}
         <Route path="/about/aboutmedilink" element={<AboutMediLink />} />
         <Route path="/about/story" element={<Story />} />
         <Route path="/about/team" element={<Team />} />
