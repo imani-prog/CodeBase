@@ -92,6 +92,27 @@ const testimonials = [
     location: "Thika",
     avatar: GraceImg,
   },
+  {
+    quote: "I appreciate the follow-up care I received after my treatment. The nurses were always available to answer my questions and provide support. MediLink truly cares about its patients.",
+    name: "Samuel",
+    role: "Patient",
+    location: "Kisii",
+    avatar: SamuelImg,
+  },
+  {
+    quote: "MediLink has made healthcare so much more accessible for me. I can consult with doctors from the comfort of my home, and the service is always reliable.",
+    name: "Amina",
+    role: "Patient",
+    location: "Nairobi",
+    avatar: AminaImg,
+  },
+  {
+    quote: "As a new mother, I found MediLink invaluable for postnatal care. I could easily book home visits, get advice on breastfeeding, and monitor my baby's health. The nurses were supportive and knowledgeable, making my transition into motherhood much smoother.",
+    name: "Faith",
+    role: "Patient",
+    location: "Thika",
+    avatar: GraceImg,
+  },
 ];
 
 function TestimonialsCarousel() {

@@ -26,10 +26,6 @@ function Patients() {
         </section>
 
         <PatientsReview />
-
-        <div className="flex justify-center mt-10">
-          <a href="/register" className="bg-blue-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-blue-700 font-bold text-lg">Register as a Patient</a>
-        </div>
       </main>
       <Footer />
     </div>

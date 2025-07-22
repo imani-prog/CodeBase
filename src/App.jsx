@@ -19,7 +19,7 @@ import Team from "./Pages/about/Team.jsx";
 import Careers from "./Pages/Careers.jsx";
 import Contact from "./Pages/Contact.jsx";
 import Donate from "./Pages/Donate.jsx";
-import FAQs from "./Pages/FAQs.jsx";
+import FrequentQuestions from "./Pages/FrequentQuestions.jsx";
 import Home from "./Pages/Home.jsx";
 import Partners from "./Pages/Partners.jsx";
 import Services from "./Pages/Services.jsx";
@@ -44,7 +44,7 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/testimonials" element={<Testimonials />} />
         <Route path="/partners" element={<Partners />} />
-        <Route path="/faqs" element={<FAQs />} />
+        <Route path="/frequent-questions" element={<FrequentQuestions />} />
         <Route path="/tech" element={<Tech />} />
         <Route path="/donate" element={<Donate />} />
         <Route path="/contact" element={<Contact />} />

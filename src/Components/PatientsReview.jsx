@@ -71,6 +71,7 @@ const PatientsReview = () => {
   });
   
   const [showNotification, setShowNotification] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const gradientColors = [
     'from-blue-500 to-purple-600',
@@ -103,6 +104,7 @@ const PatientsReview = () => {
       setReviews(prev => [newReview, ...prev]);
       setFormData({ name: '', comment: '', rating: 5 });
       setShowNotification(true);
+      setShowForm(false);
       setTimeout(() => setShowNotification(false), 3000);
     }
   };
@@ -130,7 +132,7 @@ const PatientsReview = () => {
   const getRandomGradient = (index) => gradientColors[index % gradientColors.length];
 
   return (
-    <section className="mb-12 px-2 md:px-6">
+    <section className="mb-0 px-2 md:px-6">
       {/* Success Notification */}
       {showNotification && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg z-50 transform transition-transform duration-300">
@@ -210,71 +212,108 @@ const PatientsReview = () => {
         </div>
       </div>
       
-      {/* Add Review Form & Video */}
+      {/*Review Button & Conditional*/}
       <div className="max-w-4xl mx-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-          {/* Review Form */}
-          <div className="w-full">
-            <div className="bg-blue-50 rounded-2xl p-6 shadow-md">
-              <div className="text-left mb-6">
-                <h4 className="text-xl font-bold mb-1 text-gray-800">Share Your Experience</h4>
-                <p className="text-gray-500">Help others by sharing your experience with MediLink</p>
-              </div>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-700">Your Name</div>
-                    <input 
-                      type="text" 
-                      placeholder="Enter your name" 
-                      value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300" 
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-700">Rating</div>
-                    <div className="flex space-x-1">
-                      {renderStars(formData.rating, true, (rating) => 
-                        setFormData(prev => ({ ...prev, rating }))
-                      )}
+        <div className="flex flex-col items-center justify-center">
+          <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4 mb-8">
+            {!showForm && (
+              <button
+                onClick={() => setShowForm(true)}
+                className="text-blue-700 border border-blue-300 px-4 py-2 rounded-lg font-bold text-base hover:bg-blue-100 hover:text-blue-900 transition-all duration-200"
+              >
+                Share Your Experience
+              </button>
+            )}
+            <button
+              className="text-blue-700 border border-blue-300 px-4 py-2 rounded-lg font-bold text-base hover:bg-blue-100 hover:text-blue-900 transition-all duration-200"
+              onClick={() => window.location.href = '/register-patient'}
+            >
+              Register as a Patient
+            </button>
+            {/* Extra Feature: Quick Links */}
+            <div className="hidden md:flex flex-col gap-2">
+              <a href="/frequent-questions" className="text-blue-700 font-semibold hover:underline">FAQs</a>
+              <a href="/contact" className="text-blue-700 font-semibold hover:underline">Contact Support</a>
+              <a href="/services/patients" className="text-blue-700 font-semibold hover:underline">Patient Services</a>
+            </div>
+          </div>
+          {showForm && (
+            <div className="relative w-full max-w-lg mb-8">
+              <div className="bg-blue-50 rounded-2xl p-6 shadow-md">
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="absolute top-2 right-2 text-gray-400 hover:text-blue-600 text-xl font-bold focus:outline-none"
+                  aria-label="Close form"
+                >
+                  ×
+                </button>
+                <div className="text-left mb-6">
+                  <h4 className="text-xl font-bold mb-1 text-gray-800">Share Your Experience</h4>
+                  <p className="text-gray-500">Help others by sharing your experience with MediLink</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-gray-700">Your Name</div>
+                      <input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={formData.name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300"
+                      />
                     </div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-700">Your Review</div>
-                    <textarea 
-                      placeholder="Tell us about your experience..." 
-                      rows="4"
-                      value={formData.comment}
-                      onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300 resize-none" 
-                    />
-                  </div>
-                  <div className="text-left">
-                    <button 
-                      onClick={handleSubmit} 
-                      className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-all duration-300 shadow"
-                    >
-                      Submit Review
-                    </button>
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-gray-700">Rating</div>
+                      <div className="flex space-x-1">
+                        {renderStars(formData.rating, true, (rating) =>
+                          setFormData(prev => ({ ...prev, rating }))
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-gray-700">Your Review</div>
+                      <textarea
+                        placeholder="Tell us about your experience..."
+                        rows="4"
+                        value={formData.comment}
+                        onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300 resize-none"
+                      />
+                    </div>
+                    <div className="text-left">
+                      <button
+                        onClick={handleSubmit}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-all duration-300 shadow"
+                      >
+                        Submit Review
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          {/* YouTube Video */}
-          <div className="w-full flex justify-center md:justify-end">
-            <div className="w-full md:w-[520px] h-[320px] md:h-[440px] rounded-2xl overflow-hidden shadow-md bg-black">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/cM4aep7VXb8?start=5"
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                style={{ minHeight: '320px', borderRadius: '1rem' }}
-              ></iframe>
+          )}
+          {/*Info Card for Patients */}
+          <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6 ">
+            <div className="p-6 flex-1 max-w-md">
+              <h5 className="text-lg font-bold text-blue-800 mb-2">Why Join MediLink?</h5>
+              <ul className="list-disc list-inside text-gray-700 text-base mb-2">
+                <li>Access affordable healthcare from anywhere</li>
+                <li>Book appointments and get reminders easily</li>
+                <li>Connect with doctors and specialists online</li>
+                <li>Track your health records securely</li>
+              </ul>
+              <p className="text-blue-600 italic">"Empowering patients for a healthier tomorrow."</p>
+            </div>
+            <div className="p-6 flex-1 max-w-md">
+              <h5 className="text-lg font-bold text-blue-800 mb-2">Need Help?</h5>
+              <ul className="list-disc list-inside text-gray-700 text-base mb-2">
+                <li>Visit our <a href="/frequent-questions" className="text-blue-700 hover:underline">FAQ</a> page</li>
+                <li>Contact our support team for assistance</li>
+                <li>Explore patient resources and guides</li>
+              </ul>
+              <p className="text-blue-600 italic">"We're here for you every step of the way."</p>
             </div>
           </div>
         </div>
