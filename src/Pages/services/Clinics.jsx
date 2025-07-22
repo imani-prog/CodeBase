@@ -5,6 +5,9 @@ import Footer from "../../Components/Footer.jsx";
 import Navbar from "../../Components/Navbar.jsx";
 import PatientReferralSlider from "../../Components/PatientReferralSlider.jsx";
 import LiveChatButton from "../../Components/LiveChatButton.jsx";
+import FinancialService from "../../Components/FinancialService.jsx";
+import React from "react";
+
 
 
 const Clinics = () => {
@@ -78,43 +81,7 @@ const Clinics = () => {
           >
             <PatientReferralSlider />
           </div>
-
-
-          {/* Financial Systems */}
-          <div className="mb-10 w-full p-10 flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-blue-800 mb-2">💳 Financial & Insurance Integration</h2>
-            <ul className="list-disc list-inside text-blue-700 ml-4 mb-2">
-              <li>NHIF, SHA, and private insurance claims</li>
-              <li>M-Pesa STK Push, card & mobile wallet support</li>
-              <li>Automated receipts, claims, and reports</li>
-            </ul>
-            <p className="italic text-blue-600 mt-2">"Simplify billing while ensuring accountability."</p>
-          </div>
-
-          {/* Ambulance + CHW Dispatch */}
-          <div className="mb-10 w-full p-10 flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-blue-800 mb-2">🚑 Ambulance & CHW Dispatch Tools</h2>
-            <ul className="list-disc list-inside text-blue-700 ml-4 mb-2">
-              <li>Geo-locate & dispatch CHWs to home visits</li>
-              <li>Coordinate emergency ambulances digitally</li>
-              <li>Log outreach, collect patient feedback</li>
-            </ul>
-            <p className="italic text-blue-600 mt-2">"Rapid response and field coordination built in."</p>
-          </div>
-
-         
-
-          {/* Staff Training + E-Learning */}
-          <div className="mb-10 w-full p-10 flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-blue-800 mb-2">📚 Staff Training & Health Education</h2>
-            <ul className="list-disc list-inside text-blue-700 ml-4 mb-2">
-              <li>E-learning portal for CHWs & clinicians</li>
-              <li>Onboarding modules & system walkthroughs</li>
-              <li>Patient education handouts & tips</li>
-            </ul>
-            <p className="italic text-blue-600 mt-2">"Build skills. Improve care delivery."</p>
-          </div>
-        
+          <FinancialService />
 
         {/* Call to Action */}
         <section className="mt-12 w-full bg-blue-100 rounded-2xl shadow-lg border border-blue-200 p-8 text-center">
