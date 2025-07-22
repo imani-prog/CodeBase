@@ -8,7 +8,7 @@ const SolutionTestimonial = ({ quote, name, role, location, avatar }) => (
         <span className="text-3xl"></span>
       )}
     </div>
-    <blockquote className="italic mb-2">"{quote}"</blockquote>
+    <blockquote className="italic mb-2 text-xl md:text-2xl">"{quote}"</blockquote>
     <div className="font-bold text-blue-800">{name}</div>
     <div className="text-bold text-sm">{role}, {location}</div>
   </div>
