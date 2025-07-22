@@ -6,6 +6,7 @@ import Navbar from "../../Components/Navbar.jsx";
 import PatientReferralSlider from "../../Components/PatientReferralSlider.jsx";
 import LiveChatButton from "../../Components/LiveChatButton.jsx";
 import FinancialService from "../../Components/FinancialService.jsx";
+import ClinicCallToAction from "../../Components/ClinicCallToAction.jsx";
 import React from "react";
 
 
@@ -82,20 +83,8 @@ const Clinics = () => {
             <PatientReferralSlider />
           </div>
           <FinancialService />
+          <ClinicCallToAction />
 
-        {/* Call to Action */}
-        <section className="mt-12 w-full bg-blue-100 rounded-2xl shadow-lg border border-blue-200 p-8 text-center">
-          <h2 className="text-2xl font-bold text-blue-800 mb-4">🚀 Ready to Digitize Your Facility?</h2>
-          <p className="text-lg text-blue-700 mb-4 max-w-3xl mx-auto">
-            MediLink is your partner in digital transformation. Whether you're a private clinic, rural health center, or major hospital — our platform scales with you.
-          </p>
-          <a
-            href="/contact"
-            className="inline-block px-6 py-3 bg-blue-800 text-white font-semibold rounded-full shadow-md hover:bg-blue-900 transition"
-          >
-            Contact Us Today
-          </a>
-        </section>
       </main>
       <Footer />
     </div>
