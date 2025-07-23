@@ -1,7 +1,7 @@
 import Footer from "../Components/Footer.jsx";
 import Navbar from "../Components/Navbar.jsx";
 import KenyattaLogo from "../assets/Kenyatta hospital.jpeg";
-import MamaLucyLogo from "../assets/Mama Lucy Kibaki Hospital.jpg";
+import MamaLucyLogo from "../assets/Lucy.jpg";
 import MinistryLogo from "../assets/MinistryOfHealth.png";
 import RedcrossLogo from "../assets/kenya-red-cross-seeklogo.png";
 import NHIFLogo from "../assets/nhif-seeklogo.png";
