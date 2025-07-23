@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 
 
-import AvenueImg from "../../assets/AvenueHealthcare.jpg";
-import BlissImg from "../../assets/BlissMedical.png";
-import KenyattaImg from "../../assets/KenyattaHospital.png";
-import MamaLucyImg from "../../assets/MamaLucy.png";
+import AvenueImg from "../../assets/Avenue.png";
+import BlissImg from "../../assets/BlissHealthCare.png";
+import KenyattaImg from "../../assets/Kenyatta hospital.jpeg";
+import MamaLucyImg from "../../assets/Mama Lucy Kibaki Hospital.jpg";
 import MOHImg from "../../assets/MinistryOfHealth.png";
 import StMarysImg from "../../assets/StMarys.png";
+
+import SolutionTestimonial from "../../Pages/solutions/SolutionTestimonial.jsx";
 
 const hospitalTestimonials = [
   {

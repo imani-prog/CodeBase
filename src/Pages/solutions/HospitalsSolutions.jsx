@@ -8,7 +8,7 @@ import ambulanceImg from "../../assets/MedilinkAmbulance.png";
 import dashboardImg from "../../assets/AdminDashboard1.jpg";
 import appointmentsImg from "../../assets/PatientReferals.jpg";
 import nhifImg from "../../assets/PaymentsInsurance.png";
-import HospitalCarousel from "../../Components/HospitalCarousel.jsx";
+// import HospitalCarousel from "../../Components/HospitalCarousel.jsx";
 
 const features = [
   {
@@ -127,7 +127,7 @@ const Hospitals = () => (
           </div>
         ))}
       </div>
-      <HospitalCarousel />
+      {/* <HospitalCarousel /> */}
 
       {/* <SolutionTestimonial 
         quote="Our bookings are faster, our claims are smoother, and our staff love the new system."
