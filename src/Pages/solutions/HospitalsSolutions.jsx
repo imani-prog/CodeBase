@@ -8,7 +8,8 @@ import ambulanceImg from "../../assets/MedilinkAmbulance.png";
 import dashboardImg from "../../assets/AdminDashboard1.jpg";
 import appointmentsImg from "../../assets/PatientReferals.jpg";
 import nhifImg from "../../assets/PaymentsInsurance.png";
-// import HospitalCarousel from "../../Components/HospitalCarousel.jsx";
+import HospitalStyle from "../../Components/HospitalStyle.jsx";
+
 
 const features = [
   {
@@ -127,15 +128,7 @@ const Hospitals = () => (
           </div>
         ))}
       </div>
-      {/* <HospitalCarousel /> */}
-
-      {/* <SolutionTestimonial 
-        quote="Our bookings are faster, our claims are smoother, and our staff love the new system."
-        name="Dr. Mutua"
-        role="Clinic Owner"
-        location="Nairobi"
-        avatar={null}
-      /> */}
+      <HospitalStyle />
 
       <div className="flex justify-center mt-10">
         <a href="/demo" className="bg-blue-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-blue-700 font-bold text-lg">
