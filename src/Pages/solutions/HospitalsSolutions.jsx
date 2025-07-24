@@ -130,11 +130,58 @@ const Hospitals = () => (
       </div>
       <HospitalStyle />
 
-      <div className="flex justify-center mt-10">
-        <a href="/demo" className="bg-blue-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-blue-700 font-bold text-lg">
-          Request a Demo
-        </a>
-      </div>
+      <div className="w-full flex flex-col items-center justify-center mt-12 mb-0">
+          {/* Buttons and Quick Links Row */}
+          <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
+            <div className="flex gap-4">
+              <a
+                href=""
+                className="text-blue-700 border border-blue-300 px-6 py-2 rounded-xl font-bold text-base hover:bg-blue-100 hover:text-blue-900 transition-all duration-200 shadow-sm"
+              >
+                Share Hospital Feedback
+              </a>
+              <a
+                href=""
+                className="text-blue-700 border border-blue-300 px-6 py-2 rounded-xl font-bold text-base hover:bg-blue-100 hover:text-blue-900 transition-all duration-200 shadow-sm"
+              >
+                Become a Partner Facility
+              </a>
+            </div>
+            <div className="hidden md:flex flex-col gap-2 ml-8">
+              <a href="/" className="text-blue-700 font-semibold hover:underline">FAQs</a>
+              <a href="/contact" className="text-blue-700 font-semibold hover:underline">Contact Support</a>
+              <a href="/services/hospitals" className="text-blue-700 font-semibold hover:underline">Hospital Services</a>
+            </div>
+          </div>
+
+          {/* Info Cards Row */}
+          <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6">
+            <div className="p-6 flex-1 max-w-md">
+              <h5 className="text-lg font-bold text-blue-800 mb-2">Why Hospitals Choose MediLink</h5>
+              <ul className="list-disc list-inside text-gray-700 text-base mb-2">
+                <li>Streamline outpatient visits and digital patient flow</li>
+                <li>Enable NHIF verification and claim submission instantly</li>
+                <li>Monitor CHW outreach linked to your catchment area</li>
+                <li>Access shared patient records with consent</li>
+                <li>Use dashboards to view performance, referrals, and KPIs</li>
+                <li>Integrate lab, pharmacy, and billing systems securely</li>
+              </ul>
+              <p className="text-blue-600 italic">"Bringing smart hospital workflows to the frontline of care."</p>
+            </div>
+            <div className="p-6 flex-1 max-w-md">
+              <h5 className="text-lg font-bold text-blue-800 mb-2">Need Support?</h5>
+              <ul className="list-disc list-inside text-gray-700 text-base mb-2">
+                <li>Visit our <a href="/faq" className="text-blue-700 hover:underline">FAQ</a> page</li>
+                <li>Reach out for onboarding, training, or API support</li>
+                <li>Explore resources for hospital admins and clinicians</li>
+              </ul>
+              <p className="text-blue-600 italic">"We support your facility every step of the way."</p>
+            </div>
+          </div>
+        </div>
+
+
+
     </main>
     <Footer />
   </div>
