@@ -3,7 +3,7 @@ import Navbar from "../Components/Navbar.jsx";
 
 const GDPR = () => (
   <>
-    <Navbar />
+    
     <div className="min-h-screen py-8 px-4">
       <h1 className="text-3xl font-bold mb-4">GDPR Compliance</h1>
       <p className="mb-8">MediLink complies with the General Data Protection Regulation (GDPR) to protect your rights and privacy.</p>
@@ -15,7 +15,7 @@ const GDPR = () => (
       </ul>
       <p className="mb-8">Your privacy and rights are our priority.</p>
     </div>
-    <Footer />
+    
   </>
 );
 

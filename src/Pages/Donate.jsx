@@ -5,7 +5,7 @@ import Navbar from "../Components/Navbar.jsx";
 const Donate = () => {
   return (
     <div className="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen flex flex-col font-sans">
-      <Navbar />
+      
       
       {/* Hero Section */}
       <div className="w-full px-4 py-12">
@@ -242,7 +242,7 @@ const Donate = () => {
         </section>
       </main>
 
-      <Footer />
+      
     </div>
   );
 };

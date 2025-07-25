@@ -5,7 +5,7 @@ import Navbar from "../Components/Navbar.jsx";
 const Tech = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-blue-50">
-      <Navbar />
+     
       
       {/* Hero Section */}
       <div className="w-full px-4 py-12 max-w-7xl mx-auto">
@@ -253,7 +253,7 @@ const Tech = () => {
         </div>
       </main>
 
-      <Footer />
+      
     </div>
   );
 };

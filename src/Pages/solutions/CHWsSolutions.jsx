@@ -92,7 +92,7 @@ const features = [
 
 const CHWs = () => (
   <div className="min-h-screen w-full flex flex-col font-sans">
-    <Navbar />
+   
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-12">
       <div className="text-center mb-10">
         <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-2">
@@ -208,7 +208,7 @@ const CHWs = () => (
         </div>
       </div>
     </main>
-    <Footer />
+    
   </div>
 );
 

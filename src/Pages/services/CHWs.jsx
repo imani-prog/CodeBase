@@ -10,7 +10,7 @@ const CHWs = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       <LiveChatButton />
-      <Navbar />
+      
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="mb-5 w-full p-2 flex flex-col items-center">
           <h1 className="text-5xl font-extrabold text-blue-900 mb-6 text-center leading-tight">Community Health Worker Services</h1>
@@ -121,7 +121,7 @@ const CHWs = () => {
           </div>
         </div>
       </main>
-      <Footer />
+     
     </div>
   );
 };

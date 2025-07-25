@@ -10,7 +10,7 @@ import SHAlogo from "../assets/sha-social-health-authority-seeklogo.png";
 const Partners = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-      <Navbar />
+      
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1000px] mx-auto">
         <section className="mb-10 w-full bg-blue-100 rounded-3xl shadow-xl border border-blue-200 p-10 flex flex-col items-center">
           <h1 className="text-4xl font-extrabold text-blue-900 mb-4 text-center leading-tight">Our Partners</h1>
@@ -59,7 +59,7 @@ const Partners = () => {
           <a href="/partner" className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-full shadow-lg text-lg">Become a Partner</a>
         </section>
       </main>
-      <Footer />
+      
     </div>
   );
 };

@@ -29,7 +29,7 @@ const Home = () => {
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       <LiveChatButton />
       {/* Navbar */}
-      <Navbar />
+      
 
 
       <main className="flex flex-col items-center w-full px-4 py-8 max-w-[1600px] mx-auto">
@@ -281,7 +281,7 @@ const Home = () => {
 
       </main>
 
-      <Footer />
+      
     </div>
   );
 };

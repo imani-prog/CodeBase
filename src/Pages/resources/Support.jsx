@@ -41,7 +41,7 @@ const Support = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      <Navbar />
+      
       
       {/* Hero Section */}
       <section className="relative py-16 px-4">
@@ -318,7 +318,6 @@ const Support = () => {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 };

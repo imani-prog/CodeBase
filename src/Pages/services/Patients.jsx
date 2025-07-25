@@ -10,7 +10,7 @@ const Patients = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       <LiveChatButton />
-      <Navbar />
+      
       <main className="flex flex-col items-center w-full px-4 py-6 md:py-10 max-w-[1200px] mx-auto">
         <section className="mb-8 w-full items-center">
           <h1 className="text-3xl md:text-5xl font-extrabold text-blue-900 mb-4 md:mb-6 text-center leading-tight">Patient Services</h1>
@@ -118,7 +118,7 @@ const Patients = () => {
           <p className="text-base md:text-lg max-w-xl md:max-w-2xl">Every feature is built from real patient stories and needs. With MediLink, you don’t just access healthcare—you access hope, dignity, and a human connection.</p>
         </section>
       </main>
-      <Footer />
+     
     </div>
   );
 };

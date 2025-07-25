@@ -15,7 +15,7 @@ const Clinics = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       <LiveChatButton />
-      <Navbar />
+      
       <main className="flex flex-col w-full px-4 py-10 max-w-[1200px] mx-auto">
         {/* Hero Section */}
         <section className="mb-10 w-full p-5 flex flex-col items-center">
@@ -86,7 +86,7 @@ const Clinics = () => {
           <ClinicCallToAction />
 
       </main>
-      <Footer />
+      
     </div>
   );
 };

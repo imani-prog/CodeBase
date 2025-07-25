@@ -3,7 +3,7 @@ import Navbar from "../Components/Navbar.jsx";
 
 const Accessibility = () => (
   <>
-    <Navbar />
+    
     <div className="min-h-screen py-8 px-4">
       <h1 className="text-3xl font-bold mb-4">Accessibility Statement</h1>
       <p className="mb-8">MediLink is committed to ensuring digital accessibility for all users, including people with disabilities. We continually improve the user experience for everyone and apply the relevant accessibility standards.</p>
@@ -15,7 +15,7 @@ const Accessibility = () => (
       </ul>
       <p className="mb-8">We welcome feedback to improve accessibility for all users.</p>
     </div>
-    <Footer />
+    
   </>
 );
 

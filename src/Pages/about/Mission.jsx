@@ -6,7 +6,7 @@ const Mission = () => {
   return (
     <div className="mb-10 w-full bg-blue-50 text-left">
       <LiveChatButton />
-      <Navbar />
+      
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="w-full flex flex-col items-center">
           <h1 className="text-5xl font-extrabold text-blue-900 mb-6 text-center leading-tight">Vision & Mission</h1>
@@ -91,7 +91,6 @@ const Mission = () => {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

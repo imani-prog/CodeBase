@@ -4,7 +4,7 @@ import Footer from "../Components/Footer.jsx";
 const FAQs = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-      <Navbar />
+      
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[900px] mx-auto">
         <section className="mb-10 w-full bg-blue-100 rounded-3xl shadow-xl border border-blue-200 p-10 flex flex-col items-center">
           <h1 className="text-4xl font-extrabold text-blue-900 mb-4 text-center leading-tight">❓ Frequently Asked Questions</h1>
@@ -113,7 +113,7 @@ const FAQs = () => {
           <p className="text-lg text-blue-700">We’re here to help!<br/>👉 <a href="/contact" className="text-blue-600 underline">Contact Us</a> or <a href="/support" className="text-blue-600 underline">Raise a Support Ticket</a> anytime.</p>
         </section>
       </main>
-       <Footer />
+       
     </div>
   );
 };

@@ -8,7 +8,7 @@ const AboutMediLink = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       <LiveChatButton />
-      <Navbar />
+      
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="w-full flex flex-col items-center mb-8">
           <h1 className="text-5xl font-extrabold text-blue-900 mb-4 text-center leading-tight">About MediLink</h1>
@@ -123,7 +123,7 @@ const AboutMediLink = () => {
         </section>
       </main>
 
-      <Footer />
+      
     </div>
   );
 };

@@ -3,7 +3,7 @@ import Navbar from "../../Components/Navbar.jsx";
 
 const Sponsors = () => (
   <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-    <Navbar />
+    
     <main className="max-w-2xl mx-auto px-4 py-10">
       <h1 className="text-4xl font-extrabold text-blue-900 mb-8 text-center">NGO & Sponsors</h1>
       <section className="mb-10 bg-blue-100 rounded-2xl shadow-lg border border-blue-200 p-8">
@@ -20,7 +20,7 @@ const Sponsors = () => (
       <a href="mailto:sponsors@medilink.africa" className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-full shadow-lg text-lg block text-center mb-4">Sponsor Us</a>
       <a href="mailto:ngo@medilink.africa" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg text-lg block text-center">NGO Collaboration</a>
     </main>
-    <Footer />
+    
   </div>
 );
 

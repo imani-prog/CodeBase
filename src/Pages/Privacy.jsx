@@ -3,7 +3,7 @@ import Navbar from "../Components/Navbar.jsx";
 
 const Privacy = () => (
   <>
-    <Navbar />
+    
     <div className="min-h-screen py-8 px-4">
       <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
       <p className="mb-8">Your privacy is important to us. This policy explains how MediLink collects, uses, and protects your personal information.</p>
@@ -15,7 +15,7 @@ const Privacy = () => (
       </ul>
       <p className="mb-8">By using MediLink, you agree to this privacy policy.</p>
     </div>
-    <Footer />
+    
   </>
 );
 

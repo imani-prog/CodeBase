@@ -4,7 +4,7 @@ import Navbar from "../Components/Navbar.jsx";
 const Testimonials = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-      <Navbar />
+      
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[900px] mx-auto">
         <section className="mb-10 w-full bg-blue-100 rounded-3xl shadow-xl border border-blue-200 p-10 flex flex-col items-center">
           <h1 className="text-4xl font-extrabold text-blue-900 mb-6 text-center leading-tight">💬 What Our Users Say</h1>
@@ -48,7 +48,7 @@ const Testimonials = () => {
           <p className="text-lg text-blue-700">We’d love to hear from you. Use the form below or contact our support team to share how MediLink made a difference in your life or community.</p>
         </section>
       </main>
-      <Footer />
+      
     </div>
   );
 };

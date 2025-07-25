@@ -12,6 +12,8 @@ import Newsletter from "./Pages/Newsletter.jsx";
 import Privacy from "./Pages/Privacy.jsx";
 import Terms from "./Pages/Terms.jsx";
 // import About from "./Pages/About.jsx";
+import HospitalStyle from "./Components/HospitalStyle.jsx";
+import Navbar from "./Components/Navbar.jsx";
 import AboutMediLink from "./Pages/about/AboutMediLink.jsx";
 import Mission from "./Pages/about/Mission.jsx";
 import Story from "./Pages/about/Story.jsx";
@@ -31,12 +33,18 @@ import Hospitals from "./Pages/solutions/HospitalsSolutions.jsx";
 import PatientsSolutions from "./Pages/solutions/PatientsSolutions.jsx";
 import Tech from "./Pages/Tech.jsx";
 import Testimonials from "./Pages/Testimonials.jsx";
+import Footer from "./Components/Footer.jsx";
+import LiveChatButton from "./Components/LiveChatButton.jsx";
 
 function App() {
   return (
     <Router>
+      
+          <Navbar />
+          <LiveChatButton />
       <Routes>
         <Route path="/" element={<Home />} />
+        
         <Route path="/about/aboutmedilink" element={<AboutMediLink />} />
         <Route path="/about/story" element={<Story />} />
         <Route path="/about/team" element={<Team />} />
@@ -69,6 +77,7 @@ function App() {
         <Route path="/accessibility" element={<Accessibility />} />
         <Route path="/newsletter" element={<Newsletter />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }

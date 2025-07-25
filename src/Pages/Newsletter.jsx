@@ -2,7 +2,7 @@ import Footer from "../Components/Footer.jsx";
 import Navbar from "../Components/Navbar.jsx";
 const Newsletter = () => (
   <>
-    <Navbar />
+    
     <div className="min-h-screen py-8 px-4">
       <h1 className="text-3xl font-bold mb-4">Subscribe to Our Newsletter</h1>
       <p className="mb-8">Stay updated with the latest news, health tips, and MediLink updates. Enter your email below to subscribe:</p>
@@ -25,7 +25,7 @@ const Newsletter = () => (
       </form>
       <p className="text-gray-600 text-sm">We respect your privacy. Unsubscribe at any time.</p>
     </div>
-    <Footer />
+    
   </>
 );
 

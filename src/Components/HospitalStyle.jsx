@@ -94,7 +94,7 @@ const HospitalStyle = () => {
           </div>
         ))}
         <button
-          aria-label="Next testimonials"
+          aria-label="Next testimonials"z
           onClick={next}
           className="absolute right-0 z-10 w-12 h-12 rounded-full border-2 border-blue-300 bg-white text-blue-700 text-3xl flex items-center justify-center shadow hover:bg-blue-50"
           style={{ top: '50%', transform: 'translateY(-50%)' }}

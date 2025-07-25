@@ -2,7 +2,7 @@
 import { ArrowRight, Bookmark, Calendar, ChevronRight, Clock, Eye, Filter, Heart, MessageCircle, Search, Share2, Star, TrendingUp, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import Footer from '../../Components/Footer';
-import Navbar from '../../Components/Navbar';
+import Discussions from '../../Components/Discussions';
 
 
 export const Blog = () => {
@@ -115,7 +115,7 @@ export const Blog = () => {
       id: 7,
       title: "Nutrition Programs: Fighting Malnutrition with Data-Driven Interventions",
       excerpt: "How predictive analytics is helping identify at-risk children and pregnant mothers.",
-      image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=600&h=400&fit=crop",
+      image: "https://www.emro.who.int/images/stories/nutrition/nutritionist-healthy-diet.jpg",
       author: "Nutritionist Team",
       date: "July 5, 2025",
       readTime: "5 min read",
@@ -204,7 +204,7 @@ export const Blog = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <Navbar />
+      
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-3">
         {/* Hero Section */}
         <div className="relative overflow-hidden  p-12 mb-2">
@@ -406,7 +406,7 @@ export const Blog = () => {
         {/* Blog Posts Grid  */}
                 <section className="mb-16">
                   <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-green-700 to-blue-700 bg-clip-text text-transparent">
+                    <h2 className="text-3xl font-bold text-blue-900 bg-clip-text">
                       Latest Health Insights
                     </h2>
                     <div className="flex items-center space-x-4">
@@ -481,7 +481,7 @@ export const Blog = () => {
                               <button 
                                 onClick={() => toggleLike(post.id)}
                                 className={`p-1.5 rounded-full transition-colors ${
-                                  likedPosts.has(post.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+                                  likedPosts.has(post.id) ? 'text-blue-500' : 'text-gray-400 hover:text-blue-500'
                                 }`}
                               >
                                 <Heart className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
@@ -504,32 +504,13 @@ export const Blog = () => {
 
           {/* Health Updates Sidebar */}
               <section className="mb-16">
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-8">
+                <h2 className="text-3xl font-bold mb-8 text-blue-900">
                   Health Updates & Alerts
                 </h2>
                 <div className="grid lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                      <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                        <MessageCircle className="w-5 h-5 mr-2 text-blue-600" />
-                        Community Discussions
-                      </h3>
-                      <div className="space-y-4">
-                        {[
-                          { topic: "CHW Training Best Practices", replies: 23, lastActive: "2 hours ago" },
-                          { topic: "Digital Health Implementation Challenges", replies: 18, lastActive: "4 hours ago" },
-                          { topic: "Maternal Health Success Stories", replies: 31, lastActive: "6 hours ago" }
-                        ].map((discussion, index) => (
-                          <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                            <div>
-                              <h4 className="font-semibold text-gray-900">{discussion.topic}</h4>
-                              <p className="text-sm text-gray-600">{discussion.replies} replies • {discussion.lastActive}</p>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-gray-400" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+
+                    <Discussions />
                   </div>
                   
                   <div className="space-y-4">
@@ -718,7 +699,7 @@ export const Blog = () => {
                 </section>
         </main>
       ?
-        <Footer />
+        
     </div>
   );
 };
