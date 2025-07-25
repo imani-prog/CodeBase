@@ -33,7 +33,7 @@ const menuGroups = [
     title: "Resources",
     items: [
       { label: "Blog / Health Updates", to: "/blog" },
-      { label: "FAQs", to: "/faqs" },
+      { label: "FAQs", to: "/frequent-questions" },
       { label: "Tech Stack", to: "/tech" },
       { label: "Support Desk", to: "/support" },
     ],

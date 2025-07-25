@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react'
 import Navbar from '../../Components/Navbar';
 import Footer from '../../Components/Footer';
@@ -214,10 +215,10 @@ export const Blog = () => {
                 <Heart className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent leading-tight">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-2">
                   Health Insights
                 </h1>
-                <p className="text-xl text-blue-200 mt-2">Empowering Communities Through Digital Healthcare Innovation</p>
+                <p className="text-xl md:text-2xl mb-3">Empowering Communities Through Digital Healthcare Innovation</p>
               </div>
             </div>
 
@@ -240,13 +241,13 @@ export const Blog = () => {
         </div>
 
         {/* Health Updates Ticker */}
-                <div className="mb-12">
+          <div className="mb-12">
           <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center mb-4">
               <div className="bg-white rounded-full p-2 mr-3">
                 <TrendingUp className="w-5 h-5 text-red-500" />
               </div>
-              <h2 className="text-2xl font-bold text-white">🚨 Breaking Health Updates</h2>
+              <h2 className="text-2xl font-bold">Breaking Health Updates</h2>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               {healthUpdates.slice(0, 2).map((update) => (
