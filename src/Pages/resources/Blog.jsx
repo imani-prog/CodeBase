@@ -1,9 +1,8 @@
 /* eslint-disable no-unused-vars */
-import React from 'react'
-import Navbar from '../../Components/Navbar';
+import { ArrowRight, Bookmark, Calendar, ChevronRight, Clock, Eye, Filter, Heart, MessageCircle, Search, Share2, Star, TrendingUp, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 import Footer from '../../Components/Footer';
-import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Eye, Heart, Share2, Search, Filter, Bookmark, TrendingUp, ChevronRight, ArrowRight, Star, Users, MessageCircle } from "lucide-react";
+import Navbar from '../../Components/Navbar';
 
 
 export const Blog = () => {
@@ -34,7 +33,7 @@ export const Blog = () => {
       id: 1,
       title: "AI-Powered Diagnostics: Revolutionizing Rural Healthcare in Kenya",
       excerpt: "Discover how machine learning algorithms are helping CHWs detect malaria, tuberculosis, and other conditions with 94% accuracy using just smartphone cameras.",
-      image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600&fit=crop",
+      image: "https://media.licdn.com/dms/image/v2/D4D12AQHXIxl3VeD1xw/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1694012235854?e=2147483647&v=beta&t=w1DzSrZeWeuKNU_1HA-q5dQoNJI4dqFeIESRAhwEreI",
       author: "Dr. Sarah Kimani",
       date: "July 20, 2025",
       readTime: "8 min read",
@@ -144,7 +143,7 @@ export const Blog = () => {
     {
       id: 9,
       title: "WHO Approves New Malaria Prevention Protocol",
-      summary: "Revolutionary bed net technology shows 78% reduction in transmission rates during Kenya trials.",
+      summary: "Revolutionary bed net technology shows 78% reduction in transmission rates during Kenya trials. The new protocol, developed in partnership with local health authorities, leverages smart materials and digital monitoring to ensure maximum protection for vulnerable populations. Early results from pilot programs in rural Kenya indicate a significant decrease in malaria-related hospitalizations and improved community health outcomes.",
       date: "2 hours ago",
       urgent: true,
       source: "WHO Kenya"
@@ -152,7 +151,7 @@ export const Blog = () => {
     {
       id: 10,
       title: "Ministry of Health Launches Universal Health Coverage Phase 3",
-      summary: "Digital health ID cards now available in 25 additional counties with full MediLink integration.",
+      summary: "Digital health ID cards now available in 25 additional counties with full MediLink integration. This phase expands access to essential healthcare services, enabling seamless patient identification and record management across public and private facilities. The initiative aims to improve efficiency, reduce fraud, and empower citizens with secure, portable health data for better care coordination.",
       date: "6 hours ago",
       urgent: false,
       source: "MOH Kenya"
@@ -206,9 +205,9 @@ export const Blog = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 md:px-6 py-12">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 py-3">
         {/* Hero Section */}
-        <div className="relative overflow-hidden  p-12 mb-16">
+        <div className="relative overflow-hidden  p-12 mb-2">
           <div className="relative z-10 max-w-4xl">
               <div className="flex items-center mb-6">
               <div className="bg-gradient-to-r from-green-400 to-blue-500 rounded-full p-3 mr-4">
@@ -242,28 +241,30 @@ export const Blog = () => {
 
         {/* Health Updates Ticker */}
           <div className="mb-12">
-          <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 shadow-2xl">
+          <div className="p-6">
             <div className="flex items-center mb-4">
               <div className="bg-white rounded-full p-2 mr-3">
                 <TrendingUp className="w-5 h-5 text-red-500" />
               </div>
-              <h2 className="text-2xl font-bold">Breaking Health Updates</h2>
+              <h2 className="text-2xl font-bold text-blue-900">Breaking Health Updates</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex flex-row gap-6">
               {healthUpdates.slice(0, 2).map((update) => (
-                <div key={update.id} className="bg-white/10 backdrop-blur rounded-xl p-4 border border-white/20">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-semibold text-white text-sm leading-tight">{update.title}</h4>
-                    {update.urgent && (
-                      <span className="bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold ml-2 flex-shrink-0">
-                        URGENT
-                      </span>
-                    )}
+                <div key={update.id} className="flex-1 bg-white rounded-xl shadow-lg p-6 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-base text-blue-800 leading-tight">{update.title}</h4>
+                      {update.urgent && (
+                        <span className="bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold ml-2 flex-shrink-0">
+                          URGENT
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm mb-2">{update.summary}</p>
                   </div>
-                  <p className="text-white/80 text-xs mb-2">{update.summary}</p>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-white/60">{update.source}</span>
-                    <span className="text-white/60">{update.date}</span>
+                  <div className="flex justify-between items-center text-xs mt-4">
+                    <span className="font-medium text-gray-500">{update.source}</span>
+                    <span className="font-medium text-gray-500">{update.date}</span>
                   </div>
                 </div>
               ))}
@@ -303,8 +304,8 @@ export const Blog = () => {
         {/* Featured Posts */}
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-purple-900 bg-clip-text text-transparent">
-              ⭐ Featured Stories
+            <h2 className="text-3xl font-bold text-blue-900 bg-clip-text">
+              Featured Stories
             </h2>
             <button className="flex items-center text-blue-600 hover:text-blue-800 font-semibold group">
               View All
@@ -406,7 +407,7 @@ export const Blog = () => {
                 <section className="mb-16">
                   <div className="flex items-center justify-between mb-8">
                     <h2 className="text-3xl font-bold bg-gradient-to-r from-green-700 to-blue-700 bg-clip-text text-transparent">
-                      📚 Latest Health Insights
+                      Latest Health Insights
                     </h2>
                     <div className="flex items-center space-x-4">
                       <div className="relative">
@@ -504,7 +505,7 @@ export const Blog = () => {
           {/* Health Updates Sidebar */}
               <section className="mb-16">
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-8">
-                  🔔 Health Updates & Alerts
+                  Health Updates & Alerts
                 </h2>
                 <div className="grid lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
@@ -648,7 +649,7 @@ export const Blog = () => {
             {/* Trending Topics */}
              <section className="mb-16">
                       <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-8 flex items-center">
-                        🔥 Trending Health Topics
+                        Trending Health Topics
                       </h2>
                       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
