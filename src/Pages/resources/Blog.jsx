@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { ArrowRight, Bookmark, Calendar, ChevronRight, Clock, Eye, Filter, Heart, MessageCircle, Search, Share2, Star, TrendingUp, Users } from "lucide-react";
+import { ArrowRight, Bookmark, Calendar, Clock, Eye, Filter, Heart, Search, Share2, Star, TrendingUp, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-import Footer from '../../Components/Footer';
 import Discussions from '../../Components/Discussions';
+import TrendingTopics from '../../Components/TrendingTopics';
 
 
 export const Blog = () => {
@@ -301,6 +301,8 @@ export const Blog = () => {
           </div>
         </div>
 
+        
+
         {/* Featured Posts */}
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">
@@ -552,72 +554,72 @@ export const Blog = () => {
               {/* Newsletter & Community Section */}
               <section className="mb-16">
                   <div className="grid lg:grid-cols-2 gap-8">
-                    {/* <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23ffffff" fill-opacity="0.05" fill-rule="evenodd"%3E%3Cpath d="m0 40l40-40h-40z"/%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div> */}
+                    
                     <div className="relative z-10">
                     <div className="flex items-center mb-6">
-                      <div className="bg-white/20 rounded-full p-3 mr-4">
-                        <Heart className="w-6 h-6" />
+                      <div className="p-3 mr-4">
+                        <Heart className="w-6 text-red-600 h-6" />
                       </div>
                         <div>
-                            <h3 className="text-2xl font-bold">Stay Informed</h3>
-                            <p className="text-blue-100">Weekly health insights & updates</p>
+                            <h3 className="text-2xl text-blue-800 font-bold">Stay Informed</h3>
+                            <p className="text-blue-400">Weekly health insights & updates</p>
                           </div>
                     </div>
-                    <p className="text-blue-100 mb-6 leading-relaxed">
+                    <p className="mb-6  leading-relaxed">
                       Get the latest healthcare innovations, research findings, and community health stories delivered to your inbox every week.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="email"
                         placeholder="Enter your email address"
-                        className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur border border-white/20 placeholder-white/70 text-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                        className="flex-1 px-4 py-3 rounded-xl bg-white border  focus:outline-none focus:ring-2 focus:ring-white/50"
                       />
-                      <button className="px-6 py-3 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                      <button className="px-6 py-3 bg-white text-blue-400 font-bold rounded-xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
                         Subscribe
                       </button>
                     </div>
-                    <div className="flex items-center mt-4 text-sm text-blue-200">
+                    <div className="flex items-center mt-10 text-sm ">
                       <div className="flex -space-x-2 mr-3">
                         {[1,2,3,4].map(i => (
                           <div key={i} className="w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full border-2 border-white"></div>
                         ))}
                       </div>
-                      <span>Join 12,000+ healthcare professionals</span>
+                      <span className="font-semibold text-1xl">Join 12,000+ healthcare professionals</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Community Stats  */}
-                <div className="bg-white rounded-3xl p-8 shadow-lg">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                    <Users className="w-6 h-6 mr-3 text-green-600" />
+                <div className="rounded-3xl p-8 shadow-lg">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-green-600" />
                     Community Impact
                   </h3>
-                  <div className="grid grid-cols-2 gap-6">
-                    {[
+                  <div className="flex flex-row justify-between items-center gap-4">
+                    {[ 
                       { label: "Active CHWs", value: "50,234", change: "+12%", color: "text-green-600" },
                       { label: "Patients Served", value: "2.1M", change: "+28%", color: "text-blue-600" },
                       { label: "Health Articles", value: "1,456", change: "+15%", color: "text-purple-600" },
                       { label: "Communities", value: "847", change: "+8%", color: "text-orange-600" }
                     ].map((stat, index) => (
-                      <div key={index} className="text-center">
-                        <div className={`text-2xl font-bold ${stat.color} mb-1`}>
+                      <div key={index} className="flex flex-col items-center px-2">
+                        <div className={`text-lg font-bold ${stat.color} mb-0.5`}>
                           {stat.value}
                         </div>
-                        <div className="text-sm text-gray-600 mb-1">{stat.label}</div>
-                        <div className={`text-xs font-semibold ${stat.color} bg-opacity-10 px-2 py-1 rounded-full inline-block`}>
+                        <div className="text-xs text-gray-600 mb-0.5">{stat.label}</div>
+                        <div className={`text-xs font-semibold ${stat.color} bg-opacity-10 px-1.5 py-0.5 rounded-full inline-block`}>
                           {stat.change} this month
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-8 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl">
+                  <div className="mt-4 p-2 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-bold text-gray-900">Join Our Community</h4>
-                        <p className="text-sm text-gray-600">Connect with healthcare professionals</p>
+                        <h4 className="font-bold text-gray-900 text-sm">Join Our Community</h4>
+                        <p className="text-xs text-gray-600">Connect with healthcare professionals</p>
                       </div>
-                      <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                      <button className="px-3 py-1 bg-gradient-to-r from-green-500 to-blue-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-xs">
                         Join Now
                       </button>
                     </div>
@@ -627,61 +629,30 @@ export const Blog = () => {
               {/* </div> */}
             </section>
 
-            {/* Trending Topics */}
-             <section className="mb-16">
-                      <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-8 flex items-center">
-                        Trending Health Topics
-                      </h2>
-                      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                          { topic: "AI in Healthcare", posts: 24, trend: "+45%", color: "from-blue-500 to-cyan-500" },
-                          { topic: "Mental Health Support", posts: 18, trend: "+32%", color: "from-green-500 to-teal-500" },
-                          { topic: "Telemedicine Growth", posts: 15, trend: "+28%", color: "from-purple-500 to-pink-500" },
-                          { topic: "Preventive Care", posts: 21, trend: "+38%", color: "from-orange-500 to-red-500" }
-                        ].map((item, index) => (
-                          <div key={index} className="group relative overflow-hidden bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
-                            <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                            <div className="relative z-10">
-                              <div className={`w-12 h-12 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                                <TrendingUp className="w-6 h-6 text-white" />
-                              </div>
-                              <h3 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                                {item.topic}
-                              </h3>
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">{item.posts} articles</span>
-                                <span className="text-green-600 font-semibold">{item.trend}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-              </section>
+            <TrendingTopics />
+
+              
 
               {/* Call to Action */}
-              <section className="text-center py-16 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl shadow-2xl text-white relative overflow-hidden">
-                  {/* <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23ffffff" fill-opacity="0.1" fill-rule="evenodd"/%3E%3C/svg%3E')] opacity-20"></div> */}
+              <section className="text-center py-6 relative overflow-hidden">
+                  
                   <div className="relative z-10 max-w-4xl mx-auto">
-                    <div className="flex justify-center mb-6">
-                      <div className="bg-white/20 backdrop-blur rounded-full p-4">
-                        <Heart className="w-8 h-8 text-white" />
-                      </div>
-                    </div>
-                    <h3 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                    
+                    <h3 className="text-4xl md:text-5xl mb-4 text-blue-800 font-bold  bg-clip-text">
                       Transform Healthcare Together
                     </h3>
-                    <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+                    <p className="text-xl  mb-8 leading-relaxed">
                       Join thousands of healthcare professionals using MediLink to improve patient outcomes, streamline workflows, and build stronger communities.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-2xl">
+                      <button className="px-8 py-4 border-2 border-blue-500 text-blue-500 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105">
                         Start Your Journey
                       </button>
-                      <button className="px-8 py-4 border-2 border-white text-white font-bold rounded-2xl hover:bg-white hover:text-indigo-600 transition-all duration-300 transform hover:scale-105">
+                      <button className="px-8 py-4 border-2 border-blue-500 text-blue-500 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105">
                         Learn More
                       </button>
                     </div>
-                    <div className="flex justify-center items-center mt-8 space-x-8 text-blue-200">
+                    <div className="flex justify-center items-center mt-8 space-x-8">
                       <div className="flex items-center">
                         <Star className="w-5 h-5 mr-2 text-yellow-300" />
                         <span>4.9/5 Rating</span>
