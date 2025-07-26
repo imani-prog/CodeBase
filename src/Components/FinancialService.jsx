@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import smartHealthcareImg from '../assets/smartHealthcare.avif';
+import smartHealthcareImg from '../assets/smartHealthcare.png';
 
 const FinancialService = () => {
   const sections = [

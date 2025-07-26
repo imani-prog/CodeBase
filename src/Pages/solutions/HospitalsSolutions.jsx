@@ -1,6 +1,6 @@
 
 import prescriptionImg from "../../assets/MedicalRecords.jpeg";
-import ehrImg from "../../assets/SmartHealthcare.png";
+import ehrImg from "../../assets/TechCompany22.jpeg";
 import ambulanceImg from "../../assets/MedilinkAmbulance.png";
 import dashboardImg from "../../assets/AdminDashboard1.jpg";
 import appointmentsImg from "../../assets/PatientReferals.jpg";
