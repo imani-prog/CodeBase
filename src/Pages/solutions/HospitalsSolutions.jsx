@@ -3,7 +3,7 @@ import Navbar from "../../Components/Navbar.jsx";
 
 
 import prescriptionImg from "../../assets/MedicalRecords.jpeg";
-import ehrImg from "../../assets/SmartHealthcare.avif";
+import ehrImg from "../../assets/SmartHealthcare.png";
 import ambulanceImg from "../../assets/MedilinkAmbulance.png";
 import dashboardImg from "../../assets/AdminDashboard1.jpg";
 import appointmentsImg from "../../assets/PatientReferals.jpg";
