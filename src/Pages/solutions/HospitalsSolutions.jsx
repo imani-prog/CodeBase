@@ -1,6 +1,3 @@
-import Footer from "../../Components/Footer.jsx";
-import Navbar from "../../Components/Navbar.jsx";
-
 
 import prescriptionImg from "../../assets/MedicalRecords.jpeg";
 import ehrImg from "../../assets/SmartHealthcare.png";
