@@ -132,7 +132,7 @@ export default function TrendingHealthTopics() {
             return (
               <div 
                 key={index} 
-                className="group relative overflow-hidden bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl hover:shadow-2xl   cursor-pointer border border-blue-100/80 hover:border-blue-200"
+                className="group relative overflow-hidden bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 cursor-pointer border border-blue-100/80 hover:border-blue-200"
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
@@ -242,7 +242,7 @@ export default function TrendingHealthTopics() {
         {/* Enhanced Bottom CTA */}
         <div className="text-center mt-16">
           <div className="inline-flex flex-col items-center gap-4">
-            <button className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold rounded-2xl shadow-lg relative overflow-hidden">
+            <button className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold rounded-2xl shadow-2xl relative overflow-hidden">
               {/* Remove animated background and icon rotation */}
               <span className="relative z-10">Explore All Health Innovations</span>
               <ArrowUpRight className="w-6 h-6 relative z-10" />
