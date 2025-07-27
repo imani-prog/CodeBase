@@ -1,25 +1,25 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
-import { 
-  Zap, 
-  Shield, 
-  Puzzle, 
-  Rocket, 
-  Server, 
-  Database, 
-  Cloud, 
-  Smartphone, 
-  Globe, 
-  Lock, 
-  Wifi, 
-  Layers,
-  CheckCircle,
-  ArrowRight,
-  Code,
-  Monitor,
-  Gauge,
-  Eye
+import {
+    ArrowRight,
+    CheckCircle,
+    Cloud,
+    Code,
+    Database,
+    Eye,
+    Gauge,
+    Globe,
+    Layers,
+    Lock,
+    Monitor,
+    Puzzle,
+    Rocket,
+    Server,
+    Shield,
+    Smartphone,
+    Wifi,
+    Zap
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const TechnicalFeatures = () => {
   const [activeTab, setActiveTab] = useState('performance');
@@ -56,9 +56,9 @@ const TechnicalFeatures = () => {
 
   const integrations = [
     { icon: "", text: "Insurance systems (NHIF, SHA)", color: "bg-blue-100" },
-    { icon: "", text: "Health information exchanges", color: "bg-green-100" },
-    { icon: "", text: "Partner clinics, hospitals, and NGOs", color: "bg-purple-100" },
-    { icon: "", text: "Mobile and USSD support for rural outreach", color: "bg-orange-100" }
+    { icon: "", text: "Health information exchanges", color: "bg-blue-100" },
+    { icon: "", text: "Partner clinics, hospitals, and NGOs", color: "bg-blue-100" },
+    { icon: "", text: "Mobile and USSD support for rural outreach", color: "bg-blue-100" }
   ];
 
   const categories = [...new Set(performanceFeatures.map(f => f.category))];
@@ -82,7 +82,7 @@ const TechnicalFeatures = () => {
       {/* Main Technical Features Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Performance & Scalability Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-200 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-200 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           {/* Background Tech Image */}
           <div className="absolute top-0 right-0 w-48 h-48 opacity-10 overflow-hidden rounded-3xl">
             <img 
@@ -93,12 +93,12 @@ const TechnicalFeatures = () => {
           </div>
           
           {/* Decorative elements */}
-          <div className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl" />
-          <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-lg" />
+          <div className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-blue-300/20 rounded-full blur-xl" />
+          <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-lg" />
           
           <div className="relative z-10">
             <div className="flex items-center mb-6">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-3 mr-4">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-3 mr-4">
                 <Zap className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -125,8 +125,8 @@ const TechnicalFeatures = () => {
                   onClick={() => setActiveTab(category.toLowerCase())}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
                     activeTab === category.toLowerCase()
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'bg-white/60 text-gray-600 hover:bg-purple-100'
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-white/60 text-gray-600 hover:bg-blue-100'
                   }`}
                 >
                   {category}
@@ -146,7 +146,7 @@ const TechnicalFeatures = () => {
                     className="group bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-blue-100/50 hover:border-blue-300 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
                   >
                     <div className="flex items-start space-x-3">
-                      <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg p-2 group-hover:scale-110 transition-transform duration-300">
+                      <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-2 group-hover:scale-110 transition-transform duration-300">
                         <IconComponent className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1">
@@ -154,7 +154,7 @@ const TechnicalFeatures = () => {
                           {feature.text}
                         </span>
                         <div className="mt-1">
-                          <span className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent text-xs font-semibold">
+                          <span className="inline-block bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent text-xs font-semibold">
                             {feature.category}
                           </span>
                         </div>
@@ -168,7 +168,7 @@ const TechnicalFeatures = () => {
         </section>
 
         {/* Security & Compliance Section */}
-        <section className={`relative bg-gradient-to-br from-white via-green-50/50 to-blue-50/30 rounded-3xl shadow-2xl border border-green-200/50 p-8 overflow-hidden transition-all duration-1000 delay-400 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-400 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           {/* Background Security Image */}
           <div className="absolute top-0 right-0 w-48 h-48 opacity-10 overflow-hidden rounded-3xl">
             <img 
@@ -179,12 +179,12 @@ const TechnicalFeatures = () => {
           </div>
           
           {/* Decorative elements */}
-          <div className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-green-400/20 to-blue-400/20 rounded-full blur-xl" />
-          <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-lg" />
+          <div className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-blue-300/20 rounded-full blur-xl" />
+          <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-lg" />
           
           <div className="relative z-10">
             <div className="flex items-center mb-8">
-              <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-xl p-3 mr-4">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-3 mr-4">
                 <Shield className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -195,10 +195,10 @@ const TechnicalFeatures = () => {
 
             <div className="space-y-6">
               {securityFeatures.map((item, index) => (
-                <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-green-100/50 hover:border-green-300 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-blue-100/50 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                   <div className="flex items-start space-x-4">
-                    <div className="bg-gradient-to-br from-green-100 to-blue-100 rounded-full p-3 group-hover:scale-110 transition-transform duration-300">
-                      <CheckCircle className="w-6 h-6 text-green-600" />
+                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-full p-3 group-hover:scale-110 transition-transform duration-300">
+                      <CheckCircle className="w-6 h-6 text-blue-600" />
                     </div>
                     <div className="flex-1">
                       <span className="text-gray-700 leading-relaxed font-medium group-hover:text-gray-900 transition-colors duration-300">
@@ -211,9 +211,9 @@ const TechnicalFeatures = () => {
             </div>
 
             {/* Security Badge */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-green-600/10 to-blue-600/10 rounded-xl border border-green-200">
+            <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/10 to-blue-400/10 rounded-xl border border-blue-200">
               <div className="text-center">
-                <div className="inline-flex items-center space-x-2 text-green-700 font-semibold">
+                <div className="inline-flex items-center space-x-2 text-blue-700 font-semibold">
                   <Lock className="w-5 h-5" />
                   <span>ISO 27001 & HIPAA Ready</span>
                 </div>
@@ -226,13 +226,13 @@ const TechnicalFeatures = () => {
       {/* Bottom Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Integrations Section */}
-        <section className={`relative bg-gradient-to-br from-white via-purple-50/50 to-pink-50/30 rounded-3xl shadow-2xl border border-purple-200/50 p-8 overflow-hidden transition-all duration-1000 delay-600 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-600 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
           
           <div className="relative z-10">
             <div className="flex items-center mb-8">
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-3 mr-4">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-3 mr-4">
                 <Puzzle className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -240,7 +240,7 @@ const TechnicalFeatures = () => {
                 <p className="text-gray-600">Connect with existing systems</p>
               </div>
             </div>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {integrations.map((item, index) => (
                 <div key={index} className={`group ${item.color} hover:scale-105 rounded-2xl p-6 border border-white/50 text-center transition-all duration-300 hover:shadow-lg cursor-pointer`}>
@@ -253,29 +253,29 @@ const TechnicalFeatures = () => {
                 </div>
               ))}
             </div>
-
+            
             {/* Integration Stats */}
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-white/60 rounded-xl border border-purple-100">
-                <div className="text-2xl font-bold text-purple-600">50+</div>
+              <div className="text-center p-4 bg-white/60 rounded-xl border border-blue-100">
+                <div className="text-2xl font-bold text-blue-600">50+</div>
                 <div className="text-sm text-gray-600">API Endpoints</div>
               </div>
-              <div className="text-center p-4 bg-white/60 rounded-xl border border-purple-100">
-                <div className="text-2xl font-bold text-purple-600">99.9%</div>
+              <div className="text-center p-4 bg-white/60 rounded-xl border border-blue-100">
+                <div className="text-2xl font-bold text-blue-600">99.9%</div>
                 <div className="text-sm text-gray-600">Uptime SLA</div>
               </div>
             </div>
           </div>
         </section>
-
+        
         {/* Built for Impact Section */}
-        <section className={`relative bg-gradient-to-br from-white via-cyan-50/50 to-blue-50/30 rounded-3xl shadow-2xl border border-cyan-200/50 p-8 overflow-hidden transition-all duration-1000 delay-800 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-800 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-full blur-2xl" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
           
           <div className="relative z-10 flex flex-col justify-center h-full">
             <div className="flex items-center mb-8">
-              <div className="bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl p-3 mr-4">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-3 mr-4">
                 <Rocket className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -283,32 +283,32 @@ const TechnicalFeatures = () => {
                 <p className="text-gray-600">Innovation meets reliability</p>
               </div>
             </div>
-
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-cyan-100/50 hover:shadow-xl transition-all duration-300">
+            
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100/50 hover:shadow-xl transition-all duration-300">
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
                 Our tech team is committed to continuous improvement, innovation, and reliability. We welcome 
-                <span className="font-semibold text-cyan-700"> feedback and collaboration</span> from partners, 
+                <span className="font-semibold text-blue-700"> feedback and collaboration</span> from partners, 
                 developers, and users to make MediLink even better.
               </p>
               
               {/* Key Stats */}
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-cyan-600">24/7</div>
+                  <div className="text-2xl font-bold text-blue-600">24/7</div>
                   <div className="text-xs text-gray-600">Support</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-cyan-600">100+</div>
+                  <div className="text-2xl font-bold text-blue-600">100+</div>
                   <div className="text-xs text-gray-600">Features</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-cyan-600">5min</div>
+                  <div className="text-2xl font-bold text-blue-600">5min</div>
                   <div className="text-xs text-gray-600">Setup</div>
                 </div>
               </div>
-
+              
               <div className="text-center">
-                <button className="group inline-flex items-center bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <button className="group inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                   <span>Partner With Us</span>
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </button>
@@ -323,7 +323,7 @@ const TechnicalFeatures = () => {
           width: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f5f9;
+          background: #e0e7ff;
           border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
