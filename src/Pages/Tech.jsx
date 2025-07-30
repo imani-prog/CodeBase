@@ -22,7 +22,7 @@ const Tech = () => {
       </div>
 
       <main className="w-full px-4 pb-12 max-w-7xl mx-auto">
-        {/* Hospital Solutions - Full Width Feature Section */}
+        {/* Hospital Solutions */}
         <section className="p-6 md:p-8 mb-4 mt-0">
           <div className="max-w-6xl mx-auto">
             <HospitalStack />
