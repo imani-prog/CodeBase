@@ -5,7 +5,7 @@ const FAQs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedItems, setExpandedItems] = useState(new Set());
   const [activeCategory, setActiveCategory] = useState('all');
-  const [showBackToTop, setShowBackToTop] = useState(false);
+  
 
   const faqData = [
     {
@@ -146,9 +146,7 @@ const FAQs = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+ 
 
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-blue-100">
@@ -297,7 +295,7 @@ const FAQs = () => {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-3xl p-8 text-center">
+        <div className="mt-16 p-8 text-center">
           <div className="flex justify-center mb-4">
             <div className="flex -space-x-2">
               <div className="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center">
@@ -311,12 +309,12 @@ const FAQs = () => {
               </div>
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Still have questions?</h2>
-          <p className="text-blue-100 mb-6">Our support team is here to help you 24/7</p>
+          <h2 className="text-2xl font-bold mb-3">Still have questions?</h2>
+          <p className="mb-6">Our support team is here to help you 24/7</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="/contact"
-              className="px-6 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors"
+              className="px-6 py-3 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition-colors"
             >
               Contact Support
             </a>
@@ -330,15 +328,7 @@ const FAQs = () => {
         </div>
       </div>
 
-      {/* Back to Top Button */}
-      {showBackToTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-110 z-50"
-        >
-          <ChevronUp className="w-6 h-6 mx-auto" />
-        </button>
-      )}
+      
     </div>
   );
 };
