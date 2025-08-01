@@ -13,12 +13,12 @@ const Support = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const supportCategories = [
-    { id: 'payment', name: 'Payment Issues', icon: '💳', color: 'from-green-500 to-green-600' },
-    { id: 'chw', name: 'CHW Support', icon: '👥', color: 'from-purple-500 to-purple-600' },
-    { id: 'clinic', name: 'Clinic Issues', icon: '🏥', color: 'from-red-500 to-red-600' },
-    { id: 'login', name: 'Login Problems', icon: '🔐', color: 'from-orange-500 to-orange-600' },
-    { id: 'technical', name: 'Technical Support', icon: '⚙️', color: 'from-blue-500 to-blue-600' },
-    { id: 'other', name: 'Other', icon: '❓', color: 'from-gray-500 to-gray-600' }
+    { id: 'payment', name: 'Payment Issues',  },
+    { id: 'chw', name: 'CHW Support',  },
+    { id: 'clinic', name: 'Clinic Issues', },
+    { id: 'login', name: 'Login Problems',},
+    { id: 'technical', name: 'Technical Support',},
+    { id: 'other', name: 'Other',}
   ];
 
   const faqs = [
@@ -46,27 +46,25 @@ const Support = () => {
       {/* Hero Section */}
       <section className="relative py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl mb-6 shadow-xl">
-            <span className="text-4xl text-white">🎧</span>
-          </div>
+          
           <h1 className="text-5xl md:text-6xl font-extrabold text-blue-900 mb-4 leading-tight">
             Support <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Desk</span>
           </h1>
-          <p className="text-xl text-blue-700 max-w-2xl mx-auto mb-8">
+          <p className="text-xl max-w-2xl mx-auto mb-8">
             We're here to help you resolve issues quickly and get back to better health.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <div className="flex items-center bg-white/60 backdrop-blur rounded-full px-4 py-2 border border-blue-200">
-              <span className="text-blue-600 mr-2">⚡</span>
-              <span className="text-blue-800 font-medium">Fast Response</span>
+              
+              <span className="font-medium">Fast Response</span>
             </div>
             <div className="flex items-center bg-white/60 backdrop-blur rounded-full px-4 py-2 border border-blue-200">
-              <span className="text-blue-600 mr-2">👨‍💻</span>
-              <span className="text-blue-800 font-medium">Expert Team</span>
+              
+              <span className="font-medium">Expert Team</span>
             </div>
             <div className="flex items-center bg-white/60 backdrop-blur rounded-full px-4 py-2 border border-blue-200">
-              <span className="text-blue-600 mr-2">📱</span>
-              <span className="text-blue-800 font-medium">Multi-channel</span>
+              
+              <span className="font-medium">Multi-channel</span>
             </div>
           </div>
         </div>
@@ -79,24 +77,22 @@ const Support = () => {
           <div className="lg:col-span-2 space-y-8">
             
             {/* How We Help Section */}
-            <section className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-200 p-8">
+            <section className=" backdrop-blur-md p-8">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-2xl text-white">🤝</span>
-                </div>
+               
                 <h2 className="text-3xl font-bold text-blue-800">How can we help?</h2>
               </div>
               
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 {[
-                  { icon: '🎫', text: 'Raise a support ticket for payment, CHW, clinic, or login issues' },
-                  { icon: '📊', text: 'Track your ticket status from your dashboard' },
-                  { icon: '📚', text: 'Access FAQs and troubleshooting guides' },
-                  { icon: '📞', text: 'Contact our helpdesk team for urgent matters' }
+                  { icon: '', text: 'Raise a support ticket for payment, CHW, clinic, or login issues' },
+                  { icon: '', text: 'Track your ticket status from your dashboard' },
+                  { icon: '', text: 'Access FAQs and troubleshooting guides' },
+                  { icon: '', text: 'Contact our helpdesk team for urgent matters' }
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start p-4 bg-blue-50 rounded-2xl border border-blue-200">
+                  <div key={index} className="flex items-start p-4  rounded-2xl border border-blue-200">
                     <span className="text-2xl mr-4 mt-1">{item.icon}</span>
-                    <span className="text-blue-700 font-medium">{item.text}</span>
+                    <span className="font-medium">{item.text}</span>
                   </div>
                 ))}
               </div>
@@ -107,11 +103,9 @@ const Support = () => {
             </section>
 
             {/* Support Categories */}
-            <section className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-200 p-8">
+            <section className="backdrop-blur-md p-8">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-2xl text-white">📋</span>
-                </div>
+                
                 <h2 className="text-3xl font-bold text-blue-800">Support Categories</h2>
               </div>
               
@@ -126,10 +120,8 @@ const Support = () => {
                         : 'border-blue-200 bg-white hover:border-blue-300 hover:shadow-md'
                     }`}
                   >
-                    <div className={`w-16 h-16 bg-gradient-to-br ${category.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                      <span className="text-3xl text-white">{category.icon}</span>
-                    </div>
-                    <h3 className="font-bold text-blue-800 text-lg">{category.name}</h3>
+                    
+                    <h3 className="font-bold text-lg">{category.name}</h3>
                   </button>
                 ))}
               </div>
@@ -167,7 +159,7 @@ const Support = () => {
                       onClick={handleTicketSubmit}
                       className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
                     >
-                      Submit Ticket 🚀
+                      Submit Ticket 
                     </button>
                   </div>
                 </div>
@@ -175,7 +167,7 @@ const Support = () => {
             </section>
 
             {/* FAQ Section */}
-            <section className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-200 p-8">
+            {/* <section className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-200 p-8">
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mr-4">
                   <span className="text-2xl text-white">❓</span>
@@ -206,52 +198,44 @@ const Support = () => {
                   </details>
                 ))}
               </div>
-            </section>
+            </section> */}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             
             {/* Contact Section */}
-            <section className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-200 p-6">
+            <section className=" p-6">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-2xl text-white">📞</span>
-                </div>
+                
                 <h2 className="text-2xl font-bold text-blue-800">Contact Us</h2>
               </div>
               
               <div className="space-y-4">
                 <a 
                   href="mailto:support@medilink.africa"
-                  className="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-2xl transition-all duration-300 border border-blue-200 group"
+                  className="flex items-center p-4 hover:bg-blue-100 rounded-2xl transition-all duration-300 border border-blue-200 group"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                    <span className="text-2xl text-white">📧</span>
-                  </div>
+                  
                   <div>
                     <div className="font-semibold text-blue-800">Email</div>
-                    <div className="text-blue-600 text-sm">support@medilink.africa</div>
+                    <div className="text-sm">support@medilink.africa</div>
                   </div>
                 </a>
                 
                 <a 
                   href="tel:+254700123456"
-                  className="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-2xl transition-all duration-300 border border-blue-200 group"
+                  className="flex items-center p-4 hover:bg-blue-100 rounded-2xl transition-all duration-300 border border-blue-200 group"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                    <span className="text-2xl text-white">📱</span>
-                  </div>
+                  
                   <div>
                     <div className="font-semibold text-blue-800">Phone</div>
-                    <div className="text-blue-600 text-sm">+254 700 123 456</div>
+                    <div className="text-sm">+254 700 123 456</div>
                   </div>
                 </a>
                 
                 <div className="flex items-center p-4 bg-yellow-50 rounded-2xl border border-yellow-200">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center mr-4">
-                    <span className="text-2xl text-white">💬</span>
-                  </div>
+                  
                   <div>
                     <div className="font-semibold text-blue-800">Live Chat</div>
                     <div className="text-yellow-600 text-sm">Coming Soon!</div>
@@ -261,11 +245,9 @@ const Support = () => {
             </section>
 
             {/* Support Hours */}
-            <section className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-xl p-6 text-white">
+            <section className="bg-gradient-to-br from-blue-600 to-blue-700 shadow-xl p-6 text-white">
               <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-2xl">🕐</span>
-                </div>
+                
                 <h3 className="text-2xl font-bold">Support Hours</h3>
               </div>
               <div className="space-y-3 text-blue-100">
@@ -291,21 +273,21 @@ const Support = () => {
             </section>
 
             {/* Quick Actions */}
-            <section className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-200 p-6">
+            <section className="bg-white/80  p-6">
               <h3 className="text-xl font-bold text-blue-800 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="w-full p-4 bg-blue-50 hover:bg-blue-100 rounded-2xl transition-colors border border-blue-200 text-left">
+                <button className="w-full p-4 cursor-pointer hover:bg-blue-100 rounded-2xl transition-colors border border-blue-200 text-left">
                   <div className="flex items-center">
-                    <span className="text-2xl mr-3">🎫</span>
+                    
                     <div>
                       <div className="font-semibold text-blue-800">View My Tickets</div>
-                      <div className="text-blue-600 text-sm">Check status & updates</div>
+                      <div className="text-sm">Check status & updates</div>
                     </div>
                   </div>
                 </button>
-                <button className="w-full p-4 bg-blue-50 hover:bg-blue-100 rounded-2xl transition-colors border border-blue-200 text-left">
+                <button className="w-full p-4 text-left">
                   <div className="flex items-center">
-                    <span className="text-2xl mr-3">📋</span>
+                    
                     <div>
                       <div className="font-semibold text-blue-800">System Status</div>
                       <div className="text-green-600 text-sm">All systems operational</div>
