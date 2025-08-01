@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState,} from 'react';
 import { ChevronDown, ChevronUp, Search, MessageCircle, Phone, Mail, HelpCircle, Shield, CreditCard, Users, Settings, Heart, Star } from 'lucide-react';
 
 const FAQs = () => {
@@ -138,16 +138,7 @@ const FAQs = () => {
     setExpandedItems(new Set());
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 400);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
  
-
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Hero Section */}
