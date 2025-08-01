@@ -82,16 +82,8 @@ const TechnicalFeatures = () => {
       {/* Main Technical Features Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Performance & Scalability Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-200 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          {/* Background Tech Image */}
-          <div className="absolute top-0 right-0 w-48 h-48 opacity-10 overflow-hidden rounded-3xl">
-            <img 
-              src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=500&h=500&fit=crop" 
-              alt="Technology Background"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
+        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-200 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+         
           {/* Decorative elements */}
           <div className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-blue-300/20 rounded-full blur-xl" />
           <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-lg" />
@@ -111,7 +103,7 @@ const TechnicalFeatures = () => {
             <div className="flex flex-wrap gap-2 mb-6">
               <button
                 onClick={() => setActiveTab('performance')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
                   activeTab === 'performance'
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'bg-white/60 text-gray-600 hover:bg-blue-100'
@@ -123,7 +115,7 @@ const TechnicalFeatures = () => {
                 <button
                   key={category}
                   onClick={() => setActiveTab(category.toLowerCase())}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
+                  className={`px-3 py-1 text-xs font-medium transition-all duration-300 ${
                     activeTab === category.toLowerCase()
                       ? 'bg-blue-600 text-white shadow-lg'
                       : 'bg-white/60 text-gray-600 hover:bg-blue-100'
@@ -143,10 +135,10 @@ const TechnicalFeatures = () => {
                 return (
                   <div 
                     key={index}
-                    className="group bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-blue-100/50 hover:border-blue-300 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                    className="group bg-white/70 backdrop-blur-sm p-4 border border-blue-100/50 hover:border-blue-300 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
                   >
                     <div className="flex items-start space-x-3">
-                      <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-2 group-hover:scale-110 transition-transform duration-300">
+                      <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-2 group-hover:scale-110 transition-transform duration-300">
                         <IconComponent className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1">
@@ -168,16 +160,8 @@ const TechnicalFeatures = () => {
         </section>
 
         {/* Security & Compliance Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-400 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          {/* Background Security Image */}
-          <div className="absolute top-0 right-0 w-48 h-48 opacity-10 overflow-hidden rounded-3xl">
-            <img 
-              src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=500&h=500&fit=crop" 
-              alt="Security Background"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
+        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-400 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+         
           {/* Decorative elements */}
           <div className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-blue-300/20 rounded-full blur-xl" />
           <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-lg" />
@@ -195,9 +179,9 @@ const TechnicalFeatures = () => {
 
             <div className="space-y-6">
               {securityFeatures.map((item, index) => (
-                <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-blue-100/50 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div key={index} className="group bg-white/80 backdrop-blur-sm p-6 border border-blue-100/50 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                   <div className="flex items-start space-x-4">
-                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-full p-3 group-hover:scale-110 transition-transform duration-300">
+                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-3 group-hover:scale-110 transition-transform duration-300">
                       <CheckCircle className="w-6 h-6 text-blue-600" />
                     </div>
                     <div className="flex-1">
@@ -211,7 +195,7 @@ const TechnicalFeatures = () => {
             </div>
 
             {/* Security Badge */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/10 to-blue-400/10 rounded-xl border border-blue-200">
+            <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/10 to-blue-400/10 border border-blue-200">
               <div className="text-center">
                 <div className="inline-flex items-center space-x-2 text-blue-700 font-semibold">
                   <Lock className="w-5 h-5" />
@@ -226,9 +210,9 @@ const TechnicalFeatures = () => {
       {/* Bottom Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Integrations Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-600 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <section className={`relative  p-8 overflow-hidden transition-all duration-1000 delay-600 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 blur-2xl" />
           
           <div className="relative z-10">
             <div className="flex items-center mb-8">
@@ -243,7 +227,7 @@ const TechnicalFeatures = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {integrations.map((item, index) => (
-                <div key={index} className={`group ${item.color} hover:scale-105 rounded-2xl p-6 border border-white/50 text-center transition-all duration-300 hover:shadow-lg cursor-pointer`}>
+                <div key={index} className={`group ${item.color} hover:scale-105 p-6 border border-white/50 text-center transition-all duration-300 hover:shadow-lg cursor-pointer`}>
                   <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">
                     {item.icon}
                   </div>
@@ -256,11 +240,11 @@ const TechnicalFeatures = () => {
             
             {/* Integration Stats */}
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-white/60 rounded-xl border border-blue-100">
+              <div className="text-center p-4 bg-white/60 border border-blue-100">
                 <div className="text-2xl font-bold text-blue-600">50+</div>
                 <div className="text-sm text-gray-600">API Endpoints</div>
               </div>
-              <div className="text-center p-4 bg-white/60 rounded-xl border border-blue-100">
+              <div className="text-center p-4 bg-white/60 border border-blue-100">
                 <div className="text-2xl font-bold text-blue-600">99.9%</div>
                 <div className="text-sm text-gray-600">Uptime SLA</div>
               </div>
@@ -269,9 +253,9 @@ const TechnicalFeatures = () => {
         </section>
         
         {/* Built for Impact Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-800 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <section className={`relative  p-8 overflow-hidden transition-all duration-1000 delay-800 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 blur-2xl" />
           
           <div className="relative z-10 flex flex-col justify-center h-full">
             <div className="flex items-center mb-8">
@@ -284,7 +268,7 @@ const TechnicalFeatures = () => {
               </div>
             </div>
             
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100/50 hover:shadow-xl transition-all duration-300">
+            <div className="backdrop-blur-sm p-8 hover:shadow-xl transition-all duration-300">
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
                 Our tech team is committed to continuous improvement, innovation, and reliability. We welcome 
                 <span className="font-semibold text-blue-700"> feedback and collaboration</span> from partners, 
@@ -308,7 +292,7 @@ const TechnicalFeatures = () => {
               </div>
               
               <div className="text-center">
-                <button className="group inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <button className="group inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white px-8 py-4 font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                   <span>Partner With Us</span>
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </button>
