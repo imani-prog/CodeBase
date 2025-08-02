@@ -1,5 +1,4 @@
-import Footer from "../../Components/Footer.jsx";
-import Navbar from "../../Components/Navbar.jsx";
+
 
 const BecomePartner = () => (
   <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
