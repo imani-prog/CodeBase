@@ -9,25 +9,25 @@ const IMPACT_STATS = [
     number: "50,000+",
     label: "Lives Impacted",
     description: "Through digital healthcare access",
-    icon: "❤️"
+    icon: ""
   },
   {
     number: "300+",
     label: "Health Workers",
     description: "Trained and equipped",
-    icon: "👨‍⚕️"
+    icon: ""
   },
   {
     number: "85+",
     label: "Communities",
     description: "Connected to healthcare",
-    icon: "🏘️"
+    icon: ""
   },
   {
     number: "24/7",
     label: "Support",
     description: "Emergency response available",
-    icon: "🚨"
+    icon: ""
   }
 ];
 
@@ -37,8 +37,8 @@ const DONATION_METHODS = [
     subtitle: "Mobile Money",
     details: "Paybill: 123456",
     account: "MediLink",
-    icon: "📱",
-    color: "from-green-500 to-green-600",
+    icon: "",
+    color: "from-blue-200 to-blue-300",
     popular: true
   },
   {
@@ -46,8 +46,8 @@ const DONATION_METHODS = [
     subtitle: "Traditional Banking",
     details: "Equity Bank",
     account: "Acc: 987654321",
-    icon: "🏦",
-    color: "from-blue-500 to-blue-600",
+    icon: "",
+    color: "from-blue-200 to-blue-300",
     popular: false
   },
   {
@@ -55,8 +55,8 @@ const DONATION_METHODS = [
     subtitle: "Credit/Debit Cards",
     details: "Stripe & Flutterwave",
     account: "Secure payments",
-    icon: "💳",
-    color: "from-purple-500 to-purple-600",
+    icon: "",
+    color: "from-blue-200 to-blue-300",
     popular: false
   },
   {
@@ -64,8 +64,8 @@ const DONATION_METHODS = [
     subtitle: "Digital Currency",
     details: "Bitcoin & Ethereum",
     account: "Modern payments",
-    icon: "₿",
-    color: "from-orange-500 to-orange-600",
+    icon: "",
+    color: "from-blue-200 to-blue-300",
     popular: false
   }
 ];
@@ -76,28 +76,28 @@ const IMPACT_TIERS = [
     title: "Healthcare Access",
     description: "Provides one month of healthcare access for a rural family",
     impact: "1 Family • 30 Days Coverage",
-    icon: "🏥"
+    icon: ""
   },
   {
     amount: "KES 2,000", 
     title: "CHW Support",
     description: "Trains and supports a Community Health Worker for one month",
     impact: "1 CHW • 500+ Patients Reached",
-    icon: "👩‍⚕️"
+    icon: ""
   },
   {
     amount: "KES 10,000",
     title: "Clinic Digitization",
     description: "Helps digitize a small clinic's patient records system",
     impact: "1 Clinic • 1000+ Records Digitized",
-    icon: "💻"
+    icon: ""
   },
   {
     amount: "KES 25,000",
     title: "Emergency Fund",
     description: "Creates emergency medical fund for critical cases",
     impact: "24/7 Emergency Response",
-    icon: "🚑"
+    icon: ""
   }
 ];
 
@@ -109,21 +109,16 @@ const Donate = () => {
   const quickAmounts = [500, 1000, 2500, 5000, 10000];
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       
       
       {/* Hero Section - Modern Design */}
       <section className="relative py-20 px-4 overflow-hidden">
         {/* Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10"></div>
-        <div className="absolute top-10 left-10 w-20 h-20 bg-blue-300/20 rounded-full blur-xl"></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 bg-indigo-300/20 rounded-full blur-xl"></div>
+       
         
         <div className="relative max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full px-6 py-2 mb-8 border border-blue-200">
-            <span className="text-2xl mr-2">💫</span>
-            <span className="text-blue-700 font-semibold">Make a Difference Today</span>
-          </div>
+          
           
           <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
             <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
@@ -141,7 +136,7 @@ const Donate = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center justify-center">
-                <span className="mr-2">🚀</span>
+                
                 Donate Now
                 <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -156,22 +151,22 @@ const Donate = () => {
       </section>
 
       {/* Live Impact Counter */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
+      <section className="py-16 ">
+        <div className="absolute inset-0"></div>
         <div className="relative max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Real-Time Impact</h2>
-            <p className="text-blue-100 text-lg">See the difference we're making together</p>
+            <h2 className="text-3xl text-blue-700 font-bold mb-4">Real-Time Impact</h2>
+            <p className="text-lg">See the difference we're making together</p>
           </div>
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {IMPACT_STATS.map((stat, index) => (
               <div key={index} className="text-center group">
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
-                  <div className="text-4xl mb-3">{stat.icon}</div>
-                  <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
-                  <div className="text-lg font-semibold text-blue-100 mb-1">{stat.label}</div>
-                  <div className="text-sm text-blue-200">{stat.description}</div>
+                <div className=" backdrop-blur rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
+                  
+                  <div className="text-3xl text-blue-700 font-bold mb-2">{stat.number}</div>
+                  <div className="text-lg text-blue-900  font-semibold mb-1">{stat.label}</div>
+                  <div className="text-sm">{stat.description}</div>
                 </div>
               </div>
             ))}
@@ -180,11 +175,11 @@ const Donate = () => {
       </section>
 
       {/* Modern Donation Methods */}
-      <section className="py-20 px-4">
+      <section className="py-20 bg-blue-950 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Choose Your Method</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-white mb-4">Choose Your Method</h2>
+            <p className="text-xl max-w-3xl text-white mx-auto">
               Multiple secure payment options designed for convenience and accessibility
             </p>
           </div>
@@ -197,23 +192,19 @@ const Donate = () => {
                 onMouseEnter={() => setIsHovered(index)}
                 onMouseLeave={() => setIsHovered(null)}
               >
-                {method.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-1 rounded-full text-sm font-bold z-10">
-                    Most Popular
-                  </div>
-                )}
                 
-                <div className={`bg-gradient-to-br ${method.color} p-1 rounded-2xl shadow-xl group-hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105`}>
-                  <div className="bg-white rounded-xl p-6 h-full">
+                
+                <div className={` p-1 rounded-2xl shadow-xl group-hover:from-blue-500 group-hover:to-blue-700 transition-all duration-300`}>
+                  <div className="bg-white rounded-xl p-6 h-full group-hover:bg-blue-50 transition-all duration-300">
                     <div className="text-center">
-                      <div className="text-4xl mb-4">{method.icon}</div>
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">{method.title}</h3>
+                      
+                      <h3 className="text-xl font-bold text-blue-800 mb-2 group-hover:text-blue-900 transition-colors duration-300">{method.title}</h3>
                       <p className="text-sm text-gray-600 mb-3">{method.subtitle}</p>
-                      <div className="bg-gray-50 rounded-lg p-3 mb-2">
+                      <div className="bg-gray-50 rounded-lg p-3 mb-2 group-hover:bg-blue-100 transition-all duration-300">
                         <p className="font-semibold text-gray-800">{method.details}</p>
                         <p className="text-sm text-gray-600">{method.account}</p>
                       </div>
-                      <button className={`w-full bg-gradient-to-r ${method.color} text-white py-2 rounded-lg font-semibold transition-all duration-300 hover:opacity-90`}>
+                      <button className={`w-full bg-blue-500 text-white py-2 rounded-lg font-semibold transition-all duration-300 hover:bg-blue-600 group-hover:shadow-md`}>
                         Select
                       </button>
                     </div>
@@ -224,9 +215,9 @@ const Donate = () => {
           </div>
           
           {/* Quick Amount Selection */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-            <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">Quick Donation</h3>
-            
+          <div className=" p-8 ">
+            <h3 className="text-2xl font-bold text-center text-white mb-8">Quick Donation</h3>
+
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
               {quickAmounts.map((amount, index) => (
                 <button
@@ -235,7 +226,7 @@ const Donate = () => {
                   className={`p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 ${
                     selectedAmount === amount
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
                   }`}
                 >
                   KES {amount.toLocaleString()}
@@ -243,7 +234,7 @@ const Donate = () => {
               ))}
             </div>
             
-            <div className="flex gap-4 mb-6">
+            <div className="flex gap-4 text-white mb-6">
               <input
                 type="number"
                 placeholder="Custom amount (KES)"
@@ -257,7 +248,7 @@ const Donate = () => {
             </div>
             
             <div className="text-center">
-              <p className="text-gray-600 text-sm">🔒 All transactions are secure and encrypted</p>
+              <p className="text-white text-sm"> All transactions are secure and encrypted</p>
             </div>
           </div>
         </div>
@@ -271,15 +262,15 @@ const Donate = () => {
             {/* Donation Impact Tiers */}
             <div className="space-y-6">
               <div className="text-center lg:text-left">
-                <h2 className="text-4xl font-bold text-gray-800 mb-4">Your Impact</h2>
-                <p className="text-xl text-gray-600 mb-8">
+                <h2 className="text-4xl font-bold text-blue-800 mb-4">Your Impact</h2>
+                <p className="text-xl mb-8">
                   See exactly how your donation transforms lives
                 </p>
               </div>
               
               <div className="space-y-4">
                 {IMPACT_TIERS.map((tier, index) => (
-                  <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102 border border-gray-100">
+                  <div key={index} className="p-6 shadow-lg ">
                     <div className="flex items-start space-x-4">
                       <div className="text-3xl">{tier.icon}</div>
                       <div className="flex-1">
