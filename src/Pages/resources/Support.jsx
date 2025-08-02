@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import Footer from '../../Components/Footer.jsx';
-import Navbar from '../../Components/Navbar.jsx';
+
 
 const Support = () => {
   const [selectedTicketType, setSelectedTicketType] = useState('');
@@ -10,7 +9,7 @@ const Support = () => {
     priority: 'medium',
     category: ''
   });
-  const [searchQuery, setSearchQuery] = useState('');
+
 
   const supportCategories = [
     { id: 'payment', name: 'Payment Issues',  },
@@ -21,26 +20,14 @@ const Support = () => {
     { id: 'other', name: 'Other',}
   ];
 
-  const faqs = [
-    { q: "How do I reset my password?", a: "Go to login page and click 'Forgot Password' to receive reset instructions." },
-    { q: "How can I update my payment method?", a: "Visit your account settings and navigate to the billing section to update payment details." },
-    { q: "How do I contact a CHW?", a: "Use the CHW directory in your dashboard or contact support for assistance." },
-    { q: "What if my clinic is not listed?", a: "Contact support to add your clinic to our network." }
-  ];
-
   const handleTicketSubmit = (e) => {
     e.preventDefault();
     // Handle ticket submission logic here
     console.log('Ticket submitted:', ticketForm);
   };
 
-  const filteredFaqs = faqs.filter(faq => 
-    faq.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    faq.a.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-blue-100">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       
       
       {/* Hero Section */}
@@ -166,39 +153,7 @@ const Support = () => {
               )}
             </section>
 
-            {/* FAQ Section */}
-            {/* <section className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-200 p-8">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-2xl text-white">❓</span>
-                </div>
-                <h2 className="text-3xl font-bold text-blue-800">Frequently Asked Questions</h2>
-              </div>
-              
-              <div className="mb-6">
-                <input
-                  type="text"
-                  placeholder="Search FAQs..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-6 py-4 rounded-2xl border-2 border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white/70"
-                />
-              </div>
-              
-              <div className="space-y-4">
-                {filteredFaqs.map((faq, index) => (
-                  <details key={index} className="bg-blue-50 rounded-2xl border border-blue-200 overflow-hidden">
-                    <summary className="p-6 cursor-pointer hover:bg-blue-100 transition-colors font-semibold text-blue-800 flex items-center">
-                      <span className="mr-3 text-xl">💡</span>
-                      {faq.q}
-                    </summary>
-                    <div className="px-6 pb-6 pt-2 text-blue-700 bg-white/50">
-                      {faq.a}
-                    </div>
-                  </details>
-                ))}
-              </div>
-            </section> */}
+            
           </div>
 
           {/* Sidebar */}
@@ -299,7 +254,6 @@ const Support = () => {
           </div>
         </div>
       </main>
-      
     </div>
   );
 };

@@ -1,5 +1,4 @@
-import Footer from "../Components/Footer.jsx";
-import Navbar from "../Components/Navbar.jsx";
+
 import KenyattaLogo from "../assets/Kenyatta hospital.jpeg";
 import MamaLucyLogo from "../assets/Lucy.jpg";
 import MinistryLogo from "../assets/MinistryOfHealth.png";

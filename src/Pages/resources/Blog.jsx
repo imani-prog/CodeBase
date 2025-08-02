@@ -638,7 +638,7 @@ export const Blog = () => {
                   
                   <div className="relative z-10 max-w-4xl mx-auto">
                     
-                    <h3 className="text-4xl md:text-5xl font-black mb-4  bg-clip-text">
+                    <h3 className="text-4xl text-blue-800 md:text-5xl font-black mb-4  bg-clip-text">
                       Transform Healthcare Together
                     </h3>
                     <p className="text-xl mb-8 leading-relaxed">
