@@ -303,15 +303,15 @@ const Partners = () => {
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             <div className="flex items-center justify-center text-blue-600">
-              <span className="mr-2">✅</span>
+              
               <span>Seamless Integration</span>
             </div>
             <div className="flex items-center justify-center text-blue-600">
-              <span className="mr-2">🔒</span>
+              
               <span>Secure & Compliant</span>
             </div>
             <div className="flex items-center justify-center text-blue-600">
-              <span className="mr-2">🎯</span>
+              
               <span>Proven Results</span>
             </div>
           </div>
