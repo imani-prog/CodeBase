@@ -121,14 +121,14 @@ const Donate = () => {
           
           
           <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
-              Transform
+            <span className="text-blue-800">
+              Transform Healthcare
             </span>
+
             <br />
-            <span className="text-gray-800">Healthcare</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-4xl mx-auto mb-10">
+          <p className="text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto mb-10">
             Your donation powers digital health innovation, connecting underserved communities 
             to life-saving healthcare across Africa. Every contribution creates lasting impact.
           </p>
@@ -255,7 +255,7 @@ const Donate = () => {
       </section>
 
       {/* Impact Visualization */}
-      <section className="py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100">
+      <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             
@@ -292,10 +292,10 @@ const Donate = () => {
             </div>
             
             {/* Transparency Dashboard */}
-            <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+            <div className="p-8 shadow-xl border border-gray-100">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-4">Transparency Report</h2>
-                <p className="text-gray-600">How we use every donation dollar</p>
+                <h2 className="text-3xl font-bold text-blue-800 mb-4">Transparency Report</h2>
+                <p className="">How we use every donation dollar</p>
               </div>
               
               <div className="space-y-6">
@@ -310,31 +310,31 @@ const Donate = () => {
                   
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-gray-700">Community Health Workers</span>
-                    <span className="font-bold text-green-600">25%</span>
+                    <span className="font-bold text-blue-600">25%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-1000 delay-200" style={{width: '25%'}}></div>
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-1000 delay-200" style={{width: '25%'}}></div>
                   </div>
                   
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-gray-700">Operations & Support</span>
-                    <span className="font-bold text-purple-600">15%</span>
+                    <span className="font-bold text-blue-600">15%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full transition-all duration-1000 delay-400" style={{width: '15%'}}></div>
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-1000 delay-400" style={{width: '15%'}}></div>
                   </div>
                 </div>
                 
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                <div className="p-6">
                   <div className="text-center">
-                    <h3 className="font-bold text-gray-800 mb-2">💡 Did you know?</h3>
-                    <p className="text-gray-600 text-sm">
+                    <h3 className="font-bold text-blue-800 mb-2">Did you know?</h3>
+                    <p className="text-sm">
                       95% of donations directly impact healthcare delivery. Only 5% goes to administrative costs.
                     </p>
                   </div>
                 </div>
-                
-                <button className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
+
+                <button className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
                   View Full Report
                 </button>
               </div>
@@ -344,34 +344,34 @@ const Donate = () => {
       </section>
 
       {/* Success Stories */}
-      <section className="py-20 px-4 bg-gradient-to-r from-green-50 to-blue-50">
+      <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Success Stories</h2>
-          <p className="text-xl text-gray-600 mb-12">Real impact from real donations</p>
+          <h2 className="text-4xl font-bold text-blue-800 mb-4">Success Stories</h2>
+          <p className="text-xl mb-12">Real impact from real donations</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="text-4xl mb-4">👩‍⚕️</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">Sarah's Story</h3>
-              <p className="text-gray-600 mb-4">
+              
+              <h3 className="text-xl font-bold text-blue-800 mb-3">Sarah's Story</h3>
+              <p className="mb-4">
                 "Thanks to MediLink, I can now provide telemedicine consultations to over 500 patients monthly in rural Turkana."
               </p>
               <div className="text-sm text-blue-600 font-semibold">Community Health Worker</div>
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="text-4xl mb-4">🏥</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">Kibera Clinic</h3>
-              <p className="text-gray-600 mb-4">
+
+              <h3 className="text-xl font-bold text-blue-800 mb-3">Kibera Clinic</h3>
+              <p className="mb-4">
                 "Digital patient records have reduced wait times by 70% and improved care coordination significantly."
               </p>
               <div className="text-sm text-blue-600 font-semibold">Healthcare Facility</div>
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">The Kamau Family</h3>
-              <p className="text-gray-600 mb-4">
+
+              <h3 className="text-xl font-bold text-blue-800 mb-3">The Kamau Family</h3>
+              <p className="mb-4">
                 "Emergency response through MediLink saved our daughter's life when she had complications during childbirth."
               </p>
               <div className="text-sm text-blue-600 font-semibold">Beneficiary Family</div>
@@ -381,7 +381,7 @@ const Donate = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 relative overflow-hidden">
+      <section className="py-20 px-4 bg-blue-950 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">Ready to Transform Lives?</h2>
@@ -392,7 +392,7 @@ const Donate = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
-              🚀 Start Donating
+              Start Donating
             </button>
             <Link 
               to="/contact" 
@@ -404,15 +404,15 @@ const Donate = () => {
           
           <div className="mt-8 flex flex-col sm:flex-row gap-6 justify-center text-blue-100">
             <div className="flex items-center">
-              <span className="mr-2">🔒</span>
+              
               <span>Secure Payments</span>
             </div>
             <div className="flex items-center">
-              <span className="mr-2">📊</span>
+              
               <span>Full Transparency</span>
             </div>
             <div className="flex items-center">
-              <span className="mr-2">🏆</span>
+              
               <span>Proven Impact</span>
             </div>
           </div>
