@@ -7,26 +7,26 @@ const COMPANY_CULTURE = [
   {
     title: "Innovation First",
     description: "We embrace cutting-edge technology to solve healthcare challenges",
-    icon: "🚀",
+    icon: "",
     color: "from-blue-500 to-blue-600"
   },
   {
     title: "Impact Driven",
     description: "Every line of code and every decision directly improves lives",
-    icon: "❤️",
-    color: "from-red-500 to-red-600"
+    icon: "",
+    color: "from-blue-500 to-blue-600"
   },
   {
     title: "Remote Friendly",
     description: "Work from anywhere while building the future of healthcare",
-    icon: "🌍",
-    color: "from-green-500 to-green-600"
+    icon: "",
+    color: "from-blue-500 to-blue-600"
   },
   {
     title: "Growth Mindset",
     description: "Continuous learning and professional development opportunities",
-    icon: "📚",
-    color: "from-purple-500 to-purple-600"
+    icon: "",
+    color: "from-blue-500 to-blue-600"
   }
 ];
 
@@ -35,22 +35,22 @@ const BENEFITS = [
   {
     category: "Health & Wellness",
     items: ["Comprehensive health insurance", "Mental health support", "Wellness stipend"],
-    icon: "🏥"
+    icon: ""
   },
   {
     category: "Work-Life Balance",
     items: ["Flexible working hours", "Unlimited PTO", "Remote work options"],
-    icon: "⚖️"
+    icon: ""
   },
   {
     category: "Professional Growth",
     items: ["Learning budget", "Conference attendance", "Mentorship programs"],
-    icon: "📈"
+    icon: ""
   },
   {
     category: "Financial",
     items: ["Competitive salary", "Equity options", "Performance bonuses"],
-    icon: "💰"
+    icon: ""
   }
 ];
 
@@ -61,12 +61,11 @@ const careerOpportunities = [
     location: "Remote / Onsite",
     type: "Full-time",
     department: "Engineering",
-    salary: "KES 1.2M - 2.5M",
-    experience: "2-5 years",
+    
     description:
       "Build beautiful, scalable React interfaces for MediLink's healthcare platform. Collaborate with designers and backend engineers to deliver seamless user experiences.",
     requirements: [
-      "2+ years experience with React.js",
+      "Basic knowledge of React.js",
       "Strong CSS/Tailwind skills",
       "Experience with REST APIs",
       "Interest in healthcare tech"
@@ -84,12 +83,11 @@ const careerOpportunities = [
     location: "Remote / Onsite",
     type: "Full-time",
     department: "Engineering",
-    salary: "KES 1.5M - 3M",
-    experience: "3-6 years",
+    
     description:
-      "Design and implement robust backend services for patient data, appointments, and analytics. Work with Node.js, Express, and cloud platforms.",
+      "Design and implement robust backend services for patient data, appointments, and analytics. Work with Java, Spring Boot, and cloud platforms.",
     requirements: [
-      "3+ years experience with Node.js/Express",
+      "Basic Knowledge and understanding of Java/Spring Boot",
       "Database experience (SQL/NoSQL)",
       "API design and security best practices",
       "Healthcare data experience a plus"
@@ -107,8 +105,7 @@ const careerOpportunities = [
     location: "Onsite (Regional Offices)",
     type: "Full-time",
     department: "Operations",
-    salary: "KES 800K - 1.5M",
-    experience: "3-7 years",
+    
     description:
       "Lead healthcare initiatives, coordinate with clinics and CHWs, and ensure MediLink's solutions meet real-world needs.",
     requirements: [
@@ -129,8 +126,7 @@ const careerOpportunities = [
     location: "Remote / Onsite",
     type: "Full-time / Contract",
     department: "Data Science",
-    salary: "KES 900K - 1.8M",
-    experience: "2-4 years",
+    
     description:
       "Analyze patient and clinic data to improve outcomes and inform product development. Use modern analytics tools and collaborate with tech teams.",
     requirements: [
@@ -151,8 +147,7 @@ const careerOpportunities = [
     location: "Onsite (Various Regions)",
     type: "Part-time / Full-time",
     department: "Community Health",
-    salary: "KES 300K - 600K",
-    experience: "1-3 years",
+    
     description:
       "Support patients and clinics, deliver health education, and help implement MediLink's technology in the field.",
     requirements: [
@@ -173,8 +168,7 @@ const careerOpportunities = [
     location: "Remote / Onsite",
     type: "Full-time",
     department: "Design",
-    salary: "KES 1M - 2M",
-    experience: "2-5 years",
+    
     description:
       "Design intuitive healthcare interfaces that improve patient outcomes. Work closely with engineering and clinical teams.",
     requirements: [
@@ -209,21 +203,15 @@ const Careers = () => {
 
  
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       
       
       {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5"></div>
-        <div className="absolute top-10 left-10 w-20 h-20 bg-blue-300/20 rounded-full blur-xl"></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 bg-indigo-300/20 rounded-full blur-xl"></div>
+       
         
         <div className="relative max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full px-6 py-2 mb-8 border border-blue-200">
-            <span className="text-2xl mr-2">💼</span>
-            <span className="text-blue-700 font-semibold">Join Our Mission</span>
-          </div>
+          
           
           <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
             <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
@@ -233,7 +221,7 @@ const Careers = () => {
             <span className="text-gray-800">of Healthcare</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-4xl mx-auto mb-10">
+          <p className="text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto mb-10">
             Join MediLink and help transform healthcare with technology. We're building solutions that 
             connect underserved communities to life-saving healthcare across Africa.
           </p>
@@ -244,7 +232,7 @@ const Careers = () => {
               className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               <span className="flex items-center justify-center">
-                <span className="mr-2">🚀</span>
+                
                 View Open Positions
                 <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -259,19 +247,18 @@ const Careers = () => {
       </section>
 
       {/* Company Culture */}
-      <section className="py-20 px-4 bg-gradient-to-r from-gray-50 to-blue-50">
+      <section className="py-20 px-4 bg-blue-950">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Why Work With Us?</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-white mb-4">Why Work With Us?</h2>
+            <p className="text-xl text-white max-w-3xl mx-auto">
               We're more than just a tech company - we're a mission-driven team changing lives through innovation
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex flex-col md:flex-row gap-6">
             {COMPANY_CULTURE.map((value, index) => (
               <div key={index} className="group text-center">
-                <div className={`bg-gradient-to-br ${value.color} p-1 rounded-2xl shadow-xl group-hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105`}>
+                <div className={` p-1 rounded-2xl shadow-xl `}>
                   <div className="bg-white rounded-xl p-6 h-full">
                     <div className="text-4xl mb-4">{value.icon}</div>
                     <h3 className="text-xl font-bold text-gray-800 mb-3">{value.title}</h3>
@@ -285,11 +272,11 @@ const Careers = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-blue-950">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Comprehensive Benefits</h2>
-            <p className="text-xl text-gray-600">We invest in our people because they invest in our mission</p>
+            <h2 className="text-4xl font-bold text-white mb-4">Comprehensive Benefits</h2>
+            <p className="text-xl text-white">We invest in our people because they invest in our mission</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -300,7 +287,7 @@ const Careers = () => {
                 <ul className="space-y-2">
                   {benefit.items.map((item, itemIndex) => (
                     <li key={itemIndex} className="flex items-center text-gray-600">
-                      <span className="text-green-500 mr-2">✓</span>
+                      <span className="text-blue-500 mr-2">✓</span>
                       <span className="text-sm">{item}</span>
                     </li>
                   ))}
@@ -315,8 +302,8 @@ const Careers = () => {
       <section id="open-positions" className="py-20 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Open Positions</h2>
-            <p className="text-xl text-gray-600 mb-8">Find your perfect role and start making an impact</p>
+            <h2 className="text-4xl font-bold text-blue-800 mb-4">Open Positions</h2>
+            <p className="text-xl mb-8">Find your perfect role and start making an impact</p>
             
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -351,10 +338,10 @@ const Careers = () => {
           {/* Job Listings */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {filteredJobs.map((job, index) => (
-              <div key={index} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+              <div key={index} className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
                 {job.featured && (
                   <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center py-2 text-sm font-semibold">
-                    ⭐ Featured Position
+                     Featured Position
                   </div>
                 )}
                 
@@ -379,10 +366,10 @@ const Careers = () => {
                   
                   <div className="grid grid-cols-2 gap-4 mb-4 text-sm text-gray-600">
                     <div>
-                      <span className="font-medium">📍 Location:</span> {job.location}
+                      <span className="font-medium"> Location:</span> {job.location}
                     </div>
                     <div>
-                      <span className="font-medium">⏰ Type:</span> {job.type}
+                      <span className="font-medium"> Type:</span> {job.type}
                     </div>
                   </div>
                   
@@ -434,7 +421,7 @@ const Careers = () => {
           
           {filteredJobs.length === 0 && (
             <div className="text-center py-12">
-              <div className="text-4xl mb-4">🔍</div>
+              
               <h3 className="text-xl font-semibold text-gray-800 mb-2">No positions found</h3>
               <p className="text-gray-600">Try adjusting your filters or check back later for new opportunities</p>
             </div>
@@ -445,22 +432,22 @@ const Careers = () => {
       {/* Application Process */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Application Process</h2>
-          <p className="text-xl text-gray-600 mb-12">Simple, transparent, and focused on finding the right fit</p>
+          <h2 className="text-4xl font-bold text-blue-800 mb-4">Application Process</h2>
+          <p className="text-xl mb-12">Simple, transparent, and focused on finding the right fit</p>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {[
-              { step: "1", title: "Apply", description: "Submit your application with resume and cover letter", icon: "📝" },
-              { step: "2", title: "Review", description: "Our team reviews your application within 48 hours", icon: "👀" },
-              { step: "3", title: "Interview", description: "Technical and cultural fit interviews", icon: "💬" },
-              { step: "4", title: "Decision", description: "Quick decision and onboarding process", icon: "🎉" }
+              { step: "1", title: "Apply", description: "Submit your application with resume and cover letter", icon: "" },
+              { step: "2", title: "Review", description: "Our team reviews your application within 48 hours", icon: "" },
+              { step: "3", title: "Interview", description: "Technical and cultural fit interviews", icon: "" },
+              { step: "4", title: "Decision", description: "Quick decision and onboarding process", icon: "" }
             ].map((step, index) => (
               <div key={index} className="relative">
                 <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
                   {step.step}
                 </div>
                 <div className="text-2xl mb-2">{step.icon}</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{step.title}</h3>
+                <h3 className="text-xl font-bold text-blue-700 mb-2">{step.title}</h3>
                 <p className="text-gray-600 text-sm">{step.description}</p>
                 
                 {index < 3 && (
@@ -473,7 +460,7 @@ const Careers = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 relative overflow-hidden">
+      <section className="py-20 px-4 bg-blue-950 relative">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">Ready to Make an Impact?</h2>
@@ -484,24 +471,24 @@ const Careers = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
-              🚀 Browse All Positions
+               Browse All Positions
             </button>
             <button className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300">
-              💬 Contact Recruiting Team
+               Contact Recruiting Team
             </button>
           </div>
           
           <div className="mt-8 flex flex-col sm:flex-row gap-6 justify-center text-blue-100">
             <div className="flex items-center">
-              <span className="mr-2">🌍</span>
+              
               <span>Remote-First Culture</span>
             </div>
             <div className="flex items-center">
-              <span className="mr-2">💡</span>
+              
               <span>Innovation Focused</span>
             </div>
             <div className="flex items-center">
-              <span className="mr-2">❤️</span>
+              
               <span>Mission Driven</span>
             </div>
           </div>

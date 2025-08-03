@@ -64,6 +64,7 @@ const Footer = () => {
                   src={mediLinkLogo}
                   alt="MediLink Logo"
                   className="w-16 h-16 object-contain rounded-full border-2"
+                 
                 />
               </div>
               <div>

@@ -55,10 +55,26 @@ const TechnicalFeatures = () => {
   ];
 
   const integrations = [
-    { icon: "", text: "Insurance systems (NHIF, SHA)", color: "bg-blue-100" },
-    { icon: "", text: "Health information exchanges", color: "bg-blue-100" },
-    { icon: "", text: "Partner clinics, hospitals, and NGOs", color: "bg-blue-100" },
-    { icon: "", text: "Mobile and USSD support for rural outreach", color: "bg-blue-100" }
+    { 
+      icon: "", 
+      text: "Insurance systems (NHIF, SHA)", 
+      color: "bg-blue-100",
+    },
+    { 
+      icon: "", 
+      text: "Health information exchanges", 
+      color: "bg-blue-100",
+    },
+    { 
+      icon: "", 
+      text: "Partner clinics, hospitals, and NGOs", 
+      color: "bg-blue-100",
+    },
+    { 
+      icon: "", 
+      text: "Mobile and USSD support for rural outreach", 
+      color: "bg-blue-100",
+    }
   ];
 
   const categories = [...new Set(performanceFeatures.map(f => f.category))];
@@ -80,23 +96,13 @@ const TechnicalFeatures = () => {
       </div>
 
       {/* Main Technical Features Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="space-y-12">
         {/* Performance & Scalability Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-200 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          {/* Background Tech Image */}
-          <div className="absolute top-0 right-0 w-48 h-48 opacity-10 overflow-hidden rounded-3xl">
-            <img 
-              src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=500&h=500&fit=crop" 
-              alt="Technology Background"
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <div className={`grid grid-cols-2 gap-20 mb-25 transition-all duration-1000 delay-200 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+         
           
-          {/* Decorative elements */}
-          <div className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-blue-300/20 rounded-full blur-xl" />
-          <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-lg" />
-          
-          <div className="relative z-10">
+          {/* Content Card */}
+          <div className="p-8 h-[400px]">
             <div className="flex items-center mb-6">
               <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-3 mr-4">
                 <Zap className="w-8 h-8 text-white" />
@@ -135,54 +141,61 @@ const TechnicalFeatures = () => {
             </div>
 
             {/* Features List */}
-            <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-              {(activeTab === 'performance' ? performanceFeatures : 
-                performanceFeatures.filter(f => f.category.toLowerCase() === activeTab))
+            <div className="space-y-2">
+              {(activeTab === 'performance' ? performanceFeatures.slice(0, 8) : 
+                performanceFeatures.filter(f => f.category.toLowerCase() === activeTab).slice(0, 8))
                 .map((feature, index) => {
                 const IconComponent = feature.icon;
                 return (
                   <div 
                     key={index}
-                    className="group bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-blue-100/50 hover:border-blue-300 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                    className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200"
                   >
-                    <div className="flex items-start space-x-3">
-                      <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-2 group-hover:scale-110 transition-transform duration-300">
-                        <IconComponent className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <span className="text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors duration-300">
-                          {feature.text}
-                        </span>
-                        <div className="mt-1">
-                          <span className="inline-block bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent text-xs font-semibold">
-                            {feature.category}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <IconComponent className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span className="text-sm leading-relaxed">
+                      {feature.text}
+                    </span>
                   </div>
                 );
               })}
             </div>
           </div>
-        </section>
+
+           {/* Image Card */}
+          <div 
+            className="bg-white rounded-3xl border border-blue-200/50 overflow-hidden h-[400px]"
+            style={{
+              boxShadow: `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+            }}
+          >
+            <img 
+              src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=500&h=500&fit=crop" 
+              alt="Technology Background"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
 
         {/* Security & Compliance Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-400 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          {/* Background Security Image */}
-          <div className="absolute top-0 right-0 w-48 h-48 opacity-10 overflow-hidden rounded-3xl">
+        <div className={`grid grid-cols-2 gap-4 transition-all duration-1000 delay-400 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+
+
+           {/* Image Card */}
+          <div 
+            className="bg-white rounded-3xl border border-blue-200/50 overflow-hidden h-[400px]"
+            style={{
+              boxShadow: `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+            }}
+          >
             <img 
               src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=500&h=500&fit=crop" 
               alt="Security Background"
               className="w-full h-full object-cover"
             />
           </div>
-          
-          {/* Decorative elements */}
-          <div className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-blue-300/20 rounded-full blur-xl" />
-          <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-lg" />
-          
-          <div className="relative z-10">
+
+          {/* Content Card */}
+          <div className="p-8 h-[400px]">
             <div className="flex items-center mb-8">
               <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-3 mr-4">
                 <Shield className="w-8 h-8 text-white" />
@@ -193,69 +206,67 @@ const TechnicalFeatures = () => {
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-3">
               {securityFeatures.map((item, index) => (
-                <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-blue-100/50 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-                  <div className="flex items-start space-x-4">
-                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-full p-3 group-hover:scale-110 transition-transform duration-300">
-                      <CheckCircle className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <span className="text-gray-700 leading-relaxed font-medium group-hover:text-gray-900 transition-colors duration-300">
-                        {item}
-                      </span>
-                    </div>
-                  </div>
+                <div key={index} className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200">
+                  <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                  <span className="text-sm leading-relaxed">
+                    {item}
+                  </span>
                 </div>
               ))}
             </div>
 
             {/* Security Badge */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/10 to-blue-400/10 rounded-xl border border-blue-200">
+            <div className="mt-6 p-3 bg-gradient-to-r from-blue-600/10 to-blue-400/10 rounded-xl border border-blue-200">
               <div className="text-center">
                 <div className="inline-flex items-center space-x-2 text-blue-700 font-semibold">
-                  <Lock className="w-5 h-5" />
-                  <span>ISO 27001 & HIPAA Ready</span>
+                  <Lock className="w-4 h-4" />
+                  <span className="text-sm">ISO 27001 & HIPAA Ready</span>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+          
+         
+        </div>
       </div>
 
-      {/* Bottom Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Bottom Section */}
+      <div className="space-y-8">
         {/* Integrations Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-600 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <section className={`relative  p-8 overflow-hidden transition-all duration-1000 delay-600 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
           
           <div className="relative z-10">
-            <div className="flex items-center mb-8">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-3 mr-4">
+            <div className="flex items-center justify-center mb-8">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-400  rounded-xl p-3 mr-4">
                 <Puzzle className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-800">Integrations & Extensibility</h2>
-                <p className="text-gray-600">Connect with existing systems</p>
+                <h2 className="text-3xl font-bold text-blue-800">Integrations & Extensibility</h2>
+                <p className="">Connect with existing systems</p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Horizontal Integration Items */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {integrations.map((item, index) => (
-                <div key={index} className={`group ${item.color} hover:scale-105 rounded-2xl p-6 border border-white/50 text-center transition-all duration-300 hover:shadow-lg cursor-pointer`}>
-                  <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">
-                    {item.icon}
-                  </div>
-                  <p className="text-gray-700 font-medium text-sm leading-relaxed group-hover:text-gray-900 transition-colors duration-300">
+                <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-blue-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] p-6 text-center">
+                  <p className="text-gray-700 font-medium text-base leading-relaxed group-hover:text-gray-900 transition-colors duration-300 mb-3">
                     {item.text}
                   </p>
+                  <div className="flex items-center justify-center text-blue-600">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
+                    <span className="text-sm font-semibold">Integration Ready</span>
+                  </div>
                 </div>
               ))}
             </div>
             
             {/* Integration Stats */}
-            <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
               <div className="text-center p-4 bg-white/60 rounded-xl border border-blue-100">
                 <div className="text-2xl font-bold text-blue-600">50+</div>
                 <div className="text-sm text-gray-600">API Endpoints</div>
@@ -269,23 +280,23 @@ const TechnicalFeatures = () => {
         </section>
         
         {/* Built for Impact Section */}
-        <section className={`relative bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 rounded-3xl shadow-2xl border border-blue-200/50 p-8 overflow-hidden transition-all duration-1000 delay-800 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <section className={`relative  p-8 overflow-hidden transition-all duration-1000 delay-800 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
           
-          <div className="relative z-10 flex flex-col justify-center h-full">
-            <div className="flex items-center mb-8">
+          <div className="relative z-10">
+            <div className="flex items-center justify-center mb-8">
               <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-3 mr-4">
                 <Rocket className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-800">Built for Impact</h2>
-                <p className="text-gray-600">Innovation meets reliability</p>
+                <h2 className="text-3xl font-bold text-blue-800">Built for Impact</h2>
+                <p className="">Innovation meets reliability</p>
               </div>
             </div>
             
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100/50 hover:shadow-xl transition-all duration-300">
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
+            <div className="max-w-4xl mx-auto">
+              <p className="text-lg text-gray-700 leading-relaxed mb-6 text-center">
                 Our tech team is committed to continuous improvement, innovation, and reliability. We welcome 
                 <span className="font-semibold text-blue-700"> feedback and collaboration</span> from partners, 
                 developers, and users to make MediLink even better.

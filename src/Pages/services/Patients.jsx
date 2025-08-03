@@ -21,7 +21,14 @@ const Patients = () => {
         <div className="grid grid-cols-1 gap-8 w-full">
           <div className="mb-5 w-full flex flex-col md:flex-row gap-6 md:gap-8">
             <div className="w-full md:w-1/2 flex justify-center items-center mb-4 md:mb-0">
-              <img src={patientsHomecareImg} alt="Patients homecare" className="w-full h-[220px] md:h-[350px] object-cover rounded-xl shadow-md border border-blue-200" />
+              <img 
+                src={patientsHomecareImg} 
+                alt="Patients homecare" 
+                className="w-full h-[220px] md:h-[350px] object-cover rounded-xl border border-blue-200" 
+                style={{
+                  boxShadow: `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                }}
+              />
             </div>
             <div className="w-full md:w-1/2 flex flex-col justify-center">
               <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2">Healthcare Appointments</h2>
@@ -65,7 +72,14 @@ const Patients = () => {
               <p className="mt-2 text-blue-900 text-xs md:text-base">Whether you need preventive care, nutrition tips, or mental wellness support, MediLink is a safe space for lifelong learning. We connect healthcare professionals and the community to build awareness and resilience for a healthier future.</p>
             </div>
             <div className="w-full md:w-1/2 flex justify-center items-center order-1 md:order-2 mb-4 md:mb-0">
-              <img src={HealthTechTraining} alt="Health Tech Training" className="w-full h-[220px] md:h-[350px] object-cover rounded-xl shadow-md border border-blue-200" />
+              <img 
+                src={HealthTechTraining} 
+                alt="Health Tech Training" 
+                className="w-full h-[220px] md:h-[350px] object-cover rounded-xl border border-blue-200" 
+                style={{
+                  boxShadow: `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+                }}
+              />
             </div>
           </div>
 
@@ -73,7 +87,14 @@ const Patients = () => {
 
           <div className="mb-5 w-full flex flex-col md:flex-row gap-6 md:gap-8">
             <div className="w-full md:w-1/2 flex justify-center items-center mb-4 md:mb-0">
-              <img src={TelemedicinePatientsImg} alt="Telemedicine Consultation" className="w-full h-[220px] md:h-[350px] object-cover rounded-xl shadow-md border border-blue-200" />
+              <img 
+                src={TelemedicinePatientsImg} 
+                alt="Telemedicine Consultation" 
+                className="w-full h-[220px] md:h-[350px] object-cover rounded-xl border border-blue-200" 
+                style={{
+                  boxShadow: `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                }}
+              />
             </div>
             <div className="w-full md:w-1/2 flex flex-col justify-center">
               <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 md:mb-4">Telemedicine Consultations</h2>
@@ -108,7 +129,14 @@ const Patients = () => {
               <p className="mt-2 text-blue-900 text-xs md:text-base">You also get digital receipts, transaction history, and automatic reminders for bills and renewals. Advanced security protects your financial data, making payments and insurance easy and worry-free.</p>
             </div>
             <div className="w-full md:w-1/2 flex justify-center items-center order-1 md:order-2 mb-4 md:mb-0">
-              <img src={PaymentsInsurance} alt="Insurance and Financial Integration" className="w-full h-[220px] md:h-[350px] object-cover rounded-xl shadow-md border border-blue-200" />
+              <img 
+                src={PaymentsInsurance} 
+                alt="Insurance and Financial Integration" 
+                className="w-full h-[220px] md:h-[350px] object-cover rounded-xl border border-blue-200" 
+                style={{
+                  boxShadow: `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+                }}
+              />
             </div>
           </div>
         </div>

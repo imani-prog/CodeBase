@@ -9,6 +9,7 @@ const TeamSection = ({ title, members }) => {
               src={member.image}
               alt={member.name}
               className="w-12 h-12 mb-2 rounded-full object-cover border"
+              
             />
             <span className="font-bold text-blue-900 text-sm text-center">
               {member.name} – {member.title}

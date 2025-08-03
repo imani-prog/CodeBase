@@ -72,6 +72,9 @@ const EventGamified = () => {
                 src={event.img}
                 alt={event.title}
                 className="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-110 transition-all duration-700"
+                style={{
+                  boxShadow: '8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)'
+                }}
               />
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent z-10 transition-all duration-500"></div>
@@ -141,14 +144,15 @@ const EventGamified = () => {
           </div>
 
           {/* Right Image with Sliding Text */}
-          <div className="w-full md:w-1/2 relative rounded-xl overflow-hidden shadow-lg flex items-center justify-center">
+          <div className="w-full md:w-1/2 relative rounded-xl shadow-lg flex items-center justify-center">
             <img
               key={currentImage}
               src={images[currentImage]}
               alt="Gamified Health Challenges"
-              className="w-full h-full object-cover max-h-[420px]"
+              className="w-full h-full object-cover max-h-[420px] rounded-xl"
               style={{
                 animation: "fadeZoom 1.5s ease-in-out",
+                boxShadow: '-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)'
               }}
             />
             <div

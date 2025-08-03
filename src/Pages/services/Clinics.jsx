@@ -44,14 +44,28 @@ const Clinics = () => {
               <p className="italic text-blue-600 mt-4 text-lg">"Real-time visibility for better decisions."</p>
             </div>
             <div className="flex justify-center items-center h-full md:h-[400px] px-2 md:px-8">
-              <img src={AdminDashboard1} alt="Admin Dashboard" className="max-w-full max-h-[400px] object-contain rounded-2xl shadow-lg border-2 border-blue-300 bg-white" />
+              <img 
+                src={AdminDashboard1} 
+                alt="Admin Dashboard" 
+                className="max-w-full max-h-[400px] object-contain rounded-2xl border-2 border-blue-300 bg-white" 
+                style={{
+                  boxShadow: `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+                }}
+              />
             </div>
           </div>
 
           {/* Electronic Health Records */}
           <div className="mb-10 w-full p-4 grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
             <div className="flex justify-center ml-0 items-center h-full md:h-[500px] px-0 md:px-0">
-              <img src={MedicalRecords11} alt="Electronic Medical Records" className="max-w-[480px] w-full max-h-[500px] object-contain rounded-2xl shadow-lg border-2 border-blue-300 bg-white" />
+              <img 
+                src={MedicalRecords11} 
+                alt="Electronic Medical Records" 
+                className="max-w-[480px] w-full max-h-[500px] object-contain rounded-2xl border-2 border-blue-300 bg-white" 
+                style={{
+                  boxShadow: `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                }}
+              />
             </div>
             <div className="flex flex-col justify-center h-full md:h-[500px] px-4 md:px-8">
               <h3 className="text-3xl font-extrabold text-blue-800 mb-4">Electronic Medical Records (EMR)</h3>

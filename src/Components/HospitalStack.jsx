@@ -4,14 +4,13 @@ import { Search, Filter, Heart, Users, Calendar, Pill, Receipt, Ambulance, UserC
 const HospitalStack = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [hoveredCard, setHoveredCard] = useState(null);
 
   const hospitalServices = useMemo(() => [
     {
       id: 1,
       title: 'Electronic Health Records (EHR)',
       description: 'Digitize patient records, history, prescriptions, lab results. Access across departments with role-based permissions. NHIF-ready reporting.',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrX7JVgPZ-MlGk07WTM_XLOAq5ztEnuog41Q&s',
+      image: 'https://www.xevensolutions.com/wp-content/uploads/2024/09/Top-6-Must-Have-Features-of-Electronic-Health-Records-EHR-Systems.jpg',
       icon: Heart,
       category: 'records',
       features: ['Digital Records', 'Cross-Department Access', 'NHIF Integration', 'Role-Based Security']
@@ -20,7 +19,7 @@ const HospitalStack = () => {
       id: 2,
       title: 'Appointment & Referral System',
       description: 'Automate patient bookings, manage referrals between facilities, SMS/Email reminders for patients.',
-      image: 'https://www.consultancy.eu/illustrations/news/detail/2024-11-25-010004496-Nine_technologies_revolutionizing_the_global_healthcare_industry.jpg',
+      image: 'https://www.bigscal.com/wp-content/uploads/2023/12/Patient-Referral-Management-Software.webp',
       icon: Calendar,
       category: 'scheduling',
       features: ['Automated Bookings', 'Referral Management', 'SMS/Email Alerts', 'Multi-Facility Support']
@@ -29,7 +28,7 @@ const HospitalStack = () => {
       id: 3,
       title: 'Inventory & Pharmacy Management',
       description: 'Track medicine stock levels, auto-generate low-stock alerts, reduce expiry loss with batch tracking.',
-      image: 'https://www.consultancy.eu/illustrations/news/detail/2024-11-25-010004496-Nine_technologies_revolutionizing_the_global_healthcare_industry.jpg',
+      image: 'https://cdn-lipbd.nitrocdn.com/NmtxoNywbwrhgCusRjwzXqAEjXRnHzOa/assets/images/optimized/rev-914be96/www.osplabs.com/wp-content/uploads/2022/01/How-Pharmacy-Inventory-Management-is-Efficient-Through-Technology.jpg',
       icon: Pill,
       category: 'inventory',
       features: ['Stock Tracking', 'Low-Stock Alerts', 'Batch Management', 'Expiry Prevention']
@@ -38,7 +37,7 @@ const HospitalStack = () => {
       id: 4,
       title: 'Billing & Finance Dashboard',
       description: 'Patient billing + NHIF claim exports, insurance integration (NHIF, SHA, private), track income, expenses, and profits.',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrX7JVgPZ-MlGk07WTM_XLOAq5ztEnuog41Q&s',
+      image: 'https://cdn-lipbd.nitrocdn.com/NmtxoNywbwrhgCusRjwzXqAEjXRnHzOa/assets/images/optimized/rev-914be96/www.osplabs.com/wp-content/uploads/2022/10/Payment-Wallet-Dashboard-1-1024x576.jpg',
       icon: Receipt,
       category: 'finance',
       features: ['Patient Billing', 'Insurance Integration', 'Financial Tracking', 'Profit Analysis']
@@ -56,7 +55,7 @@ const HospitalStack = () => {
       id: 6,
       title: 'Staff & Payroll Management',
       description: 'Schedule shifts, track attendance, handle salaries and CHW incentives, performance reports and KPIs.',
-      image: 'https://www.consultancy.eu/illustrations/news/detail/2024-11-25-010004496-Nine_technologies_revolutionizing_the_global_healthcare_industry.jpg',
+      image: 'https://ristsys.com/wp-content/uploads/2018/09/hr-chart.jpg',
       icon: UserCheck,
       category: 'management',
       features: ['Shift Scheduling', 'Attendance Tracking', 'Payroll Processing', 'Performance KPIs']
@@ -131,62 +130,80 @@ const HospitalStack = () => {
         </div>
       </div>
 
-      {/* Services Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+      {/* Services Grid - Separated Image and Text Cards */}
+      <div className="space-y-12 mb-10">
         {filteredServices.map((service) => {
           const IconComponent = service.icon;
           return (
             <div
               key={service.id}
-              className={`group relative bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-lg border border-blue-100 transition-all duration-500 hover:shadow-2xl hover:scale-105 cursor-pointer ${
-                hoveredCard === service.id ? 'ring-2 ring-blue-400' : ''
-              }`}
-              onMouseEnter={() => setHoveredCard(service.id)}
-              onMouseLeave={() => setHoveredCard(null)}
+              className="group"
             >
-              {/* Image Section */}
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2">
-                  <IconComponent className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
-
-              {/* Content Section */}
-              <div className="p-6">
-                <h4 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300">
-                  {service.title}
-                </h4>
-                <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                  {service.description}
-                </p>
-
-                {/* Features List */}
-                <div className="space-y-2">
-                  <h5 className="text-sm font-semibold text-gray-700 mb-2">Key Features:</h5>
-                  <div className="grid grid-cols-2 gap-1">
-                    {service.features.map((feature, index) => (
-                      <div key={index} className="flex items-center text-xs text-gray-600">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2" />
-                        {feature}
-                      </div>
-                    ))}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                {/* Image Card */}
+                <div 
+                  className={`relative bg-white backdrop-blur-lg rounded-2xl overflow-hidden border border-blue-100 cursor-pointer ${
+                    service.id % 2 === 1 ? 'lg:order-2' : ''
+                  }`}
+                  style={{
+                    boxShadow: service.id % 2 === 1 
+                      ? `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+                      : `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                  }}
+                >
+                  <div className="relative h-64 md:h-80 overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover transition-all duration-300"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3">
+                      <IconComponent className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
+                      <span className="text-sm font-medium text-gray-700 capitalize">{service.category}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Hover Action */}
-                <div className={`mt-4 pt-4 border-t border-gray-100 transition-all duration-300 ${
-                  hoveredCard === service.id ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-                }`}>
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:shadow-lg transition-all duration-300">
-                    Learn More
-                  </button>
+                {/* Text Card */}
+                <div 
+                  className={`p-8 ${
+                    service.id % 2 === 1 ? 'lg:order-1' : ''
+                  }`}
+                >
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4">
+                        {service.title}
+                      </h4>
+                      <p className="text-gray-600 text-base leading-relaxed">
+                        {service.description}
+                      </p>
+                    </div>
+
+                    {/* Features List */}
+                    <div className="space-y-3">
+                      <h5 className="text-lg font-semibold text-gray-700">Key Features:</h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {service.features.map((feature, index) => (
+                          <div key={index} className="flex items-center text-sm text-gray-600">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="pt-4">
+                      <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-medium">
+                        Learn More
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

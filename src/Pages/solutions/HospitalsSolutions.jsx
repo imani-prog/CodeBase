@@ -101,11 +101,12 @@ const Hospitals = () => (
               <img
                 src={f.img}
                 alt={f.title}
-                className={`w-full max-w-[600px] h-[360px] md:h-[400px] object-cover rounded-xl border-4 border-blue-200
-                  ${idx % 2 === 0
-                    ? 'shadow-[-20px_0_40px_-10px_rgba(30,64,175,0.25),-40px_0_60px_-20px_rgba(30,64,175,0.18),-60px_0_80px_-30px_rgba(30,64,175,0.12)]'
-                    : 'shadow-[20px_0_40px_-10px_rgba(30,64,175,0.25),40px_0_60px_-20px_rgba(30,64,175,0.18),60px_0_80px_-30px_rgba(30,64,175,0.12)]'
-                  }`}
+                className="w-full max-w-[600px] h-[360px] md:h-[400px] object-cover rounded-xl border-4 border-blue-200"
+                style={{
+                  boxShadow: idx % 2 === 0 
+                    ? `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+                    : `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                }}
               />
             </div>
 
