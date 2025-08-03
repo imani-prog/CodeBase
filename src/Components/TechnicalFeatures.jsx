@@ -162,7 +162,12 @@ const TechnicalFeatures = () => {
           </div>
 
            {/* Image Card */}
-          <div className="bg-white rounded-3xl shadow-2xl border border-blue-200/50 overflow-hidden h-[400px]">
+          <div 
+            className="bg-white rounded-3xl border border-blue-200/50 overflow-hidden h-[400px]"
+            style={{
+              boxShadow: `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+            }}
+          >
             <img 
               src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=500&h=500&fit=crop" 
               alt="Technology Background"
@@ -176,7 +181,12 @@ const TechnicalFeatures = () => {
 
 
            {/* Image Card */}
-          <div className="bg-white rounded-3xl shadow-2xl border border-blue-200/50 overflow-hidden h-[400px]">
+          <div 
+            className="bg-white rounded-3xl border border-blue-200/50 overflow-hidden h-[400px]"
+            style={{
+              boxShadow: `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+            }}
+          >
             <img 
               src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=500&h=500&fit=crop" 
               alt="Security Background"

@@ -118,8 +118,11 @@ const FinancialService = () => {
           <img
             src={smartHealthcareImg}
             alt="Smart Healthcare"
-            className="rounded-2xl shadow-lg w-full h-auto object-cover max-h-[520px]"
-            style={{ minHeight: '320px' }}
+            className="rounded-2xl w-full h-auto object-cover max-h-[520px]"
+            style={{ 
+              minHeight: '320px',
+              boxShadow: `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+            }}
           />
         </div>
       </div>

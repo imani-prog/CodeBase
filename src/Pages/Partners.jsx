@@ -228,15 +228,21 @@ const Partners = () => {
 
                 {/* Image Content - Right for even index, Left for odd index */}
                 <div className={`${index % 2 === 0 ? 'lg:order-2' : 'lg:order-1'} flex justify-center`}>
-                  <div className="relative group">
-                    <div className="w-80 h-80 bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-blue-100 hover:border-blue-300 flex items-center justify-center">
+                  <div className="relative">
+                    <div 
+                      className="w-80 h-80 bg-white rounded-3xl p-8 border border-blue-100 flex items-center justify-center"
+                      style={{
+                        boxShadow: index % 2 === 0 
+                          ? `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+                          : `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                      }}
+                    >
                       <img 
                         src={partner.logo} 
                         alt={partner.name} 
                         className="w-full h-full object-contain rounded-2xl"
                       />
                     </div>
-                    <div className="absolute -inset-2 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 -z-10"></div>
                   </div>
                 </div>
               </div>

@@ -46,6 +46,7 @@ const Home = () => {
               src={sliderImages[currentSlide]}
               alt={`MediLink Slide ${currentSlide + 1}`}
               className="w-full h-full object-cover"
+              
             />
             <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent"></div>
           </div>
@@ -54,11 +55,12 @@ const Home = () => {
           <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
             {/* Logo Glow */}
             <div className="relative mb-8">
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full blur-xl opacity-40"></div>
+              <div className="absolute -inset-4  rounded-full blur-xl opacity-40"></div>
               <img
                 src={MediLinkLogo}
                 alt="MediLink Logo"
                 className="relative w-32 h-32 md:w-40 md:h-40 rounded-full shadow-xl border-4 border-white bg-gradient-to-br from-blue-50 to-white"
+                
               />
             </div>
 

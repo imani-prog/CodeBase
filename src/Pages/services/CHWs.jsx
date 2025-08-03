@@ -35,7 +35,14 @@ const CHWs = () => {
               <p className="italic text-blue-600 mt-2">"Empowering CHWs means empowering communities."</p>
             </div>
             <div className="flex justify-center items-center h-full">
-              <img src={CommunityWorkerOutreach} alt="Mobile Outreach" className="w-full h-[350px] object-cover rounded-xl shadow-md border border-blue-200" />
+              <img 
+                src={CommunityWorkerOutreach} 
+                alt="Mobile Outreach" 
+                className="w-full h-[350px] object-cover rounded-xl shadow-md border border-blue-200" 
+                style={{
+                  boxShadow: '-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)'
+                }}
+              />
             </div>
           </div>
 
@@ -85,7 +92,14 @@ const CHWs = () => {
               <p className="italic text-blue-600 mt-2 text-lg">"CHWs deserve dignity, respect, and fair compensation."</p>
             </div>
             <div className="flex justify-center items-center h-full">
-              <img src={CommunityTogetherness} alt="Community Togetherness" className="w-full h-[350px] object-cover rounded-xl shadow-md border border-blue-200" />
+              <img 
+                src={CommunityTogetherness} 
+                alt="Community Togetherness" 
+                className="w-full h-[350px] object-cover rounded-xl shadow-md border border-blue-200" 
+                style={{
+                  boxShadow: '-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)'
+                }}
+              />
             </div>
           </div>
         </div>

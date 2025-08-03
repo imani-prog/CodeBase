@@ -27,7 +27,11 @@ const AboutMediLink = () => {
                 src={MedilinkHomePageSlider}
                 alt="Healthcare Technology Illustration"
                 className="w-full h-full rounded-2xl shadow-lg border border-blue-200 object-cover"
-                style={{ minHeight: '100%', minWidth: '100%' }}
+                style={{ 
+                  minHeight: '100%', 
+                  minWidth: '100%',
+                  boxShadow: '-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)'
+                }}
               />
             </div>
           </div>
@@ -101,7 +105,16 @@ const AboutMediLink = () => {
         <section className="mb-5 w-full bg-blue-50  p-2">
           <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
             <div className="flex-1 flex items-stretch justify-center">
-              <img src={Workers} alt="Workers" className="w-full h-full rounded-2xl shadow object-cover" style={{ minHeight: '100%', minWidth: '100%' }} />
+              <img 
+                src={Workers} 
+                alt="Workers" 
+                className="w-full h-full rounded-2xl shadow object-cover" 
+                style={{ 
+                  minHeight: '100%', 
+                  minWidth: '100%',
+                  boxShadow: '8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)'
+                }} 
+              />
             </div>
             <div className="flex-1 rounded-2xl shadow border border-blue-300  p-6">
               <h2 className="text-2xl font-bold text-blue-700 mb-4">Our Broader Vision</h2>
