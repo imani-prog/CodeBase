@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, Heart, Repeat2, Share, MoreHorizontal, Clock, User, Stethoscope, UserCheck, AlertCircle, Filter, BookOpen, Award } from 'lucide-react';
+import { MessageCircle, Heart, Repeat2, Share, MoreHorizontal, Clock, User, Stethoscope, UserCheck, AlertCircle, Filter, BookOpen, Award, Menu, X } from 'lucide-react';
 
 const CommunityDiscussions = () => {
   const [likes, setLikes] = useState({});
@@ -9,6 +9,7 @@ const CommunityDiscussions = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [bookmarked, setBookmarked] = useState({});
   const [following, setFollowing] = useState({});
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Flattened discussion data to look more like Twitter posts
   const posts = [
@@ -189,22 +190,43 @@ const CommunityDiscussions = () => {
 
 
   return (
-    <div className="max-w-6xl mx-auto bg-white rounded-lg shadow ">
-      <div className="flex">
+    <div className="max-w-6xl mx-auto bg-white rounded-lg shadow">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-opacity-50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
+      <div className="flex flex-col lg:flex-row">
         {/* Main Feed */}
-        <div className="flex-1 max-w-2xl border-x border-gray-200">
+        <div className="flex-1 lg:max-w-2xl border-x border-gray-200">
           {/* Header */}
           <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-3">
-            <div className="flex items-center space-x-3 mb-3">
-              <Stethoscope className="w-6 h-6 text-blue-500" />
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Medical Discussions</h2>
-                <p className="text-sm text-gray-500">Healthcare professionals sharing insights</p>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-3">
+                <Stethoscope className="w-6 h-6 text-blue-500" />
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">Medical Discussions</h2>
+                  <p className="text-xs sm:text-sm text-gray-500">Healthcare professionals sharing insights</p>
+                </div>
               </div>
+              
+              {/* Mobile sidebar toggle */}
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Toggle sidebar"
+              >
+                <Menu className="w-5 h-5 text-gray-600" />
+                {/* Notification badge */}
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></span>
+              </button>
             </div>
             
             {/* Filter Tabs */}
-            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 overflow-x-auto">
               {[
                 { id: 'all', label: 'All', icon: null },
                 { id: 'training', label: 'Training', icon: BookOpen },
@@ -214,7 +236,7 @@ const CommunityDiscussions = () => {
                 <button
                   key={filter.id}
                   onClick={() => handleFilterChange(filter.id)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                     activeFilter === filter.id
                       ? 'bg-blue-500 text-white'
                       : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
@@ -252,15 +274,15 @@ const CommunityDiscussions = () => {
                     <div className="flex-1 min-w-0">
                       {/* Header */}
                       <div className="flex items-center flex-wrap gap-1 mb-1">
-                        <span className="font-bold text-gray-900 hover:underline">{post.author}</span>
+                        <span className="font-bold text-gray-900 hover:underline text-sm sm:text-base">{post.author}</span>
                         {post.verified && (
                           <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                             <UserCheck className="w-3 h-3 text-white" />
                           </div>
                         )}
-                        <span className="text-gray-500">{post.handle}</span>
-                        <span className="text-gray-500">·</span>
-                        <span className="text-gray-500">{post.timestamp}</span>
+                        <span className="text-gray-500 text-sm">{post.handle}</span>
+                        <span className="text-gray-500 hidden sm:inline">·</span>
+                        <span className="text-gray-500 text-sm">{post.timestamp}</span>
                         {post.specialty && (
                           <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">
                             {post.specialty}
@@ -274,7 +296,7 @@ const CommunityDiscussions = () => {
                       </div>
 
                       {/* Post content */}
-                      <div className="text-gray-900 mb-3 leading-relaxed">
+                      <div className="text-gray-900 mb-3 leading-relaxed text-sm sm:text-base">
                         {post.content}
                       </div>
 
@@ -282,58 +304,58 @@ const CommunityDiscussions = () => {
                       <div className="flex items-center justify-between max-w-md">
                         <button
                           onClick={() => toggleReplyForm(post.id)}
-                          className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group"
+                          className="flex items-center space-x-1 sm:space-x-2 text-gray-500 hover:text-blue-500 transition-colors group"
                         >
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
-                            <MessageCircle className="w-5 h-5" />
+                          <div className="p-1.5 sm:p-2 rounded-full group-hover:bg-blue-50">
+                            <MessageCircle className="w-4 sm:w-5 h-4 sm:h-5" />
                           </div>
-                          <span className="text-sm">{post.replies}</span>
+                          <span className="text-xs sm:text-sm">{post.replies}</span>
                         </button>
 
                         <button
                           onClick={() => handleRetweet(post.id)}
-                          className={`flex items-center space-x-2 transition-colors group ${
+                          className={`flex items-center space-x-1 sm:space-x-2 transition-colors group ${
                             retweets[post.id] ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'
                           }`}
                         >
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
-                            <Repeat2 className="w-5 h-5" />
+                          <div className="p-1.5 sm:p-2 rounded-full group-hover:bg-blue-50">
+                            <Repeat2 className="w-4 sm:w-5 h-4 sm:h-5" />
                           </div>
-                          <span className="text-sm">{post.retweets + (retweets[post.id] ? 1 : 0)}</span>
+                          <span className="text-xs sm:text-sm">{post.retweets + (retweets[post.id] ? 1 : 0)}</span>
                         </button>
 
                         <button
                           onClick={() => handleLike(post.id)}
-                          className={`flex items-center space-x-2 transition-colors group ${
+                          className={`flex items-center space-x-1 sm:space-x-2 transition-colors group ${
                             likes[post.id] ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'
                           }`}
                         >
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
-                            <Heart className={`w-5 h-5 ${likes[post.id] ? 'fill-current' : ''}`} />
+                          <div className="p-1.5 sm:p-2 rounded-full group-hover:bg-blue-50">
+                            <Heart className={`w-4 sm:w-5 h-4 sm:h-5 ${likes[post.id] ? 'fill-current' : ''}`} />
                           </div>
-                          <span className="text-sm">{post.likes + (likes[post.id] ? 1 : 0)}</span>
+                          <span className="text-xs sm:text-sm">{post.likes + (likes[post.id] ? 1 : 0)}</span>
                         </button>
 
                         <button
                           onClick={() => handleBookmark(post.id)}
-                          className={`flex items-center space-x-2 transition-colors group ${
+                          className={`flex items-center space-x-1 sm:space-x-2 transition-colors group ${
                             bookmarked[post.id] ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'
                           }`}
                         >
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
-                            <BookOpen className={`w-5 h-5 ${bookmarked[post.id] ? 'fill-current' : ''}`} />
+                          <div className="p-1.5 sm:p-2 rounded-full group-hover:bg-blue-50">
+                            <BookOpen className={`w-4 sm:w-5 h-4 sm:h-5 ${bookmarked[post.id] ? 'fill-current' : ''}`} />
                           </div>
                         </button>
 
-                        <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group">
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
-                            <Share className="w-5 h-5" />
+                        <button className="flex items-center space-x-1 sm:space-x-2 text-gray-500 hover:text-blue-500 transition-colors group">
+                          <div className="p-1.5 sm:p-2 rounded-full group-hover:bg-blue-50">
+                            <Share className="w-4 sm:w-5 h-4 sm:h-5" />
                           </div>
                         </button>
 
-                        <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group">
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
-                            <MoreHorizontal className="w-5 h-5" />
+                        <button className="flex items-center space-x-1 sm:space-x-2 text-gray-500 hover:text-blue-500 transition-colors group">
+                          <div className="p-1.5 sm:p-2 rounded-full group-hover:bg-blue-50">
+                            <MoreHorizontal className="w-4 sm:w-5 h-4 sm:h-5" />
                           </div>
                         </button>
                       </div>
@@ -389,11 +411,32 @@ const CommunityDiscussions = () => {
             <button className="text-blue-500 hover:text-blue-600 font-medium bg-blue-50 px-6 py-2 rounded-full hover:bg-blue-100 transition-colors">
               Show more discussions
             </button>
+            
+            {/* Mobile sidebar hint */}
+            <div className="lg:hidden mt-4 text-sm text-gray-500 flex items-center justify-center gap-2">
+              <Menu className="w-4 h-4" />
+              <span>Tap menu for trending topics & quick actions</span>
+            </div>
           </div>
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-80 p-4 space-y-4">
+        <div className={`lg:block w-80 p-4 space-y-4 ${
+          sidebarOpen ? 'fixed top-0 right-0 h-full bg-white z-50 shadow-xl overflow-y-auto' : 'hidden'
+        } lg:relative lg:shadow-none lg:z-auto lg:overflow-visible`}>
+          
+          {/* Mobile close button */}
+          <div className="lg:hidden flex justify-between items-center mb-4 pb-3 border-b border-gray-200 sticky top-0 bg-white">
+            <h3 className="text-lg font-bold text-gray-900">Discussions Sidebar</h3>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+          
           {/* Search */}
           <div className="sticky top-0">
             <div className="relative">

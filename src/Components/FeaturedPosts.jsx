@@ -82,12 +82,12 @@ const FeaturedPosts = ({ categories = [] }) => {
       
       <div className="space-y-6">
         {featuredPosts.map((post, index) => (
-          <div key={post.id} className={`grid grid-cols-2 gap-25 ${index % 2 === 1 ? 'flex-row-reverse' : ''}`}>
+          <div key={post.id} className={`grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
             {/* Conditional Layout based on index */}
             {index % 2 === 0 ? (
               <>
                 {/* Text Card - Left Side (for even index) */}
-                <article className="bg-white rounded-2xl shadow-xl p-6 mb-8">
+                <article className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 mb-6 lg:mb-8 order-2 lg:order-1">
                   <div className="flex flex-col h-full justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-4">
@@ -109,10 +109,10 @@ const FeaturedPosts = ({ categories = [] }) => {
                         </div>
                       </div>
                       
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                      <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
                         {post.title}
                       </h3>
-                      <p className="text-gray-600 mb-4 leading-relaxed">{post.excerpt}</p>
+                      <p className="text-gray-600 mb-4 leading-relaxed text-sm sm:text-base">{post.excerpt}</p>
                       
                       <div className="flex items-center space-x-4 text-gray-500 text-sm mb-4">
                         <div className="flex items-center">
@@ -133,7 +133,7 @@ const FeaturedPosts = ({ categories = [] }) => {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                        <div className="w-8 sm:w-10 h-8 sm:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm mr-3">
                           {post.author.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div>
@@ -167,8 +167,8 @@ const FeaturedPosts = ({ categories = [] }) => {
                 </article>
                 
                 {/* Image Card - Right Side (for even index) */}
-                <article className="bg-white rounded-2xl shadow-xl mb-8">
-                  <div className="relative h-full min-h-[300px]">
+                <article className="bg-white rounded-2xl shadow-xl mb-6 lg:mb-8 order-1 lg:order-2">
+                  <div className="relative h-48 sm:h-64 lg:h-full lg:min-h-[300px]">
                     <img
                       src={post.image}
                       alt={post.title}
@@ -186,8 +186,8 @@ const FeaturedPosts = ({ categories = [] }) => {
             ) : (
               <>
                 {/* Image Card - Left Side (for odd index) */}
-                <article className="bg-white rounded-2xl shadow-xl mb-8">
-                  <div className="relative h-full min-h-[300px]">
+                <article className="bg-white rounded-2xl shadow-xl mb-6 lg:mb-8 order-1">
+                  <div className="relative h-48 sm:h-64 lg:h-full lg:min-h-[300px]">
                     <img
                       src={post.image}
                       alt={post.title}
@@ -202,7 +202,7 @@ const FeaturedPosts = ({ categories = [] }) => {
                 </article>
                 
                 {/* Text Card - Right Side (for odd index) */}
-                <article className="bg-white rounded-2xl shadow-xl p-6 mb-8">
+                <article className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 mb-6 lg:mb-8 order-2">
                   <div className="flex flex-col h-full justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-4">
@@ -224,10 +224,10 @@ const FeaturedPosts = ({ categories = [] }) => {
                         </div>
                       </div>
                       
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                      <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
                         {post.title}
                       </h3>
-                      <p className="text-gray-600 mb-4 leading-relaxed">{post.excerpt}</p>
+                      <p className="text-gray-600 mb-4 leading-relaxed text-sm sm:text-base">{post.excerpt}</p>
                       
                       <div className="flex items-center space-x-4 text-gray-500 text-sm mb-4">
                         <div className="flex items-center">
@@ -248,7 +248,7 @@ const FeaturedPosts = ({ categories = [] }) => {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                        <div className="w-8 sm:w-10 h-8 sm:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm mr-3">
                           {post.author.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div>
