@@ -83,47 +83,49 @@ const HospitalStack = () => {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6">
+    <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
       {/* Header Section */}
-      <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-          Hospital Management Stack
-        </h2>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-          Comprehensive healthcare solutions designed for modern medical facilities
+      <div className="text-center mb-6 sm:mb-8 lg:mb-12">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3 sm:mb-4">
+          Hospital Technology Stack
+        </h1>
+        <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Comprehensive digital solutions designed for modern healthcare facilities, 
+          enhancing patient care and operational efficiency.
         </p>
       </div>
 
       {/* Search and Filter Controls */}
-      <div className="mb-8 space-y-4">
+      <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
         {/* Search Bar */}
         <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
           <input
             type="text"
             placeholder="Search services..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-3 border border-gray-200 rounded-xl bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
           />
         </div>
 
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
           {categories.map((category) => {
             const IconComponent = category.icon;
             return (
               <button
                 key={category.value}
                 onClick={() => setSelectedCategory(category.value)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 ${
                   selectedCategory === category.value
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-blue-50 border border-gray-200'
                 }`}
               >
-                <IconComponent className="w-4 h-4" />
-                <span>{category.label}</span>
+                <IconComponent className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">{category.label}</span>
+                <span className="sm:hidden">{category.label.length > 8 ? category.label.slice(0, 8) + '...' : category.label}</span>
               </button>
             );
           })}
@@ -131,7 +133,7 @@ const HospitalStack = () => {
       </div>
 
       {/* Services Grid - Separated Image and Text Cards */}
-      <div className="space-y-12 mb-10">
+      <div className="space-y-8 sm:space-y-10 lg:space-y-12 mb-6 sm:mb-8 lg:mb-10">
         {filteredServices.map((service) => {
           const IconComponent = service.icon;
           return (
@@ -139,7 +141,7 @@ const HospitalStack = () => {
               key={service.id}
               className="group"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-center">
                 {/* Image Card */}
                 <div 
                   className={`relative bg-white backdrop-blur-lg rounded-2xl overflow-hidden border border-blue-100 cursor-pointer ${
@@ -147,11 +149,11 @@ const HospitalStack = () => {
                   }`}
                   style={{
                     boxShadow: service.id % 2 === 1 
-                      ? `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
-                      : `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                      ? `-4px 4px 0px rgba(59, 130, 246, 0.3), -8px 8px 0px rgba(59, 130, 246, 0.2), -12px 12px 0px rgba(59, 130, 246, 0.1), -16px 16px 20px rgba(0, 0, 0, 0.1)`
+                      : `4px 4px 0px rgba(59, 130, 246, 0.3), 8px 8px 0px rgba(59, 130, 246, 0.2), 12px 12px 0px rgba(59, 130, 246, 0.1), 16px 16px 20px rgba(0, 0, 0, 0.1)`
                   }}
                 >
-                  <div className="relative h-64 md:h-80 overflow-hidden">
+                  <div className="relative h-48 sm:h-56 md:h-64 lg:h-80 overflow-hidden">
                     <img
                       src={service.image}
                       alt={service.title}
@@ -159,39 +161,39 @@ const HospitalStack = () => {
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3">
-                      <IconComponent className="w-8 h-8 text-blue-600" />
+                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3">
+                      <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-blue-600" />
                     </div>
-                    <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
-                      <span className="text-sm font-medium text-gray-700 capitalize">{service.category}</span>
+                    <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 bg-white/90 backdrop-blur-sm rounded-lg px-2 sm:px-3 py-1">
+                      <span className="text-xs sm:text-sm font-medium text-gray-700 capitalize">{service.category}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Text Card */}
                 <div 
-                  className={`p-8 ${
+                  className={`p-4 sm:p-6 lg:p-8 ${
                     service.id % 2 === 1 ? 'lg:order-1' : ''
                   }`}
                 >
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     <div>
-                      <h4 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4">
+                      <h4 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600 mb-3 sm:mb-4">
                         {service.title}
                       </h4>
-                      <p className="text-gray-600 text-base leading-relaxed">
+                      <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                         {service.description}
                       </p>
                     </div>
 
                     {/* Features List */}
-                    <div className="space-y-3">
-                      <h5 className="text-lg font-semibold text-gray-700">Key Features:</h5>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-2 sm:space-y-3">
+                      <h5 className="text-base sm:text-lg font-semibold text-gray-700">Key Features:</h5>
+                      <div className="grid grid-cols-1 gap-2 sm:gap-3">
                         {service.features.map((feature, index) => (
-                          <div key={index} className="flex items-center text-sm text-gray-600">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 flex-shrink-0" />
-                            <span>{feature}</span>
+                          <div key={index} className="flex items-start text-xs sm:text-sm text-gray-600">
+                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full mr-2 sm:mr-3 flex-shrink-0 mt-1.5 sm:mt-2" />
+                            <span className="leading-relaxed">{feature}</span>
                           </div>
                         ))}
                       </div>
