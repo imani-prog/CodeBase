@@ -93,7 +93,7 @@ const CTA = () => {
           <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3 sm:mb-4">
               <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center">Built for Africa, Backed by Security</h3>
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center text-blue-600">Built for Africa, Backed by Security</h3>
             </div>
             <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Trusted by healthcare providers across Kenya</p>
           </div>
@@ -133,7 +133,7 @@ const CTA = () => {
                         <div className={`absolute -bottom-1 sm:-bottom-2 -right-1 sm:-right-2 transition-all duration-500 ${
                           isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
                         }`}>
-                          <div className="bg-green-500 rounded-full p-1">
+                          <div className="bg-blue-500 rounded-full p-1">
                             <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                           </div>
                         </div>
@@ -187,7 +187,7 @@ const CTA = () => {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-2 sm:p-3">
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-700 to-purple-700 bg-clip-text text-transparent text-center">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600 text-center">
                 Ready to Transform Your Hospital?
               </h3>
             </div>
@@ -195,7 +195,7 @@ const CTA = () => {
             <p className="text-sm sm:text-base lg:text-lg text-gray-700 mb-4 sm:mb-6 max-w-3xl mx-auto leading-relaxed">
               Whether you're a rural clinic or a major hospital, MediLink offers a customizable platform to 
               <span className="font-semibold text-blue-700"> digitize your operations</span> and 
-              <span className="font-semibold text-purple-700"> serve more patients efficiently</span>.
+              <span className="font-semibold text-blue-700"> serve more patients efficiently</span>.
             </p>
           </div>
 
@@ -213,17 +213,17 @@ const CTA = () => {
                 return (
                   <div 
                     key={index}
-                    className="group bg-white/60 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-green-200 hover:border-green-400 transition-all duration-300 hover:shadow-lg hover:scale-105"
+                    className="group bg-white/60 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-blue-200 hover:border-blue-400 transition-all duration-300 hover:shadow-lg hover:scale-105"
                   >
                     <div className="flex items-center justify-center space-x-2 sm:space-x-3">
-                      <div className="bg-green-100 group-hover:bg-green-200 rounded-full p-1.5 sm:p-2 transition-colors duration-300">
-                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                      <div className="bg-blue-100 group-hover:bg-blue-200 rounded-full p-1.5 sm:p-2 transition-colors duration-300">
+                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                       </div>
                       <div className="text-left flex-1">
                         <p className="font-semibold text-gray-800 text-xs sm:text-sm">{feature.text}</p>
                         <p className="text-xs text-gray-600">{feature.description}</p>
                       </div>
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
                     </div>
                   </div>
                 );
@@ -259,10 +259,10 @@ const CTA = () => {
             
             <button
               onClick={() => handleCTAClick('success-stories')}
-              className="group bg-gradient-to-r from-green-100 to-blue-100 hover:from-green-200 hover:to-blue-200 text-gray-800 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-md transition-all duration-300 transform hover:scale-105 font-semibold border border-green-200 hover:border-green-300"
+              className="group bg-gradient-to-r from-blue-200 to-purple-200 hover:from-blue-200 hover:to-purple-200 text-gray-800 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-md transition-all duration-300 transform hover:scale-105 font-semibold border border-blue-200 hover:border-blue-300"
             >
               <div className="flex items-center justify-center space-x-2">
-                <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 <span className="text-sm sm:text-base">See Hospital Success Stories</span>
                 <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
@@ -273,7 +273,7 @@ const CTA = () => {
           <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-8 text-xs sm:text-sm text-gray-600">
               <div className="flex items-center space-x-2">
-                <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+                <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                 <span>Secure & Compliant</span>
               </div>
               <div className="flex items-center space-x-2">
@@ -281,7 +281,7 @@ const CTA = () => {
                 <span>50+ Hospitals Trust Us</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                 <span>5-Star Support</span>
               </div>
             </div>

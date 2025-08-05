@@ -39,6 +39,7 @@ const referralSlides = [
   },
 ];
 
+
 function PatientReferralSlider() {
   const [current, setCurrent] = useState(0);
   useEffect(() => {
@@ -49,7 +50,7 @@ function PatientReferralSlider() {
   }, []);
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-blue-900/60 p-16 rounded-2xl min-h-[700px] relative">
+    <div className="w-full h-full flex items-center justify-center bg-blue-950/60 p-16 rounded-2xl min-h-[700px] relative">
       <div
         className="w-full max-w-2xl mx-auto transition-transform duration-700 ease-in-out"
         style={{
@@ -64,9 +65,12 @@ function PatientReferralSlider() {
             style={{ minWidth: "100%" }}
           >
             <h2 className="text-3xl font-extrabold text-white mb-4 text-center drop-shadow-lg">{slide.title}</h2>
-            <ul className="list-disc list-inside mb-4 text-xl text-white text-center">
+            <ul className="list-none space-y-3 mb-4 text-xl text-white text-center">
               {slide.points.map((point, i) => (
-                <li key={i}>{point}</li>
+                <li key={i} className="flex items-start justify-center">
+                  <span className="text-blue-200 mr-3 mt-1">✓</span>
+                  <span>{point}</span>
+                </li>
               ))}
             </ul>
             <p className="italic text-blue-200 mt-2 text-lg text-center">"{slide.quote}"</p>

@@ -298,20 +298,41 @@ const PatientsReview = () => {
           <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6 ">
             <div className="p-6 flex-1 max-w-md">
               <h5 className="text-lg font-bold text-blue-800 mb-2">Why Join MediLink?</h5>
-              <ul className="list-disc list-inside text-gray-700 text-base mb-2">
-                <li>Access affordable healthcare from anywhere</li>
-                <li>Book appointments and get reminders easily</li>
-                <li>Connect with doctors and specialists online</li>
-                <li>Track your health records securely</li>
+              <ul className="list-none space-y-3 text-gray-700 text-base mb-2">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Access affordable healthcare from anywhere</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Book appointments and get reminders easily</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Connect with doctors and specialists online</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Track your health records securely</span>
+                </li>
               </ul>
               <p className="text-blue-600 italic">"Empowering patients for a healthier tomorrow."</p>
             </div>
             <div className="p-6 flex-1 max-w-md">
               <h5 className="text-lg font-bold text-blue-800 mb-2">Need Help?</h5>
-              <ul className="list-disc list-inside text-gray-700 text-base mb-2">
-                <li>Visit our <a href="/frequent-questions" className="text-blue-700 hover:underline">FAQ</a> page</li>
-                <li>Contact our support team for assistance</li>
-                <li>Explore patient resources and guides</li>
+              <ul className="list-none space-y-3 text-gray-700 text-base mb-2">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Visit our <a href="/frequent-questions" className="text-blue-700 hover:underline">FAQ</a> page</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Contact our support team for assistance</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Explore patient resources and guides</span>
+                </li>
               </ul>
               <p className="text-blue-600 italic">"We're here for you every step of the way."</p>
             </div>

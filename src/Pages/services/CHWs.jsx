@@ -22,14 +22,35 @@ const CHWs = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-2 p-8 items-center">
             <div className="flex flex-col justify-center h-full pr-4">
               <h2 className="text-2xl font-bold text-blue-800 mb-1 mt-0">Mobile Outreach & Home Visits</h2>
-              <ul className="list-disc list-inside ml-6 mb-2">
-                <li>Track and manage home visits</li>
-                <li>Digitally-enabled CHWs for better care and faster response</li>
-                <li>Emergency support and referrals</li>
-                <li>Health screenings and basic diagnostics at home</li>
-                <li>Medication delivery and follow-up care</li>
-                <li>Community health education and awareness</li>
-                <li>Support for elderly and vulnerable patients</li>
+              <ul className="list-none space-y-3 mb-2">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Track and manage home visits</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Digitally-enabled CHWs for better care and faster response</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Emergency support and referrals</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Health screenings and basic diagnostics at home</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Medication delivery and follow-up care</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Community health education and awareness</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Support for elderly and vulnerable patients</span>
+                </li>
               </ul>
               <p className="mt-2 text-blue-900">Our mobile outreach program brings essential healthcare directly to patients' homes, especially in remote and underserved areas. CHWs use digital tools to coordinate visits, monitor patient progress, and respond quickly to emergencies. This approach reduces barriers to care, improves health outcomes, and strengthens community trust in healthcare services.</p>
               <p className="italic text-blue-600 mt-2">"Empowering CHWs means empowering communities."</p>
@@ -62,14 +83,35 @@ const CHWs = () => {
             </div>
             <div className="flex flex-col justify-center h-full pl-4">
               <h2 className="text-2xl font-bold text-blue-800 mb-1 mt-0">E-learning & Certification</h2>
-              <ul className="list-disc list-inside ml-6 mb-2 text-lg">
-                <li>E-learning courses for CHWs</li>
-                <li>Certification tracking for CHW growth</li>
-                <li>Maternal, child, chronic illness education</li>
-                <li>Interactive webinars and workshops</li>
-                <li>Peer-to-peer learning and support groups</li>
-                <li>Practical skills for preventive care and nutrition</li>
-                <li>Access to expert advice and mentorship</li>
+              <ul className="list-none space-y-3 mb-2 text-lg">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>E-learning courses for CHWs</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Certification tracking for CHW growth</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Maternal, child, chronic illness education</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Interactive webinars and workshops</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Peer-to-peer learning and support groups</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Practical skills for preventive care and nutrition</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Access to expert advice and mentorship</span>
+                </li>
               </ul>
               <p className="mt-2 text-blue-900 text-lg">Our E-learning & Certification program empowers CHWs to continuously grow their skills and knowledge. Through interactive courses, workshops, and expert mentorship, CHWs gain practical tools for patient care, health education, and community engagement. The platform supports lifelong learning, professional development, and collaboration among health workers.</p>
               <p className="italic text-blue-600 mt-2 text-lg">"Learn. Apply. Thrive."</p>
@@ -80,13 +122,31 @@ const CHWs = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-2 p-8 items-center">
             <div className="flex flex-col justify-center h-full pr-4">
               <h2 className="text-2xl font-bold text-blue-800 mb-2">Financial Empowerment</h2>
-              <ul className="list-disc list-inside ml-6 mb-2 text-lg">
-                <li>Stable income through digital bookings</li>
-                <li>Mobile wallet payments (M-Pesa, etc.)</li>
-                <li>Transparent earnings and impact tracking</li>
-                <li>Financial literacy and savings support</li>
-                <li>Access to microloans and incentives</li>
-                <li>Recognition for community impact</li>
+              <ul className="list-none space-y-3 mb-2 text-lg">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Stable income through digital bookings</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Mobile wallet payments (M-Pesa, etc.)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Transparent earnings and impact tracking</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Financial literacy and savings support</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Access to microloans and incentives</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Recognition for community impact</span>
+                </li>
               </ul>
               <p className="mt-2 text-blue-900 text-lg">MediLink’s Financial Empowerment program ensures CHWs receive fair compensation, timely payments, and opportunities for growth. With digital tools for tracking earnings, financial literacy resources, and access to incentives, CHWs can focus on serving their communities while building a stable future.</p>
               <p className="italic text-blue-600 mt-2 text-lg">"CHWs deserve dignity, respect, and fair compensation."</p>
@@ -125,11 +185,23 @@ const CHWs = () => {
             <div className="rounded-xl p-8 max-w-2xl w-full bg-transparent">
               <h2 className="text-3xl font-extrabold text-white mb-4 text-center drop-shadow-lg">Serving CHWs with Purpose</h2>
               <p className="text-xl text-white text-center mb-4 drop-shadow-lg">MediLink listens to CHWs and builds tools they actually use and love. Every feature is designed to make their work easier, safer, and more impactful.</p>
-              <ul className="list-disc list-inside ml-6 mt-4 text-lg text-white drop-shadow-lg">
-                <li>Co-designed features with CHW feedback</li>
-                <li>Focus on safety, dignity, and impact</li>
-                <li>Continuous improvement based on real needs</li>
-                <li>Tools for easier reporting and communication</li>
+              <ul className="list-none space-y-3 mt-4 text-lg text-white drop-shadow-lg">
+                <li className="flex items-start">
+                  <span className="text-blue-200 mr-3 mt-1">✓</span>
+                  <span>Co-designed features with CHW feedback</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-200 mr-3 mt-1">✓</span>
+                  <span>Focus on safety, dignity, and impact</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-200 mr-3 mt-1">✓</span>
+                  <span>Continuous improvement based on real needs</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-200 mr-3 mt-1">✓</span>
+                  <span>Tools for easier reporting and communication</span>
+                </li>
               </ul>
             </div>
           </div>

@@ -86,7 +86,7 @@ const HospitalStack = () => {
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
       {/* Header Section */}
       <div className="text-center mb-6 sm:mb-8 lg:mb-12">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3 sm:mb-4">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-800 mb-3 sm:mb-4">
           Hospital Technology Stack
         </h1>
         <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -192,7 +192,7 @@ const HospitalStack = () => {
                       <div className="grid grid-cols-1 gap-2 sm:gap-3">
                         {service.features.map((feature, index) => (
                           <div key={index} className="flex items-start text-xs sm:text-sm text-gray-600">
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full mr-2 sm:mr-3 flex-shrink-0 mt-1.5 sm:mt-2" />
+                            <span className="text-blue-400 mr-2 sm:mr-3 flex-shrink-0 mt-0.5 sm:mt-1">✓</span>
                             <span className="leading-relaxed">{feature}</span>
                           </div>
                         ))}
@@ -201,7 +201,7 @@ const HospitalStack = () => {
 
                     {/* Action Button */}
                     <div className="pt-4">
-                      <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-medium">
+                      <button className="bg-blue-600 text-white py-3 px-6 rounded-lg font-medium">
                         Learn More
                       </button>
                     </div>

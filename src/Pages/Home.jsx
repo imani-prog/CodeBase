@@ -135,11 +135,23 @@ const Home = () => {
                 <p className="text-md md:text-lg text-blue-700 max-w-md mb-4">
                   MediLink makes healthcare easy and accessible. Here’s how it works:
                 </p>
-                <ol className="list-disc pl-5 text-base md:text-lg space-y-2">
-                  <li>Create your account or log in to access personalized healthcare services and support.</li>
-                  <li>Browse available clinics, services, and health workers in your area or online.</li>
-                  <li>Reach out to community health workers, doctors, or support staff for guidance and care.</li>
-                  <li>Receive timely medical attention, advice, and ongoing support for your health needs.</li>
+                  <ol className="list-none space-y-3">
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Create your account or log in to access personalized healthcare services and support.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Browse available clinics, services, and health workers in your area or online.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Reach out to community health workers, doctors, or support staff for guidance and care.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Receive timely medical attention, advice, and ongoing support for your health needs.</span>
+                  </li>
                 </ol>
               </div>
             </div>

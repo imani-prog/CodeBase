@@ -46,25 +46,58 @@ const AboutMediLink = () => {
               {/* Card 1 */}
               <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-6 flex flex-col gap-3">
                 <h3 className="text-2xl font-bold text-blue-700 mb-4">Healthcare SaaS Systems</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2"><span className="">•</span> Hospital Management Systems (HMS)</li>
-                  <li className="flex items-center gap-2"><span className="">•</span> Patient Portals & Outreach Dashboards</li>
-                  <li className="flex items-center gap-2"><span className="">•</span> Telemedicine Modules</li>
-                  <li className="flex items-center gap-2"><span className="">•</span> Health Data Analytics & Reporting</li>
-                  <li className="flex items-center gap-2"><span className="">•</span> CHW Workflow & Supervision Apps</li>
-                  <li className="flex items-center gap-2"><span className="">•</span> Financial Integration (NHIF, M-Pesa, SHA)</li>
+                <ul className="list-none space-y-3">
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Hospital Management Systems (HMS)</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Patient Portals & Outreach Dashboards</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Telemedicine Modules</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Health Data Analytics & Reporting</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>CHW Workflow & Supervision Apps</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Financial Integration (NHIF, M-Pesa, SHA)</span>
+                  </li>
                 </ul>
               </div>
               {/* Card 2 */}
               <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-6 flex flex-col justify-center gap-3">
                 <h3 className="text-2xl font-bold text-blue-700 mb-4">System Features</h3>
                 <p className="mb-2">These systems are:</p>
-                <ul className="list-disc ml-6 space-y-2">
-                  <li>Modular</li>
-                  <li>Secure</li>
-                  <li>Mobile-friendly</li>
-                  <li>Scalable</li>
-                  <li>Tailored to the African healthcare context</li>
+                <ul className="list-none space-y-3">
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Modular</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Secure</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Mobile-friendly</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Scalable</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Tailored to the African healthcare context</span>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -78,23 +111,50 @@ const AboutMediLink = () => {
             {/* Column 1: How MediLink Works with Health Facilities */}
             <div className="rounded-2xl p-8">
               <h2 className="text-2xl text-blue-700 font-bold mb-4">How MediLink Works with Health Facilities</h2>
-              <ul className="list-disc mb-4 flex flex-col gap-2">
-                <li>Receiving digital tools to manage patient flow and care delivery</li>
-                <li>Using MediLink to dispatch CHWs and ambulances</li>
-                <li>Accessing real-time data for insurance claims, payments, and reports</li>
-                <li>Improving coordination between staff, CHWs, and patients</li>
-                <li>Enhancing public outreach and expanding their footprint into underserved areas</li>
+              <ul className="list-none space-y-3 mb-4">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Receiving digital tools to manage patient flow and care delivery</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Using MediLink to dispatch CHWs and ambulances</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Accessing real-time data for insurance claims, payments, and reports</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Improving coordination between staff, CHWs, and patients</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Enhancing public outreach and expanding their footprint into underserved areas</span>
+                </li>
               </ul>
               <p className="mb-2">We offer training and support to health workers, ensuring smooth onboarding and sustainable use of the systems.</p>
             </div>
             {/* Column 2: How the Platform Operates */}
             <div className="rounded-2xl p-8">
               <h2 className="text-2xl text-blue-700 font-bold mb-4">How the Platform Operates</h2>
-              <ul className="list-disc   ml-6 mb-4">
-                <li>A robust backend (Spring Boot + PostgreSQL/MySQL)</li>
-                <li>Microservice architecture for performance and scalability</li>
-                <li>Integration with local APIs (e.g., NHIF, M-Pesa)</li>
-                <li>A secure portal for each user type (patients, CHWs, clinics, admins)</li>
+              <ul className="list-none space-y-3 mb-4">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>A robust backend (Spring Boot + PostgreSQL/MySQL)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Microservice architecture for performance and scalability</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Integration with local APIs (e.g., NHIF, M-Pesa)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>A secure portal for each user type (patients, CHWs, clinics, admins)</span>
+                </li>
               </ul>
               <p className="mb-0">Patients can request services online or via USSD, while CHWs access mobile tools to manage visits and provide feedback. Clinics can upload prescriptions, assign staff, and generate insurance reports. Admins monitor everything from a central dashboard.</p>
             </div>
@@ -119,11 +179,23 @@ const AboutMediLink = () => {
             <div className="flex-1 rounded-2xl shadow border border-blue-300  p-6">
               <h2 className="text-2xl font-bold text-blue-700 mb-4">Our Broader Vision</h2>
               <p className="mb-4">At its heart, MediLink is more than software. We are a movement for health equity, built on the belief that no one should be left behind. We work closely with:</p>
-              <ul className="list-disc ml-6 mb-4">
-                <li>Governments to support national health goals</li>
-                <li>NGOs & humanitarian partners to reach vulnerable populations</li>
-                <li>Universities & training colleges to empower CHWs and students with digital tools</li>
-                <li>Donors & sponsors to support innovation and outreach expansion</li>
+              <ul className="list-none space-y-3 mb-4">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Governments to support national health goals</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>NGOs & humanitarian partners to reach vulnerable populations</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Universities & training colleges to empower CHWs and students with digital tools</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Donors & sponsors to support innovation and outreach expansion</span>
+                </li>
               </ul>
             </div>
           </div>
