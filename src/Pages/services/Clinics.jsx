@@ -1,8 +1,7 @@
 import AdminDashboard1 from "../../assets/AdminDashboard1.jpg";
 import MedicalRecords11 from "../../assets/MedicalRecords11.png";
-import PatientReferals from "../../assets/PatientReferals.jpg";
-import Footer from "../../Components/Footer.jsx";
-import Navbar from "../../Components/Navbar.jsx";
+import PatientReferals from "../../assets/PatientReferralSoftware.png";
+
 import PatientReferralSlider from "../../Components/PatientReferralSlider.jsx";
 import LiveChatButton from "../../Components/LiveChatButton.jsx";
 import FinancialService from "../../Components/FinancialService.jsx";
@@ -35,10 +34,19 @@ const Clinics = () => {
             <div className="flex flex-col justify-center h-full md:h-[400px] px-2 md:px-8">
               <h3 className="text-3xl font-extrabold text-blue-800 mb-4">Centralized Admin Dashboards</h3>
               <p className="text-l mb-4">Our admin dashboards provide a unified view of your clinic or hospital operations, making it easy to oversee all activities in real time. With intuitive charts and actionable insights, administrators can quickly identify trends, bottlenecks, and opportunities for improvement.</p>
-              <ul className="list-disc list-inside ml-6 mb-4 text-xl">
-                <li>Monitor appointments, payments & CHW activity</li>
-                <li>View analytics, patient flow, and service logs</li>
-                <li>Track ambulance dispatch and support tickets</li>
+              <ul className="list-none space-y-3 mb-4 text-xl">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Monitor appointments, payments & CHW activity</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>View analytics, patient flow, and service logs</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Track ambulance dispatch and support tickets</span>
+                </li>
               </ul>
               <p className="text-grey mb-2 text-lg">Easily filter data by department, time period, or staff member to drill down into specific metrics. Export reports for compliance, share updates with your team, and stay ahead with predictive analytics.</p>
               <p className="italic text-blue-600 mt-4 text-lg">"Real-time visibility for better decisions."</p>
@@ -70,10 +78,19 @@ const Clinics = () => {
             <div className="flex flex-col justify-center h-full md:h-[500px] px-4 md:px-8">
               <h3 className="text-3xl font-extrabold text-blue-800 mb-4">Electronic Medical Records (EMR)</h3>
               <p className="text-xl mb-4">Our EMR system streamlines clinical workflows, enabling healthcare professionals to access and update patient records instantly. With robust security and compliance features, you can trust that sensitive data is protected at every step.</p>
-              <ul className="list-disc list-inside ml-6 mb-4 text-xl">
-                <li>Secure access to patient history & reports</li>
-                <li>PDF exports of prescriptions and lab results</li>
-                <li>Role-based access for data privacy</li>
+              <ul className="list-none space-y-3 mb-4 text-xl">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Secure access to patient history & reports</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>PDF exports of prescriptions and lab results</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Role-based access for data privacy</span>
+                </li>
               </ul>
               <p className=" mb-2 text-lg">Easily search for patient information, track medical history, and share records with authorized staff. Our EMR supports interoperability, making it simple to integrate with labs, pharmacies, and insurance providers.</p>
               <p className="italic text-blue-600 mt-2 text-lg">"All records. One system. Anywhere, anytime."</p>

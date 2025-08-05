@@ -19,12 +19,27 @@ const Story = () => {
           <p className="text-lg mb-2">Founded by a group of passionate technologists, medical professionals, and community leaders, MediLink is more than a platform—it is a movement. A movement to ensure that no one is left behind due to where they live, how much they earn, or the resources available around them.</p>
           <p className="text-lg mb-2">We saw the power of community health workers (CHWs)—often the first and only link to care in remote areas—and we asked: <span className="font-semibold text-blue-800">What if we could supercharge their impact with digital tools?</span><br/>What if every citizen, from urban centers to remote villages, could connect to care, support, education, and emergency help through their phone?</p>
           <p className="text-lg mb-2">With this vision, MediLink was created—a centralized digital health platform that brings together:</p>
-          <ul className="list-disc list-inside ml-6 mb-4">
-            <li>Patients seeking care, education, or emergency support</li>
-            <li>Clinics and hospitals aiming to serve better and smarter</li>
-            <li>CHWs on the frontlines delivering care in homes and villages</li>
-            <li>Governments and NGOs driving public health policy and outreach</li>
-            <li>Donors and partners committed to sustainable health solutions</li>
+          <ul className="list-none space-y-3 mb-4">
+            <li className="flex items-start">
+              <span className="text-blue-400 mr-3 mt-1">✓</span>
+              <span>Patients seeking care, education, or emergency support</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-400 mr-3 mt-1">✓</span>
+              <span>Clinics and hospitals aiming to serve better and smarter</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-400 mr-3 mt-1">✓</span>
+              <span>CHWs on the frontlines delivering care in homes and villages</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-400 mr-3 mt-1">✓</span>
+              <span>Governments and NGOs driving public health policy and outreach</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-400 mr-3 mt-1">✓</span>
+              <span>Donors and partners committed to sustainable health solutions</span>
+            </li>
           </ul>
           <p className="text-lg mb-4">Through real-time bookings, home visits, insurance claims, and secure health data access, MediLink brings healthcare within reach. Whether it's an elderly patient requesting a home visit, a mother seeking health tips via SMS, or a clinic managing dozens of patient referrals, MediLink provides the digital backbone.</p>
         </section>
@@ -51,21 +66,48 @@ const Story = () => {
             {/* Text Column */}
             <div className="flex flex-col justify-between h-full">
               <h2 className="text-2xl font-bold text-blue-800 mb-2">Why We Exist</h2>
-              <ul className="list-disc list-inside ml-6 mb-2">
-                <li>To reduce maternal and child mortality through faster access to trained health workers</li>
-                <li>To empower CHWs with tools, training, and income</li>
-                <li>To streamline health systems and reduce hospital congestion</li>
-                <li>To help governments and NGOs make data-driven decisions</li>
-                <li>To create a transparent and sustainable digital health ecosystem</li>
+              <ul className="list-none space-y-3 mb-2">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>To reduce maternal and child mortality through faster access to trained health workers</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>To empower CHWs with tools, training, and income</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>To streamline health systems and reduce hospital congestion</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>To help governments and NGOs make data-driven decisions</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>To create a transparent and sustainable digital health ecosystem</span>
+                </li>
               </ul>
               <div className="mt-2">
                 <h3 className="text-xl font-bold text-blue-700 mb-2">Our Impact</h3>
                 <p className="mb-2">Since our inception, MediLink has:</p>
-                <ul className="list-disc list-inside ml-6 mb-2">
-                  <li>Connected thousands of patients to care in remote areas</li>
-                  <li>Enabled hundreds of CHWs to earn a stable income and access training</li>
-                  <li>Helped clinics and hospitals manage patient flow and referrals more efficiently</li>
-                  <li>Supported government and NGO health campaigns with real-time data</li>
+                <ul className="list-none space-y-3 mb-2">
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Connected thousands of patients to care in remote areas</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Enabled hundreds of CHWs to earn a stable income and access training</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Helped clinics and hospitals manage patient flow and referrals more efficiently</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1">✓</span>
+                    <span>Supported government and NGO health campaigns with real-time data</span>
+                  </li>
                 </ul>
               </div>
             </div>

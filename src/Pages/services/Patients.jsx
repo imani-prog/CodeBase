@@ -19,7 +19,7 @@ const Patients = () => {
 
 
         <div className="grid grid-cols-1 gap-8 w-full">
-          <div className="mb-5 w-full flex flex-col md:flex-row gap-6 md:gap-8">
+          <div className="mb-5 w-full flex flex-col md:flex-row gap-16 md:gap-18">
             <div className="w-full md:w-1/2 flex justify-center items-center mb-4 md:mb-0">
               <img 
                 src={patientsHomecareImg} 
@@ -32,21 +32,51 @@ const Patients = () => {
             </div>
             <div className="w-full md:w-1/2 flex flex-col justify-center">
               <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2">Healthcare Appointments</h2>
-              <ul className="list-disc list-inside ml-4 mb-2">
-                <li className="mb-2">Clinic Visits – Book outpatient appointments at local facilities.</li>
-                <li className="mb-2">Home-Based Care – Request a CHW or nurse for home visits.</li>
-                <li className="mb-2">Ambulance Dispatch – Get emergency support fast.</li>
-                <li className="mb-2">Treatment Orders – Order care services online or in-app.</li>
-                <li>Medication Delivery – Get prescriptions delivered to your home.</li>
+              <ul className="list-none space-y-3 mb-2">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Clinic Visits – Book outpatient appointments at local facilities.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Home-Based Care – Request a CHW or nurse for home visits.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Ambulance Dispatch – Get emergency support fast.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Treatment Orders – Order care services online or in-app.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Medication Delivery – Get prescriptions delivered to your home.</span>
+                </li>
               </ul>
               <div className="mt-2 p-3 bg-blue-100 rounded-xl border border-blue-200 text-xs md:text-sm">
                 <strong className="text-blue-800">Steps for Ordering Treatment Services:</strong>
-                <ul className="list-disc list-inside ml-4 mt-2">
-                  <li>Log in to your MediLink account for a personalized experience and faster processing.</li>
-                  <li>Provide accurate details about your symptoms or treatment needs to help healthcare providers prepare.</li>
-                  <li>Check your appointment status and notifications regularly for updates or changes.</li>
-                  <li>Use the chat feature to ask questions or get support from our care team.</li>
-                  <li>For urgent needs, select the emergency option for priority response.</li>
+                <ul className="list-none space-y-2 mt-2">
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-2 mt-1 text-xs">✓</span>
+                    <span>Log in to your MediLink account for a personalized experience and faster processing.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-2 mt-1 text-xs">✓</span>
+                    <span>Provide accurate details about your symptoms or treatment needs to help healthcare providers prepare.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-2 mt-1 text-xs">✓</span>
+                    <span>Check your appointment status and notifications regularly for updates or changes.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-2 mt-1 text-xs">✓</span>
+                    <span>Use the chat feature to ask questions or get support from our care team.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-2 mt-1 text-xs">✓</span>
+                    <span>For urgent needs, select the emergency option for priority response.</span>
+                  </li>
                 </ul>
               </div>
               <p className="italic mt-2 text-blue-600 text-xs md:text-base">"We bring healthcare to your doorstep—literally."</p>
@@ -58,14 +88,35 @@ const Patients = () => {
           <div className="mb-5 w-full flex flex-col md:flex-row gap-6 md:gap-8">
             <div className="w-full md:w-1/2 flex flex-col justify-center order-2 md:order-1">
               <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2">Health Education & Community Awareness</h2>
-              <ul className="list-disc list-inside ml-4 md:ml-6 mb-2 text-xs md:text-base">
-                <li>Verified health tips (via SMS, dashboard, or app)</li>
-                <li>E-learning courses for patients</li>
-                <li>Maternal, child, chronic illness education</li>
-                <li>Interactive workshops and webinars</li>
-                <li>Personalized guidance for chronic condition management</li>
-                <li>Support groups and peer learning</li>
-                <li>Practical skills for preventive care and nutrition</li>
+              <ul className="list-none space-y-3 mb-2 text-xs md:text-base">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Verified health tips (via SMS, dashboard, or app)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>E-learning courses for patients</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Maternal, child, chronic illness education</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Interactive workshops and webinars</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Personalized guidance for chronic condition management</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Support groups and peer learning</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Practical skills for preventive care and nutrition</span>
+                </li>
               </ul>
               <p className="italic mt-2 text-blue-600 text-xs md:text-base">"Learn. Apply. Thrive."</p>
               <p className="mt-4 text-blue-900 text-xs md:text-base">MediLink offers more than basic health info—patients access interactive courses, workshops, expert advice, and practical skills for lifelong wellness. Live webinars, support groups, and personalized guidance help everyone make informed choices and thrive in their health journey.</p>
@@ -98,10 +149,19 @@ const Patients = () => {
             </div>
             <div className="w-full md:w-1/2 flex flex-col justify-center">
               <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 md:mb-4">Telemedicine Consultations</h2>
-              <ul className="list-disc list-inside ml-4 md:ml-6 mb-2 text-xs md:text-base">
-                <li>Doctor consultations via Zoom or video chat</li>
-                <li>Follow-up sessions from prior clinic visits</li>
-                <li>Remote prescription delivery (where available)</li>
+              <ul className="list-none space-y-3 mb-2 text-xs md:text-base">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Doctor consultations via Zoom or video chat</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Follow-up sessions from prior clinic visits</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Remote prescription delivery (where available)</span>
+                </li>
               </ul>
               <p className="italic text-blue-600 mt-2 text-xs md:text-base">"Care beyond clinics—connect with a doctor from wherever you are."</p>
               <p className="mt-4 text-blue-900 text-xs md:text-base">Telemedicine brings expert care to patients anywhere, enabling video consultations, timely advice, and home prescription delivery. It saves travel time, avoids crowded clinics, and supports ongoing care for chronic conditions.</p>
@@ -114,15 +174,39 @@ const Patients = () => {
           <div className="mb-5 w-full flex flex-col md:flex-row gap-6 md:gap-8">
             <div className="w-full md:w-1/2 flex flex-col justify-center order-2 md:order-1">
               <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2">Insurance & Financial Integration</h2>
-              <ul className="list-disc list-inside ml-4 md:ml-6 mb-2 text-xs md:text-base">
-                <li>Integration with NHIF, SHA, and private covers</li>
-                <li>M-Pesa STK Push and mobile wallet payments</li>
-                <li>Debit/Credit card support (Stripe, Flutterwave)</li>
-                <li>Patient balance visibility & history</li>
-                <li>Instant payment confirmations and receipts</li>
-                <li>Automated reminders for upcoming bills and renewals</li>
-                <li>Secure data encryption for all financial transactions</li>
-                <li>Support for multiple currencies and payment methods</li>
+              <ul className="list-none space-y-3 mb-2 text-xs md:text-base">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Integration with NHIF, SHA, and private covers</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>M-Pesa STK Push and mobile wallet payments</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Debit/Credit card support (Stripe, Flutterwave)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Patient balance visibility & history</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Instant payment confirmations and receipts</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Automated reminders for upcoming bills and renewals</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Secure data encryption for all financial transactions</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1">✓</span>
+                  <span>Support for multiple currencies and payment methods</span>
+                </li>
               </ul>
               <p className="italic text-blue-600 mt-2 text-xs md:text-base">"Affordable care for all—MediLink makes payments simple, secure, and offers subsidized services for those in need."</p>
               <p className="mt-4 text-blue-900 text-xs md:text-base">MediLink lets patients manage healthcare expenses and insurance in one place, with real-time updates on payments, claims, and balances. Integrated payment and insurance options help you focus on your health while MediLink handles the details.</p>

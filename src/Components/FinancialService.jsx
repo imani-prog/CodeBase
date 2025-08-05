@@ -93,9 +93,12 @@ const FinancialService = () => {
               <h2 className="text-2xl font-bold text-blue-800 mb-4">
                 {section.icon} {section.title}
               </h2>
-              <ul className="list-disc list-inside ml-4 space-y-1 text-[16px]">
+              <ul className="list-none space-y-2 text-[16px]">
                 {section.items.map((item, idx) => (
-                  <li key={idx}>{item}</li>
+                  <li key={idx} className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1 text-sm">✓</span>
+                    <span>{item}</span>
+                  </li>
                 ))}
               </ul>
             </div>

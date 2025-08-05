@@ -114,11 +114,19 @@ const Hospitals = () => (
             <div className={`w-full flex justify-center ${idx % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
               <div className="w-full bg-white rounded-xl p-6 max-w-xl">
                 <h3 className="text-2xl font-bold text-blue-800 mb-4">{f.title}</h3>
-                <ul className="list-disc list-inside text-lg space-y-2">
+                <ul className="text-lg space-y-3">
                   {Array.isArray(f.description) ? (
-                    f.description.map((desc, i) => <li key={i}>{desc}</li>)
+                    f.description.map((desc, i) => (
+                      <li key={i} className="flex items-start">
+                        <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                        <span>{desc}</span>
+                      </li>
+                    ))
                   ) : (
-                    <li>{f.description}</li>
+                    <li className="flex items-start">
+                      <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                      <span>{f.description}</span>
+                    </li>
                   )}
                 </ul>
               </div>
@@ -156,22 +164,49 @@ const Hospitals = () => (
           <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6">
             <div className="p-6 flex-1 max-w-md">
               <h5 className="text-lg font-bold text-blue-800 mb-2">Why Hospitals Choose MediLink</h5>
-              <ul className="list-disc list-inside text-gray-700 text-base mb-2">
-                <li>Streamline outpatient visits and digital patient flow</li>
-                <li>Enable NHIF verification and claim submission instantly</li>
-                <li>Monitor CHW outreach linked to your catchment area</li>
-                <li>Access shared patient records with consent</li>
-                <li>Use dashboards to view performance, referrals, and KPIs</li>
-                <li>Integrate lab, pharmacy, and billing systems securely</li>
+              <ul className="text-gray-700 text-base mb-2 space-y-3">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Streamline outpatient visits and digital patient flow</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Enable NHIF verification and claim submission instantly</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Monitor CHW outreach linked to your catchment area</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Access shared patient records with consent</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Use dashboards to view performance, referrals, and KPIs</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Integrate lab, pharmacy, and billing systems securely</span>
+                </li>
               </ul>
               <p className="text-blue-600 italic">"Bringing smart hospital workflows to the frontline of care."</p>
             </div>
             <div className="p-6 flex-1 max-w-md">
               <h5 className="text-lg font-bold text-blue-800 mb-2">Need Support?</h5>
-              <ul className="list-disc list-inside text-gray-700 text-base mb-2">
-                <li>Visit our <a href="/faq" className="text-blue-700 hover:underline">FAQ</a> page</li>
-                <li>Reach out for onboarding, training, or API support</li>
-                <li>Explore resources for hospital admins and clinicians</li>
+              <ul className="text-gray-700 text-base mb-2 space-y-3">
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Visit our <a href="/faq" className="text-blue-700 hover:underline">FAQ</a> page</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Reach out for onboarding, training, or API support</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                  <span>Explore resources for hospital admins and clinicians</span>
+                </li>
               </ul>
               <p className="text-blue-600 italic">"We support your facility every step of the way."</p>
             </div>

@@ -104,6 +104,7 @@ function PatientSolutionFeature() {
               &gt;
             </button>
           </div>
+        
         </div>
 
         {/* Right: Ambulance Image */}

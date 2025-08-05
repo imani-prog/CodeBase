@@ -124,9 +124,12 @@ const CHWs = () => (
               <h3 className="text-3xl font-bold text-blue-800 mb-4">
                 {feature.title}
               </h3>
-              <ul className="list-disc list-inside text-lg space-y-2 leading-relaxed">
+              <ul className="text-lg leading-relaxed space-y-3">
                 {feature.description.map((item, i) => (
-                  <li key={i}>{item}</li>
+                  <li key={i} className="flex items-start">
+                    <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                    <span>{item}</span>
+                  </li>
                 ))}
               </ul>
               <p className="mt-4 text-blue-700 text-base font-medium">
@@ -187,22 +190,49 @@ const CHWs = () => (
         <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6">
           <div className="p-6 flex-1 max-w-md">
             <h5 className="text-lg font-bold text-blue-800 mb-2">Why Join MediLink?</h5>
-            <ul className="list-disc list-inside text-gray-700 text-base mb-2">
-              <li>Manage assigned patient visits and requests efficiently</li>
-              <li>Track outreach activities and mileage with GPS logging</li>
-              <li>Access digital training modules and earn certifications</li>
-              <li>Scan NHIF cards and update patient records instantly</li>
-              <li>Receive performance reports and earn incentives</li>
-              <li>Communicate directly with supervisors for support</li>
+            <ul className="text-gray-700 text-base mb-2 space-y-3">
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Manage assigned patient visits and requests efficiently</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Track outreach activities and mileage with GPS logging</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Access digital training modules and earn certifications</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Scan NHIF cards and update patient records instantly</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Receive performance reports and earn incentives</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Communicate directly with supervisors for support</span>
+              </li>
             </ul>
             <p className="text-blue-600 italic">"Empowering CHWs to deliver better care in the community."</p>
           </div>
           <div className="p-6 flex-1 max-w-md">
             <h5 className="text-lg font-bold text-blue-800 mb-2">Need Help?</h5>
-            <ul className="list-disc list-inside text-gray-700 text-base mb-2">
-              <li>Visit our <a href="/faq" className="text-blue-700 hover:underline">FAQ</a> page</li>
-              <li>Contact our support team for assistance</li>
-              <li>Explore patient resources and guides</li>
+            <ul className="text-gray-700 text-base mb-2 space-y-3">
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Visit our <a href="/faq" className="text-blue-700 hover:underline">FAQ</a> page</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Contact our support team for assistance</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
+                <span>Explore patient resources and guides</span>
+              </li>
             </ul>
             <p className="text-blue-600 italic">"We're here for you every step of the way."</p>
           </div>
