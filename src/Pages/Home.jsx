@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import DocUsingMedilink from "../assets/DocUsingMedilink.jpg";
 import HomepageImg from "../assets/Homepage.png";
 import MediLinkLogo from "../assets/mediLink.png";
-import MedilinkHomePageSlider from "../assets/MedilinkHomePageSlider.jpeg";
+import MedilinkHomePageSlider from "../assets/TechnologyHome.jpg";
 import EventGamified from "../Components/EventGamified.jsx";
-import Footer from "../Components/Footer.jsx";
+
 import LiveChatButton from "../Components/LiveChatButton.jsx";
-import Navbar from "../Components/Navbar.jsx";
+
 
 const Home = () => {
   // Image slider setup
@@ -72,7 +72,7 @@ const Home = () => {
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl font-medium text-blue-100 mb-6 max-w-2xl leading-relaxed drop-shadow">
+            <p className="text-xl md:text-2xl font-bold text-blue-100 mb-6 max-w-2xl leading-relaxed drop-shadow">
               Healing Begins with Connection.
             </p>
 
