@@ -73,14 +73,14 @@ function PatientSolutionFeature() {
 
   return (
     <section className="w-full max-w-6xl mx-auto my-20 px-4">
-      <h3 className="text-3xl font-bold text-blue-800 mb-12 text-center">
+      <h3 className="text-3xl font-bold text-blue-800 mb-12 text-center font-serif">
         How MediLink Solves Real Patient Problems
       </h3>
 
       <div className="flex flex-col md:flex-row items-center gap-10">
         {/* Left: Feature Display */}
         <div className="w-full md:w-1/2 p-6 space-y-8">
-          <h4 className="text-2xl font-bold text-blue-900">Your Health, Our Priority – Anywhere, Anytime</h4>
+          <h4 className="text-2xl font-bold text-blue-900 font-serif">Your Health, Our Priority – Anywhere, Anytime</h4>
 
           {/* Animated Feature */}
           <div className="relative min-h-[160px] overflow-visible flex items-center">
@@ -92,7 +92,7 @@ function PatientSolutionFeature() {
               &lt;
             </button>
             <div key={index} className="animate-fadeSlide flex-1 px-2">
-              <p className="text-xl font-semibold text-blue-800 mb-2">{features[index].title}</p>
+              <p className="text-xl font-semibold text-blue-800 mb-2 font-serif">{features[index].title}</p>
               <p className="font-bold text-base mb-2">{features[index].text}</p>
               <p className="text-gray-600 text-base">{features[index].desc}</p>
             </div>

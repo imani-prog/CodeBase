@@ -5,7 +5,7 @@ import PeterImg from "../assets/Brian Wekesa.jpeg";
 import { default as AminaImg, default as EstherImg } from "../assets/Esther Nyambura.jpeg";
 import GraceImg from "../assets/Grace Achieng.jpeg";
 import SamuelImg from "../assets/Joseph Otieno.jpeg";
-// ...existing code...
+
 
 const testimonials = [
   {
@@ -124,7 +124,7 @@ function TestimonialsCarousel() {
   return (
     <div className="w-full">
       <div className="text-center mb-2">
-        <p className="text-base text-gray-700 max-w-2xl mx-auto mb-8">Discover how MediLink is transforming healthcare for real patients across Kenya. From telemedicine consults to home visits and easy access to specialists, these stories show the impact of digital health on everyday lives.</p>
+        <p className="text-base text-black max-w-2xl mx-auto mb-8">Discover how MediLink is transforming healthcare for real patients across Kenya. From telemedicine consults to home visits and easy access to specialists, these stories show the impact of digital health on everyday lives.</p>
       </div>
       <div className="flex items-center justify-center w-full">
         {/* Previous Button */}

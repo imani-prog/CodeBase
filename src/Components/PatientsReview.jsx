@@ -19,7 +19,7 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "1 week ago",
       category: "Lab Services",
-      categoryColor: "green",
+      categoryColor: "blue",
       likes: 12
     },
     {
@@ -29,7 +29,7 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "3 days ago",
       category: "Home Visits",
-      categoryColor: "purple",
+      categoryColor: "blue",
       likes: 8
     },
     {
@@ -39,7 +39,7 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "5 days ago",
       category: "Telemedicine",
-      categoryColor: "indigo",
+      categoryColor: "blue",
       likes: 15
     },
     {
@@ -49,7 +49,7 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "1 day ago",
       category: "App Features",
-      categoryColor: "orange",
+      categoryColor: "blue",
       likes: 10
     },
     {
@@ -59,7 +59,7 @@ const PatientsReview = () => {
       rating: 5,
       timeAgo: "2 days ago",
       category: "App Features",
-      categoryColor: "orange",
+      categoryColor: "blue",
       likes: 5
     }
   ]);
@@ -74,19 +74,13 @@ const PatientsReview = () => {
   const [showForm, setShowForm] = useState(false);
 
   const gradientColors = [
-    'from-blue-500 to-purple-600',
-    'from-green-500 to-teal-600', 
-    'from-pink-500 to-rose-600',
-    'from-indigo-500 to-blue-600',
-    'from-orange-500 to-red-600'
+    'from-blue-500 to-blue-600',
+    
   ];
 
   const categoryColors = {
     blue: 'bg-blue-100 text-blue-800',
-    green: 'bg-green-100 text-green-800',
-    purple: 'bg-purple-100 text-purple-800',
-    indigo: 'bg-indigo-100 text-indigo-800',
-    orange: 'bg-orange-100 text-orange-800'
+    
   };
 
   const handleSubmit = () => {
@@ -147,10 +141,10 @@ const PatientsReview = () => {
 
       {/* Header Section */}
       <div className="text-center mb-12">
-        <h3 className="text-4xl font-bold bg-gradient-to-r bg-clip-text text-blue-900 mb-4">
+        <h3 className="text-4xl font-bold bg-gradient-to-r bg-clip-text text-blue-900 mb-4 font-serif">
           Patient Reviews & Testimonials
         </h3>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        <p className="text-black text-lg max-w-2xl mx-auto">
           Hear what our patients have to say about their experience with MediLink
         </p>
         <div className="flex items-center justify-center mt-4 space-x-2">
@@ -168,7 +162,7 @@ const PatientsReview = () => {
           {reviews.map((review, index) => (
             <div 
               key={review.id} 
-              className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[220px] flex flex-col justify-between"
+              className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-all duration-300 min-h-[220px] flex flex-col justify-between"
               style={{ minWidth: '260px', maxWidth: '340px' }}
             >
               <div className="flex items-center mb-2">
@@ -297,7 +291,7 @@ const PatientsReview = () => {
           {/*Info Card for Patients */}
           <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6 ">
             <div className="p-6 flex-1 max-w-md">
-              <h5 className="text-lg font-bold text-blue-800 mb-2">Why Join MediLink?</h5>
+              <h5 className="text-lg font-bold text-blue-800 mb-2 font-serif">Why Join MediLink?</h5>
               <ul className="list-none space-y-3 text-gray-700 text-base mb-2">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1">✓</span>
@@ -319,7 +313,7 @@ const PatientsReview = () => {
               <p className="text-blue-600 italic">"Empowering patients for a healthier tomorrow."</p>
             </div>
             <div className="p-6 flex-1 max-w-md">
-              <h5 className="text-lg font-bold text-blue-800 mb-2">Need Help?</h5>
+              <h5 className="text-lg font-bold text-blue-800 mb-2 font-serif">Need Help?</h5>
               <ul className="list-none space-y-3 text-gray-700 text-base mb-2">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1">✓</span>

@@ -11,7 +11,7 @@ function Patients() {
      
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-2">Healthcare That Comes to You</h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-2 font-serif">Healthcare That Comes to You</h1>
           <h2 className="text-xl md:text-2xl mb-3">Access care at your fingertips—no matter where you live.</h2>
           <p className="text-lg mb-3">MediLink connects you to nearby clinics, CHWs, and telemedicine services from your phone. No more long queues or travel expenses.</p>
           <p className="font-medium mb-8">In rural and urban Kenya, many patients struggle to get timely, affordable healthcare. MediLink fixes that by simplifying booking, payments, and access to support.</p>
@@ -21,7 +21,7 @@ function Patients() {
 
         {/* Multiple Testimonials with Images - Carousel UI */}
         <section className="mb-12">
-          <h3 className="text-2xl font-bold text-blue-800 mb-6 text-center">Patient Success Stories</h3>
+          <h3 className="text-2xl font-bold text-blue-800 mb-6 text-center font-serif">Patient Success Stories</h3>
           <TestimonialsCarousel />
         </section>
 
