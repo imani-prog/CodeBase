@@ -1,7 +1,3 @@
-// src/pages/Team.jsx
-import Footer from "../../Components/Footer.jsx";
-import Navbar from "../../Components/Navbar.jsx";
-import LiveChatButton from "../../Components/LiveChatButton.jsx";
 
 import BrianWekesa from "../../assets/Brian Wekesa.jpeg";
 import EstherNyambura from "../../assets/Esther Nyambura.jpeg";
@@ -21,14 +17,14 @@ import AdvisoryBoard from "../../Components/AdvisoryBoard";
 const Team = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-      <LiveChatButton />
+      
       
 
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         {/* Intro Section */}
         <section className="w-full flex flex-col items-center mb-10">
           <div className="text-center w-full">
-            <h1 className="text-5xl font-extrabold text-blue-900 mb-2 leading-tight">
+            <h1 className="text-5xl font-serif font-extrabold text-blue-900 mb-2 leading-tight">
               The Team Behind MediLink
             </h1>
             <img

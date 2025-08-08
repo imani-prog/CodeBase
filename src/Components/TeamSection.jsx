@@ -1,7 +1,7 @@
 const TeamSection = ({ title, members }) => {
   return (
     <section className="mb-6 w-full bg-blue-50 text-left">
-      <h2 className="text-2xl font-bold text-blue-800 mb-4">{title}</h2>
+      <h2 className="text-2xl font-bold text-blue-800 font-serif mb-4">{title}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {members.map((member, index) => (
           <div key={index} className="p-4 flex flex-col items-center">

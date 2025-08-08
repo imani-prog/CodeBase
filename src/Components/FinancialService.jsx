@@ -90,7 +90,7 @@ const FinancialService = () => {
           {/* Text Card */}
           <div className="p-8 h-full transition-all duration-500 ease-in-out flex flex-col justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-blue-800 mb-4">
+              <h2 className="text-2xl font-bold text-blue-800 mb-4 font-serif">
                 {section.icon} {section.title}
               </h2>
               <ul className="list-none space-y-2 text-[16px]">

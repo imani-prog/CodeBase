@@ -9,7 +9,7 @@ const ClinicCallToAction = () => {
       {/* Main Content Container */}
       <div className="relative p-8 text-center">
         {/* Main Heading */}
-        <h2 className="text-3xl md:text-4xl font-bold text-blue-800 mb-4 leading-tight">
+        <h2 className="text-3xl md:text-4xl font-bold text-blue-800 mb-4 leading-tight font-serif">
           Ready to Digitize Your Facility?
         </h2>
         

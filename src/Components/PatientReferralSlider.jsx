@@ -64,7 +64,7 @@ function PatientReferralSlider() {
             className="w-full flex-shrink-0 flex flex-col items-center justify-center px-8"
             style={{ minWidth: "100%" }}
           >
-            <h2 className="text-3xl font-extrabold text-white mb-4 text-center drop-shadow-lg">{slide.title}</h2>
+            <h2 className="text-3xl font-extrabold text-white mb-4 text-center drop-shadow-lg font-serif">{slide.title}</h2>
             <ul className="list-none space-y-3 mb-4 text-xl text-white text-center">
               {slide.points.map((point, i) => (
                 <li key={i} className="flex items-start justify-center">
