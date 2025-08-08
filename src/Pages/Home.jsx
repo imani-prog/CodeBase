@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import DocUsingMedilink from "../assets/DocUsingMedilink.jpg";
 import HomepageImg from "../assets/Homepage.png";
 import MediLinkLogo from "../assets/mediLink.png";
-import MedilinkHomePageSlider from "../assets/MedilinkHomePageSlider.jpeg";
+import MedilinkHomePageSlider from "../assets/TechnologyHome.jpg";
 import EventGamified from "../Components/EventGamified.jsx";
-import Footer from "../Components/Footer.jsx";
+
 import LiveChatButton from "../Components/LiveChatButton.jsx";
-import Navbar from "../Components/Navbar.jsx";
+
 
 const Home = () => {
   // Image slider setup
@@ -27,8 +27,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-      <LiveChatButton />
-      {/* Navbar */}
+      
       
 
 
@@ -72,13 +71,13 @@ const Home = () => {
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl font-medium text-blue-100 mb-6 max-w-2xl leading-relaxed drop-shadow">
+            <p className="text-xl md:text-2xl font-bold text-blue-100 mb-6 max-w-2xl leading-relaxed drop-shadow">
               Healing Begins with Connection.
             </p>
 
             {/* CTA Button (Optional) */}
             <a
-              href="/register"
+              href=""
               className="inline-block text-sm md:text-base px-6 py-3 rounded-full border border-white text-white hover:bg-white hover:text-blue-900 transition-all duration-300 font-semibold shadow-sm mb-8"
             >
               Get Started
@@ -93,10 +92,10 @@ const Home = () => {
               ].map(({ value, label }) => (
                 <div
                   key={label}
-                  className="bg-white/70 backdrop-blur-xl border border-blue-200 rounded-xl px-5 py-3 shadow-lg w-28 text-center"
+                  className="bg-yellow-300 border border-blue-200 rounded-xl px-5 py-3 shadow-lg w-28 text-center"
                 >
-                  <div className="text-lg font-bold text-blue-800">{value}</div>
-                  <div className="text-sm text-blue-700">{label}</div>
+                  <div className="text-lg font-bold text-black">{value}</div>
+                  <div className="text-sm text-black">{label}</div>
                 </div>
               ))}
             </div>
@@ -107,7 +106,7 @@ const Home = () => {
       {/* Mission & Vision - Enhanced Cards */}
       <section className="mb-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="mb-5 w-full text-left">
-          <h2 className="text-3xl md:text-4xl font-bold text-blue-800 mb-6">Our Mission</h2>
+          <h2 className="text-3xl md:text-4xl font-bold font-serif text-blue-800 mb-6">Our Mission</h2>
           <p className="text-lg md:text-xl leading-relaxed">
             To revolutionize healthcare access in Africa by connecting communities, clinics, and caregivers through a smart digital platform that simplifies access to quality, affordable, and timely medical services.
           </p>
@@ -116,7 +115,7 @@ const Home = () => {
         <div className="mb-5 w-full text-left">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200 to-transparent rounded-full blur-2xl opacity-50"></div>
           <div className="relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-blue-800 mb-6">Our Vision</h2>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-blue-800 mb-6">Our Vision</h2>
             <p className="text-lg md:text-xl  leading-relaxed">
               A healthy and empowered Africa where every citizen can access quality care, anytime, anywhere.
             </p>
@@ -131,7 +130,7 @@ const Home = () => {
             {/* Left: Steps Guide */}
             <div className="flex-1 min-w-0 flex flex-col justify-center">
               <div className="mb-4 text-left md:text-left">
-                <h4 className="text-3xl md:text-4xl font-bold text-blue-900 mb-2">How MediLink Works</h4>
+                <h4 className="text-3xl md:text-4xl font-bold text-blue-900 font-serif mb-2">How MediLink Works</h4>
                 <p className="text-md md:text-lg text-blue-700 max-w-md mb-4">
                   MediLink makes healthcare easy and accessible. Here’s how it works:
                 </p>
@@ -176,7 +175,7 @@ const Home = () => {
         {/* Call to Action Buttons - Enhanced */}
         <section className="mb-8 w-full flex flex-col items-center">
           <div className="text-center mb-4">
-            <h4 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
+            <h4 className="text-3xl md:text-4xl font-bold font-serif text-blue-900 mb-4">
               Ready to Get Started?
             </h4>
             <p className="text-xl">
@@ -227,7 +226,7 @@ const Home = () => {
             <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
             <div className="relative z-10 flex flex-col justify-center h-full">
               <div className="mb-4">
-                <h3 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">
+                <h3 className="text-2xl md:text-3xl font-bold font-serif text-blue-900 mb-2">
                   "Health Within Reach."
                 </h3>
               </div>
@@ -273,7 +272,7 @@ const Home = () => {
           <div className="flex-1 min-w-[260px] max-w-[370px] mx-auto text-center flex flex-col justify-center bg-gradient-to-brp-3 md:p-4 h-[270px] md:h-[290px]">
             <div className="relative z-10 flex flex-col justify-center h-full">
               <div className="backdrop-blur p-1 max-w-xs mx-auto flex flex-col justify-center h-full">
-                <p className="text-blue-900 font-bold text-lg md:text-xl mb-1 leading-relaxed">
+                <p className="text-blue-900 font-serif font-bold text-lg md:text-xl mb-1 leading-relaxed">
                   Services Close to the People
                 </p>
                 <p className="font-bold text-base md:text-lg leading-relaxed mb-1">

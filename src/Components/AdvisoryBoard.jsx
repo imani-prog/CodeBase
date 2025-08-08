@@ -1,7 +1,7 @@
 const AdvisoryBoard = () => {
   return (
     <section className="mb-0 w-full bg-blue-50 text-left">
-      <h2 className="text-3xl font-bold text-blue-800 mb-4 text-center">
+      <h2 className="text-3xl font-bold font-serif text-blue-800 mb-4 text-center">
         Advisory Board
       </h2>
       <p className="mb-4 text-center text-lg">

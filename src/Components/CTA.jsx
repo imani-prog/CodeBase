@@ -93,9 +93,9 @@ const CTA = () => {
           <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3 sm:mb-4">
               <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center text-blue-600">Built for Africa, Backed by Security</h3>
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center font-serif text-blue-600">Built for Africa, Backed by Security</h3>
             </div>
-            <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Trusted by healthcare providers across Kenya</p>
+            <p className="text-sm sm:text-base lg:text-lg">Trusted by healthcare providers across Kenya</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -139,7 +139,7 @@ const CTA = () => {
                         </div>
                       </div>
                       
-                      <h4 className={`font-bold mb-2 transition-colors duration-300 text-sm sm:text-base ${
+                      <h4 className={`font-bold font-serif mb-2 transition-colors duration-300 text-sm sm:text-base ${
                         isActive ? 'text-blue-700 lg:text-lg' : 'text-gray-800'
                       }`}>
                         {feature.title}
@@ -187,7 +187,7 @@ const CTA = () => {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-2 sm:p-3">
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600 text-center">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold font-serif text-blue-600 text-center">
                 Ready to Transform Your Hospital?
               </h3>
             </div>
@@ -201,7 +201,7 @@ const CTA = () => {
 
           {/* Support Features */}
           <div className="mb-6 sm:mb-8">
-            <h4 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center justify-center space-x-2">
+            <h4 className="text-lg sm:text-xl font-bold font-serif text-gray-800 mb-4 sm:mb-6 flex items-center justify-center space-x-2">
               <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
               <span>What You Get</span>
               <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
@@ -220,7 +220,7 @@ const CTA = () => {
                         <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                       </div>
                       <div className="text-left flex-1">
-                        <p className="font-semibold text-gray-800 text-xs sm:text-sm">{feature.text}</p>
+                        <p className="font-semibold font-serif text-blue-800 text-xs sm:text-sm">{feature.text}</p>
                         <p className="text-xs text-gray-600">{feature.description}</p>
                       </div>
                       <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
@@ -236,7 +236,7 @@ const CTA = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
               <button
                 onClick={() => handleCTAClick('contact')}
-                className="group relative bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold overflow-hidden"
+                className="group relative bg-blue-600 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="relative flex items-center justify-center space-x-2">
@@ -247,9 +247,9 @@ const CTA = () => {
               
               <button
                 onClick={() => handleCTAClick('demo')}
-                className="group relative bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold overflow-hidden"
+                className="group relative bg-blue-600 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="relative flex items-center justify-center space-x-2">
                   <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="text-sm sm:text-base">Request a Demo</span>
@@ -259,11 +259,11 @@ const CTA = () => {
             
             <button
               onClick={() => handleCTAClick('success-stories')}
-              className="group bg-gradient-to-r from-blue-200 to-purple-200 hover:from-blue-200 hover:to-purple-200 text-gray-800 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-md transition-all duration-300 transform hover:scale-105 font-semibold border border-blue-200 hover:border-blue-300"
+              className="group bg-gradient-to-r from-blue-600 to-blue-700 text-blue-800 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-md transition-all duration-300 transform hover:scale-105 font-semibold border border-blue-200 hover:border-blue-300"
             >
               <div className="flex items-center justify-center space-x-2">
                 <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                <span className="text-sm sm:text-base">See Hospital Success Stories</span>
+                <span className="text-sm sm:text-base text-white">See Hospital Success Stories</span>
                 <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </button>
@@ -271,23 +271,25 @@ const CTA = () => {
 
           {/* Trust indicators */}
           <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
-            <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-8 text-xs sm:text-sm text-gray-600">
-              <div className="flex items-center space-x-2">
-                <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                <span>Secure & Compliant</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                <span>50+ Hospitals Trust Us</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Star className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                <span>5-Star Support</span>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6 text-xs sm:text-sm">
+                <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 py-2">
+                  <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-black" />
+                  <span className="text-black font-medium">Secure & Compliant</span>
+                </div>
+
+                <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 py-2">
+                  <Users className="w-3 h-3 sm:w-4 sm:h-4 text-black" />
+                  <span className="text-black font-medium">50+ Hospitals Trust Us</span>
+                </div>
+
+                <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 py-2">
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4 text-black" />
+                  <span className="text-black font-medium">5-Star Support</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 };

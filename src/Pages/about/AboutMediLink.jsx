@@ -1,22 +1,21 @@
-import Footer from "../../Components/Footer.jsx";
-import Navbar from "../../Components/Navbar.jsx";
+
 import MedilinkHomePageSlider from "../../assets/MedilinkHomePageSlider.jpeg";
 import Workers from "../../assets/Workers.jpg";
-import LiveChatButton from "../../Components/LiveChatButton.jsx";
+
 
 const AboutMediLink = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-      <LiveChatButton />
+      
       
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="w-full flex flex-col items-center mb-8">
-          <h1 className="text-5xl font-extrabold text-blue-900 mb-4 text-center leading-tight">About MediLink</h1>
+          <h1 className="text-5xl font-extrabold text-blue-900 mb-4 text-center font-serif leading-tight">About MediLink</h1>
           {/* Healthcare Illustration Image */}
-        
+      
         </section>
         <section className="mb-10 w-full bg-blue-50 p-4 text-left">
-          <h2 className="text-3xl font-bold text-blue-800 mb-4">Who We Are</h2>
+          <h2 className="text-3xl font-bold text-blue-800 font-serif mb-4">Who We Are</h2>
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             <div className="flex-1">
               <p className="text-lg mb-4">MediLink is a digital health and technology company transforming healthcare access in Africa. Our mission is to bridge the gaps between citizens, clinics, hospitals, and Community Health Workers (CHWs) through smart, user-centric technology.</p>
@@ -40,12 +39,12 @@ const AboutMediLink = () => {
 
         <section className="mb-5 w-full p-0">
           <div className="w-full p-2">
-            <h2 className="text-4xl font-extrabold text-blue-900 mb-4">What We Do</h2>
+            <h2 className="text-4xl font-extrabold text-blue-900 font-serif mb-4">What We Do</h2>
             <p className="text-lg mb-6 leading-relaxed">MediLink operates as both a <span className="font-semibold text-blue-600">healthcare service platform</span> and a <span className="font-semibold text-blue-600">technology solutions provider</span>. Our offerings include:</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
               {/* Card 1 */}
               <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-6 flex flex-col gap-3">
-                <h3 className="text-2xl font-bold text-blue-700 mb-4">Healthcare SaaS Systems</h3>
+                <h3 className="text-2xl font-bold text-blue-700 mb-4 font-serif">Healthcare SaaS Systems</h3>
                 <ul className="list-none space-y-3">
                   <li className="flex items-start">
                     <span className="text-blue-400 mr-3 mt-1">✓</span>
@@ -75,7 +74,7 @@ const AboutMediLink = () => {
               </div>
               {/* Card 2 */}
               <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-6 flex flex-col justify-center gap-3">
-                <h3 className="text-2xl font-bold text-blue-700 mb-4">System Features</h3>
+                <h3 className="text-2xl font-bold text-blue-700 mb-4 font-serif">System Features</h3>
                 <p className="mb-2">These systems are:</p>
                 <ul className="list-none space-y-3">
                   <li className="flex items-start">
@@ -110,7 +109,7 @@ const AboutMediLink = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Column 1: How MediLink Works with Health Facilities */}
             <div className="rounded-2xl p-8">
-              <h2 className="text-2xl text-blue-700 font-bold mb-4">How MediLink Works with Health Facilities</h2>
+              <h2 className="text-2xl text-blue-700 font-bold mb-4 font-serif">How MediLink Works with Health Facilities</h2>
               <ul className="list-none space-y-3 mb-4">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1">✓</span>
@@ -137,7 +136,7 @@ const AboutMediLink = () => {
             </div>
             {/* Column 2: How the Platform Operates */}
             <div className="rounded-2xl p-8">
-              <h2 className="text-2xl text-blue-700 font-bold mb-4">How the Platform Operates</h2>
+              <h2 className="text-2xl text-blue-700 font-bold font-serif mb-4">How the Platform Operates</h2>
               <ul className="list-none space-y-3 mb-4">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1">✓</span>
@@ -177,7 +176,7 @@ const AboutMediLink = () => {
               />
             </div>
             <div className="flex-1 rounded-2xl shadow border border-blue-300  p-6">
-              <h2 className="text-2xl font-bold text-blue-700 mb-4">Our Broader Vision</h2>
+              <h2 className="text-2xl font-bold text-blue-700 mb-4 font-serif">Our Broader Vision</h2>
               <p className="mb-4">At its heart, MediLink is more than software. We are a movement for health equity, built on the belief that no one should be left behind. We work closely with:</p>
               <ul className="list-none space-y-3 mb-4">
                 <li className="flex items-start">
@@ -202,7 +201,7 @@ const AboutMediLink = () => {
         </section>
        
         <section className="mb-0 w-full bg-blue-50 p-0">
-          <h2 className="text-2xl font-bold text-blue-700 mb-0">Together for Better Health</h2>
+          <h2 className="text-2xl font-bold text-blue-700 mb-0 font-serif">Together for Better Health</h2>
           <p className="mb-4">We believe in co-creating solutions with health providers, not just selling them. By listening to the needs on the ground, adapting to local contexts, and embracing innovation, we are redefining what it means to deliver care in Africa.</p>
           <blockquote className="border-l-4 pl-4 italic text-blue-800">“Healing Begins with Connection.”</blockquote>
         </section>

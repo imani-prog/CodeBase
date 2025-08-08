@@ -58,7 +58,7 @@ const EventGamified = () => {
     <div>
       {/* ...existing code... */}
       <section className="mb-24 w-full max-w-6xl mx-auto px-4">
-        <h2 className="text-4xl font-bold text-blue-900 mb-10 text-center">
+        <h2 className="text-4xl font-bold font-serif text-blue-900 mb-10 text-center">
           Upcoming Events & Webinars
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -100,7 +100,7 @@ const EventGamified = () => {
 
 
       <section className="mb-20 w-full max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-10 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-blue-900 font-serif mb-10 text-center">
           Gamified Health Challenges
         </h2>
 

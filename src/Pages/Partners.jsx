@@ -95,7 +95,7 @@ const Partners = () => {
         <div className="max-w-6xl mx-auto text-center">
           
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 bg-clip-text text-transparent font-serif">
               Our Strategic Partners
             </span>
             
@@ -125,34 +125,34 @@ const Partners = () => {
 
       {/* Partnership Impact Stats */}
       <section className="py-16 px-4 bg-blue-950">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             <div className="text-center group">
-              <div className="bg-white backdrop-blur rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 transform hover:scale-105 border border-blue-100">
-                <div className="text-3xl text-blue-700 font-bold mb-2">50+</div>
-                <div className="text-lg text-blue-900 font-semibold mb-1">Active Partners</div>
-                <div className="text-sm text-gray-600">Across all sectors</div>
+              <div className="bg-yellow-300 rounded-2xl px-2 py-4 h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
+                <div className="text-2xl lg:text-3xl text-black font-bold mb-1">50+</div>
+                <div className="text-sm lg:text-base text-black font-semibold mb-1">Active Partners</div>
+                <div className="text-xs">Across all sectors</div>
               </div>
             </div>
             <div className="text-center group">
-              <div className="bg-white backdrop-blur rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 transform hover:scale-105 border border-blue-100">
-                <div className="text-3xl text-blue-700 font-bold mb-2">20M+</div>
-                <div className="text-lg text-blue-900 font-semibold mb-1">Lives Covered</div>
-                <div className="text-sm text-gray-600">Through our network</div>
+              <div className="bg-yellow-300 rounded-2xl px-2 py-4 h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
+                <div className="text-2xl lg:text-3xl text-black font-bold mb-1">20M+</div>
+                <div className="text-sm lg:text-base text-black font-semibold mb-1">Lives Covered</div>
+                <div className="text-xs">Through our network</div>
               </div>
             </div>
             <div className="text-center group">
-              <div className="bg-white backdrop-blur rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 transform hover:scale-105 border border-blue-100">
-                <div className="text-3xl text-blue-700 font-bold mb-2">24/7</div>
-                <div className="text-lg text-blue-900 font-semibold mb-1">Support Network</div>
-                <div className="text-sm text-gray-600">Emergency response</div>
+              <div className="bg-yellow-300 rounded-2xl px-2 py-4 h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
+                <div className="text-2xl lg:text-3xl text-black font-bold mb-1">24/7</div>
+                <div className="text-sm lg:text-base text-black font-semibold mb-1">Support Network</div>
+                <div className="text-xs">Emergency response</div>
               </div>
             </div>
             <div className="text-center group">
-              <div className="bg-white backdrop-blur rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 transform hover:scale-105 border border-blue-100">
-                <div className="text-3xl text-blue-700 font-bold mb-2">47</div>
-                <div className="text-lg text-blue-900 font-semibold mb-1">Counties</div>
-                <div className="text-sm text-gray-600">Nationwide coverage</div>
+              <div className="bg-yellow-300 rounded-2xl px-2 py-4 h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
+                <div className="text-2xl lg:text-3xl text-black font-bold mb-1">47</div>
+                <div className="text-sm lg:text-base text-black font-semibold mb-1">Counties</div>
+                <div className="text-xs">Nationwide coverage</div>
               </div>
             </div>
           </div>
@@ -163,7 +163,7 @@ const Partners = () => {
       <section className="py-20 px-4 bg-blue-950">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Meet Our Partners</h2>
+            <h2 className="text-4xl font-extrabold text-yellow-300 font-serif mb-4">Meet Our Partners</h2>
             <p className="text-xl text-white max-w-3xl mx-auto">
               Leading organizations that trust MediLink to deliver innovative healthcare solutions
             </p>
@@ -186,7 +186,7 @@ const Partners = () => {
                   
                   {/* Partner Info */}
                   <div>
-                    <h3 className="text-3xl font-bold text-white mb-2">
+                    <h3 className="text-3xl font-bold text-yellow-300 font-serif mb-2">
                       {partner.name}
                     </h3>
                     <p className="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-bold">{partner.fullName}</p>
@@ -255,7 +255,7 @@ const Partners = () => {
       <section className="py-20 px-4 ">
         <div className="relative max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blue-700 mb-4">Why Partner With MediLink?</h2>
+            <h2 className="text-4xl font-bold text-blue-700 font-serif mb-4">Why Partner With MediLink?</h2>
             <p className="text-xl max-w-3xl mx-auto">
               Join our ecosystem and unlock the power of digital health innovation
             </p>
@@ -264,7 +264,7 @@ const Partners = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
 
-              <h3 className="text-xl font-bold text-blue-700 mb-4">Digital Innovation</h3>
+              <h3 className="text-xl font-bold text-blue-700 font-serif mb-4">Digital Innovation</h3>
               <p className="">
                 Access cutting-edge digital health tools and technologies to enhance service delivery and patient outcomes.
               </p>
@@ -272,7 +272,7 @@ const Partners = () => {
             
             <div className="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
 
-              <h3 className="text-xl font-bold text-blue-700 mb-4">Network Expansion</h3>
+              <h3 className="text-xl font-bold text-blue-700 font-serif mb-4">Network Expansion</h3>
               <p className="">
                 Connect with a vast network of healthcare providers, increasing your reach and impact across Kenya.
               </p>
@@ -280,7 +280,7 @@ const Partners = () => {
             
             <div className="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
 
-              <h3 className="text-xl font-bold text-blue-700 mb-4">Data Insights</h3>
+              <h3 className="text-xl font-bold text-blue-700 font-serif mb-4">Data Insights</h3>
               <p className="">
                 Leverage real-time health data and analytics to make informed decisions and improve service quality.
               </p>
@@ -292,7 +292,7 @@ const Partners = () => {
       {/* Call to Action */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-blue-800 mb-6">Ready to Join Our Network?</h2>
+          <h2 className="text-4xl font-bold text-blue-800 font-serif mb-6">Ready to Join Our Network?</h2>
           <p className="text-xl mb-10 max-w-2xl mx-auto">
             Become part of Kenya's most comprehensive digital health ecosystem. 
             Together, we can transform healthcare delivery and improve lives.
@@ -307,7 +307,7 @@ const Partners = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+          <div className="grid grid-cols-1 font-extrabold sm:grid-cols-3 gap-6 text-center">
             <div className="flex items-center justify-center text-blue-600">
               
               <span>Seamless Integration</span>

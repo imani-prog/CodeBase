@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { MessageCircle, Heart, Repeat2, Share, MoreHorizontal, Clock, User, Stethoscope, UserCheck, AlertCircle, Filter, BookOpen, Award, Menu, X } from 'lucide-react';
 
@@ -182,8 +183,8 @@ const CommunityDiscussions = () => {
 
   const getAvatarColor = (author) => {
     const blueColors = [
-      'bg-blue-500', 'bg-blue-600', 'bg-blue-700', 'bg-sky-500', 
-      'bg-sky-600', 'bg-cyan-500', 'bg-cyan-600', 'bg-slate-600'
+      'bg-blue-500', 'bg-blue-600', 'bg-blue-700', 'bg-blue-400', 
+      
     ];
     return blueColors[author.length % blueColors.length];
   };
@@ -208,7 +209,7 @@ const CommunityDiscussions = () => {
               <div className="flex items-center space-x-3">
                 <Stethoscope className="w-6 h-6 text-blue-500" />
                 <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">Medical Discussions</h2>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 font-serif">Medical Discussions</h2>
                   <p className="text-xs sm:text-sm text-gray-500">Healthcare professionals sharing insights</p>
                 </div>
               </div>
@@ -312,7 +313,7 @@ const CommunityDiscussions = () => {
                           <span className="text-xs sm:text-sm">{post.replies}</span>
                         </button>
 
-                        <button
+                        {/* <button
                           onClick={() => handleRetweet(post.id)}
                           className={`flex items-center space-x-1 sm:space-x-2 transition-colors group ${
                             retweets[post.id] ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'
@@ -322,7 +323,7 @@ const CommunityDiscussions = () => {
                             <Repeat2 className="w-4 sm:w-5 h-4 sm:h-5" />
                           </div>
                           <span className="text-xs sm:text-sm">{post.retweets + (retweets[post.id] ? 1 : 0)}</span>
-                        </button>
+                        </button> */}
 
                         <button
                           onClick={() => handleLike(post.id)}

@@ -82,8 +82,8 @@ const Hospitals = () => (
 
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-12">
       <div className="text-center mb-10">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-2">Digitize and Streamline Your Facility</h1>
-        <h2 className="text-xl md:text-2xl mb-3">Future-proof your operations with MediLink’s smart hospital systems.</h2>
+        <h1 className="text-4xl md:text-5xl font-extrabold font-serif text-blue-900 mb-2">Digitize and Streamline Your Facility</h1>
+        <h2 className="text-xl md:text-2xl mb-3 text-blue-500 font-serif">Future-proof your operations with MediLink’s smart hospital systems.</h2>
         <p className="text-lg mb-3">We provide custom-built digital tools for hospitals and clinics in Kenya—from electronic records to finance dashboards and CHW coordination tools.</p>
         <p className="font-medium mb-4">Most clinics still use paper files, which are slow, insecure, and inefficient. MediLink’s hospital-grade systems reduce paperwork, speed up operations, and boost patient outcomes.</p>
       </div>
@@ -113,7 +113,7 @@ const Hospitals = () => (
             {/* Text Card */}
             <div className={`w-full flex justify-center ${idx % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
               <div className="w-full bg-white rounded-xl p-6 max-w-xl">
-                <h3 className="text-2xl font-bold text-blue-800 mb-4">{f.title}</h3>
+                <h3 className="text-2xl font-bold text-blue-800 mb-4 font-serif">{f.title}</h3>
                 <ul className="text-lg space-y-3">
                   {Array.isArray(f.description) ? (
                     f.description.map((desc, i) => (
@@ -163,7 +163,7 @@ const Hospitals = () => (
           {/* Info Cards Row */}
           <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6">
             <div className="p-6 flex-1 max-w-md">
-              <h5 className="text-lg font-bold text-blue-800 mb-2">Why Hospitals Choose MediLink</h5>
+              <h5 className="text-lg font-bold text-blue-800 mb-2 font-serif">Why Hospitals Choose MediLink</h5>
               <ul className="text-gray-700 text-base mb-2 space-y-3">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
@@ -193,7 +193,7 @@ const Hospitals = () => (
               <p className="text-blue-600 italic">"Bringing smart hospital workflows to the frontline of care."</p>
             </div>
             <div className="p-6 flex-1 max-w-md">
-              <h5 className="text-lg font-bold text-blue-800 mb-2">Need Support?</h5>
+              <h5 className="text-lg font-bold text-blue-800 mb-2 font-serif">Need Support?</h5>
               <ul className="text-gray-700 text-base mb-2 space-y-3">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>

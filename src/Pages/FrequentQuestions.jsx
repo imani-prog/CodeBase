@@ -140,14 +140,14 @@ const FAQs = () => {
 
  
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-blue-100">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       {/* Hero Section */}
       <div className="relative ">
         
         <div className="relative max-w-6xl mx-auto px-6 py-20">
           <div className="text-center">
             
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-blue-800">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 font-serif leading-tight text-blue-800">
               Frequently Asked
               <span className="block bg-clip-text">
                 Questions
@@ -238,10 +238,10 @@ const FAQs = () => {
                   className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-blue-50 transition-colors group"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
+                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full  transition-colors">
                       {faq.icon}
                     </div>
-                    <h3 className="text-lg font-semibold text-blue-900 group-hover:text-blue-700 transition-colors">
+                    <h3 className="text-lg font-semibold text-blue-900 font-serif group-hover:text-blue-700 transition-colors">
                       {faq.question}
                     </h3>
                   </div>
@@ -266,7 +266,7 @@ const FAQs = () => {
                 {expandedItems.has(index) && (
                   <div className="px-8 pb-6 pt-0">
                     <div className="pl-14">
-                      <p className="text-blue-800 leading-relaxed mb-4">{faq.answer}</p>
+                      <p className="text-black leading-relaxed mb-4">{faq.answer}</p>
                       <div className="flex flex-wrap gap-2">
                         {faq.tags.map((tag, tagIndex) => (
                           <span
@@ -300,7 +300,7 @@ const FAQs = () => {
               </div>
             </div>
           </div>
-          <h2 className="text-2xl font-bold mb-3">Still have questions?</h2>
+          <h2 className="text-2xl font-bold mb-3 font-serif">Still have questions?</h2>
           <p className="mb-6">Our support team is here to help you 24/7</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a

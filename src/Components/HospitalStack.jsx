@@ -86,10 +86,10 @@ const HospitalStack = () => {
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
       {/* Header Section */}
       <div className="text-center mb-6 sm:mb-8 lg:mb-12">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-800 mb-3 sm:mb-4">
+        <h1 className="text-2xl sm:text-3xl font-serif lg:text-4xl font-bold text-blue-800 mb-3 sm:mb-4">
           Hospital Technology Stack
         </h1>
-        <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-sm sm:text-base lg:text-l max-w-3xl mx-auto leading-relaxed">
           Comprehensive digital solutions designed for modern healthcare facilities, 
           enhancing patient care and operational efficiency.
         </p>
@@ -178,7 +178,7 @@ const HospitalStack = () => {
                 >
                   <div className="space-y-4 sm:space-y-6">
                     <div>
-                      <h4 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600 mb-3 sm:mb-4">
+                      <h4 className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-blue-600 mb-3 sm:mb-4">
                         {service.title}
                       </h4>
                       <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
@@ -188,7 +188,7 @@ const HospitalStack = () => {
 
                     {/* Features List */}
                     <div className="space-y-2 sm:space-y-3">
-                      <h5 className="text-base sm:text-lg font-semibold text-gray-700">Key Features:</h5>
+                      <h5 className="text-base sm:text-lg font-semibold text-black font-serif">Key Features:</h5>
                       <div className="grid grid-cols-1 gap-2 sm:gap-3">
                         {service.features.map((feature, index) => (
                           <div key={index} className="flex items-start text-xs sm:text-sm text-gray-600">

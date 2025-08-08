@@ -40,7 +40,7 @@ export default function TrendingHealthTopics() {
       topic: "Remote Healthcare Evolution", 
       posts: 15, 
       trend: "+28%", 
-      color: "from-cyan-500 to-teal-500",
+      color: "from-blue-600 to-indigo-600",
       icon: Stethoscope,
       description: "Next-generation telemedicine platforms expanding global healthcare accessibility",
       engagement: "9.2k views",
@@ -92,31 +92,34 @@ export default function TrendingHealthTopics() {
         <div className="text-center mb-16">
          
           
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white bg-clip-text mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-yellow-300 bg-clip-text mb-6 leading-tight font-serif">
             Trending Health Topics
           </h2>
 
-          <p className="text-white text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
+          <p className="text-white font-bold text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
             Discover cutting-edge healthcare innovations, breakthrough research, and wellness trends that are revolutionizing the medical industry right now
           </p>
           
           {/* Stats bar */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mt-8 text-sm">
-            <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4 text-white" />
-              <span className="text-white font-medium">41.2k total views</span>
+         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-8 text-sm">
+            <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
+              <Eye className="w-4 h-4 text-black" />
+              <span className="text-black font-bold">41.2k total views</span>
             </div>
-            <div className="hidden sm:block w-1 h-1 bg-gray-400 rounded-full"></div>
-            <div className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-white" />
-              <span className="text-white font-medium">661 discussions</span>
+
+            <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
+              <MessageCircle className="w-4 h-4 text-black" />
+              <span className="text-black font-bold">661 discussions</span>
             </div>
-            <div className="hidden sm:block w-1 h-1 bg-gray-400 rounded-full"></div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-white" />
-              <span className="text-white font-medium">+35% this week</span>
+
+            <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
+              <TrendingUp className="w-4 h-4 text-black" />
+              <span className="text-black font-bold">+35% this week</span>
             </div>
           </div>
+
+
+
         </div>
 
         {/* Enhanced Grid */}
@@ -240,12 +243,12 @@ export default function TrendingHealthTopics() {
         <div className="text-center mt-16 text-white">
           <div className="inline-flex flex-col items-center gap-4">
             <button className="inline-flex items-center gap-3 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold rounded-2xl shadow-2xl relative overflow-hidden">
-              {/* Remove animated background and icon rotation */}
+              
               <span className="relative z-10">Explore All Health Innovations</span>
               <ArrowUpRight className="w-5 sm:w-6 h-5 sm:h-6 relative z-10" />
             </button>
             
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-sm">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 font-extrabold text-sm">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4" />
                 <span>Updated every hour</span>

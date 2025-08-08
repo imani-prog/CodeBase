@@ -120,7 +120,7 @@ const Sponsors = () => (
     {/* Hero Section */}
     <section className="py-8">
       <div className="max-w-6xl mx-auto px-4 text-center">
-        <h1 className="text-5xl font-bold text-blue-700 mb-6">Partner with Purpose</h1>
+        <h1 className="text-5xl font-bold text-blue-700 font-serif mb-6">Partner with Purpose</h1>
         <p className="text-xl mb-8 max-w-3xl mx-auto">
           Join leading organizations in transforming healthcare delivery across Africa. 
           Your sponsorship directly impacts communities, saves lives, and builds sustainable health systems.
@@ -145,7 +145,7 @@ const Sponsors = () => (
     {/* Impact Statistics */}
     <section className="py-16">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-blue-800">Our Collective Impact</h2>
+        <h2 className="text-3xl font-bold text-center mb-12 font-serif text-blue-800">Our Collective Impact</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {SPONSORSHIP_IMPACT.map((stat, index) => (
             <div key={index} className="text-center p-6 ">
@@ -161,12 +161,12 @@ const Sponsors = () => (
     {/* Sponsorship Opportunities */}
     <section id="opportunities" className="py-16 ">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-blue-800">Sponsorship Opportunities</h2>
+        <h2 className="text-3xl font-bold text-center font-serif mb-12 text-blue-800">Sponsorship Opportunities</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {SPONSORSHIP_OPPORTUNITIES.map((opportunity, index) => (
             <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-gray-200">
               <div className="text-4xl mb-4">{opportunity.icon}</div>
-              <h3 className="text-xl font-bold mb-3 text-gray-800">{opportunity.title}</h3>
+              <h3 className="text-xl font-bold mb-3 font-serif text-gray-800">{opportunity.title}</h3>
               <p className="text-gray-600 mb-4">{opportunity.description}</p>
               <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
                 <p className="text-sm font-semibold text-blue-800">Impact: {opportunity.impact}</p>
@@ -180,11 +180,11 @@ const Sponsors = () => (
     {/* Sponsor Benefits */}
     <section className="bg-blue-950 text-white py-16">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 ">Why Sponsor MediLink?</h2>
+        <h2 className="text-4xl font-extrabold text-center mb-12 text-yellow-300 font-serif">Why Sponsor MediLink?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {SPONSOR_BENEFITS.map((benefit, index) => (
             <div key={index} className=" p-10">
-              <h3 className="text-xl font-bold mb-3 ">{benefit.title}</h3>
+              <h3 className="text-xl font-bold mb-3 text-yellow-300 font-serif">{benefit.title}</h3>
               <p className=" mb-4">{benefit.description}</p>
               <ul className="space-y-2">
                 {benefit.features.map((feature, featureIndex) => (
@@ -203,7 +203,7 @@ const Sponsors = () => (
     {/* Sponsor Testimonials */}
     <section className="py-16">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">What Our Sponsors Say</h2>
+        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 font-serif">What Our Sponsors Say</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {SPONSOR_TESTIMONIALS.map((testimonial, index) => (
             <div key={index} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
@@ -232,16 +232,16 @@ const Sponsors = () => (
     {/* NGO Collaboration Section */}
     <section className="py-16">
       <div className="max-w-4xl mx-auto px-4 text-center">
-        <h2 className="text-3xl font-bold mb-8 text-blue-900">NGO & Development Partners</h2>
+        <h2 className="text-3xl font-bold mb-8 text-blue-900 font-serif">NGO & Development Partners</h2>
         <div className="p-8">
-          <h3 className="text-2xl font-bold text-blue-600 mb-4">Collaborative Impact</h3>
+          <h3 className="text-2xl font-bold text-blue-600 font-serif mb-4">Collaborative Impact</h3>
           <p className="text-gray-700 mb-6">
             Partner with MediLink to amplify your organization's health impact. We collaborate with NGOs, 
             development agencies, and foundations to implement sustainable health solutions at scale.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="text-left">
-              <h4 className="font-semibold text-blue-600 mb-2">Partnership Areas:</h4>
+              <h4 className="font-semibold text-blue-600 mb-2 font-serif">Partnership Areas:</h4>
               <ul className="space-y-1 text-sm text-gray-600">
                 <li>• Program implementation & scaling</li>
                 <li>• Technology integration & training</li>
@@ -250,7 +250,7 @@ const Sponsors = () => (
               </ul>
             </div>
             <div className="text-left">
-              <h4 className="font-semibold text-blue-600 mb-2">Collaboration Benefits:</h4>
+              <h4 className="font-semibold text-blue-600 font-serif mb-2">Collaboration Benefits:</h4>
               <ul className="space-y-1 text-sm text-gray-600">
                 <li>• Shared resources & expertise</li>
                 <li>• Expanded geographic reach</li>
@@ -272,7 +272,7 @@ const Sponsors = () => (
     {/* Call to Action */}
     <section className="py-16 bg-blue-950 text-white">
       <div className="max-w-4xl mx-auto px-4 text-center">
-        <h2 className="text-3xl font-bold mb-6">Ready to Make a Difference?</h2>
+        <h2 className="text-4xl font-extrabold mb-6 font-serif text-yellow-300">Ready to Make a Difference?</h2>
         <p className="text-xl mb-8">
           Your sponsorship can transform healthcare delivery for thousands of people across Africa. 
           Let's discuss how we can create meaningful impact together.
@@ -293,10 +293,10 @@ const Sponsors = () => (
         </div>
         <div className="mt-8 text-center">
           <p className="text-blue-200 mb-2">Or reach out directly:</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center text-sm">
-            <span>📧 sponsors@medilink.africa</span>
-            <span>🤝 ngo@medilink.africa</span>
-            <span>💬 partnerships@medilink.africa</span>
+          <div className="flex flex-col sm:flex-row gap-4 text-yellow-300 justify-center text-sm">
+            <span>sponsors@medilink.africa</span>
+            <span>ngo@medilink.africa</span>
+            <span>partnerships@medilink.africa</span>
           </div>
         </div>
       </div>

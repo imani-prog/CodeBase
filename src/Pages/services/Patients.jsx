@@ -2,18 +2,16 @@ import HealthTechTraining from "../../assets/HealthTechTraining.jpg";
 import patientsHomecareImg from "../../assets/PatientService.jpg";
 import PaymentsInsurance from "../../assets/PaymentsInsurance.png";
 import TelemedicinePatientsImg from "../../assets/Telehealth.jpg";
-import Footer from "../../Components/Footer.jsx";
-import LiveChatButton from "../../Components/LiveChatButton.jsx";
-import Navbar from "../../Components/Navbar.jsx";
+
 
 const Patients = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-      <LiveChatButton />
+      
       
       <main className="flex flex-col items-center w-full px-4 py-6 md:py-10 max-w-[1200px] mx-auto">
         <section className="mb-8 w-full items-center">
-          <h1 className="text-3xl md:text-5xl font-extrabold text-blue-900 mb-4 md:mb-6 text-center leading-tight">Patient Services</h1>
+          <h1 className="text-3xl md:text-5xl font-extrabold text-blue-900 mb-4 md:mb-6 text-center leading-tight font-serif">Patient Services</h1>
           <p className="text-base md:text-lg w-full text-left md:text-center">MediLink empowers patients to access care, education, and support from anywhere. Our platform is designed to make healthcare simple, affordable, and compassionate for every citizen.</p>
         </section>
 
@@ -31,7 +29,7 @@ const Patients = () => {
               />
             </div>
             <div className="w-full md:w-1/2 flex flex-col justify-center">
-              <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2">Healthcare Appointments</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 font-serif">Healthcare Appointments</h2>
               <ul className="list-none space-y-3 mb-2">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1">✓</span>
@@ -87,7 +85,7 @@ const Patients = () => {
 
           <div className="mb-5 w-full flex flex-col md:flex-row gap-6 md:gap-8">
             <div className="w-full md:w-1/2 flex flex-col justify-center order-2 md:order-1">
-              <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2">Health Education & Community Awareness</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 font-serif">Health Education & Community Awareness</h2>
               <ul className="list-none space-y-3 mb-2 text-xs md:text-base">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1">✓</span>
@@ -148,7 +146,7 @@ const Patients = () => {
               />
             </div>
             <div className="w-full md:w-1/2 flex flex-col justify-center">
-              <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 md:mb-4">Telemedicine Consultations</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 md:mb-4 font-serif">Telemedicine Consultations</h2>
               <ul className="list-none space-y-3 mb-2 text-xs md:text-base">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1">✓</span>
@@ -173,7 +171,7 @@ const Patients = () => {
 
           <div className="mb-5 w-full flex flex-col md:flex-row gap-6 md:gap-8">
             <div className="w-full md:w-1/2 flex flex-col justify-center order-2 md:order-1">
-              <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2">Insurance & Financial Integration</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 font-serif">Insurance & Financial Integration</h2>
               <ul className="list-none space-y-3 mb-2 text-xs md:text-base">
                 <li className="flex items-start">
                   <span className="text-blue-400 mr-3 mt-1">✓</span>
@@ -226,7 +224,7 @@ const Patients = () => {
         </div>
 
         <section className="mt-8 w-full text-center flex flex-col items-center justify-center">
-          <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 md:mb-4">Serving Patients with Purpose</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 md:mb-4 font-serif">Serving Patients with Purpose</h2>
           <p className="text-base md:text-lg max-w-xl md:max-w-2xl">Every feature is built from real patient stories and needs. With MediLink, you don’t just access healthcare—you access hope, dignity, and a human connection.</p>
         </section>
       </main>
