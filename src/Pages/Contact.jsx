@@ -41,8 +41,8 @@ const Contact = () => {
       {/* Hero Section */}
       <section className="relative py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-         
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 leading-tight">
+
+          <h1 className="text-5xl font-extrabold md:text-6xl font-serif text-yellow-300 mb-4 leading-tight">
             Get in <span className="">Touch</span>
           </h1>
           <p className=" max-w-2xl mx-auto mb-8">
@@ -70,8 +70,8 @@ const Contact = () => {
         <section className="flex-[2]">
           <div className="bg-white backdrop-blur-md shadow-2xl p-8 h-fit rounded-3xl">
             <div className="flex items-center mb-6">
-              
-              <h2 className="text-3xl font-bold text-blue-800">Send us a Message</h2>
+
+              <h2 className="text-3xl font-bold text-blue-800 font-serif">Send us a Message</h2>
             </div>
             
             {submitted && (
@@ -180,7 +180,7 @@ const Contact = () => {
           <div className="p-6">
             <div className="flex items-center mb-4">
               
-              <h3 className="text-xl font-bold text-white">Quick Contact</h3>
+              <h3 className="text-xl font-bold text-yellow-300 font-serif">Quick Contact</h3>
             </div>
             
             <div className="space-y-3">
@@ -223,7 +223,7 @@ const Contact = () => {
           <div className="p-4">
             <div className="flex items-center mb-3">
               
-              <h3 className="text-xl font-bold text-white">Office Location</h3>
+              <h3 className="text-xl font-bold text-yellow-300 font-serif">Office Location</h3>
             </div>
             <div className="p-3">
               <div className="font-semibold text-white mb-1 text-sm">MediLink Africa</div>
@@ -252,7 +252,7 @@ const Contact = () => {
         </aside>
         <section className="lg:w-80 space-y-4">
           <div className="p-4">
-            <h1 className="text-xl font-bold text-white mb-4">Social Media Links</h1>
+            <h1 className="text-xl font-bold text-white text-yellow-300 font-serif mb-4">Social Media Links</h1>
             <div className="flex items-center justify-center space-x-4">
               <a href="https://www.facebook.com/medilinkafrica" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-white transition-colors transform hover:scale-110 duration-200">
                 <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
@@ -285,7 +285,7 @@ const Contact = () => {
           <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-xl p-6 text-white">
             <div className="flex items-center mb-4">
               
-              <h3 className="text-2xl font-bold">Response Time</h3>
+              <h3 className="text-2xl font-bold font-serif">Response Time</h3>
             </div>
             <p className="text-blue-100 mb-4">
               We aim to respond to all messages within 24 hours. For urgent matters, please call or WhatsApp us directly.
