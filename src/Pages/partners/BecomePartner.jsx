@@ -198,7 +198,7 @@ const BecomePartner = () => {
           
           
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 bg-clip-text text-transparent font-serif">
               Become a MediLink Partner
             </span>
             
@@ -229,7 +229,7 @@ const BecomePartner = () => {
       <section className="py-20 px-4 ">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blue-800 mb-4">Why Partner With MediLink?</h2>
+            <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Why Partner With MediLink?</h2>
             <p className="text-xl max-w-3xl mx-auto">
               Unlock powerful benefits and transform your healthcare delivery with our comprehensive platform
             </p>
@@ -244,7 +244,7 @@ const BecomePartner = () => {
                 <div className=" rounded-xl p-4 mb-6 w-fit">
                   {benefit.icon}
                 </div>
-                <h3 className="text-xl font-bold text-blue-800 mb-4 group-hover:text-blue-900 transition-colors">
+                <h3 className="text-xl font-bold text-blue-800 font-serif mb-4 group-hover:text-blue-900 transition-colors">
                   {benefit.title}
                 </h3>
                 <p className="leading-relaxed">
@@ -260,7 +260,7 @@ const BecomePartner = () => {
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blue-800 mb-4">Perfect for Every Healthcare Organization</h2>
+            <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Perfect for Every Healthcare Organization</h2>
             <p className="text-xl max-w-3xl mx-auto">
               Whether you're a hospital, insurance provider, tech company, or NGO, we have tailored solutions for you
             </p>
@@ -286,7 +286,7 @@ const BecomePartner = () => {
           {/* Selected Partner Type Details */}
           <div className=" p-8 shadow-x">
             <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-blue-800 mb-4">
+              <h3 className="text-3xl font-bold text-blue-800 font-serif mb-4">
                 {PARTNER_TYPES[selectedPartnerType].title}
               </h3>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -302,7 +302,7 @@ const BecomePartner = () => {
                       {FEATURE_ICONS[feature]}
                     </div>
                   </div>
-                  <p className="font-semibold text-blue-800">{feature}</p>
+                  <p className="font-semibold font-serif text-blue-800">{feature}</p>
                 </div>
               ))}
             </div>
@@ -315,7 +315,7 @@ const BecomePartner = () => {
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
+            <h2 className="text-4xl font-bold text-yellow-300 font-serif mb-4">Ready to Get Started?</h2>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto">
               Fill out our partnership form and we'll get back to you within 24 hours
             </p>
@@ -443,7 +443,7 @@ const BecomePartner = () => {
       {/* Trust & Support Section */}
       <section className="py-20 px-4 ">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-blue-800 mb-4">Join Our Trusted Network</h2>
+          <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Join Our Trusted Network</h2>
           <p className="text-xl mb-12 max-w-3xl mx-auto">
             We support our partners every step of the way with comprehensive onboarding, training, and ongoing support
           </p>
@@ -453,7 +453,7 @@ const BecomePartner = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
                 1
               </div>
-              <h3 className="text-xl font-bold text-blue-800 mb-2">Quick Setup</h3>
+              <h3 className="text-xl font-bold text-blue-800 font-serif mb-2">Quick Setup</h3>
               <p className="">Get integrated with our platform in just a few days with our streamlined onboarding process.</p>
             </div>
             
@@ -461,7 +461,7 @@ const BecomePartner = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
                 2
               </div>
-              <h3 className="text-xl font-bold text-blue-800 mb-2">Training & Support</h3>
+              <h3 className="text-xl font-bold text-blue-800 font-serif mb-2">Training & Support</h3>
               <p className="">Comprehensive training for your team and 24/7 technical support to ensure smooth operations.</p>
             </div>
             
@@ -469,7 +469,7 @@ const BecomePartner = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
                 3
               </div>
-              <h3 className="text-xl font-bold text-blue-800 mb-2">Ongoing Growth</h3>
+              <h3 className="text-xl font-bold text-blue-800 font-serif mb-2">Ongoing Growth</h3>
               <p className="">Continuous platform updates, new features, and partnership opportunities to grow together.</p>
             </div>
           </div>
