@@ -129,7 +129,7 @@ const LatestHealthInsights = ({ categories = [] }) => {
   return (
     <section className="mb-16">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 bg-clip-text">
+        <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 bg-clip-text font-serif">
           Latest Health Insights
         </h2>
         <div className="flex items-center space-x-4">

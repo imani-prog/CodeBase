@@ -6,13 +6,13 @@ import TechnicalFeatures from "../Components/TechnicalFeatures.jsx";
 
 const Tech = () => {
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
      
       
       {/* Hero Section */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-7xl mx-auto">
         <div className="text-center mb-0 flex flex-col items-center justify-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-3 sm:mb-4 lg:mb-6 leading-tight text-center">
+          <h1 className="text-2xl font-serif sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-3 sm:mb-4 lg:mb-6 leading-tight text-center">
                Our Technology
           </h1>
           <p className="text-sm sm:text-base md:text-lg w-full text-center sm:text-left leading-relaxed mb-0 max-w-4xl mx-auto">

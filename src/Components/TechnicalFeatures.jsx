@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+import SmartHealthcare77 from '../assets/SmartHealthcare77.jpg';
+import React from 'react';  
 import {
     ArrowRight,
     CheckCircle,
@@ -84,250 +86,263 @@ const TechnicalFeatures = () => {
     : performanceFeatures.filter(f => f.category.toLowerCase().includes(activeTab));
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-3 sm:p-4 lg:p-6 space-y-8 sm:space-y-10 lg:space-y-12">
-      {/* Header */}
-      <div className={`text-center transition-all duration-1000 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent mb-3 sm:mb-4">
-          Technical Excellence
-        </h1>
-        <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Built with cutting-edge technology to deliver secure, scalable, and reliable healthcare solutions
-        </p>
-      </div>
+    <div className="font-sans">
+      {/* First Section with constrained width */}
+      <div className="min-h-screen bg-blue-50 mb-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className={`text-center transition-all duration-1000 pt-8 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-extrabold text-blue-700 bg-clip-text mb-3 sm:mb-4">
+              Technical Excellence
+            </h1>
+            <p className="text-base sm:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed">
+              Built with cutting-edge technology to deliver secure, scalable, and reliable healthcare solutions
+            </p>
+          </div>
 
-      {/* Main Technical Features Grid */}
-      <div className="space-y-8 sm:space-y-10 lg:space-y-12">
-        {/* Performance & Scalability Section */}
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-20 mb-8 sm:mb-12 lg:mb-25 transition-all duration-1000 delay-200 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-         
-          
-          {/* Content Card */}
-          <div className="p-4 sm:p-6 lg:p-8 h-auto lg:h-[400px]">
-            <div className="flex items-center mb-4 sm:mb-6">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-2 sm:p-3 mr-3 sm:mr-4">
-                <Zap className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Performance & Scalability</h2>
-                <p className="text-sm sm:text-base text-gray-600">Enterprise-grade architecture</p>
-              </div>
-            </div>
+          {/* Main Technical Features Grid */}
+          <div className="space-y-8 mb-15 sm:space-y-10 lg:space-y-12 py-8">
+            {/* Performance & Scalability Section */}
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-20 mb-8 sm:mb-12 lg:mb-25 transition-all duration-1000 delay-200 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+             
+              
+              {/* Content Card */}
+              <div className="p-4 sm:p-6 lg:p-8 h-auto lg:h-[400px]">
+                <div className="flex items-center mb-4 sm:mb-6">
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-2 sm:p-3 mr-3 sm:mr-4">
+                    <Zap className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-800 font-serif">Performance & Scalability</h2>
+                    <p className="text-sm sm:text-base text-black">Enterprise-grade architecture</p>
+                  </div>
+                </div>
 
-            {/* Category Tabs */}
-            <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
-              <button
-                onClick={() => setActiveTab('performance')}
-                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
-                  activeTab === 'performance'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white/60 text-gray-600 hover:bg-blue-100'
-                }`}
-              >
-                All Features
-              </button>
-              {categories.slice(0, 3).map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setActiveTab(category.toLowerCase())}
-                  className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
-                    activeTab === category.toLowerCase()
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'bg-white/60 text-gray-600 hover:bg-blue-100'
-                  }`}
-                >
-                  <span className="hidden sm:inline">{category}</span>
-                  <span className="sm:hidden">{category.slice(0, 6)}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Features List */}
-            <div className="space-y-1.5 sm:space-y-2">
-              {(activeTab === 'performance' ? performanceFeatures.slice(0, 8) : 
-                performanceFeatures.filter(f => f.category.toLowerCase() === activeTab).slice(0, 8))
-                .map((feature, index) => {
-                const IconComponent = feature.icon;
-                return (
-                  <div 
-                    key={index}
-                    className="flex items-start space-x-2 sm:space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                {/* Category Tabs */}
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
+                  <button
+                    onClick={() => setActiveTab('performance')}
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
+                      activeTab === 'performance'
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'bg-white/60 text-gray-600 hover:bg-blue-100'
+                    }`}
                   >
-                    <IconComponent className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0 mt-1" />
-                    <span className="text-xs sm:text-sm leading-relaxed">
-                      {feature.text}
-                    </span>
+                    All Features
+                  </button>
+                  {categories.slice(0, 3).map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setActiveTab(category.toLowerCase())}
+                      className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
+                        activeTab === category.toLowerCase()
+                          ? 'bg-blue-600 text-white shadow-lg'
+                          : 'bg-white/60 text-gray-600 hover:bg-blue-100'
+                      }`}
+                    >
+                      <span className="hidden sm:inline">{category}</span>
+                      <span className="sm:hidden">{category.slice(0, 6)}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Features List */}
+                <div className="space-y-1.5 sm:space-y-2">
+                  {(activeTab === 'performance' ? performanceFeatures.slice(0, 8) : 
+                    performanceFeatures.filter(f => f.category.toLowerCase() === activeTab).slice(0, 8))
+                    .map((feature, index) => {
+                    const IconComponent = feature.icon;
+                    return (
+                      <div 
+                        key={index}
+                        className="flex items-start space-x-2 sm:space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                      >
+                        <IconComponent className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0 mt-1" />
+                        <span className="text-xs sm:text-sm leading-relaxed">
+                          {feature.text}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+               {/* Image Card */}
+              <div 
+                className="bg-white rounded-3xl border border-blue-200/50 overflow-hidden h-48 sm:h-64 lg:h-[400px] order-first lg:order-last"
+                style={{
+                  boxShadow: `-4px 4px 0px rgba(59, 130, 246, 0.3), -8px 8px 0px rgba(59, 130, 246, 0.2), -12px 12px 0px rgba(59, 130, 246, 0.1), -16px 16px 20px rgba(0, 0, 0, 0.1)`
+                }}
+              >
+                <img 
+                  
+                  src={SmartHealthcare77}
+                  alt="Technology Background"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Security & Compliance Section */}
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-4 transition-all duration-1000 delay-400 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+
+
+               {/* Image Card */}
+              <div 
+                className="bg-white rounded-3xl border border-blue-200/50 overflow-hidden h-48 sm:h-64 lg:h-[400px]"
+                style={{
+                  boxShadow: `4px 4px 0px rgba(59, 130, 246, 0.3), 8px 8px 0px rgba(59, 130, 246, 0.2), 12px 12px 0px rgba(59, 130, 246, 0.1), 16px 16px 20px rgba(0, 0, 0, 0.1)`
+                }}
+              >
+                <img 
+                  src="https://www.dewsolutions.in/wp-content/uploads/2021/07/HIPAA1.png" 
+                  alt="Security Background"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Content Card */}
+              <div className="p-4 sm:p-6 lg:p-8 h-auto lg:h-[400px]">
+                <div className="flex items-center mb-6 sm:mb-8">
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-2 sm:p-3 mr-3 sm:mr-4">
+                    <Shield className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
                   </div>
-                );
-              })}
-            </div>
-          </div>
-
-           {/* Image Card */}
-          <div 
-            className="bg-white rounded-3xl border border-blue-200/50 overflow-hidden h-48 sm:h-64 lg:h-[400px] order-first lg:order-last"
-            style={{
-              boxShadow: `-4px 4px 0px rgba(59, 130, 246, 0.3), -8px 8px 0px rgba(59, 130, 246, 0.2), -12px 12px 0px rgba(59, 130, 246, 0.1), -16px 16px 20px rgba(0, 0, 0, 0.1)`
-            }}
-          >
-            <img 
-              src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=500&h=500&fit=crop" 
-              alt="Technology Background"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-
-        {/* Security & Compliance Section */}
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-4 transition-all duration-1000 delay-400 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-
-
-           {/* Image Card */}
-          <div 
-            className="bg-white rounded-3xl border border-blue-200/50 overflow-hidden h-48 sm:h-64 lg:h-[400px]"
-            style={{
-              boxShadow: `4px 4px 0px rgba(59, 130, 246, 0.3), 8px 8px 0px rgba(59, 130, 246, 0.2), 12px 12px 0px rgba(59, 130, 246, 0.1), 16px 16px 20px rgba(0, 0, 0, 0.1)`
-            }}
-          >
-            <img 
-              src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=500&h=500&fit=crop" 
-              alt="Security Background"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Content Card */}
-          <div className="p-4 sm:p-6 lg:p-8 h-auto lg:h-[400px]">
-            <div className="flex items-center mb-6 sm:mb-8">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-2 sm:p-3 mr-3 sm:mr-4">
-                <Shield className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Security & Compliance</h2>
-                <p className="text-sm sm:text-base text-gray-600">Bank-level security standards</p>
-              </div>
-            </div>
-
-            <div className="space-y-2 sm:space-y-3">
-              {securityFeatures.map((item, index) => (
-                <div key={index} className="flex items-start space-x-2 sm:space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0 mt-1" />
-                  <span className="text-xs sm:text-sm leading-relaxed">
-                    {item}
-                  </span>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-800 font-serif">Security & Compliance</h2>
+                    <p className="text-sm sm:text-base text-black">Bank-level security standards</p>
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Security Badge */}
-            <div className="mt-4 sm:mt-6 p-2 sm:p-3 bg-gradient-to-r from-blue-600/10 to-blue-400/10 rounded-xl border border-blue-200">
-              <div className="text-center">
-                <div className="inline-flex items-center space-x-2 text-blue-700 font-semibold">
-                  <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="text-xs sm:text-sm">ISO 27001 & HIPAA Ready</span>
+                <div className="space-y-2 sm:space-y-3">
+                  {securityFeatures.map((item, index) => (
+                    <div key={index} className="flex items-start space-x-2 sm:space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200">
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0 mt-1" />
+                      <span className="text-xs sm:text-sm leading-relaxed">
+                        {item}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Security Badge */}
+                <div className="mt-4 sm:mt-6 p-2 sm:p-3 bg-gradient-to-r from-blue-600/10 to-blue-400/10 rounded-xl border border-blue-200">
+                  <div className="text-center">
+                    <div className="inline-flex items-center space-x-2 text-blue-700 font-semibold">
+                      <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="text-xs sm:text-sm">ISO 27001 & HIPAA Ready</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+              
+             
             </div>
+
           </div>
-          
-         
         </div>
       </div>
 
-      {/* Bottom Section */}
-      <div className="space-y-6 sm:space-y-8">
-        {/* Integrations Section */}
-        <section className={`relative p-4 sm:p-6 lg:p-8 overflow-hidden transition-all duration-1000 delay-600 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
-          
-          <div className="relative z-10">
-            <div className="flex flex-col sm:flex-row items-center justify-center mb-6 sm:mb-8">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-2 sm:p-3 mr-0 sm:mr-4 mb-3 sm:mb-0">
-                <Puzzle className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-              </div>
-              <div className="text-center sm:text-left">
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-800">Integrations & Extensibility</h2>
-                <p className="text-sm sm:text-base">Connect with existing systems</p>
-              </div>
-            </div>
+      {/* Bottom Section - Full Width Background that breaks out of container */}
+      <div className="bg-blue-950 mb-0 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] space-y-6 sm:space-y-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Integrations Section */}
+          <section className={`relative py-8 sm:py-12 lg:py-16 overflow-hidden transition-all duration-1000 delay-600 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
             
-            {/* Horizontal Integration Items */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              {integrations.map((item, index) => (
-                <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-blue-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] p-4 sm:p-6 text-center">
-                  <p className="text-gray-700 font-medium text-sm sm:text-base leading-relaxed group-hover:text-gray-900 transition-colors duration-300 mb-2 sm:mb-3">
-                    {item.text}
-                  </p>
-                  <div className="flex items-center justify-center text-blue-600">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full mr-2"></div>
-                    <span className="text-xs sm:text-sm font-semibold">Integration Ready</span>
+            <div className="relative z-10">
+              <div className="flex flex-col sm:flex-row items-center justify-center mb-6 sm:mb-8">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-2 sm:p-3 mr-0 sm:mr-4 mb-3 sm:mb-0">
+                  <Puzzle className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
+                </div>
+                <div className="text-center sm:text-left">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-yellow-300 font-serif">Integrations & Extensibility</h2>
+                  <p className="text-sm sm:text-base text-white">Connect with existing systems</p>
+                </div>
+              </div>
+              
+              {/* Horizontal Integration Items */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                {integrations.map((item, index) => (
+                  <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-blue-200 hover:border-blue-300 hover:shadow-xl p-4 sm:p-6 text-center">
+                    <p className="text-gray-700 font-medium text-sm sm:text-base leading-relaxed group-hover:text-gray-900 transition-colors duration-300 mb-2 sm:mb-3">
+                      {item.text}
+                    </p>
+                    <div className="flex items-center justify-center text-blue-600">
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full mr-2"></div>
+                      <span className="text-xs sm:text-sm font-semibold font-serif">Integration Ready</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Integration Stats */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-xs sm:max-w-md mx-auto">
-              <div className="text-center p-3 sm:p-4 bg-white/60 rounded-xl border border-blue-100">
-                <div className="text-lg sm:text-2xl font-bold text-blue-600">50+</div>
-                <div className="text-xs sm:text-sm text-gray-600">API Endpoints</div>
+                ))}
               </div>
-              <div className="text-center p-3 sm:p-4 bg-white/60 rounded-xl border border-blue-100">
-                <div className="text-lg sm:text-2xl font-bold text-blue-600">99.9%</div>
-                <div className="text-xs sm:text-sm text-gray-600">Uptime SLA</div>
+              
+              {/* Integration Stats */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-xs sm:max-w-md mx-auto">
+                  <div className="text-center p-3 sm:p-4 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50">
+                    <div className="text-lg sm:text-2xl font-bold text-black">50+</div>
+                    <div className="text-xs sm:text-sm text-black">API Endpoints</div>
+                  </div>
+                  
+                  <div className="text-center p-3 sm:p-4 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50">
+                    <div className="text-lg sm:text-2xl font-bold text-black">99.9%</div>
+                    <div className="text-xs sm:text-sm text-black">Uptime SLA</div>
+                  </div>
               </div>
             </div>
-          </div>
-        </section>
-        
-        {/* Built for Impact Section */}
-        <section className={`relative p-4 sm:p-6 lg:p-8 overflow-hidden transition-all duration-1000 delay-800 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
+          </section>
           
-          <div className="relative z-10">
-            <div className="flex flex-col sm:flex-row items-center justify-center mb-6 sm:mb-8">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-2 sm:p-3 mr-0 sm:mr-4 mb-3 sm:mb-0">
-                <Rocket className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-              </div>
-              <div className="text-center sm:text-left">
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-800">Built for Impact</h2>
-                <p className="text-sm sm:text-base">Innovation meets reliability</p>
-              </div>
-            </div>
+          {/* Built for Impact Section */}
+          <section className={`relative py-8 sm:py-12 lg:py-16 overflow-hidden transition-all duration-1000 delay-800 ${animationTrigger ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-blue-400/20 to-blue-200/20 rounded-full blur-2xl" />
             
-            <div className="max-w-4xl mx-auto">
-              <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed mb-4 sm:mb-6 text-center">
-                Our tech team is committed to continuous improvement, innovation, and reliability. We welcome 
-                <span className="font-semibold text-blue-700"> feedback and collaboration</span> from partners, 
-                developers, and users to make MediLink even better.
-              </p>
-              
-              {/* Key Stats */}
-              <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                <div className="text-center">
-                  <div className="text-lg sm:text-2xl font-bold text-blue-600">24/7</div>
-                  <div className="text-xs text-gray-600">Support</div>
+            <div className="relative z-10">
+              <div className="flex flex-col sm:flex-row items-center justify-center mb-6 sm:mb-8">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl p-2 sm:p-3 mr-0 sm:mr-4 mb-3 sm:mb-0">
+                  <Rocket className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
                 </div>
-                <div className="text-center">
-                  <div className="text-lg sm:text-2xl font-bold text-blue-600">100+</div>
-                  <div className="text-xs text-gray-600">Features</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg sm:text-2xl font-bold text-blue-600">5min</div>
-                  <div className="text-xs text-gray-600">Setup</div>
+                <div className="text-center sm:text-left">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-yellow-300 font-serif">Built for Impact</h2>
+                  <p className="text-sm sm:text-base text-white">Innovation meets reliability</p>
                 </div>
               </div>
               
-              <div className="text-center">
-                <button className="group inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
-                  <span>Partner With Us</span>
-                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                </button>
+              <div className="max-w-4xl mx-auto">
+                <p className="text-sm sm:text-base lg:text-lg leading-relaxed mb-4 sm:mb-6 text-center text-white">
+                  Our tech team is committed to continuous improvement, innovation, and reliability. We welcome 
+                  <span className="font-semibold text-blue-300"> feedback and collaboration</span> from partners, 
+                  developers, and users to make MediLink even better.
+                </p>
+                
+                {/* Key Stats */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6 max-w-lg mx-auto">
+                    <div className="text-center bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 p-2 sm:p-3">
+                      <div className="text-base sm:text-xl font-bold text-black">24/7</div>
+                      <div className="text-xs text-black">Support</div>
+                    </div>
+                    
+                    <div className="text-center bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 p-2 sm:p-3">
+                      <div className="text-base sm:text-xl font-bold text-black">100+</div>
+                      <div className="text-xs text-black">Features</div>
+                    </div>
+                    
+                    <div className="text-center bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 p-2 sm:p-3">
+                      <div className="text-base sm:text-xl font-bold text-black">5min</div>
+                      <div className="text-xs text-black">Setup</div>
+                    </div>
+                  </div>
+
+                
+                <div className="text-center">
+                  <button className="group inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <span>Partner With Us</span>
+                    <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
 
       <style jsx>{`

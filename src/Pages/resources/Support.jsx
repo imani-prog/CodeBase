@@ -34,7 +34,7 @@ const Support = () => {
       <section className="relative py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           
-          <h1 className="text-5xl md:text-6xl font-extrabold text-blue-900 mb-4 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-extrabold font-serif text-blue-900 mb-4 leading-tight">
             Support <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Desk</span>
           </h1>
           <p className="text-xl max-w-2xl mx-auto mb-8">
@@ -67,7 +67,7 @@ const Support = () => {
             <section className=" backdrop-blur-md p-8">
               <div className="flex items-center mb-6">
                
-                <h2 className="text-3xl font-bold text-blue-800">How can we help?</h2>
+                <h2 className="text-3xl font-bold font-serif text-blue-800">How can we help?</h2>
               </div>
               
               <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -93,7 +93,7 @@ const Support = () => {
             <section className="backdrop-blur-md p-8">
               <div className="flex items-center mb-6">
                 
-                <h2 className="text-3xl font-bold text-blue-800">Support Categories</h2>
+                <h2 className="text-3xl font-bold font-serif text-blue-800">Support Categories</h2>
               </div>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -116,7 +116,7 @@ const Support = () => {
               {/* Quick Ticket Form */}
               {selectedTicketType && (
                 <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
-                  <h3 className="text-xl font-bold text-blue-800 mb-4">Create Support Ticket</h3>
+                  <h3 className="text-xl font-bold text-blue-800 font-serif mb-4">Create Support Ticket</h3>
                   <div className="space-y-4">
                     <input
                       type="text"
@@ -163,7 +163,7 @@ const Support = () => {
             <section className=" p-6">
               <div className="flex items-center mb-6">
                 
-                <h2 className="text-2xl font-bold text-blue-800">Contact Us</h2>
+                <h2 className="text-2xl font-bold text-blue-800 font-serif">Contact Us</h2>
               </div>
               
               <div className="space-y-4">
@@ -203,7 +203,7 @@ const Support = () => {
             <section className="bg-gradient-to-br from-blue-600 to-blue-700 shadow-xl p-6 text-white">
               <div className="flex items-center mb-4">
                 
-                <h3 className="text-2xl font-bold">Support Hours</h3>
+                <h3 className="text-2xl font-bold font-serif">Support Hours</h3>
               </div>
               <div className="space-y-3 text-blue-100">
                 <div className="flex justify-between">
@@ -229,7 +229,7 @@ const Support = () => {
 
             {/* Quick Actions */}
             <section className="bg-white/80  p-6">
-              <h3 className="text-xl font-bold text-blue-800 mb-4">Quick Actions</h3>
+              <h3 className="text-xl font-bold text-blue-800 font-serif mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <button className="w-full p-4 cursor-pointer hover:bg-blue-100 rounded-2xl transition-colors border border-blue-200 text-left">
                   <div className="flex items-center">

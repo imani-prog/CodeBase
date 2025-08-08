@@ -74,7 +74,7 @@ const CHWCarousel = () => {
 
   return (
     <div className="flex flex-col items-center mt-10 w-full">
-      <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-8 text-center w-full">What CHWs Say About MediLink</h2>
+      <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-8 text-center w-full font-serif">What CHWs Say About MediLink</h2>
       <div className="relative flex flex-row gap-8 w-full justify-center items-center">
         <button
           aria-label="Previous testimonials"

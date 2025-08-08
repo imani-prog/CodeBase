@@ -95,7 +95,7 @@ const CHWs = () => (
    
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-12">
       <div className="text-center mb-10">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-2">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 font-serif mb-2">
           Empowering CHWs with Digital Tools
         </h1>
         <h2 className="text-xl md:text-2xl mb-3">
@@ -121,7 +121,7 @@ const CHWs = () => (
                 idx % 2 === 0 ? "" : "md:order-2"
               }`}
             >
-              <h3 className="text-3xl font-bold text-blue-800 mb-4">
+              <h3 className="text-3xl font-bold text-blue-800 mb-4 font-serif">
                 {feature.title}
               </h3>
               <ul className="text-lg leading-relaxed space-y-3">
@@ -189,7 +189,7 @@ const CHWs = () => (
         {/* Info Cards Row */}
         <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6">
           <div className="p-6 flex-1 max-w-md">
-            <h5 className="text-lg font-bold text-blue-800 mb-2">Why Join MediLink?</h5>
+            <h5 className="text-lg font-bold text-blue-800 mb-2 font-serif">Why Join MediLink?</h5>
             <ul className="text-gray-700 text-base mb-2 space-y-3">
               <li className="flex items-start">
                 <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>
@@ -219,7 +219,7 @@ const CHWs = () => (
             <p className="text-blue-600 italic">"Empowering CHWs to deliver better care in the community."</p>
           </div>
           <div className="p-6 flex-1 max-w-md">
-            <h5 className="text-lg font-bold text-blue-800 mb-2">Need Help?</h5>
+            <h5 className="text-lg font-bold text-blue-800 mb-2 font-serif">Need Help?</h5>
             <ul className="text-gray-700 text-base mb-2 space-y-3">
               <li className="flex items-start">
                 <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">✓</span>

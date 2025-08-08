@@ -72,7 +72,7 @@ const HospitalStyle = () => {
 
   return (
     <div className="flex flex-col items-center mt-16 w-full">
-      <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-8 text-center w-full">
+      <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-8 text-center w-full font-serif">
         What Hospitals Say About MediLink
       </h2>
       <div className="relative flex flex-row gap-8 w-full justify-center items-center px-4 md:px-0">

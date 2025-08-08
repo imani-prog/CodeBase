@@ -71,7 +71,7 @@ const FeaturedPosts = ({ categories = [] }) => {
   return (
     <section className="mb-16">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold text-blue-900 bg-clip-text">
+        <h2 className="text-3xl font-bold text-blue-900 bg-clip-text font-serif">
           Featured Stories
         </h2>
         <button className="flex items-center text-blue-600 hover:text-blue-700 font-semibold group">
@@ -96,12 +96,12 @@ const FeaturedPosts = ({ categories = [] }) => {
                         </span>
                         <div className="flex space-x-2">
                           {post.featured && (
-                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold">
+                            <span className="bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-bold">
                               FEATURED
                             </span>
                           )}
                           {post.trending && (
-                            <span className="bg-gradient-to-r from-pink-500 to-red-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center">
+                            <span className="bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-bold flex items-center">
                               <TrendingUp className="w-3 h-3 mr-1" />
                               TRENDING
                             </span>
@@ -122,7 +122,7 @@ const FeaturedPosts = ({ categories = [] }) => {
                         <button 
                           onClick={() => toggleLike(post.id)}
                           className={`flex items-center transition-colors ${
-                            likedPosts.has(post.id) ? 'text-red-500' : 'hover:text-red-500'
+                            likedPosts.has(post.id) ? 'text-blue-500' : 'hover:text-blue-500'
                           }`}
                         >
                           <Heart className={`w-4 h-4 mr-1 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
@@ -211,12 +211,12 @@ const FeaturedPosts = ({ categories = [] }) => {
                         </span>
                         <div className="flex space-x-2">
                           {post.featured && (
-                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold">
+                            <span className="bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-bold">
                               FEATURED
                             </span>
                           )}
                           {post.trending && (
-                            <span className="bg-gradient-to-r from-pink-500 to-red-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center">
+                            <span className="bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-bold flex items-center">
                               <TrendingUp className="w-3 h-3 mr-1" />
                               TRENDING
                             </span>
