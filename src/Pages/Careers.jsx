@@ -213,12 +213,10 @@ const Careers = () => {
         <div className="relative max-w-6xl mx-auto text-center">
           
           
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+          <h1 className="text-6xl font-serif md:text-7xl font-bold mb-6 leading-tight">
             <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
-              Build the Future
+              Build the Future of Healthcare
             </span>
-            <br />
-            <span className="text-gray-800">of Healthcare</span>
           </h1>
           
           <p className="text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto mb-10">
@@ -250,7 +248,7 @@ const Careers = () => {
       <section className="py-20 px-4 bg-blue-950">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Why Work With Us?</h2>
+            <h2 className="text-4xl font-extrabold text-yellow-300 font-serif mb-4">Why Work With Us?</h2>
             <p className="text-xl text-white max-w-3xl mx-auto">
               We're more than just a tech company - we're a mission-driven team changing lives through innovation
             </p>
@@ -259,9 +257,8 @@ const Careers = () => {
             {COMPANY_CULTURE.map((value, index) => (
               <div key={index} className="group text-center">
                 <div className={` p-1 rounded-2xl shadow-xl `}>
-                  <div className="bg-white rounded-xl p-6 h-full">
-                    <div className="text-4xl mb-4">{value.icon}</div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-3">{value.title}</h3>
+                  <div className="bg-blue-50 rounded-xl p-6 h-full">
+                    <h3 className="text-xl font-bold font-serif text-blue-800 mb-3">{value.title}</h3>
                     <p className="text-gray-600 text-sm">{value.description}</p>
                   </div>
                 </div>
@@ -275,15 +272,14 @@ const Careers = () => {
       <section className="py-20 px-4 bg-blue-950">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Comprehensive Benefits</h2>
+            <h2 className="text-4xl font-extrabold text-yellow-300 font-serif mb-4">Comprehensive Benefits</h2>
             <p className="text-xl text-white">We invest in our people because they invest in our mission</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {BENEFITS.map((benefit, index) => (
               <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <div className="text-3xl mb-4">{benefit.icon}</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">{benefit.category}</h3>
+                <h3 className="text-xl font-bold text-blue-800 font-serif mb-4">{benefit.category}</h3>
                 <ul className="space-y-2">
                   {benefit.items.map((item, itemIndex) => (
                     <li key={itemIndex} className="flex items-center text-gray-600">
@@ -302,7 +298,7 @@ const Careers = () => {
       <section id="open-positions" className="py-20 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blue-800 mb-4">Open Positions</h2>
+            <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Open Positions</h2>
             <p className="text-xl mb-8">Find your perfect role and start making an impact</p>
             
             {/* Filters */}
@@ -340,7 +336,7 @@ const Careers = () => {
             {filteredJobs.map((job, index) => (
               <div key={index} className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
                 {job.featured && (
-                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center py-2 text-sm font-semibold">
+                  <div className="bg-blue-800 text-white text-center py-2 text-sm font-semibold">
                      Featured Position
                   </div>
                 )}
@@ -348,12 +344,12 @@ const Careers = () => {
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">{job.title}</h3>
+                      <h3 className="text-2xl font-bold text-gray-800 font-serif mb-2">{job.title}</h3>
                       <div className="flex flex-wrap gap-2 mb-2">
                         <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
                           {job.department}
                         </span>
-                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
                           {job.type}
                         </span>
                       </div>
@@ -394,7 +390,7 @@ const Careers = () => {
                         <ul className="space-y-1">
                           {job.responsibilities.map((resp, respIndex) => (
                             <li key={respIndex} className="flex items-center text-gray-600 text-sm">
-                              <span className="text-green-500 mr-2">•</span>
+                              <span className="text-blue-500 mr-2">•</span>
                               {resp}
                             </li>
                           ))}
@@ -432,7 +428,7 @@ const Careers = () => {
       {/* Application Process */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-blue-800 mb-4">Application Process</h2>
+          <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Application Process</h2>
           <p className="text-xl mb-12">Simple, transparent, and focused on finding the right fit</p>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -447,7 +443,7 @@ const Careers = () => {
                   {step.step}
                 </div>
                 <div className="text-2xl mb-2">{step.icon}</div>
-                <h3 className="text-xl font-bold text-blue-700 mb-2">{step.title}</h3>
+                <h3 className="text-xl font-bold text-blue-700 font-serif mb-2">{step.title}</h3>
                 <p className="text-gray-600 text-sm">{step.description}</p>
                 
                 {index < 3 && (
@@ -463,8 +459,8 @@ const Careers = () => {
       <section className="py-20 px-4 bg-blue-950 relative">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Make an Impact?</h2>
-          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-extrabold font-serif text-yellow-300 mb-6">Ready to Make an Impact?</h2>
+          <p className="text-xl text-white mb-10 max-w-2xl mx-auto">
             Join our mission to transform healthcare delivery across Africa. 
             Your skills can save lives and build a healthier future.
           </p>
@@ -478,7 +474,7 @@ const Careers = () => {
             </button>
           </div>
           
-          <div className="mt-8 flex flex-col sm:flex-row gap-6 justify-center text-blue-100">
+          <div className="mt-8 flex flex-col sm:flex-row gap-6 justify-center font-bold text-white">
             <div className="flex items-center">
               
               <span>Remote-First Culture</span>

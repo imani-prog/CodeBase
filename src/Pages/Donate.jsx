@@ -121,7 +121,7 @@ const Donate = () => {
           
           
           <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-blue-800">
+            <span className="text-blue-800 font-serif">
               Transform Healthcare
             </span>
 
@@ -155,7 +155,7 @@ const Donate = () => {
         <div className="absolute inset-0"></div>
         <div className="relative max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl text-blue-700 font-bold mb-4">Real-Time Impact</h2>
+            <h2 className="text-3xl text-blue-700 font-bold font-serif mb-4">Real-Time Impact</h2>
             <p className="text-lg">See the difference we're making together</p>
           </div>
           
@@ -178,7 +178,7 @@ const Donate = () => {
       <section className="py-20 bg-blue-950 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Choose Your Method</h2>
+            <h2 className="text-4xl font-extrabold text-yellow-300 font-serif mb-4">Choose Your Method</h2>
             <p className="text-xl max-w-3xl text-white mx-auto">
               Multiple secure payment options designed for convenience and accessibility
             </p>
@@ -198,7 +198,7 @@ const Donate = () => {
                   <div className="bg-white rounded-xl p-6 h-full group-hover:bg-blue-50 transition-all duration-300">
                     <div className="text-center">
                       
-                      <h3 className="text-xl font-bold text-blue-800 mb-2 group-hover:text-blue-900 transition-colors duration-300">{method.title}</h3>
+                      <h3 className="text-xl font-bold text-blue-800 mb-2 font-serif group-hover:text-blue-900 transition-colors duration-300">{method.title}</h3>
                       <p className="text-sm text-gray-600 mb-3">{method.subtitle}</p>
                       <div className="bg-gray-50 rounded-lg p-3 mb-2 group-hover:bg-blue-100 transition-all duration-300">
                         <p className="font-semibold text-gray-800">{method.details}</p>
@@ -216,7 +216,7 @@ const Donate = () => {
           
           {/* Quick Amount Selection */}
           <div className=" p-8 ">
-            <h3 className="text-2xl font-bold text-center text-white mb-8">Quick Donation</h3>
+            <h3 className="text-2xl font-extrabold text-center text-yellow-300 font-serif mb-8">Quick Donation</h3>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
               {quickAmounts.map((amount, index) => (
@@ -248,7 +248,7 @@ const Donate = () => {
             </div>
             
             <div className="text-center">
-              <p className="text-white text-sm"> All transactions are secure and encrypted</p>
+              <p className="text-white font-bold text-sm"> All transactions are secure and encrypted</p>
             </div>
           </div>
         </div>
@@ -262,7 +262,7 @@ const Donate = () => {
             {/* Donation Impact Tiers */}
             <div className="space-y-6">
               <div className="text-center lg:text-left">
-                <h2 className="text-4xl font-bold text-blue-800 mb-4">Your Impact</h2>
+                <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Your Impact</h2>
                 <p className="text-xl mb-8">
                   See exactly how your donation transforms lives
                 </p>
@@ -272,10 +272,10 @@ const Donate = () => {
                 {IMPACT_TIERS.map((tier, index) => (
                   <div key={index} className="p-6 shadow-lg ">
                     <div className="flex items-start space-x-4">
-                      <div className="text-3xl">{tier.icon}</div>
+                      
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-xl font-bold text-gray-800">{tier.title}</h3>
+                          <h3 className="text-xl font-bold font-serif text-gray-800">{tier.title}</h3>
                           <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-full text-sm font-bold">
                             {tier.amount}
                           </span>
@@ -294,7 +294,7 @@ const Donate = () => {
             {/* Transparency Dashboard */}
             <div className="p-8 shadow-xl border border-gray-100">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-blue-800 mb-4">Transparency Report</h2>
+                <h2 className="text-3xl font-bold text-blue-800 font-serif mb-4">Transparency Report</h2>
                 <p className="">How we use every donation dollar</p>
               </div>
               
@@ -327,7 +327,7 @@ const Donate = () => {
                 
                 <div className="p-6">
                   <div className="text-center">
-                    <h3 className="font-bold text-blue-800 mb-2">Did you know?</h3>
+                    <h3 className="font-bold text-blue-800 font-serif mb-2">Did you know?</h3>
                     <p className="text-sm">
                       95% of donations directly impact healthcare delivery. Only 5% goes to administrative costs.
                     </p>
@@ -346,13 +346,13 @@ const Donate = () => {
       {/* Success Stories */}
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-blue-800 mb-4">Success Stories</h2>
+          <h2 className="text-4xl font-bold font-serif text-blue-800 mb-4">Success Stories</h2>
           <p className="text-xl mb-12">Real impact from real donations</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
               
-              <h3 className="text-xl font-bold text-blue-800 mb-3">Sarah's Story</h3>
+              <h3 className="text-xl font-bold font-serif text-blue-800 mb-3">Sarah's Story</h3>
               <p className="mb-4">
                 "Thanks to MediLink, I can now provide telemedicine consultations to over 500 patients monthly in rural Turkana."
               </p>
@@ -361,7 +361,7 @@ const Donate = () => {
             
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
 
-              <h3 className="text-xl font-bold text-blue-800 mb-3">Kibera Clinic</h3>
+              <h3 className="text-xl font-bold text-blue-800 font-serif mb-3">Kibera Clinic</h3>
               <p className="mb-4">
                 "Digital patient records have reduced wait times by 70% and improved care coordination significantly."
               </p>
@@ -370,7 +370,7 @@ const Donate = () => {
             
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
 
-              <h3 className="text-xl font-bold text-blue-800 mb-3">The Kamau Family</h3>
+              <h3 className="text-xl font-bold text-blue-800 font-serif mb-3">The Kamau Family</h3>
               <p className="mb-4">
                 "Emergency response through MediLink saved our daughter's life when she had complications during childbirth."
               </p>
@@ -384,7 +384,7 @@ const Donate = () => {
       <section className="py-20 px-4 bg-blue-950 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Transform Lives?</h2>
+          <h2 className="text-4xl font-extrabold font-serif text-yellow-300 mb-6">Ready to Transform Lives?</h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
             Join thousands of donors who are revolutionizing healthcare access across Africa. 
             Your contribution today becomes someone's lifeline tomorrow.
@@ -402,7 +402,7 @@ const Donate = () => {
             </Link>
           </div>
           
-          <div className="mt-8 flex flex-col sm:flex-row gap-6 justify-center text-blue-100">
+          <div className="mt-8 flex flex-col sm:flex-row gap-6 justify-center font-bold text-white">
             <div className="flex items-center">
               
               <span>Secure Payments</span>
