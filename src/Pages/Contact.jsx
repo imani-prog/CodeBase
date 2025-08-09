@@ -86,7 +86,7 @@ const Contact = () => {
             <div className="space-y-6 w-full">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-blue-800 font-semibold mb-3 flex items-center">
+                  <label htmlFor="name" className=" text-blue-800 font-semibold mb-3 flex items-center">
                     
                     Name
                   </label>
@@ -102,7 +102,7 @@ const Contact = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-blue-800 font-semibold mb-3 flex items-center">
+                  <label htmlFor="email" className=" text-blue-800 font-semibold mb-3 flex items-center">
                     
                     Email
                   </label>
@@ -120,7 +120,7 @@ const Contact = () => {
               </div>
               
               <div>
-                <label htmlFor="subject" className="block text-blue-800 font-semibold mb-3 flex items-center">
+                <label htmlFor="subject" className=" text-blue-800 font-semibold mb-3 flex items-center">
                   
                   Subject
                 </label>
@@ -137,7 +137,7 @@ const Contact = () => {
               </div>
               
               <div>
-                <label htmlFor="message" className="block text-blue-800 font-semibold mb-3 flex items-center">
+                <label htmlFor="message" className=" text-blue-800 font-semibold mb-3 flex items-center">
                   
                   Message
                 </label>
@@ -252,7 +252,7 @@ const Contact = () => {
         </aside>
         <section className="lg:w-80 space-y-4">
           <div className="p-4">
-            <h1 className="text-xl font-bold text-white text-yellow-300 font-serif mb-4">Social Media Links</h1>
+            <h1 className="text-xl font-bold text-yellow-300 font-serif mb-4">Social Media Links</h1>
             <div className="flex items-center justify-center space-x-4">
               <a href="https://www.facebook.com/medilinkafrica" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-white transition-colors transform hover:scale-110 duration-200">
                 <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
