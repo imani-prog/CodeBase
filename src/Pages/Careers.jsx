@@ -490,8 +490,6 @@ const Careers = () => {
           </div>
         </div>
       </section>
-
-      
     </div>
   );
 };
