@@ -185,7 +185,7 @@ const Home = () => {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-4xl">
             <Link
-              to="/register"
+              to=""
               className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-8 rounded-2xl shadow-xl text-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden w-full sm:w-auto text-center"
             >
               <span className="relative z-10 flex items-center justify-center">
@@ -207,7 +207,7 @@ const Home = () => {
             </Link>
             
             <Link
-              to="/partner"
+              to="/partners"
               className="group bg-gradient-to-r from-blue-900 to-blue-950 hover:from-blue-950 hover:to-blue-900 text-white font-bold py-3 px-8 rounded-2xl shadow-xl text-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden w-full sm:w-auto text-center"
             >
               <span className="relative z-10 flex items-center justify-center">
