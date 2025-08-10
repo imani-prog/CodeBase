@@ -35,6 +35,10 @@ import Tech from "./Pages/Tech.jsx";
 import Testimonials from "./Pages/Testimonials.jsx";
 import Footer from "./Components/Footer.jsx";
 import LiveChatButton from "./Components/LiveChatButton.jsx";
+import SecurityCompliance from "./Pages/resources/SecurityCompliance.jsx";
+import DevelopersAPI from "./Pages/resources/DevelopersAPI.jsx";
+import Training from "./Pages/resources/Training.jsx";
+import Demo from "./Pages/services/Demo.jsx";
 
 function App() {
   return (
@@ -50,6 +54,12 @@ function App() {
         <Route path="/about/team" element={<Team />} />
         <Route path="/about/mission" element={<Mission />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/services/demo" element={<Demo />} />
+        <Route path="/resources/training" element={<Training />} />
+        <Route path="/resources/developers-api" element={<DevelopersAPI />} />
+        <Route path="/resources/security-compliance" element={<SecurityCompliance />} />
+        <Route path="/resources" element={<HospitalStyle />} />
+        
         <Route path="/testimonials" element={<Testimonials />} />
         <Route path="/partners" element={<Partners />} />
         <Route path="/frequent-questions" element={<FrequentQuestions />} />

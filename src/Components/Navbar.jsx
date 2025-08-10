@@ -19,6 +19,7 @@ const menuGroups = [
       { label: "Patient Services", to: "/services/patients" },
       { label: "CHW Services", to: "/services/chws" },
       { label: "Clinic & Hospital Tools", to: "/services/clinics" },
+      { label: "Product Demo", to: "/services/demo" },
     ],
   },
   {
@@ -33,8 +34,11 @@ const menuGroups = [
     title: "Resources",
     items: [
       { label: "Blog / Health Updates", to: "/blog" },
-      { label: "FAQs", to: "/frequent-questions" },
+      { label: "Training & Certification", to: "/resources/training" },
       { label: "Tech Stack", to: "/tech" },
+      { label: "API Documentation", to: "/resources/developers-api" },
+      { label: "Security & Compliance", to: "/resources/security-compliance" },
+      { label: "FAQs", to: "/frequent-questions" },
       { label: "Support Desk", to: "/support" },
     ],
   },
