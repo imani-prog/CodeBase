@@ -77,9 +77,9 @@ const EventGamified = () => {
                 }}
               />
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent z-10 transition-all duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10 transition-all duration-500"></div>
               {/* Text Content */}
-              <div className="absolute bottom-0 p-6 z-20 text-white space-y-2 transform translate-x-full group-hover:translate-x-0 transition-all duration-700 ease-out">
+              <div className="absolute bottom-0 p-6 z-20 text-white space-y-2 transform translate-x-0 group-hover:translate-y-[-8px] transition-all duration-300 ease-out">
                 <p className="text-sm font-medium text-blue-200">{event.date}</p>
                 <h3 className="text-xl font-semibold leading-tight">{event.title}</h3>
                 <p className="text-sm text-blue-100 opacity-90">{event.desc}</p>
