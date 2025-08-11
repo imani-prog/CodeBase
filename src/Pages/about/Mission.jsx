@@ -4,8 +4,7 @@ import LiveChatButton from "../../Components/LiveChatButton.jsx";
 
 const Mission = () => {
   return (
-    <div className="mb-0 w-full bg-blue-950 text-left text-white">
-      <LiveChatButton />
+    <div className="mb-0 w-full bg-blue-950 text-left relative text-white overflow-hidden">
       
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="w-full flex flex-col items-center">

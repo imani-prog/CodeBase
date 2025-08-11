@@ -32,7 +32,7 @@ const Home = () => {
 
 
       <main className="flex flex-col items-center w-full px-4 py-8 max-w-[1600px] mx-auto">
-        <section className="relative w-full aspect-[16/9] mb-16 rounded-3xl overflow-hidden shadow-2xl border border-blue-200 bg-blue-950 text-white">
+        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[500px] md:min-h-[600px] mb-16 rounded-3xl overflow-hidden shadow-2xl border border-blue-200 bg-blue-950 text-white">
           {/* Background Blobs */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             <div className="absolute -top-16 -left-16 w-64 h-64 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
@@ -51,40 +51,40 @@ const Home = () => {
           </div>
 
           {/* Overlayed Content */}
-          <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
+          <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 md:px-6 text-center py-6 md:py-8">
             {/* Logo Glow */}
-            <div className="relative mb-8">
+            <div className="relative mb-3 md:mb-6">
               <div className="absolute -inset-4  rounded-full blur-xl opacity-40"></div>
               <img
                 src={MediLinkLogo}
                 alt="MediLink Logo"
-                className="relative w-32 h-32 md:w-40 md:h-40 rounded-full shadow-xl border-4 border-white bg-gradient-to-br from-blue-50 to-white"
+                className="relative w-20 h-20 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full shadow-xl border-4 border-white bg-gradient-to-br from-blue-50 to-white"
                 
               />
             </div>
 
             {/* Hero Title */}
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-xl">
+            <h1 className="text-xl md:text-4xl lg:text-6xl font-extrabold leading-tight mb-2 md:mb-4 drop-shadow-xl">
               Karibu{" "}
               <span className="bg-gradient-to-r from-blue-200 to-blue-400 bg-clip-text text-transparent">
                 MediLink
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl font-bold text-blue-100 mb-6 max-w-2xl leading-relaxed drop-shadow">
+            <p className="text-sm md:text-xl lg:text-2xl font-bold text-blue-100 mb-3 md:mb-6 max-w-2xl leading-relaxed drop-shadow">
               Healing Begins with Connection.
             </p>
 
             {/* CTA Button (Optional) */}
             <a
               href=""
-              className="inline-block text-sm md:text-base px-6 py-3 rounded-full border border-white text-white hover:bg-white hover:text-blue-900 transition-all duration-300 font-semibold shadow-sm mb-8"
+              className="inline-block text-xs md:text-sm lg:text-base px-3 md:px-6 py-2 md:py-3 rounded-full border border-white text-white hover:bg-white hover:text-blue-900 transition-all duration-300 font-semibold shadow-sm mb-3 md:mb-6"
             >
               Get Started
             </a>
 
             {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-6">
+            <div className="flex flex-wrap justify-center gap-2 md:gap-6 w-full">
               {[
                 { value: "10K+", label: "Patients" },
                 { value: "200+", label: "CHWs" },
@@ -92,10 +92,10 @@ const Home = () => {
               ].map(({ value, label }) => (
                 <div
                   key={label}
-                  className="bg-yellow-300 border border-blue-200 rounded-xl px-5 py-3 shadow-lg w-28 text-center"
+                  className="bg-yellow-300 border border-blue-200 rounded-lg md:rounded-xl px-2 md:px-5 py-1 md:py-3 shadow-lg flex-1 max-w-[100px] md:max-w-[120px] text-center"
                 >
-                  <div className="text-lg font-bold text-black">{value}</div>
-                  <div className="text-sm text-black">{label}</div>
+                  <div className="text-xs md:text-lg font-bold text-black">{value}</div>
+                  <div className="text-xs md:text-sm text-black">{label}</div>
                 </div>
               ))}
             </div>
@@ -156,7 +156,7 @@ const Home = () => {
             </div>
             {/* Right: Video */}
             <div className="flex-1 flex justify-center items-center min-w-0">
-              <div className="w-full max-w-xl aspect-video rounded-2xl overflow-hidden shadow-lg border border-blue-100">
+              <div className="w-full max-w-sm md:max-w-2xl lg:max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-xl border border-blue-100 min-h-[200px] md:min-h-[300px] lg:min-h-[400px]">
                 <iframe
                   width="100%"
                   height="100%"

@@ -5,9 +5,8 @@ import Workers from "../../assets/Workers.jpg";
 
 const AboutMediLink = () => {
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-      
-      
+    <div className="min-h-screen w-full flex flex-col font-sans relative  bg-blue-50 overflow-hidden">
+
       <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
         <section className="w-full flex flex-col items-center mb-8">
           <h1 className="text-5xl font-extrabold text-blue-900 mb-4 text-center font-serif leading-tight">About MediLink</h1>
