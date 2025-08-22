@@ -1,5 +1,4 @@
-import Footer from "../Components/Footer.jsx";
-import Navbar from "../Components/Navbar.jsx";
+
 const Newsletter = () => (
   <>
     
