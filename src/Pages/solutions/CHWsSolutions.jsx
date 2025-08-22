@@ -1,5 +1,4 @@
-import Footer from "../../Components/Footer.jsx";
-import Navbar from "../../Components/Navbar.jsx";
+
 
 import gpsImg from "../../assets/GPSlocationForCHW.webp";
 import elearningImg from "../../assets/ManualForCHWTraining.png";

@@ -6,7 +6,7 @@ import MediLinkLogo from "../assets/mediLink.png";
 import MedilinkHomePageSlider from "../assets/TechnologyHome.jpg";
 import EventGamified from "../Components/EventGamified.jsx";
 
-import LiveChatButton from "../Components/LiveChatButton.jsx";
+
 
 
 const Home = () => {
