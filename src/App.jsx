@@ -3,15 +3,21 @@ import Sponsors from "./Pages/partners/Sponsors.jsx";
 import Blog from "./Pages/resources/Blog.jsx";
 import Support from "./Pages/resources/Support.jsx";
 
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import './App.css';
+import { AuthProvider } from "./hooks/useAuth.jsx";
+import Login from "./Pages/Login.jsx";
+import Register from "./Pages/Register.jsx";
+import Unauthorized from "./Pages/Unauthorized.jsx";
+import PrivateRoute from "./routes/PrivateRoute.jsx";
+import { clientRoutes } from "./routes/clientRoutes.jsx";
+import { adminRoutes } from "./routes/adminRoutes.jsx";
 import Accessibility from "./Pages/Accessibility.jsx";
 import DataProtection from "./Pages/DataProtection.jsx";
 import GDPR from "./Pages/GDPR.jsx";
 import Newsletter from "./Pages/Newsletter.jsx";
 import Privacy from "./Pages/Privacy.jsx";
 import Terms from "./Pages/Terms.jsx";
-// import About from "./Pages/About.jsx";
 import HospitalStyle from "./Components/HospitalStyle.jsx";
 import Navbar from "./Components/Navbar.jsx";
 import AboutMediLink from "./Pages/about/AboutMediLink.jsx";
@@ -40,15 +46,18 @@ import DevelopersAPI from "./Pages/resources/DevelopersAPI.jsx";
 import Training from "./Pages/resources/Training.jsx";
 import Demo from "./Pages/services/Demo.jsx";
 
-function App() {
+function AppLayout() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
-    <Router>
-      
-          <Navbar />
-          <LiveChatButton />
+    <>
+      {/* Render the normal site navbar only on non-admin routes. AdminLayout renders its own AdminNavbar. */}
+      {!isAdminRoute && <Navbar />}
+
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Home />} />
-        
         <Route path="/about/aboutmedilink" element={<AboutMediLink />} />
         <Route path="/about/story" element={<Story />} />
         <Route path="/about/team" element={<Team />} />
@@ -59,7 +68,6 @@ function App() {
         <Route path="/resources/developers-api" element={<DevelopersAPI />} />
         <Route path="/resources/security-compliance" element={<SecurityCompliance />} />
         <Route path="/resources" element={<HospitalStyle />} />
-        
         <Route path="/testimonials" element={<Testimonials />} />
         <Route path="/partners" element={<Partners />} />
         <Route path="/frequent-questions" element={<FrequentQuestions />} />
@@ -72,13 +80,11 @@ function App() {
         <Route path="/solutions/patients" element={<PatientsSolutions />} />
         <Route path="/solutions/chws" element={<CHWsSolutions />} />
         <Route path="/solutions/hospitals" element={<Hospitals />} />
-
         <Route path="/blog" element={<Blog />} />
-
         <Route path="/support" element={<Support />} />
         <Route path="/partners/join" element={<BecomePartner />} />
         <Route path="/partners/sponsors" element={<Sponsors />} />
-        <Route path="/careers" element={<Careers />} />
+
         {/* Footer legal/info pages */}
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
@@ -86,9 +92,58 @@ function App() {
         <Route path="/gdpr" element={<GDPR />} />
         <Route path="/accessibility" element={<Accessibility />} />
         <Route path="/newsletter" element={<Newsletter />} />
+
+        {/* Auth routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
+        {/* Client portal (protected) */}
+        <Route
+          path="/client/*"
+          element={
+            <PrivateRoute role={["chw", "patient"]}>
+              <Routes>
+                {clientRoutes[0].children.map((route) => (
+                  <Route key={route.path} path={route.path} element={route.element} />
+                ))}
+              </Routes>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Admin portal (protected) */}
+        <Route
+          path="/admin/*"
+          element={
+            <PrivateRoute role="admin">
+              {adminRoutes[0].element}
+            </PrivateRoute>
+          }
+        >
+          {adminRoutes[0].children.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
       </Routes>
-      <Footer />
-    </Router>
+
+      {!isAdminRoute && (
+        <>
+          <LiveChatButton />
+          <Footer />
+        </>
+      )}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <AppLayout />
+      </Router>
+    </AuthProvider>
   );
 }
 

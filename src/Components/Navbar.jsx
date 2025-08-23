@@ -286,13 +286,13 @@ const Navbar = () => {
     {/* Auth Buttons */}
     <div className="hidden md:flex gap-2 items-center">
       <Link
-        to=""
+        to="/login"
         className="px-3 py-1 text-white text-sm font-bold rounded transition duration-200 hover:border hover:border-yellow-300 hover:text-white"
       >
         Login
       </Link>
       <Link
-        to=""
+        to="/register"
         className="px-3 py-1 text-white text-sm font-bold rounded transition duration-200 hover:border hover:border-yellow-300 hover:text-white"
       >
         Register
@@ -345,13 +345,13 @@ const Navbar = () => {
         ))}
         <div className="flex gap-4 mt-8">
           <Link
-            to=""
+            to="/login"
             className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
           >
             Login
           </Link>
           <Link
-            to=""
+            to="/register"
             className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
           >
             Register
