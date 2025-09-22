@@ -49,12 +49,7 @@ const AdminDashboard = () => {
     { day: 'Sun', logins: 98, appointments: 45, reports: 12 }
   ];
 
-  const systemUsageData = [
-    { name: 'Active Users', value: 1245, color: '#3b82f6' },
-    { name: 'Inactive Users', value: 234, color: '#e5e7eb' },
-    { name: 'Pending Users', value: 89, color: '#f59e0b' }
-  ];
-
+ 
   // Mock data for tables
   const topPerformers = [
     { id: 1, name: 'Dr. Sarah Wilson', role: 'CHW', patients: 45, rating: 4.9 },
@@ -107,18 +102,6 @@ const AdminDashboard = () => {
               <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
               <p className="text-sm text-gray-500">Manage your healthcare platform</p>
             </div>
-            {/* <div className="flex items-center space-x-4">
-              <button className="relative p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-indigo-700">AD</span>
-                </div>
-                <span className="text-sm font-medium text-gray-700">Admin</span>
-              </div>
-            </div> */}
           </div>
         </div>
       </div>

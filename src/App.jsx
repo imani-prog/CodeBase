@@ -84,6 +84,7 @@ function AppLayout() {
         <Route path="/support" element={<Support />} />
         <Route path="/partners/join" element={<BecomePartner />} />
         <Route path="/partners/sponsors" element={<Sponsors />} />
+        <Route path="/careers" element={<Careers />} />
 
         {/* Footer legal/info pages */}
         <Route path="/privacy" element={<Privacy />} />
