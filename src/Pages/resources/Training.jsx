@@ -13,6 +13,7 @@ import ComponentsTechnology from '../../assets/ComponentsTechnology.jpeg';
 import TelemedicinePatients from '../../assets/TelemedicinePatients.jpeg';
 import SmartHealthcare from '../../assets/SmartHealthcare77.jpg';
 import Workers from '../../assets/Workers.jpg';
+import TrainingMethodology from '../../Components/TrainingMethodology.jsx';
 
 const Training = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -181,69 +182,6 @@ const Training = () => {
     }
   ];
 
-  // const features = [
-  //   {
-  //     icon: '',
-  //     title: 'Internationally Certified Training',
-  //     description: 'Globally recognized certifications aligned with WHO standards and Kenya Ministry of Health guidelines, including digital badges and continuing education credits'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Expert Healthcare Instructors',
-  //     description: 'Learn from experienced doctors, nurses, public health specialists, and healthcare technology experts with over 15+ years of combined experience'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Hybrid Learning Experience',
-  //     description: 'Flexible learning with live virtual sessions, hands-on workshops, clinical placements, and self-paced online modules to fit your schedule'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Career Advancement Support',
-  //     description: 'Comprehensive post-training support including job placement assistance, interview preparation, resume building, and networking opportunities'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Mobile-First Learning Platform',
-  //     description: 'Access courses, assignments, and resources on any device with offline capability for areas with limited internet connectivity'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Continuous Curriculum Updates',
-  //     description: 'Regular updates based on latest medical research, healthcare trends, and feedback from healthcare institutions across Kenya'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Clinical Partnerships',
-  //     description: 'Hands-on experience through partnerships with leading hospitals and health centers including Kenyatta Hospital and private clinics'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Performance Tracking',
-  //     description: 'Detailed progress tracking, competency assessments, and personalized learning paths to ensure mastery of skills'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Peer Learning Network',
-  //     description: 'Connect with fellow healthcare professionals, join study groups, and participate in professional forums and mentorship programs'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Innovation Focus',
-  //     description: 'Stay ahead with training on latest healthcare technologies, AI in healthcare, digital health solutions, and emerging medical practices'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Community Impact Projects',
-  //     description: 'Real-world application through community health projects, outreach programs, and collaboration with local health initiatives'
-  //   },
-  //   {
-  //     icon: '',
-  //     title: 'Excellence Recognition',
-  //     description: 'Outstanding performers receive special recognition, scholarships for advanced courses, and recommendations for leadership positions'
-  //   }
-  // ];
-
   const testimonials = [
     {
       name: 'Grace Achieng',
@@ -380,7 +318,7 @@ const Training = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> 
     );
   };
 
@@ -459,24 +397,13 @@ const Training = () => {
               We provide comprehensive, practical training that prepares you for real-world healthcare challenges with cutting-edge methodologies and expert instruction
             </p>
           </div>
-          
-          {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
-            ))}
-          </div> */}
-
           <WhyChooseTraining />
 
         </div>
       </section>
 
       {/* Training Programs Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -528,156 +455,7 @@ const Training = () => {
         </div>
       </section>
 
-      {/* Training Methodology Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Our Proven Training Methodology
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Experience our unique 5-phase training approach that ensures skill mastery and real-world application
-            </p>
-          </div>
-          
-          <div className="space-y-8">
-            <div className="flex flex-col lg:flex-row items-center gap-8">
-              <div className="lg:w-1/2">
-                <div className="bg-blue-600 text-white p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <span className="bg-white text-blue-600 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4">1</span>
-                    <h3 className="text-xl font-semibold">Pre-Assessment & Personalization</h3>
-                  </div>
-                  <p className="text-blue-100">
-                    Every trainee undergoes a comprehensive skills assessment to identify knowledge gaps and learning preferences. 
-                    We create personalized learning paths based on experience level, career goals, and regional healthcare needs.
-                  </p>
-                </div>
-              </div>
-              <div className="lg:w-1/2">
-                <div className="bg-gray-100 p-6 rounded-lg">
-                  <h4 className="font-semibold mb-3">What happens during Pre-Assessment:</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Skills evaluation through practical scenarios</li>
-                    <li>• Learning style assessment (visual, auditory, kinesthetic)</li>
-                    <li>• Career goal mapping and pathway planning</li>
-                    <li>• Technology readiness evaluation</li>
-                    <li>• Regional healthcare context analysis</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col lg:flex-row-reverse items-center gap-8">
-              <div className="lg:w-1/2">
-                <div className="bg-green-600 text-white p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <span className="bg-white text-green-600 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4">2</span>
-                    <h3 className="text-xl font-semibold">Interactive Learning Modules</h3>
-                  </div>
-                  <p className="text-green-100">
-                    Engaging multimedia content delivered through our smart learning platform. Interactive simulations, 
-                    virtual patient cases, and gamified challenges make learning enjoyable and memorable.
-                  </p>
-                </div>
-              </div>
-              <div className="lg:w-1/2">
-                <div className="bg-gray-100 p-6 rounded-lg">
-                  <h4 className="font-semibold mb-3">Learning Features Include:</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li>• 3D medical simulations and virtual reality experiences</li>
-                    <li>• Interactive case studies from real patient scenarios</li>
-                    <li>• Gamified progress tracking with achievement badges</li>
-                    <li>• Voice-enabled learning for hands-free practice</li>
-                    <li>• Offline content download for remote areas</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col lg:flex-row items-center gap-8">
-              <div className="lg:w-1/2">
-                <div className="bg-purple-600 text-white p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <span className="bg-white text-purple-600 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4">3</span>
-                    <h3 className="text-xl font-semibold">Hands-On Practice Sessions</h3>
-                  </div>
-                  <p className="text-purple-100">
-                    Real-world application through supervised practice in clinical settings, community outreach programs, 
-                    and simulation labs equipped with modern medical equipment and technology.
-                  </p>
-                </div>
-              </div>
-              <div className="lg:w-1/2">
-                <div className="bg-gray-100 p-6 rounded-lg">
-                  <h4 className="font-semibold mb-3">Practice Opportunities:</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Clinical rotations in partner hospitals and clinics</li>
-                    <li>• Community health screening and outreach events</li>
-                    <li>• Medical equipment handling and maintenance training</li>
-                    <li>• Electronic health records practice on live systems</li>
-                    <li>• Emergency response drills and scenario-based training</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col lg:flex-row-reverse items-center gap-8">
-              <div className="lg:w-1/2">
-                <div className="bg-orange-600 text-white p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <span className="bg-white text-orange-600 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4">4</span>
-                    <h3 className="text-xl font-semibold">Competency Validation</h3>
-                  </div>
-                  <p className="text-orange-100">
-                    Rigorous assessment through multiple evaluation methods including practical demonstrations, 
-                    peer reviews, patient feedback, and standardized testing to ensure competency mastery.
-                  </p>
-                </div>
-              </div>
-              <div className="lg:w-1/2">
-                <div className="bg-gray-100 p-6 rounded-lg">
-                  <h4 className="font-semibold mb-3">Assessment Methods:</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Practical skill demonstrations with expert evaluators</li>
-                    <li>• Standardized patient interactions and feedback</li>
-                    <li>• Peer assessment and collaborative evaluations</li>
-                    <li>• Technology proficiency testing</li>
-                    <li>• Portfolio development and case study presentations</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col lg:flex-row items-center gap-8">
-              <div className="lg:w-1/2">
-                <div className="bg-red-600 text-white p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <span className="bg-white text-red-600 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4">5</span>
-                    <h3 className="text-xl font-semibold">Continuous Support & Growth</h3>
-                  </div>
-                  <p className="text-red-100">
-                    Ongoing mentorship, career guidance, and professional development opportunities. 
-                    Alumni network access, continuing education credits, and advanced certification pathways.
-                  </p>
-                </div>
-              </div>
-              <div className="lg:w-1/2">
-                <div className="bg-gray-100 p-6 rounded-lg">
-                  <h4 className="font-semibold mb-3">Ongoing Support Includes:</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Monthly mentorship sessions with industry experts</li>
-                    <li>• Job placement assistance and interview coaching</li>
-                    <li>• Alumni networking events and professional forums</li>
-                    <li>• Refresher courses and skill update workshops</li>
-                    <li>• Leadership development and advancement opportunities</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <TrainingMethodology />
 
       {/* Training Delivery Process */}
       <section className="py-16 bg-gray-50">
