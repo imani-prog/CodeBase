@@ -51,13 +51,20 @@ const WhyChoose = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className={`flex flex-col lg:flex-row items-center gap-8 ${
+              className={`flex flex-col lg:flex-row items-center gap-12 lg:gap-16 ${
                 index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
               }`}
             >
               {/* Image Section */}
               <div className="flex-1 relative">
-                <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div 
+                  className="relative bg-white rounded-2xl overflow-hidden"
+                  style={{
+                    boxShadow: index % 2 === 0 
+                      ? `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                      : `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+                  }}
+                >
                   <img
                     src={feature.image}
                     alt={feature.title}
