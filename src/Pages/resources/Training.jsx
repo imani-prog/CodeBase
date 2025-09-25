@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react';
+import TrainingPath from '../../Components/TrainingPath.jsx';
+import WhyChooseTraining from '../../Components/WhyChooseTraining.jsx';
 import { Users, TrendingUp, Star, Award } from 'lucide-react';
 
 // Import training-related assets
@@ -179,68 +181,68 @@ const Training = () => {
     }
   ];
 
-  const features = [
-    {
-      icon: '',
-      title: 'Internationally Certified Training',
-      description: 'Globally recognized certifications aligned with WHO standards and Kenya Ministry of Health guidelines, including digital badges and continuing education credits'
-    },
-    {
-      icon: '',
-      title: 'Expert Healthcare Instructors',
-      description: 'Learn from experienced doctors, nurses, public health specialists, and healthcare technology experts with over 15+ years of combined experience'
-    },
-    {
-      icon: '',
-      title: 'Hybrid Learning Experience',
-      description: 'Flexible learning with live virtual sessions, hands-on workshops, clinical placements, and self-paced online modules to fit your schedule'
-    },
-    {
-      icon: '',
-      title: 'Career Advancement Support',
-      description: 'Comprehensive post-training support including job placement assistance, interview preparation, resume building, and networking opportunities'
-    },
-    {
-      icon: '',
-      title: 'Mobile-First Learning Platform',
-      description: 'Access courses, assignments, and resources on any device with offline capability for areas with limited internet connectivity'
-    },
-    {
-      icon: '',
-      title: 'Continuous Curriculum Updates',
-      description: 'Regular updates based on latest medical research, healthcare trends, and feedback from healthcare institutions across Kenya'
-    },
-    {
-      icon: '',
-      title: 'Clinical Partnerships',
-      description: 'Hands-on experience through partnerships with leading hospitals and health centers including Kenyatta Hospital and private clinics'
-    },
-    {
-      icon: '',
-      title: 'Performance Tracking',
-      description: 'Detailed progress tracking, competency assessments, and personalized learning paths to ensure mastery of skills'
-    },
-    {
-      icon: '',
-      title: 'Peer Learning Network',
-      description: 'Connect with fellow healthcare professionals, join study groups, and participate in professional forums and mentorship programs'
-    },
-    {
-      icon: '',
-      title: 'Innovation Focus',
-      description: 'Stay ahead with training on latest healthcare technologies, AI in healthcare, digital health solutions, and emerging medical practices'
-    },
-    {
-      icon: '',
-      title: 'Community Impact Projects',
-      description: 'Real-world application through community health projects, outreach programs, and collaboration with local health initiatives'
-    },
-    {
-      icon: '',
-      title: 'Excellence Recognition',
-      description: 'Outstanding performers receive special recognition, scholarships for advanced courses, and recommendations for leadership positions'
-    }
-  ];
+  // const features = [
+  //   {
+  //     icon: '',
+  //     title: 'Internationally Certified Training',
+  //     description: 'Globally recognized certifications aligned with WHO standards and Kenya Ministry of Health guidelines, including digital badges and continuing education credits'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Expert Healthcare Instructors',
+  //     description: 'Learn from experienced doctors, nurses, public health specialists, and healthcare technology experts with over 15+ years of combined experience'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Hybrid Learning Experience',
+  //     description: 'Flexible learning with live virtual sessions, hands-on workshops, clinical placements, and self-paced online modules to fit your schedule'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Career Advancement Support',
+  //     description: 'Comprehensive post-training support including job placement assistance, interview preparation, resume building, and networking opportunities'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Mobile-First Learning Platform',
+  //     description: 'Access courses, assignments, and resources on any device with offline capability for areas with limited internet connectivity'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Continuous Curriculum Updates',
+  //     description: 'Regular updates based on latest medical research, healthcare trends, and feedback from healthcare institutions across Kenya'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Clinical Partnerships',
+  //     description: 'Hands-on experience through partnerships with leading hospitals and health centers including Kenyatta Hospital and private clinics'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Performance Tracking',
+  //     description: 'Detailed progress tracking, competency assessments, and personalized learning paths to ensure mastery of skills'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Peer Learning Network',
+  //     description: 'Connect with fellow healthcare professionals, join study groups, and participate in professional forums and mentorship programs'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Innovation Focus',
+  //     description: 'Stay ahead with training on latest healthcare technologies, AI in healthcare, digital health solutions, and emerging medical practices'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Community Impact Projects',
+  //     description: 'Real-world application through community health projects, outreach programs, and collaboration with local health initiatives'
+  //   },
+  //   {
+  //     icon: '',
+  //     title: 'Excellence Recognition',
+  //     description: 'Outstanding performers receive special recognition, scholarships for advanced courses, and recommendations for leadership positions'
+  //   }
+  // ];
 
   const testimonials = [
     {
@@ -420,7 +422,7 @@ const Training = () => {
               return (
                 <div key={index} className="bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 sm:px-6 py-8 flex items-center">
                   <IconComponent className="w-4 h-4 mr-2 text-black" />
-                  <span className="text-base sm:text-lg text-black font-bold">
+                  <span className="text-base sm:text-lg text-black font-serif font-bold">
                     {stat.number} {stat.label}
                   </span>
                 </div>
@@ -431,100 +433,34 @@ const Training = () => {
       </section>
 
       {/* Learning Pathways Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-blue-950">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-yellow-300 mb-4 font-serif">
               Structured Learning Pathways
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-white max-w-3xl mx-auto">
               Follow our carefully designed career progression paths tailored to different healthcare roles and experience levels
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
-              <h3 className="text-xl font-semibold mb-4 text-blue-800">🏥 Clinical Care Path</h3>
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">1</span>
-                  <span>Mental Health First Aid</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">2</span>
-                  <span>Community Health Worker Certification</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">3</span>
-                  <span>Maternal & Child Health Specialist</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">4</span>
-                  <span>Healthcare Quality Improvement</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
-              <h3 className="text-xl font-semibold mb-4 text-green-800">💻 Digital Health Path</h3>
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">1</span>
-                  <span>Digital Health Technology Training</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">2</span>
-                  <span>Telemedicine & Remote Care</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">3</span>
-                  <span>Healthcare Data Analytics</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">4</span>
-                  <span>Advanced Digital Health Leadership</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-purple-50 p-6 rounded-lg border-l-4 border-purple-500">
-              <h3 className="text-xl font-semibold mb-4 text-purple-800">📊 Management Path</h3>
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">1</span>
-                  <span>Community Health Worker Certification</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">2</span>
-                  <span>Healthcare Quality Improvement</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">3</span>
-                  <span>Healthcare Data Analytics</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">4</span>
-                  <span>Healthcare System Administration</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TrainingPath />
         </div>
       </section>
 
+
       {/* Features Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-blue-950">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-yellow-300 mb-4 font-serif">
               Why Choose MediLink Training?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-white max-w-3xl mx-auto">
               We provide comprehensive, practical training that prepares you for real-world healthcare challenges with cutting-edge methodologies and expert instruction
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-4xl mb-4">{feature.icon}</div>
@@ -532,7 +468,10 @@ const Training = () => {
                 <p className="text-gray-600">{feature.description}</p>
               </div>
             ))}
-          </div>
+          </div> */}
+
+          <WhyChooseTraining />
+
         </div>
       </section>
 
