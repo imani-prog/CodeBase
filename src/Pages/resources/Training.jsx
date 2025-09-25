@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react';
+import { Users, TrendingUp, Star, Award } from 'lucide-react';
 
 // Import training-related assets
 import HealthTechTraining from '../../assets/HealthTechTraining.jpg';
@@ -180,62 +181,62 @@ const Training = () => {
 
   const features = [
     {
-      icon: '🎓',
+      icon: '',
       title: 'Internationally Certified Training',
       description: 'Globally recognized certifications aligned with WHO standards and Kenya Ministry of Health guidelines, including digital badges and continuing education credits'
     },
     {
-      icon: '�‍⚕️',
+      icon: '',
       title: 'Expert Healthcare Instructors',
       description: 'Learn from experienced doctors, nurses, public health specialists, and healthcare technology experts with over 15+ years of combined experience'
     },
     {
-      icon: '🌐',
+      icon: '',
       title: 'Hybrid Learning Experience',
       description: 'Flexible learning with live virtual sessions, hands-on workshops, clinical placements, and self-paced online modules to fit your schedule'
     },
     {
-      icon: '💼',
+      icon: '',
       title: 'Career Advancement Support',
       description: 'Comprehensive post-training support including job placement assistance, interview preparation, resume building, and networking opportunities'
     },
     {
-      icon: '📱',
+      icon: '',
       title: 'Mobile-First Learning Platform',
       description: 'Access courses, assignments, and resources on any device with offline capability for areas with limited internet connectivity'
     },
     {
-      icon: '🔄',
+      icon: '',
       title: 'Continuous Curriculum Updates',
       description: 'Regular updates based on latest medical research, healthcare trends, and feedback from healthcare institutions across Kenya'
     },
     {
-      icon: '🏥',
+      icon: '',
       title: 'Clinical Partnerships',
       description: 'Hands-on experience through partnerships with leading hospitals and health centers including Kenyatta Hospital and private clinics'
     },
     {
-      icon: '📊',
+      icon: '',
       title: 'Performance Tracking',
       description: 'Detailed progress tracking, competency assessments, and personalized learning paths to ensure mastery of skills'
     },
     {
-      icon: '🤝',
+      icon: '',
       title: 'Peer Learning Network',
       description: 'Connect with fellow healthcare professionals, join study groups, and participate in professional forums and mentorship programs'
     },
     {
-      icon: '💡',
+      icon: '',
       title: 'Innovation Focus',
       description: 'Stay ahead with training on latest healthcare technologies, AI in healthcare, digital health solutions, and emerging medical practices'
     },
     {
-      icon: '🌍',
+      icon: '',
       title: 'Community Impact Projects',
       description: 'Real-world application through community health projects, outreach programs, and collaboration with local health initiatives'
     },
     {
-      icon: '🏆',
+      icon: '',
       title: 'Excellence Recognition',
       description: 'Outstanding performers receive special recognition, scholarships for advanced courses, and recommendations for leadership positions'
     }
@@ -303,8 +304,8 @@ const Training = () => {
     if (!course) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+        <div className="rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
           <div className="relative">
             <img
               src={course.image}
@@ -326,10 +327,10 @@ const Training = () => {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">{course.title}</h2>
                 <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-                  <span>⏱️ {course.duration}</span>
-                  <span>📊 {course.level}</span>
-                  <span>👥 {course.participants} enrolled</span>
-                  <span>⭐ {course.rating}/5</span>
+                  <span> {course.duration}</span>
+                  <span> {course.level}</span>
+                  <span> {course.participants} enrolled</span>
+                  <span> {course.rating}/5</span>
                 </div>
               </div>
               <div className="text-right">
@@ -382,29 +383,26 @@ const Training = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
+      <section className="">
+        <div className="absolute inset-0"></div>
         <div className="relative max-w-7xl mx-auto px-4 py-20">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-2xl font-serif sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-3 sm:mb-4 lg:mb-6 leading-tight text-center">
               Professional Healthcare Training
             </h1>
-            <p className="text-xl md:text-2xl mb-4 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg w-full text-center sm:text-left leading-relaxed mb-10 max-w-4xl mx-auto text-blue-600 font-bold">
               Empowering healthcare professionals with cutting-edge skills and internationally recognized certifications
             </p>
-            <p className="text-lg mb-8 max-w-4xl mx-auto opacity-90">
-              Transform your healthcare career with our comprehensive training programs designed by industry experts. 
-              Whether you're a Community Health Worker, healthcare administrator, or medical professional, 
-              our courses provide practical skills, theoretical knowledge, and hands-on experience to excel in 
-              today's evolving healthcare landscape. Join over 500+ professionals who have advanced their careers through MediLink Training.
+            <p className="text-lg mb-8 max-w-4xl mx-auto">
+              Advance your healthcare career with MediLink Training programs offering expert-designed courses that combine theory, practical skills, and hands-on experience. Trusted by 500+ professionals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+              <button className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-colors">
                 Browse Courses
               </button>
-              <button className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+              <button className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-colors">
                 Contact Us
               </button>
             </div>
@@ -413,17 +411,21 @@ const Training = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">
-                  {stat.number}
+          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
+            {stats.map((stat, index) => {
+              const icons = [Users, TrendingUp, Star, Award];
+              const IconComponent = icons[index];
+              return (
+                <div key={index} className="bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 sm:px-6 py-8 flex items-center">
+                  <IconComponent className="w-4 h-4 mr-2 text-black" />
+                  <span className="text-base sm:text-lg text-black font-bold">
+                    {stat.number} {stat.label}
+                  </span>
                 </div>
-                <div className="text-gray-600">{stat.label}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
