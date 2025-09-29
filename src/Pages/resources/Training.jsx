@@ -1,238 +1,12 @@
-/* eslint-disable no-unused-vars */
-import { useState } from 'react';
 import TrainingPath from '../../Components/TrainingPath.jsx';
 import WhyChooseTraining from '../../Components/WhyChooseTraining.jsx';
 import { Users, TrendingUp, Star, Award } from 'lucide-react';
-
-// Import training-related assets
-import HealthTechTraining from '../../assets/HealthTechTraining.jpg';
-import ManualForCHWTraining from '../../assets/ManualForCHWTraining.png';
-import CommunityHealthWorker from '../../assets/CommunityHealthWorker.jpeg';
-import CommunityWorkerOutreach from '../../assets/CommunityWorkerOutreach.jpeg';
-import ComponentsTechnology from '../../assets/ComponentsTechnology.jpeg';
-import TelemedicinePatients from '../../assets/TelemedicinePatients.jpeg';
-import SmartHealthcare from '../../assets/SmartHealthcare77.jpg';
-import Workers from '../../assets/Workers.jpg';
 import TrainingMethodology from '../../Components/TrainingMethodology.jsx';
 import TrainingPartner from '../../Components/TrainingPartner.jsx';
+import TrainingTestimony from '../../Components/TrainingTestimony.jsx';
+import TrainingCourses from '../../Components/TrainingCourses.jsx';
 
 const Training = () => {
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview');
-
-  const trainingPrograms = [
-    {
-      id: 1,
-      title: 'Community Health Worker Certification',
-      duration: '6 weeks',
-      level: 'Beginner to Intermediate',
-      // price: 'KES 12,000',
-      image: CommunityHealthWorker,
-      description: 'Comprehensive training for Community Health Workers covering patient care, health education, and community outreach.',
-      modules: [
-        'Basic Health Assessment',
-        'Community Health Education',
-        'Patient Referral Systems',
-        'Health Data Collection',
-        'Emergency Response',
-        'Communication Skills'
-      ],
-      certification: 'MediLink Certified CHW',
-      participants: 250,
-      rating: 4.8
-    },
-    {
-      id: 2,
-      title: 'Digital Health Technology Training',
-      duration: '4 weeks',
-      level: 'Intermediate',
-      // price: 'KES 15,000',
-      image: ComponentsTechnology,
-      description: 'Learn to use modern healthcare technology, electronic health records, and telemedicine platforms.',
-      modules: [
-        'Electronic Health Records',
-        'Telemedicine Platforms',
-        'Mobile Health Apps',
-        'Data Security & Privacy',
-        'Technology Troubleshooting',
-        'Digital Communication'
-      ],
-      certification: 'Digital Health Specialist',
-      participants: 180,
-      rating: 4.9
-    },
-    {
-      id: 3,
-      title: 'Healthcare System Administration',
-      duration: '8 weeks',
-      level: 'Advanced',
-      // price: 'KES 25,000',
-      image: SmartHealthcare,
-      description: 'Advanced training for healthcare administrators and system managers.',
-      modules: [
-        'Healthcare Management',
-        'Quality Assurance',
-        'Budget Management',
-        'Staff Coordination',
-        'Compliance & Regulations',
-        'Strategic Planning'
-      ],
-      certification: 'Healthcare Administrator',
-      participants: 95,
-      rating: 4.7
-    },
-    {
-      id: 4,
-      title: 'Telemedicine & Remote Care',
-      duration: '5 weeks',
-      level: 'Intermediate',
-      // price: 'KES 18,000',
-      image: TelemedicinePatients,
-      description: 'Master remote patient care, teleconsultation, and virtual health services with comprehensive hands-on training.',
-      modules: [
-        'Teleconsultation Techniques',
-        'Remote Monitoring',
-        'Virtual Triage',
-        'Patient Communication',
-        'Technology Setup',
-        'Emergency Protocols'
-      ],
-      certification: 'Telemedicine Specialist',
-      participants: 140,
-      rating: 4.6
-    },
-    {
-      id: 5,
-      title: 'Healthcare Data Analytics',
-      duration: '7 weeks',
-      level: 'Advanced',
-      // price: 'KES 22,000',
-      image: HealthTechTraining,
-      description: 'Learn to analyze healthcare data, create meaningful reports, and drive data-driven decisions in healthcare settings.',
-      modules: [
-        'Healthcare Data Fundamentals',
-        'Statistical Analysis in Healthcare',
-        'Data Visualization Tools',
-        'Predictive Analytics',
-        'Healthcare Metrics & KPIs',
-        'Regulatory Compliance'
-      ],
-      certification: 'Healthcare Data Analyst',
-      participants: 85,
-      rating: 4.7
-    },
-    {
-      id: 6,
-      title: 'Maternal & Child Health Specialist',
-      duration: '8 weeks',
-      level: 'Intermediate to Advanced',
-      // price: 'KES 20,000',
-      image: CommunityWorkerOutreach,
-      description: 'Specialized training focused on maternal and child health, including prenatal care, child development, and family planning.',
-      modules: [
-        'Prenatal & Postnatal Care',
-        'Child Development Milestones',
-        'Nutrition for Mothers & Children',
-        'Immunization Programs',
-        'Family Planning Counseling',
-        'Emergency Obstetric Care'
-      ],
-      certification: 'Maternal & Child Health Specialist',
-      participants: 120,
-      rating: 4.9
-    },
-    {
-      id: 7,
-      title: 'Healthcare Quality Improvement',
-      duration: '6 weeks',
-      level: 'Intermediate',
-      // price: 'KES 16,000',
-      image: SmartHealthcare,
-      description: 'Learn quality improvement methodologies, patient safety protocols, and healthcare accreditation standards.',
-      modules: [
-        'Quality Management Systems',
-        'Patient Safety Protocols',
-        'Healthcare Accreditation',
-        'Performance Measurement',
-        'Process Improvement',
-        'Risk Management'
-      ],
-      certification: 'Healthcare Quality Specialist',
-      participants: 95,
-      rating: 4.6
-    },
-    {
-      id: 8,
-      title: 'Mental Health First Aid',
-      duration: '3 weeks',
-      level: 'Beginner',
-      // price: 'KES 8,000',
-      image: Workers,
-      description: 'Essential mental health awareness and first aid skills for healthcare workers and community volunteers.',
-      modules: [
-        'Mental Health Awareness',
-        'Crisis Intervention',
-        'De-escalation Techniques',
-        'Referral Pathways',
-        'Self-Care for Caregivers',
-        'Community Mental Health'
-      ],
-      certification: 'Mental Health First Aid Certificate',
-      participants: 180,
-      rating: 4.8
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: 'Grace Achieng',
-      role: 'Community Health Worker, Nairobi County',
-      image: CommunityWorkerOutreach,
-      text: 'The CHW certification program transformed my approach to community health. The practical skills I learned have made me more effective in serving my community. The digital health training especially helped me use technology to better track and manage patient records.',
-      rating: 5,
-      course: 'Community Health Worker Certification'
-    },
-    {
-      name: 'Dr. Peter Njoroge',
-      role: 'Healthcare Administrator, Kenyatta Hospital',
-      image: Workers,
-      text: 'The healthcare administration course provided me with essential management skills. The curriculum is well-structured and highly relevant to our local context. I was able to implement new quality improvement processes immediately after completing the course.',
-      rating: 5,
-      course: 'Healthcare System Administration'
-    },
-    {
-      name: 'Susan Mwangi',
-      role: 'Telemedicine Specialist, Private Practice',
-      image: TelemedicinePatients,
-      text: 'The telemedicine training opened up new opportunities for my practice. I can now provide remote consultations effectively and help patients who cannot physically visit the clinic. The technical training was thorough and practical.',
-      rating: 5,
-      course: 'Telemedicine & Remote Care'
-    },
-    {
-      name: 'Joseph Otieno',
-      role: 'Data Analyst, Ministry of Health',
-      image: HealthTechTraining,
-      text: 'The healthcare data analytics course gave me the skills to turn raw health data into meaningful insights. Now I help inform policy decisions with data-driven recommendations. The instructors were knowledgeable and supportive throughout.',
-      rating: 5,
-      course: 'Healthcare Data Analytics'
-    },
-    {
-      name: 'Mary Wanjiku',
-      role: 'Maternal Health Specialist, Machakos County',
-      image: CommunityHealthWorker,
-      text: 'This specialized training in maternal and child health has been invaluable. I now feel more confident handling complex cases and educating mothers in my community. The practical sessions were particularly helpful.',
-      rating: 5,
-      course: 'Maternal & Child Health Specialist'
-    },
-    {
-      name: 'Kevin Murage',
-      role: 'Quality Improvement Officer, Coast General Hospital',
-      image: SmartHealthcare,
-      text: 'The quality improvement training equipped me with tools and methodologies to enhance patient care in our facility. We have seen significant improvements in patient satisfaction and safety metrics since implementing what I learned.',
-      rating: 5,
-      course: 'Healthcare Quality Improvement'
-    }
-  ];
 
   const stats = [
     { number: '500+', label: 'Trained Professionals' },
@@ -241,87 +15,7 @@ const Training = () => {
     { number: '95%', label: 'Job Placement Rate' }
   ];
 
-  const CourseModal = ({ course, onClose }) => {
-    if (!course) return null;
 
-    return (
-      <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
-        <div className="rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="relative">
-            <img
-              src={course.image}
-              alt={course.title}
-              className="w-full h-64 object-cover rounded-t-lg"
-            />
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{course.title}</h2>
-                <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-                  <span> {course.duration}</span>
-                  <span> {course.level}</span>
-                  <span> {course.participants} enrolled</span>
-                  <span> {course.rating}/5</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-blue-600">{course.price}</div>
-                <div className="text-sm text-gray-500">Per participant</div>
-              </div>
-            </div>
-
-            <p className="text-gray-700 mb-6">{course.description}</p>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Course Modules</h3>
-                <ul className="space-y-2">
-                  {course.modules.map((module, index) => (
-                    <li key={index} className="flex items-center">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-                      {module}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Certification</h3>
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">🏆</span>
-                    <div>
-                      <div className="font-medium">{course.certification}</div>
-                      <div className="text-sm text-gray-600">Digital badge included</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 flex space-x-4">
-              <button className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
-                Enroll Now
-              </button>
-              <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                Download Brochure
-              </button>
-            </div>
-          </div>
-        </div>
-      </div> 
-    );
-  };
 
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
@@ -403,117 +97,15 @@ const Training = () => {
         </div>
       </section>
 
-      {/* Training Programs Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Our Comprehensive Training Programs
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Industry-leading courses designed by healthcare experts to advance your career and improve patient outcomes. 
-              Each program combines theoretical knowledge with practical skills and real-world application.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {trainingPrograms.map((program) => (
-              <div key={program.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <img
-                  src={program.image}
-                  alt={program.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-xl font-semibold text-gray-900">{program.title}</h3>
-                    <span className="text-lg font-bold text-blue-600">{program.price}</span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">
-                    <span>⏱️ {program.duration}</span>
-                    <span>📊 {program.level}</span>
-                    <span>⭐ {program.rating}/5</span>
-                  </div>
-                  
-                  <p className="text-gray-600 mb-4">{program.description}</p>
-                  
-                  <div className="flex space-x-3">
-                    <button 
-                      onClick={() => setSelectedCourse(program)}
-                      className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      View Details
-                    </button>
-                    <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                      Enroll
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      <TrainingCourses />
       <TrainingMethodology />
-
-      {/* Training Delivery Process */}
-      
-
-      {/* Unique Benefits Section */}
-      
-
-      {/* Success Stories Section */}
-      
-
-      {/* Partnerships & Accreditations Section */}
-      
       <TrainingPartner />
-
-      {/* Testimonials Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              What Our Students Say
-            </h2>
-            <p className="text-xl text-gray-600">
-              Real feedback from healthcare professionals who've completed our programs
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center mb-4">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover mr-4"
-                  />
-                  <div className="flex-1">
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-gray-600 text-sm">{testimonial.role}</div>
-                    <div className="text-blue-600 text-xs font-medium mt-1">{testimonial.course}</div>
-                  </div>
-                  <div className="flex">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <span key={i} className="text-yellow-400 text-sm">⭐</span>
-                    ))}
-                  </div>
-                </div>
-                <p className="text-gray-700 italic text-sm leading-relaxed">"{testimonial.text}"</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TrainingTestimony />
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif text-blue-900">
             Ready to Transform Your Healthcare Career?
           </h2>
           <p className="text-xl mb-6 max-w-3xl mx-auto">
@@ -521,7 +113,7 @@ const Training = () => {
             and improved patient outcomes through MediLink Training programs
           </p>
           
-          <div className="grid md:grid-cols-3 gap-6 mb-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 mb-8 max-w-4xl mx-auto text-white">
             <div className="bg-blue-700 bg-opacity-50 p-4 rounded-lg">
               <div className="text-2xl font-bold">95%</div>
               <div className="text-sm opacity-90">Job Placement Rate</div>
@@ -537,25 +129,15 @@ const Training = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-            <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-              🚀 Start Your Journey Today
+            <button className="bg-white text-blue-600 px-8 py-3 rounded-lg border border-blue-600 font-semibold hover:bg-blue-600 hover:text-white transition-colors">
+              Start Your Journey Today
             </button>
-            <button className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
-              📞 Schedule Free Consultation
+            <button className="bg-blue-600 border-2 border-blue text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+               Schedule Free Consultation
             </button>
           </div>
-          
-          <p className="text-sm opacity-80">
-            💼 Career support included • 🎓 Internationally certified • 📱 Mobile learning platform • 🏥 Clinical placements available
-          </p>
         </div>
       </section>
-
-      {/* Course Detail Modal */}
-      <CourseModal 
-        course={selectedCourse} 
-        onClose={() => setSelectedCourse(null)} 
-      />
     </div>
   );
 };
