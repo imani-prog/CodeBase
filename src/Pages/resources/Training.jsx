@@ -25,7 +25,7 @@ const Training = () => {
       title: 'Community Health Worker Certification',
       duration: '6 weeks',
       level: 'Beginner to Intermediate',
-      price: 'KES 15,000',
+      // price: 'KES 12,000',
       image: CommunityHealthWorker,
       description: 'Comprehensive training for Community Health Workers covering patient care, health education, and community outreach.',
       modules: [
@@ -45,7 +45,7 @@ const Training = () => {
       title: 'Digital Health Technology Training',
       duration: '4 weeks',
       level: 'Intermediate',
-      price: 'KES 12,000',
+      // price: 'KES 15,000',
       image: ComponentsTechnology,
       description: 'Learn to use modern healthcare technology, electronic health records, and telemedicine platforms.',
       modules: [
@@ -65,7 +65,7 @@ const Training = () => {
       title: 'Healthcare System Administration',
       duration: '8 weeks',
       level: 'Advanced',
-      price: 'KES 25,000',
+      // price: 'KES 25,000',
       image: SmartHealthcare,
       description: 'Advanced training for healthcare administrators and system managers.',
       modules: [
@@ -85,7 +85,7 @@ const Training = () => {
       title: 'Telemedicine & Remote Care',
       duration: '5 weeks',
       level: 'Intermediate',
-      price: 'KES 18,000',
+      // price: 'KES 18,000',
       image: TelemedicinePatients,
       description: 'Master remote patient care, teleconsultation, and virtual health services with comprehensive hands-on training.',
       modules: [
@@ -105,7 +105,7 @@ const Training = () => {
       title: 'Healthcare Data Analytics',
       duration: '7 weeks',
       level: 'Advanced',
-      price: 'KES 22,000',
+      // price: 'KES 22,000',
       image: HealthTechTraining,
       description: 'Learn to analyze healthcare data, create meaningful reports, and drive data-driven decisions in healthcare settings.',
       modules: [
@@ -125,7 +125,7 @@ const Training = () => {
       title: 'Maternal & Child Health Specialist',
       duration: '8 weeks',
       level: 'Intermediate to Advanced',
-      price: 'KES 20,000',
+      // price: 'KES 20,000',
       image: CommunityWorkerOutreach,
       description: 'Specialized training focused on maternal and child health, including prenatal care, child development, and family planning.',
       modules: [
@@ -145,7 +145,7 @@ const Training = () => {
       title: 'Healthcare Quality Improvement',
       duration: '6 weeks',
       level: 'Intermediate',
-      price: 'KES 16,000',
+      // price: 'KES 16,000',
       image: SmartHealthcare,
       description: 'Learn quality improvement methodologies, patient safety protocols, and healthcare accreditation standards.',
       modules: [
@@ -165,7 +165,7 @@ const Training = () => {
       title: 'Mental Health First Aid',
       duration: '3 weeks',
       level: 'Beginner',
-      price: 'KES 8,000',
+      // price: 'KES 8,000',
       image: Workers,
       description: 'Essential mental health awareness and first aid skills for healthcare workers and community volunteers.',
       modules: [
