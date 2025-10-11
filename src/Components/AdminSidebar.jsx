@@ -12,6 +12,9 @@ const sidebarLinks = [
   { to: '/admin/active-chw', label: 'Active CHWs', icon: (
     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m13-7.13A4 4 0 0016 4a4 4 0 00-4 4v1a4 4 0 01-4 4H4a4 4 0 00-4 4v2a4 4 0 004 4h16a4 4 0 004-4v-2a4 4 0 00-4-4z" /></svg>
   ) },
+  { to: '/admin/ambulance-management', label: 'Ambulance Management', icon: (
+    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+  ) },
   { to: '/admin/approve-requests', label: 'Approve Requests', icon: (
     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
   ) },
