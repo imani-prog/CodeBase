@@ -8,6 +8,7 @@ import ApproveRequests from '../Pages/Admin/ApproveRequests';
 import SystemLogs from '../Pages/Admin/SystemLogs';
 import UserManagement from '../Pages/Admin/UserManagement';
 import AmbulanceManagement from '../Pages/Admin/AmbulanceManagement';
+import SystemSettings from '../Pages/Admin/SystemSettings';
 import { Outlet } from 'react-router-dom';
 
 export const adminRoutes = [
@@ -23,6 +24,7 @@ export const adminRoutes = [
       { path: 'approve-requests', element: <ApproveRequests /> },
       { path: 'system-logs', element: <SystemLogs /> },
       { path: 'user-management', element: <UserManagement /> },
+      { path: 'system-settings', element: <SystemSettings /> },
       // add more admin routes here
     ],
   },
