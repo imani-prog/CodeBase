@@ -9,6 +9,8 @@ import SystemLogs from '../Pages/Admin/SystemLogs';
 import UserManagement from '../Pages/Admin/UserManagement';
 import AmbulanceManagement from '../Pages/Admin/AmbulanceManagement';
 import SystemSettings from '../Pages/Admin/SystemSettings';
+import FinancialManagement from '../Pages/Admin/FinancialManagement';
+import TelemedicineManagement from '../Pages/Admin/TelemedicineManagement';
 import { Outlet } from 'react-router-dom';
 
 export const adminRoutes = [
@@ -25,6 +27,8 @@ export const adminRoutes = [
       { path: 'system-logs', element: <SystemLogs /> },
       { path: 'user-management', element: <UserManagement /> },
       { path: 'system-settings', element: <SystemSettings /> },
+      { path: 'financial-management', element: <FinancialManagement /> },
+      { path: 'telemedicine-management', element: <TelemedicineManagement /> },
       // add more admin routes here
     ],
   },
