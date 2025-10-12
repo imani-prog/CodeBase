@@ -14,6 +14,7 @@ import TelemedicineManagement from '../Pages/Admin/TelemedicineManagement';
 import TrainingManagement from '../Pages/Admin/TrainingManagement';
 import InsuranceManagement from '../Pages/Admin/InsuranceManagement';
 import NotificationManagement from '../Pages/Admin/NotificationManagement';
+import ReportsAnalytics from '../Pages/Admin/ReportsAnalytics';
 import { Outlet } from 'react-router-dom';
 
 export const adminRoutes = [
@@ -35,6 +36,7 @@ export const adminRoutes = [
       { path: 'training-management', element: <TrainingManagement /> },
       { path: 'insurance-management', element: <InsuranceManagement /> },
       { path: 'notifications', element: <NotificationManagement /> },
+      { path: 'reports', element: <ReportsAnalytics /> },
       // add more admin routes here
     ],
   },
