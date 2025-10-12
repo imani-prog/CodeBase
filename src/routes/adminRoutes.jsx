@@ -11,6 +11,9 @@ import AmbulanceManagement from '../Pages/Admin/AmbulanceManagement';
 import SystemSettings from '../Pages/Admin/SystemSettings';
 import FinancialManagement from '../Pages/Admin/FinancialManagement';
 import TelemedicineManagement from '../Pages/Admin/TelemedicineManagement';
+import TrainingManagement from '../Pages/Admin/TrainingManagement';
+import InsuranceManagement from '../Pages/Admin/InsuranceManagement';
+import NotificationManagement from '../Pages/Admin/NotificationManagement';
 import { Outlet } from 'react-router-dom';
 
 export const adminRoutes = [
@@ -29,6 +32,9 @@ export const adminRoutes = [
       { path: 'system-settings', element: <SystemSettings /> },
       { path: 'financial-management', element: <FinancialManagement /> },
       { path: 'telemedicine-management', element: <TelemedicineManagement /> },
+      { path: 'training-management', element: <TrainingManagement /> },
+      { path: 'insurance-management', element: <InsuranceManagement /> },
+      { path: 'notifications', element: <NotificationManagement /> },
       // add more admin routes here
     ],
   },
