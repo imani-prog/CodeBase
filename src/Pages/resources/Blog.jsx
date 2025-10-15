@@ -38,40 +38,40 @@ export const Blog = () => {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
       
-      <main className="max-w-7xl mx-auto px-4 md:px-6 py-3">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-3 w-full">
         {/* Hero Section */}
-        <div className="relative overflow-hidden p-6 md:p-12 mb-2">
+        <div className="relative overflow-hidden py-6 sm:py-8 md:py-12 mb-4 sm:mb-6">
           <div className="relative z-10 max-w-4xl">
-              <div className="flex items-center mb-6">
+              <div className="flex items-center mb-4 sm:mb-6">
               
               <div>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-blue-900 mb-2 font-serif">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-2 font-serif leading-tight">
                   Health Insights
                 </h1>
-                <p className="text-lg sm:text-xl md:text-2xl mb-3">Empowering Communities Through Digital Healthcare Innovation</p>
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-3 text-gray-700">Empowering Communities Through Digital Healthcare Innovation</p>
               </div>
             </div>
 
-              <div className="flex flex-wrap gap-3 sm:gap-4 mt-8">
-                  <div className="bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 sm:px-6 py-2 flex items-center">
-                    <Users className="w-4 h-4 mr-2 text-black" />
-                    <span className="text-xs sm:text-sm text-black font-bold">
+              <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 mt-4 sm:mt-6 md:mt-8">
+                  <div className="bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 md:px-6 py-2 flex items-center">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-black flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-black font-bold whitespace-nowrap">
                       50,000+ CHWs Connected
                     </span>
                   </div>
 
-                  <div className="bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 sm:px-6 py-2 flex items-center">
-                    <TrendingUp className="w-4 h-4 mr-2 text-black" />
-                    <span className="text-xs sm:text-sm text-black font-bold">
+                  <div className="bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 md:px-6 py-2 flex items-center">
+                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-black flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-black font-bold whitespace-nowrap">
                       2M+ Patients Served
                     </span>
                   </div>
 
-                  <div className="bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 sm:px-6 py-2 flex items-center">
-                    <Star className="w-4 h-4 mr-2 text-black" />
-                    <span className="text-xs sm:text-sm text-black font-bold">
+                  <div className="bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 md:px-6 py-2 flex items-center">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-black flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-black font-bold whitespace-nowrap">
                       95% Satisfaction Rate
                     </span>
                   </div>
@@ -82,29 +82,29 @@ export const Blog = () => {
         </div>
 
         {/* Health Updates Ticker */}
-          <div className="mb-12">
-          <div className="p-4 sm:p-6">
-            <div className="flex items-center mb-4">
-              <div className="bg-white rounded-full p-2 mr-3">
-                <TrendingUp className="w-5 h-5 text-red-500" />
+          <div className="mb-8 sm:mb-12">
+          <div className="py-3 sm:py-4 md:py-6">
+            <div className="flex items-center mb-3 sm:mb-4">
+              <div className="bg-white rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-900 font-serif">Breaking Health Updates</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-900 font-serif">Breaking Health Updates</h2>
             </div>
-            <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+            <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
               {healthUpdates.slice(0, 2).map((update) => (
-                <div key={update.id} className="flex-1 bg-white rounded-xl shadow-lg p-4 sm:p-6 flex flex-col justify-between">
+                <div key={update.id} className="flex-1 bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-sm sm:text-base text-blue-800 leading-tight">{update.title}</h4>
+                    <div className="flex items-start justify-between mb-2 gap-2">
+                      <h4 className="font-semibold text-sm sm:text-base text-blue-800 leading-tight flex-1">{update.title}</h4>
                       {update.urgent && (
-                        <span className="bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold ml-2 flex-shrink-0">
+                        <span className="bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold flex-shrink-0 whitespace-nowrap">
                           URGENT
                         </span>
                       )}
                     </div>
-                    <p className="text-xs sm:text-sm mb-2">{update.summary}</p>
+                    <p className="text-xs sm:text-sm mb-2 text-gray-600 leading-relaxed">{update.summary}</p>
                   </div>
-                  <div className="flex justify-between items-center text-xs mt-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs mt-3 sm:mt-4 gap-1 sm:gap-0">
                     <span className="font-medium text-gray-500">{update.source}</span>
                     <span className="font-medium text-gray-500">{update.date}</span>
                   </div>
@@ -115,21 +115,21 @@ export const Blog = () => {
         </div>
 
         {/* Category Filter */}
-        <div className="mb-12">
-          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center px-4">
+        <div className="mb-8 sm:mb-12">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`group relative overflow-hidden rounded-full px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base ${
+                className={`group relative overflow-hidden rounded-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 font-semibold transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm md:text-base ${
                   selectedCategory === category.id
                     ? `${category.color} text-white shadow-2xl`
                     : 'bg-white text-gray-700 hover:bg-gray-50 shadow-lg border border-gray-200'
                 }`}
               >
-                <span className="relative z-10 flex items-center">
+                <span className="relative z-10 flex items-center whitespace-nowrap">
                   {category.name}
-                  <span className={`ml-2 text-xs px-2 py-1 rounded-full ${
+                  <span className={`ml-1.5 sm:ml-2 text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
                     selectedCategory === category.id 
                       ? 'bg-white/20 text-white' 
                       : 'bg-gray-100 text-gray-600'
@@ -148,8 +148,8 @@ export const Blog = () => {
                 <LatestHealthInsights />
 
           {/* Health Updates Sidebar */}
-              <section className="mb-16">
-                <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-blue-900 font-serif">
+              <section className="mb-12 sm:mb-16">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8 text-blue-900 font-serif">
                   Health Updates & Alerts
                 </h2>
                 <Discussions />
@@ -158,52 +158,52 @@ export const Blog = () => {
 
         {/* Full-width Newsletter & Community Section */}
         <section className="bg-blue-950 w-full">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16">
             {/* Newsletter & Community Section */}
-            <section className="mb-16">
+            <section className="mb-12 sm:mb-16">
               <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
                         
                         <div className="relative z-10">
-                        <div className="flex items-center mb-6">
-                          <div className="p-3 mr-4">
-                            <Heart className="w-6 text-white h-6" />
+                        <div className="flex items-start sm:items-center mb-4 sm:mb-6">
+                          <div className="p-2 sm:p-3 mr-3 sm:mr-4">
+                            <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                           </div>
                             <div>
-                                <h3 className="text-2xl sm:text-3xl font-extrabold font-serif text-yellow-300">Stay Informed</h3>
-                                <p className="text-white font-bold">Weekly health insights & updates</p>
+                                <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold font-serif text-yellow-300">Stay Informed</h3>
+                                <p className="text-white font-bold text-sm sm:text-base">Weekly health insights & updates</p>
                               </div>
                         </div>
-                        <p className="mb-6 text-white leading-relaxed">
+                        <p className="mb-4 sm:mb-6 text-white leading-relaxed text-sm sm:text-base">
                           Get the latest healthcare innovations, research findings, and community health stories delivered to your inbox every week.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3">
                           <input
                             type="email"
                             placeholder="Enter your email address"
-                            className="flex-1 px-4 py-3 rounded-xl bg-white border focus:outline-none focus:ring-2 focus:ring-white/50"
+                            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white border focus:outline-none focus:ring-2 focus:ring-white/50 text-sm sm:text-base"
                           />
-                          <button className="px-6 py-3 bg-white text-blue-400 font-bold rounded-xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                          <button className="px-4 sm:px-6 py-2.5 sm:py-3 bg-white text-blue-400 font-bold rounded-xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base whitespace-nowrap">
                             Subscribe
                           </button>
                         </div>
-                        <div className="flex items-center mt-6 lg:mt-10 text-sm text-blue-200">
-                          <div className="flex -space-x-2 mr-3">
+                        <div className="flex items-center mt-4 sm:mt-6 lg:mt-10 text-sm text-blue-200">
+                          <div className="flex -space-x-2 mr-2 sm:mr-3">
                             {[1,2,3,4].map(i => (
-                              <div key={i} className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white"></div>
+                              <div key={i} className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full border-2 border-white"></div>
                             ))}
                           </div>
-                          <span className="font-semibold text-white text-sm sm:text-base lg:text-xl">Join 12,000+ healthcare professionals</span>
+                          <span className="font-semibold text-white text-xs sm:text-sm md:text-base lg:text-xl">Join 12,000+ healthcare professionals</span>
                         </div>
                       </div>
 
                     {/* Community Stats  */}
-                    <div className="rounded-3xl p-6 lg:p-8 shadow-lg">
-                        <h3 className="text-lg font-extrabold sm:text-xl text-white mb-4 flex items-center font-serif">
-                          <Users className="w-5 h-5 mr-2 text-white" />
+                    <div className="rounded-3xl p-4 sm:p-6 lg:p-8 shadow-lg">
+                        <h3 className="text-base sm:text-lg md:text-xl font-extrabold text-white mb-3 sm:mb-4 flex items-center font-serif">
+                          <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-white" />
                           Community Impact
                         </h3>
 
-                        <div className="grid grid-cols-2 lg:flex lg:flex-row lg:justify-between items-center gap-4">
+                        <div className="grid grid-cols-2 lg:flex lg:flex-row lg:justify-between items-stretch gap-3 sm:gap-4">
                           {[
                             { label: "Active CHWs", value: "50,234", change: "+12%" },
                             { label: "Patients Served", value: "2.1M", change: "+28%" },
@@ -212,26 +212,26 @@ export const Blog = () => {
                           ].map((stat, index) => (
                             <div
                               key={index}
-                              className="flex flex-col items-center px-4 py-3 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 max-w-[150px]"
+                              className="flex flex-col items-center px-2 sm:px-3 md:px-4 py-2 sm:py-3 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 w-full lg:max-w-[150px]"
                             >
-                              <div className="text-lg font-bold text-black mb-0.5">
+                              <div className="text-base sm:text-lg font-bold text-black mb-0.5">
                                 {stat.value}
                               </div>
-                              <div className="text-xs text-black mb-1 text-center">{stat.label}</div>
-                              <div className="text-xs font-semibold text-black bg-white px-1.5 py-0.5 rounded-x1 inline-block">
+                              <div className="text-xs text-black mb-1 text-center leading-tight">{stat.label}</div>
+                              <div className="text-xs font-semibold text-black bg-white px-1.5 py-0.5 rounded-xl inline-block whitespace-nowrap">
                                 {stat.change} this month
                               </div>
                             </div>
                           ))}
                         </div>
 
-                        <div className="mt-4 p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
-                          <div className="flex items-center justify-between">
-                            <div>
+                        <div className="mt-3 sm:mt-4 p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+                            <div className="flex-1">
                               <h4 className="font-bold text-gray-900 text-sm">Join Our Community</h4>
                               <p className="text-xs text-gray-600">Connect with healthcare professionals</p>
                             </div>
-                            <button className="px-3 py-1 bg-blue-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-xs">
+                            <button className="px-3 py-1.5 bg-blue-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-xs whitespace-nowrap">
                               Join Now
                             </button>
                           </div>
@@ -243,38 +243,38 @@ export const Blog = () => {
                 <TrendingTopics />
 
                 {/* Call to Action */}
-                <section className="text-center py-12 sm:py-16 shadow-2xl relative overflow-hidden">
-                  <div className="relative z-10 max-w-4xl mx-auto px-4">
-                    <h3 className="text-3xl sm:text-4xl md:text-5xl font-serif text-yellow-300 font-black mb-4 bg-clip-text">
+                <section className="text-center py-8 sm:py-12 md:py-16 shadow-2xl relative overflow-hidden">
+                  <div className="relative z-10 max-w-4xl mx-auto">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-yellow-300 font-black mb-3 sm:mb-4 bg-clip-text leading-tight">
                       Transform Healthcare Together
                     </h3>
-                    <p className="text-lg sm:text-xl mb-8 leading-relaxed text-white">
+                    <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 leading-relaxed text-white px-2">
                       Join thousands of healthcare professionals using MediLink to improve patient outcomes, streamline workflows, and build stronger communities.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button className="px-6 sm:px-8 py-3 sm:py-4 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-2xl">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                      <button className="px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-2xl text-sm sm:text-base">
                         Start Your Journey
                       </button>
-                      <button className="px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white font-bold rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-300 transform hover:scale-105">
+                      <button className="px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 border-2 border-white text-white font-bold rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-300 transform hover:scale-105 text-sm sm:text-base">
                         Learn More
                       </button>
                     </div>
 
 
-                    <div className="flex flex-col sm:flex-row justify-center items-center mt-8 gap-4 sm:gap-6 text-sm">
-                        <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
-                          <Star className="w-5 h-5 text-black" />
-                          <span className="text-black font-bold">4.9/5 Rating</span>
+                    <div className="flex flex-col sm:flex-row justify-center items-center mt-6 sm:mt-8 gap-3 sm:gap-4 md:gap-6 text-sm">
+                        <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 py-2">
+                          <Star className="w-4 h-4 sm:w-5 sm:h-5 text-black flex-shrink-0" />
+                          <span className="text-black font-bold text-xs sm:text-sm whitespace-nowrap">4.9/5 Rating</span>
                         </div>
 
-                        <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
-                          <Users className="w-5 h-5 text-black" />
-                          <span className="text-black font-bold">50K+ Users</span>
+                        <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 py-2">
+                          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-black flex-shrink-0" />
+                          <span className="text-black font-bold text-xs sm:text-sm whitespace-nowrap">50K+ Users</span>
                         </div>
 
-                        <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
-                          <Heart className="w-5 h-5 text-black" />
-                          <span className="text-black font-bold">2M+ Lives Impacted</span>
+                        <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 py-2">
+                          <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-black flex-shrink-0" />
+                          <span className="text-black font-bold text-xs sm:text-sm whitespace-nowrap">2M+ Lives Impacted</span>
                         </div>
                       </div>
 
