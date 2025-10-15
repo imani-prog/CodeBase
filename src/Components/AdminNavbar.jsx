@@ -47,7 +47,7 @@ const AdminNavbar = () => {
     { name: 'Account Settings', icon: Settings, path: '/admin/settings' },
     { name: 'Security', icon: Shield, path: '/admin/security' },
     { name: 'Help Center', icon: HelpCircle, path: '/admin/help' },
-    { name: 'Sign Out', icon: LogOut, path: '/logout', isDanger: true }
+    { name: 'Sign Out', icon: LogOut, path: '/', isDanger: true }
   ];
 
   const toggleDarkMode = () => {

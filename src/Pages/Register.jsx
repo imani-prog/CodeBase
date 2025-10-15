@@ -12,22 +12,52 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Get users from localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    // Check if username already exists
-    if (users.some(u => u.username === username)) {
-      setError('Username already exists.');
+    
+    // Clear any previous errors
+    setError('');
+    
+    // Validate inputs
+    if (!username.trim()) {
+      setError('Username is required.');
+      return;
+    }
+    if (!password.trim()) {
+      setError('Password is required.');
       return;
     }
     if (!role) {
       setError('Please select a role.');
       return;
     }
+    
+    // Get users from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Check if username already exists (case-insensitive)
+    if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+      setError('Username already exists.');
+      return;
+    }
+    
+    // Create new user with normalized data
+    const newUser = {
+      username: username.trim(),
+      password: password.trim(),
+      role: role.trim()
+    };
+    
+    // Debug logging
+    console.log('Registering new user:', newUser);
+    
     // Add new user
-    users.push({ username, password, role });
+    users.push(newUser);
     localStorage.setItem('users', JSON.stringify(users));
+    
+    console.log('All users after registration:', JSON.parse(localStorage.getItem('users') || '[]'));
+    
     navigate('/login');
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -66,7 +96,7 @@ const Register = () => {
         </div>
         <select value={role} onChange={e => setRole(e.target.value)} className="mb-3 p-2 border rounded w-full">
           <option value="" disabled>Choose login or signup option</option>
-          <option value="patient">Patient</option>
+          <option value="patient">Patient/Client</option>
           <option value="chw">Community Health Worker (CHW)</option>
           <option value="admin">Admin</option>
         </select>

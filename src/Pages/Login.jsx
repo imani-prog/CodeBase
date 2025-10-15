@@ -13,28 +13,72 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Clear any previous errors
+    setError('');
+    
     // Get users from localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Debug logging (remove in production)
+    console.log('All users:', users);
+    console.log('Login attempt - Username:', username, 'Role:', role);
+    
     const found = users.find(u => u.username === username && u.password === password);
+    
     if (!found) {
       setError('Invalid username or password.');
       return;
     }
+    
+    // Debug logging
+    console.log('Found user:', found);
+    console.log('User role:', `"${found.role}"`, 'Selected role:', `"${role}"`);
+    console.log('Role comparison:', found.role === role);
+    
     if (!role) {
       setError('Please select a role.');
       return;
     }
-    if (found.role !== role) {
-      setError('Role does not match registration.');
+    
+    // Normalize roles to handle any whitespace issues and treat client/patient as same
+    const userRole = found.role?.toString().trim().toLowerCase();
+    const selectedRole = role?.toString().trim().toLowerCase();
+    
+    // Normalize client/patient to be the same
+    const normalizeRole = (role) => {
+      if (role === 'client' || role === 'patient') return 'patient';
+      return role;
+    };
+    
+    const normalizedUserRole = normalizeRole(userRole);
+    const normalizedSelectedRole = normalizeRole(selectedRole);
+    
+    console.log('Role normalization:');
+    console.log('  Original user role:', userRole);
+    console.log('  Original selected role:', selectedRole);
+    console.log('  Normalized user role:', normalizedUserRole);
+    console.log('  Normalized selected role:', normalizedSelectedRole);
+    console.log('  Roles match:', normalizedUserRole === normalizedSelectedRole);
+    
+    if (normalizedUserRole !== normalizedSelectedRole) {
+      setError(`Role does not match registration. You registered as "${found.role}" but selected "${role}".`);
       return;
     }
-    setUser({ username, role });
-    if (role === 'admin') {
+    
+    // Set user with normalized role (always use 'patient' for client/patient)
+    const finalRole = normalizeRole(found.role?.toString().trim().toLowerCase());
+    setUser({ username, role: finalRole });
+    
+    // Navigate based on the normalized role
+    if (finalRole === 'admin') {
       navigate('/admin/dashboard');
-    } else if (role === 'chw') {
+    } else if (finalRole === 'chw') {
       navigate('/client/chw/dashboard');
-    } else {
+    } else if (finalRole === 'patient') {
       navigate('/client/patient/dashboard');
+    } else {
+      setError('Invalid role detected. Please contact support.');
     }
   };
 
@@ -75,7 +119,7 @@ const Login = () => {
         </div>
         <select value={role} onChange={e => setRole(e.target.value)} className="mb-3 p-2 border rounded w-full">
           <option value="" disabled>Choose login or signup option</option>
-          <option value="patient">Patient</option>
+          <option value="patient">Patient/Client</option>
           <option value="chw">Community Health Worker (CHW)</option>
           <option value="admin">Admin</option>
         </select>

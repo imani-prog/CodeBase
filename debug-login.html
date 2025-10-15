@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Login Issues</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .user-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error { color: red; }
+        .success { color: green; }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>MediLink Login Debug Tool</h1>
+    
+    <h2>Current Users in LocalStorage:</h2>
+    <div id="usersList"></div>
+    
+    <h2>Add Test User:</h2>
+    <input type="text" id="testUsername" placeholder="Username" value="testpatient">
+    <input type="password" id="testPassword" placeholder="Password" value="password123">
+    <select id="testRole">
+        <option value="patient">Patient</option>
+        <option value="chw">Community Health Worker (CHW)</option>
+        <option value="admin">Admin</option>
+    </select>
+    <button onclick="addTestUser()">Add Test User</button>
+    
+    <h2>Test Login:</h2>
+    <input type="text" id="loginUsername" placeholder="Username" value="testpatient">
+    <input type="password" id="loginPassword" placeholder="Password" value="password123">
+    <select id="loginRole">
+        <option value="patient">Patient</option>
+        <option value="chw">Community Health Worker (CHW)</option>
+        <option value="admin">Admin</option>
+    </select>
+    <button onclick="testLogin()">Test Login</button>
+    
+    <div id="loginResult"></div>
+    
+    <h2>Actions:</h2>
+    <button onclick="clearAllUsers()">Clear All Users</button>
+    <button onclick="refreshUsersList()">Refresh Users List</button>
+
+    <script>
+        function refreshUsersList() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const usersList = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                usersList.innerHTML = '<p class="error">No users found in localStorage</p>';
+                return;
+            }
+            
+            usersList.innerHTML = users.map((user, index) => `
+                <div class="user-card">
+                    <strong>User ${index + 1}:</strong><br>
+                    Username: ${user.username}<br>
+                    Password: ${user.password}<br>
+                    Role: "${user.role}" (Type: ${typeof user.role})<br>
+                    <button onclick="deleteUser(${index})">Delete User</button>
+                </div>
+            `).join('');
+        }
+        
+        function addTestUser() {
+            const username = document.getElementById('testUsername').value;
+            const password = document.getElementById('testPassword').value;
+            const role = document.getElementById('testRole').value;
+            
+            if (!username || !password || !role) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            // Check if username exists
+            if (users.some(u => u.username === username)) {
+                alert('Username already exists');
+                return;
+            }
+            
+            users.push({ username, password, role });
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            refreshUsersList();
+            alert('User added successfully!');
+        }
+        
+        function testLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const role = document.getElementById('loginRole').value;
+            const resultDiv = document.getElementById('loginResult');
+            
+            if (!username || !password || !role) {
+                resultDiv.innerHTML = '<p class="error">Please fill all fields</p>';
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const found = users.find(u => u.username === username && u.password === password);
+            
+            if (!found) {
+                resultDiv.innerHTML = '<p class="error">❌ Invalid username or password</p>';
+                return;
+            }
+            
+            console.log('Found user:', found);
+            console.log('Found user role:', `"${found.role}"`, 'Type:', typeof found.role);
+            console.log('Selected role:', `"${role}"`, 'Type:', typeof role);
+            console.log('Roles match:', found.role === role);
+            
+            if (found.role !== role) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Role does not match registration</p>
+                    <p>User's registered role: "${found.role}" (${typeof found.role})</p>
+                    <p>Selected role: "${role}" (${typeof role})</p>
+                    <p>Comparison result: ${found.role === role}</p>
+                `;
+                return;
+            }
+            
+            resultDiv.innerHTML = '<p class="success">✅ Login successful!</p>';
+        }
+        
+        function deleteUser(index) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            refreshUsersList();
+        }
+        
+        function clearAllUsers() {
+            if (confirm('Are you sure you want to clear all users?')) {
+                localStorage.removeItem('users');
+                refreshUsersList();
+                alert('All users cleared!');
+            }
+        }
+        
+        // Initialize
+        refreshUsersList();
+    </script>
+</body>
+</html>
