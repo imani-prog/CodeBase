@@ -26,13 +26,13 @@ const Home = () => {
 
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
       
       
 
 
-      <main className="flex flex-col items-center w-full px-4 py-8 max-w-[1600px] mx-auto">
-        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[500px] md:min-h-[600px] mb-16 rounded-3xl overflow-hidden shadow-2xl border border-blue-200 bg-blue-950 text-white">
+      <main className="flex flex-col items-center w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 max-w-[1600px] mx-auto">
+        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] mb-8 sm:mb-12 md:mb-16 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-blue-200 bg-blue-950 text-white">
           {/* Background Blobs */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             <div className="absolute -top-16 -left-16 w-64 h-64 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
@@ -51,40 +51,40 @@ const Home = () => {
           </div>
 
           {/* Overlayed Content */}
-          <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 md:px-6 text-center py-6 md:py-8">
+          <div className="relative z-10 flex flex-col items-center justify-center h-full px-3 sm:px-4 md:px-6 text-center py-4 sm:py-6 md:py-8">
             {/* Logo Glow */}
-            <div className="relative mb-3 md:mb-6">
-              <div className="absolute -inset-4  rounded-full blur-xl opacity-40"></div>
+            <div className="relative mb-2 sm:mb-3 md:mb-6">
+              <div className="absolute -inset-4 rounded-full blur-xl opacity-40"></div>
               <img
                 src={MediLinkLogo}
                 alt="MediLink Logo"
-                className="relative w-20 h-20 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full shadow-xl border-4 border-white bg-gradient-to-br from-blue-50 to-white"
+                className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full shadow-xl border-2 sm:border-4 border-white bg-gradient-to-br from-blue-50 to-white"
                 
               />
             </div>
 
             {/* Hero Title */}
-            <h1 className="text-xl md:text-4xl lg:text-6xl font-extrabold leading-tight mb-2 md:mb-4 drop-shadow-xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-extrabold leading-tight mb-2 sm:mb-3 md:mb-4 drop-shadow-xl px-2">
               Karibu{" "}
               <span className="bg-gradient-to-r from-blue-200 to-blue-400 bg-clip-text text-transparent">
                 MediLink
               </span>
             </h1>
 
-            <p className="text-sm md:text-xl lg:text-2xl font-bold text-blue-100 mb-3 md:mb-6 max-w-2xl leading-relaxed drop-shadow">
+            <p className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-blue-100 mb-3 sm:mb-4 md:mb-6 max-w-2xl leading-relaxed drop-shadow px-2">
               Healing Begins with Connection.
             </p>
 
             {/* CTA Button (Optional) */}
             <a
               href=""
-              className="inline-block text-xs md:text-sm lg:text-base px-3 md:px-6 py-2 md:py-3 rounded-full border border-white text-white hover:bg-white hover:text-blue-900 transition-all duration-300 font-semibold shadow-sm mb-3 md:mb-6"
+              className="inline-block text-xs sm:text-sm md:text-base px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 rounded-full border-2 border-white text-white hover:bg-white hover:text-blue-900 transition-all duration-300 font-semibold shadow-sm mb-3 sm:mb-4 md:mb-6"
             >
               Get Started
             </a>
 
             {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-2 md:gap-6 w-full">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 w-full px-2">
               {[
                 { value: "10K+", label: "Patients" },
                 { value: "200+", label: "CHWs" },
@@ -92,10 +92,10 @@ const Home = () => {
               ].map(({ value, label }) => (
                 <div
                   key={label}
-                  className="bg-yellow-300 border border-blue-200 rounded-lg md:rounded-xl px-2 md:px-5 py-1 md:py-3 shadow-lg flex-1 max-w-[100px] md:max-w-[120px] text-center"
+                  className="bg-yellow-300 border border-blue-200 rounded-lg sm:rounded-xl px-2 sm:px-3 md:px-5 py-1.5 sm:py-2 md:py-3 shadow-lg flex-1 min-w-[80px] max-w-[100px] sm:max-w-[110px] md:max-w-[120px] text-center"
                 >
-                  <div className="text-xs md:text-lg font-bold text-black">{value}</div>
-                  <div className="text-xs md:text-sm text-black">{label}</div>
+                  <div className="text-sm sm:text-base md:text-lg font-bold text-black">{value}</div>
+                  <div className="text-xs sm:text-xs md:text-sm text-black">{label}</div>
                 </div>
               ))}
             </div>
@@ -104,19 +104,19 @@ const Home = () => {
 
 
       {/* Mission & Vision - Enhanced Cards */}
-      <section className="mb-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="mb-5 w-full text-left">
-          <h2 className="text-3xl md:text-4xl font-bold font-serif text-blue-800 mb-6">Our Mission</h2>
-          <p className="text-lg md:text-xl leading-relaxed">
+      <section className="mb-6 sm:mb-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        <div className="mb-3 sm:mb-5 w-full text-left">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif text-blue-800 mb-4 sm:mb-6 px-2">Our Mission</h2>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed px-2">
             To revolutionize healthcare access in Africa by connecting communities, clinics, and caregivers through a smart digital platform that simplifies access to quality, affordable, and timely medical services.
           </p>
         </div>
         
-        <div className="mb-5 w-full text-left">
+        <div className="mb-3 sm:mb-5 w-full text-left relative">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200 to-transparent rounded-full blur-2xl opacity-50"></div>
           <div className="relative z-10">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-blue-800 mb-6">Our Vision</h2>
-            <p className="text-lg md:text-xl  leading-relaxed">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-blue-800 mb-4 sm:mb-6 px-2">Our Vision</h2>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed px-2">
               A healthy and empowered Africa where every citizen can access quality care, anytime, anywhere.
             </p>
           </div>
@@ -125,38 +125,38 @@ const Home = () => {
 
        
         {/* How MediLink Works - Step by Step Guide */}
-        <section className="mb-8 w-full p-4">
-          <div className="flex flex-col md:flex-row items-center gap-8">
+        <section className="mb-6 sm:mb-8 w-full p-3 sm:p-4">
+          <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8">
             {/* Left: Steps Guide */}
             <div className="flex-1 min-w-0 flex flex-col justify-center">
               <div className="mb-4 text-left md:text-left">
-                <h4 className="text-3xl md:text-4xl font-bold text-blue-900 font-serif mb-2">How MediLink Works</h4>
-                <p className="text-md md:text-lg text-blue-700 max-w-md mb-4">
-                  MediLink makes healthcare easy and accessible. Here’s how it works:
+                <h4 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 font-serif mb-2 sm:mb-3 px-2">How MediLink Works</h4>
+                <p className="text-sm sm:text-base md:text-lg text-blue-700 max-w-md mb-3 sm:mb-4 px-2">
+                  MediLink makes healthcare easy and accessible. Here's how it works:
                 </p>
-                  <ol className="list-none space-y-3">
+                  <ol className="list-none space-y-2 sm:space-y-3 px-2">
                   <li className="flex items-start">
-                    <span className="text-blue-400 mr-3 mt-1">✓</span>
-                    <span>Create your account or log in to access personalized healthcare services and support.</span>
+                    <span className="text-blue-400 mr-2 sm:mr-3 mt-1 flex-shrink-0 text-sm sm:text-base">✓</span>
+                    <span className="text-xs sm:text-sm md:text-base">Create your account or log in to access personalized healthcare services and support.</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-blue-400 mr-3 mt-1">✓</span>
-                    <span>Browse available clinics, services, and health workers in your area or online.</span>
+                    <span className="text-blue-400 mr-2 sm:mr-3 mt-1 flex-shrink-0 text-sm sm:text-base">✓</span>
+                    <span className="text-xs sm:text-sm md:text-base">Browse available clinics, services, and health workers in your area or online.</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-blue-400 mr-3 mt-1">✓</span>
-                    <span>Reach out to community health workers, doctors, or support staff for guidance and care.</span>
+                    <span className="text-blue-400 mr-2 sm:mr-3 mt-1 flex-shrink-0 text-sm sm:text-base">✓</span>
+                    <span className="text-xs sm:text-sm md:text-base">Reach out to community health workers, doctors, or support staff for guidance and care.</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-blue-400 mr-3 mt-1">✓</span>
-                    <span>Receive timely medical attention, advice, and ongoing support for your health needs.</span>
+                    <span className="text-blue-400 mr-2 sm:mr-3 mt-1 flex-shrink-0 text-sm sm:text-base">✓</span>
+                    <span className="text-xs sm:text-sm md:text-base">Receive timely medical attention, advice, and ongoing support for your health needs.</span>
                   </li>
                 </ol>
               </div>
             </div>
             {/* Right: Video */}
-            <div className="flex-1 flex justify-center items-center min-w-0">
-              <div className="w-full max-w-sm md:max-w-2xl lg:max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-xl border border-blue-100 min-h-[200px] md:min-h-[300px] lg:min-h-[400px]">
+            <div className="flex-1 flex justify-center items-center min-w-0 w-full">
+              <div className="w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl aspect-video rounded-xl sm:rounded-2xl overflow-hidden shadow-xl border border-blue-100 min-h-[180px] sm:min-h-[200px] md:min-h-[300px] lg:min-h-[400px]">
                 <iframe
                   width="100%"
                   height="100%"
@@ -173,23 +173,25 @@ const Home = () => {
         </section>
 
         {/* Call to Action Buttons - Enhanced */}
-        <section className="mb-8 w-full flex flex-col items-center">
-          <div className="text-center mb-4">
-            <h4 className="text-3xl md:text-4xl font-bold font-serif text-blue-900 mb-4">
+        <section className="mb-6 sm:mb-8 w-full flex flex-col items-center px-2">
+          <div className="text-center mb-4 sm:mb-6">
+            <h4 className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif text-blue-900 mb-3 sm:mb-4 px-2">
               Ready to Get Started?
             </h4>
-            <p className="text-xl">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl px-2">
               Join thousands who are already experiencing better healthcare
             </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-4xl">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 w-full max-w-4xl">
             <Link
               to=""
-              className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-8 rounded-2xl shadow-xl text-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden w-full sm:w-auto text-center"
+              className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl sm:rounded-2xl shadow-xl text-base sm:text-lg md:text-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden w-full sm:flex-1 text-center"
             >
-              <span className="relative z-10 flex items-center justify-center">
-                <span className="mr-2"></span>
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
                 Register
               </span>
               <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
@@ -197,10 +199,12 @@ const Home = () => {
             
             <Link
               to="/donate"
-              className="group bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3 px-8 rounded-2xl shadow-xl text-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden w-full sm:w-auto text-center"
+              className="group bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl sm:rounded-2xl shadow-xl text-base sm:text-lg md:text-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden w-full sm:flex-1 text-center"
             >
-              <span className="relative z-10 flex items-center justify-center">
-                <span className="mr-2"></span>
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 Donate
               </span>
               <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
@@ -208,10 +212,12 @@ const Home = () => {
             
             <Link
               to="/partners"
-              className="group bg-gradient-to-r from-blue-900 to-blue-950 hover:from-blue-950 hover:to-blue-900 text-white font-bold py-3 px-8 rounded-2xl shadow-xl text-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden w-full sm:w-auto text-center"
+              className="group bg-gradient-to-r from-blue-900 to-blue-950 hover:from-blue-950 hover:to-blue-900 text-white font-bold py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl sm:rounded-2xl shadow-xl text-base sm:text-lg md:text-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden w-full sm:flex-1 text-center"
             >
-              <span className="relative z-10 flex items-center justify-center">
-                <span className="mr-2"></span>
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
                 Partner
               </span>
               <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
@@ -220,18 +226,18 @@ const Home = () => {
         </section>
 
         {/* Two Column Section: Slogan & Swahili Tagline */}
-        <section className="mb-5 w-full flex flex-col md:flex-row gap-8 items-stretch">
+        <section className="mb-4 sm:mb-5 w-full flex flex-col md:flex-row gap-6 sm:gap-8 items-stretch">
           {/* Left: Slogan & Inspirational Verse */}
-          <div className="flex-1 min-w-[280px] max-w-[400px] mx-auto text-center relative overflow-hidden flex flex-col justify-center bg-gradient-to-br  p-4 md:p-6 h-[320px] md:h-[340px]">
+          <div className="flex-1 min-w-[280px] max-w-[400px] mx-auto text-center relative overflow-hidden flex flex-col justify-center bg-gradient-to-br p-3 sm:p-4 md:p-6 min-h-[280px] sm:h-[320px] md:h-[340px]">
             <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
             <div className="relative z-10 flex flex-col justify-center h-full">
-              <div className="mb-4">
-                <h3 className="text-2xl md:text-3xl font-bold font-serif text-blue-900 mb-2">
+              <div className="mb-3 sm:mb-4">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-serif text-blue-900 mb-2 px-2">
                   "Health Within Reach."
                 </h3>
               </div>
-              <div className="backdrop-blur p-1 max-w-xs mx-auto pb-0">
-                <blockquote className="italic text-base md:text-lg leading-relaxed">
+              <div className="backdrop-blur p-1 max-w-xs mx-auto pb-0 px-2">
+                <blockquote className="italic text-sm sm:text-base md:text-lg leading-relaxed">
                   <span className="text-blue-800 font-semibold">Jeremiah 33:6 (NIV)</span>
                   <br />
                   <br />
@@ -243,14 +249,14 @@ const Home = () => {
 
           {/* Divider with icon and message */}
           <div className="hidden md:flex flex-col items-center justify-center mx-2 animate-fade-in" style={{animation: 'fadeIn 1s ease-in'}}>
-            <div className="w-[2px] h-32 bg-blue-200 mb-3 animate-pulse"></div>
+            <div className="w-[2px] h-24 lg:h-32 bg-blue-200 mb-3 animate-pulse"></div>
             <div className="flex flex-col items-center">
-              <span className="bg-blue-100 text-blue-700 rounded-full p-3 shadow mb-2 animate-bounce" style={{animation: 'bounce 2s infinite'}}>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
+              <span className="bg-blue-100 text-blue-700 rounded-full p-2 lg:p-3 shadow mb-2 animate-bounce" style={{animation: 'bounce 2s infinite'}}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 lg:w-7 lg:h-7">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
               </span>
-              <span className="text-blue-700 text-sm font-semibold text-center max-w-[120px] animate-fade-in" style={{animation: 'fadeIn 1.5s ease-in'}}>
+              <span className="text-blue-700 text-xs lg:text-sm font-semibold text-center max-w-[100px] lg:max-w-[120px] animate-fade-in" style={{animation: 'fadeIn 1.5s ease-in'}}>
                 Connecting Faith & Care
               </span>
             </div>
@@ -269,19 +275,19 @@ const Home = () => {
           </style>
 
           {/* Right: Swahili tagline */}
-          <div className="flex-1 min-w-[260px] max-w-[370px] mx-auto text-center flex flex-col justify-center bg-gradient-to-brp-3 md:p-4 h-[270px] md:h-[290px]">
+          <div className="flex-1 min-w-[260px] max-w-[370px] mx-auto text-center flex flex-col justify-center bg-gradient-to-br p-3 sm:p-4 min-h-[250px] sm:h-[270px] md:h-[290px]">
             <div className="relative z-10 flex flex-col justify-center h-full">
-              <div className="backdrop-blur p-1 max-w-xs mx-auto flex flex-col justify-center h-full">
-                <p className="text-blue-900 font-serif font-bold text-lg md:text-xl mb-1 leading-relaxed">
+              <div className="backdrop-blur p-1 max-w-xs mx-auto flex flex-col justify-center h-full px-2">
+                <p className="text-blue-900 font-serif font-bold text-base sm:text-lg md:text-xl mb-1 leading-relaxed">
                   Services Close to the People
                 </p>
-                <p className="font-bold text-base md:text-lg leading-relaxed mb-1">
+                <p className="font-bold text-sm sm:text-base md:text-lg leading-relaxed mb-1">
                   Healthcare for Everyone
                 </p>
-                <p className="text-sm md:text-base leading-relaxed mb-1">
+                <p className="text-xs sm:text-sm md:text-base leading-relaxed mb-1">
                   We provide quality healthcare for all, connecting communities, health workers, and facilities so everyone gets care quickly and easily.
                 </p>
-                <p className="text-sm md:text-base leading-relaxed">
+                <p className="text-xs sm:text-sm md:text-base leading-relaxed">
                   Health is a right. We help make it accessible to every Kenyan.
                 </p>
               </div>
