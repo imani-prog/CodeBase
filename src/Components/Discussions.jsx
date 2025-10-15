@@ -191,11 +191,11 @@ const CommunityDiscussions = () => {
 
 
   return (
-    <div className="max-w-6xl mx-auto bg-white rounded-lg shadow">
+    <div className="max-w-6xl bg-white rounded-lg shadow overflow-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-opacity-50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -204,20 +204,20 @@ const CommunityDiscussions = () => {
         {/* Main Feed */}
         <div className="flex-1 lg:max-w-2xl border-x border-gray-200">
           {/* Header */}
-          <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-3">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <Stethoscope className="w-6 h-6 text-blue-500" />
-                <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 font-serif">Medical Discussions</h2>
-                  <p className="text-xs sm:text-sm text-gray-500">Healthcare professionals sharing insights</p>
+          <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-gray-200 px-3 sm:px-4 py-3 z-10">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 font-serif truncate">Medical Discussions</h2>
+                  <p className="text-xs sm:text-sm text-gray-500 truncate">Healthcare professionals sharing insights</p>
                 </div>
               </div>
               
               {/* Mobile sidebar toggle */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="lg:hidden relative p-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
                 aria-label="Toggle sidebar"
               >
                 <Menu className="w-5 h-5 text-gray-600" />
@@ -227,7 +227,7 @@ const CommunityDiscussions = () => {
             </div>
             
             {/* Filter Tabs */}
-            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 overflow-x-auto">
+            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 overflow-x-auto scrollbar-hide">
               {[
                 { id: 'all', label: 'All', icon: null },
                 { id: 'training', label: 'Training', icon: BookOpen },
@@ -256,7 +256,7 @@ const CommunityDiscussions = () => {
               .filter(post => activeFilter === 'all' || post.category === activeFilter)
               .map((post) => (
               <div key={post.id}>
-                <article className="px-4 pt-3 pb-2 hover:bg-blue-50/30 transition-colors cursor-pointer">
+                <article className="px-3 sm:px-4 pt-3 pb-2 hover:bg-blue-50/30 transition-colors cursor-pointer">
                   {/* Reply indicator */}
                   {post.replyingTo && (
                     <div className="flex items-center mb-2 text-sm text-gray-500">

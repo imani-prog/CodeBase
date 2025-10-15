@@ -87,36 +87,36 @@ const PARTNERS_DATA = [
 
 const Partners = () => {
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
       
       
       {/* Hero Section */}
-      <section className="py-20 px-4">
+      <section className="py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8">
         <div className="max-w-6xl mx-auto text-center">
           
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
             <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 bg-clip-text text-transparent font-serif">
               Our Strategic Partners
             </span>
             
           </h1>
           
-          <p className="text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto mb-12">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl leading-relaxed max-w-4xl mx-auto mb-8 sm:mb-10 md:mb-12 px-2">
             MediLink connects a diverse network of partners—including hospitals, insurance providers, 
             government agencies, and humanitarian organizations—through a unified digital health platform. 
             Together, we're transforming healthcare delivery across Kenya.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-10 sm:mb-12 md:mb-16">
+            <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center justify-center">
                  Become a Partner
-                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
             </button>
-            <button className="border-2 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300">
+            <button className="border-2 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 rounded-2xl font-bold text-sm sm:text-base md:text-lg transition-all duration-300">
                Partnership Benefits
             </button>
           </div>
@@ -124,34 +124,34 @@ const Partners = () => {
       </section>
 
       {/* Partnership Impact Stats */}
-      <section className="py-16 px-4 bg-blue-950">
+      <section className="py-8 sm:py-12 md:py-16 px-4 sm:px-6 md:px-8 bg-blue-950">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
             <div className="text-center group">
-              <div className="bg-yellow-300 rounded-2xl px-2 py-4 h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
-                <div className="text-2xl lg:text-3xl text-black font-bold mb-1">50+</div>
-                <div className="text-sm lg:text-base text-black font-semibold mb-1">Active Partners</div>
+              <div className="bg-yellow-300 rounded-xl sm:rounded-2xl px-2 py-3 sm:py-4 h-28 sm:h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
+                <div className="text-xl sm:text-2xl lg:text-3xl text-black font-bold mb-0.5 sm:mb-1">50+</div>
+                <div className="text-xs sm:text-sm lg:text-base text-black font-semibold mb-0.5 sm:mb-1 leading-tight">Active Partners</div>
                 <div className="text-xs">Across all sectors</div>
               </div>
             </div>
             <div className="text-center group">
-              <div className="bg-yellow-300 rounded-2xl px-2 py-4 h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
-                <div className="text-2xl lg:text-3xl text-black font-bold mb-1">20M+</div>
-                <div className="text-sm lg:text-base text-black font-semibold mb-1">Lives Covered</div>
+              <div className="bg-yellow-300 rounded-xl sm:rounded-2xl px-2 py-3 sm:py-4 h-28 sm:h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
+                <div className="text-xl sm:text-2xl lg:text-3xl text-black font-bold mb-0.5 sm:mb-1">20M+</div>
+                <div className="text-xs sm:text-sm lg:text-base text-black font-semibold mb-0.5 sm:mb-1 leading-tight">Lives Covered</div>
                 <div className="text-xs">Through our network</div>
               </div>
             </div>
             <div className="text-center group">
-              <div className="bg-yellow-300 rounded-2xl px-2 py-4 h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
-                <div className="text-2xl lg:text-3xl text-black font-bold mb-1">24/7</div>
-                <div className="text-sm lg:text-base text-black font-semibold mb-1">Support Network</div>
+              <div className="bg-yellow-300 rounded-xl sm:rounded-2xl px-2 py-3 sm:py-4 h-28 sm:h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
+                <div className="text-xl sm:text-2xl lg:text-3xl text-black font-bold mb-0.5 sm:mb-1">24/7</div>
+                <div className="text-xs sm:text-sm lg:text-base text-black font-semibold mb-0.5 sm:mb-1 leading-tight">Support Network</div>
                 <div className="text-xs">Emergency response</div>
               </div>
             </div>
             <div className="text-center group">
-              <div className="bg-yellow-300 rounded-2xl px-2 py-4 h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
-                <div className="text-2xl lg:text-3xl text-black font-bold mb-1">47</div>
-                <div className="text-sm lg:text-base text-black font-semibold mb-1">Counties</div>
+              <div className="bg-yellow-300 rounded-xl sm:rounded-2xl px-2 py-3 sm:py-4 h-28 sm:h-32 flex flex-col justify-center border border-blue-100 shadow-lg shadow-gray-900">
+                <div className="text-xl sm:text-2xl lg:text-3xl text-black font-bold mb-0.5 sm:mb-1">47</div>
+                <div className="text-xs sm:text-sm lg:text-base text-black font-semibold mb-0.5 sm:mb-1 leading-tight">Counties</div>
                 <div className="text-xs">Nationwide coverage</div>
               </div>
             </div>
@@ -160,11 +160,11 @@ const Partners = () => {
       </section>
 
       {/* Partners Grid - Modern Design */}
-      <section className="py-20 px-4 bg-blue-950">
+      <section className="py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 bg-blue-950">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold text-yellow-300 font-serif mb-4">Meet Our Partners</h2>
-            <p className="text-xl text-white max-w-3xl mx-auto">
+          <div className="text-center mb-10 sm:mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-yellow-300 font-serif mb-3 sm:mb-4">Meet Our Partners</h2>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white max-w-3xl mx-auto px-4">
               Leading organizations that trust MediLink to deliver innovative healthcare solutions
             </p>
           </div>

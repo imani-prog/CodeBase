@@ -140,77 +140,78 @@ const FAQs = () => {
 
  
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
       {/* Hero Section */}
-      <div className="relative ">
+      <div className="relative">
         
-        <div className="relative max-w-6xl mx-auto px-6 py-20">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 lg:py-20">
           <div className="text-center">
             
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 font-serif leading-tight text-blue-800">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 font-serif leading-tight text-blue-800">
               Frequently Asked
               <span className="block bg-clip-text">
                 Questions
               </span>
             </h1>
-            <p className="text-xl  mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
               Everything you need to know about MediLink. Can't find what you're looking for? 
-              <a href="/contact" className="underline hover:text-blue-600 transition-colors ml-1">
+              <a href="/contact" className="underline hover:text-blue-600 transition-colors ml-1 whitespace-nowrap">
                 Contact our support team
               </a>
             </p>
             
             {/* Search Bar */}
-            <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5" />
+            <div className="relative max-w-2xl mx-auto px-2 sm:px-0">
+              <Search className="absolute left-4 sm:left-6 top-1/2 transform -translate-y-1/2 text-blue-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 type="text"
                 placeholder="Search for answers..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-white/95 backdrop-blur-sm border border-blue-200 text-blue-900 placeholder-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-300/50 focus:border-blue-300 transition-all shadow-lg"
+                className="w-full pl-10 sm:pl-12 pr-4 sm:pr-6 py-3 sm:py-4 rounded-2xl bg-white/95 backdrop-blur-sm border border-blue-200 text-sm sm:text-base text-blue-900 placeholder-blue-500 focus:outline-none focus:ring-2 sm:focus:ring-4 focus:ring-blue-300/50 focus:border-blue-300 transition-all shadow-lg"
               />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12">
         {/* Category Filters */}
-        <div className="mb-12">
-          <div className="flex flex-wrap gap-3 justify-center">
+        <div className="mb-8 sm:mb-10 md:mb-12">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm transition-all duration-300 ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 rounded-full font-medium text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${
                   activeCategory === category.id
                     ? 'bg-blue-600 text-white shadow-lg scale-105'
                     : 'bg-white text-blue-600 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50'
                 }`}
               >
-                {category.icon}
-                {category.name}
+                <span className="flex-shrink-0">{category.icon}</span>
+                <span className="hidden sm:inline">{category.name}</span>
+                <span className="sm:hidden">{category.name.split(' ')[0]}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="text-blue-700">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-3 sm:gap-0">
+          <div className="text-blue-700 text-sm sm:text-base">
             <span className="font-semibold">{filteredFAQs.length}</span> question{filteredFAQs.length !== 1 ? 's' : ''} found
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={expandAll}
-              className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+              className="flex-1 sm:flex-initial px-3 sm:px-4 py-2 text-xs sm:text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors whitespace-nowrap"
             >
               Expand All
             </button>
             <button
               onClick={collapseAll}
-              className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+              className="flex-1 sm:flex-initial px-3 sm:px-4 py-2 text-xs sm:text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors whitespace-nowrap"
             >
               Collapse All
             </button>
@@ -218,60 +219,60 @@ const FAQs = () => {
         </div>
 
         {/* FAQ Items */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {filteredFAQs.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-blue-400" />
+            <div className="text-center py-12 sm:py-16 px-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               </div>
-              <h3 className="text-xl font-semibold text-blue-800 mb-2">No results found</h3>
-              <p className="text-blue-600">Try adjusting your search or browse different categories</p>
+              <h3 className="text-lg sm:text-xl font-semibold text-blue-800 mb-2">No results found</h3>
+              <p className="text-sm sm:text-base text-blue-600">Try adjusting your search or browse different categories</p>
             </div>
           ) : (
             filteredFAQs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow-md border border-blue-100 overflow-hidden hover:shadow-lg transition-all duration-300"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-md border border-blue-100 overflow-hidden hover:shadow-lg transition-all duration-300"
               >
                 <button
                   onClick={() => toggleExpanded(index)}
-                  className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-blue-50 transition-colors group"
+                  className="w-full px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 text-left flex items-start sm:items-center justify-between hover:bg-blue-50 transition-colors group gap-3"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full  transition-colors">
+                  <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-full transition-colors flex-shrink-0">
                       {faq.icon}
                     </div>
-                    <h3 className="text-lg font-semibold text-blue-900 font-serif group-hover:text-blue-700 transition-colors">
+                    <h3 className="text-sm sm:text-base md:text-lg font-semibold text-blue-900 font-serif group-hover:text-blue-700 transition-colors leading-snug">
                       {faq.question}
                     </h3>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="hidden md:flex gap-1">
                       {faq.tags.slice(0, 2).map((tag, tagIndex) => (
                         <span
                           key={tagIndex}
-                          className="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full"
+                          className="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full whitespace-nowrap"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
                     {expandedItems.has(index) ? (
-                      <ChevronUp className="w-5 h-5 text-blue-600" />
+                      <ChevronUp className="w-5 h-5 text-blue-600 flex-shrink-0" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-blue-600" />
+                      <ChevronDown className="w-5 h-5 text-blue-600 flex-shrink-0" />
                     )}
                   </div>
                 </button>
                 {expandedItems.has(index) && (
-                  <div className="px-8 pb-6 pt-0">
-                    <div className="pl-14">
-                      <p className="text-black leading-relaxed mb-4">{faq.answer}</p>
-                      <div className="flex flex-wrap gap-2">
+                  <div className="px-4 sm:px-6 md:px-8 pb-4 sm:pb-5 md:pb-6 pt-0">
+                    <div className="sm:pl-12 md:pl-14">
+                      <p className="text-sm sm:text-base text-black leading-relaxed mb-3 sm:mb-4">{faq.answer}</p>
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {faq.tags.map((tag, tagIndex) => (
                           <span
                             key={tagIndex}
-                            className="px-3 py-1 bg-blue-50 text-blue-600 text-xs rounded-full border border-blue-200"
+                            className="px-2 sm:px-3 py-1 bg-blue-50 text-blue-600 text-xs rounded-full border border-blue-200"
                           >
                             #{tag}
                           </span>
@@ -286,32 +287,32 @@ const FAQs = () => {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-16 p-8 text-center">
+        <div className="mt-10 sm:mt-12 md:mt-16 p-6 sm:p-8 text-center">
           <div className="flex justify-center mb-4">
             <div className="flex -space-x-2">
-              <div className="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-400 rounded-full flex items-center justify-center">
+                <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                <Phone className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                <Mail className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
             </div>
           </div>
-          <h2 className="text-2xl font-bold mb-3 font-serif">Still have questions?</h2>
-          <p className="mb-6">Our support team is here to help you 24/7</p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 font-serif">Still have questions?</h2>
+          <p className="text-sm sm:text-base mb-5 sm:mb-6 px-4">Our support team is here to help you 24/7</p>
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
             <a
               href="/contact"
-              className="px-6 py-3 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition-colors"
+              className="px-5 sm:px-6 py-2.5 sm:py-3 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition-colors text-sm sm:text-base"
             >
               Contact Support
             </a>
             <a
               href="/support"
-              className="px-6 py-3 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition-colors"
+              className="px-5 sm:px-6 py-2.5 sm:py-3 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition-colors text-sm sm:text-base"
             >
               Open Ticket
             </a>
