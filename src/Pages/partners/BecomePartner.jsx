@@ -187,38 +187,38 @@ const BecomePartner = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
       
       
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
+      <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 overflow-hidden">
        
         
         <div className="relative max-w-6xl mx-auto text-center">
           
           
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight px-2">
             <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 bg-clip-text text-transparent font-serif">
               Become a MediLink Partner
             </span>
             
           </h1>
           
-          <p className="text-xl md:text-2xl  leading-relaxed max-w-4xl mx-auto mb-12">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl leading-relaxed max-w-4xl mx-auto mb-8 sm:mb-10 md:mb-12 px-2">
             Transform healthcare delivery and expand your impact by joining Kenya's most comprehensive 
             digital health ecosystem. Partner with us to reach more patients and improve health outcomes.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 md:mb-16">
+            <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center justify-center">
                  Start Partnership
-                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
             </button>
-            <button className="border-2 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300">
+            <button className="border-2 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg transition-all duration-300">
               Schedule Call
             </button>
           </div>
@@ -226,28 +226,28 @@ const BecomePartner = () => {
       </section>
 
       {/* Partnership Benefits */}
-      <section className="py-20 px-4 ">
+      <section className="py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Why Partner With MediLink?</h2>
-            <p className="text-xl max-w-3xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-800 font-serif mb-3 sm:mb-4 px-2">Why Partner With MediLink?</h2>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl max-w-3xl mx-auto px-2">
               Unlock powerful benefits and transform your healthcare delivery with our comprehensive platform
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {PARTNERSHIP_BENEFITS.map((benefit, index) => (
               <div 
                 key={index}
-                className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-blue-100 hover:border-blue-300"
+                className="group bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-blue-100 hover:border-blue-300"
               >
-                <div className=" rounded-xl p-4 mb-6 w-fit">
+                <div className="rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 w-fit">
                   {benefit.icon}
                 </div>
-                <h3 className="text-xl font-bold text-blue-800 font-serif mb-4 group-hover:text-blue-900 transition-colors">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold text-blue-800 font-serif mb-3 sm:mb-4 group-hover:text-blue-900 transition-colors">
                   {benefit.title}
                 </h3>
-                <p className="leading-relaxed">
+                <p className="text-sm sm:text-base leading-relaxed">
                   {benefit.description}
                 </p>
               </div>
@@ -257,22 +257,22 @@ const BecomePartner = () => {
       </section>
 
       {/* Partner Types Section */}
-      <section className="py-20 px-4">
+      <section className="py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Perfect for Every Healthcare Organization</h2>
-            <p className="text-xl max-w-3xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-800 font-serif mb-3 sm:mb-4 px-2">Perfect for Every Healthcare Organization</h2>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl max-w-3xl mx-auto px-2">
               Whether you're a hospital, insurance provider, tech company, or NGO, we have tailored solutions for you
             </p>
           </div>
           
           {/* Partner Type Selector */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 mb-8 sm:mb-10 md:mb-12">
             {PARTNER_TYPES.map((type, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedPartnerType(index)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                className={`px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-semibold transition-all duration-300 ${
                   selectedPartnerType === index
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
                     : 'bg-white text-blue-700 hover:bg-blue-50 border border-blue-200'
@@ -284,25 +284,25 @@ const BecomePartner = () => {
           </div>
           
           {/* Selected Partner Type Details */}
-          <div className=" p-8 shadow-x">
-            <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-blue-800 font-serif mb-4">
+          <div className="p-4 sm:p-6 md:p-8">
+            <div className="text-center mb-6 sm:mb-8">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-800 font-serif mb-3 sm:mb-4 px-2">
                 {PARTNER_TYPES[selectedPartnerType].title}
               </h3>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto px-2">
                 {PARTNER_TYPES[selectedPartnerType].description}
               </p>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
               {PARTNER_TYPES[selectedPartnerType].features.map((feature, index) => (
                 <div key={index} className="text-center">
-                  <div className=" p-4 mb-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg mx-auto flex items-center justify-center">
+                  <div className="p-3 sm:p-4 mb-2 sm:mb-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg mx-auto flex items-center justify-center">
                       {FEATURE_ICONS[feature]}
                     </div>
                   </div>
-                  <p className="font-semibold font-serif text-blue-800">{feature}</p>
+                  <p className="text-xs sm:text-sm md:text-base font-semibold font-serif text-blue-800 leading-tight">{feature}</p>
                 </div>
               ))}
             </div>
@@ -311,21 +311,21 @@ const BecomePartner = () => {
       </section>
       
       {/* Contact Form Section */}
-      <section className="py-20 px-4 bg-blue-950 relative overflow-hidden">
+      <section className="py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 bg-blue-950 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-yellow-300 font-serif mb-4">Ready to Get Started?</h2>
-            <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <div className="text-center mb-8 sm:mb-10 md:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-300 font-serif mb-3 sm:mb-4 px-2">Ready to Get Started?</h2>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-2xl mx-auto px-2">
               Fill out our partnership form and we'll get back to you within 24 hours
             </p>
           </div>
           
-          <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl">
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white/95 backdrop-blur rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl">
+            <form className="space-y-4 sm:space-y-5 md:space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
                     Organization Name *
                   </label>
                   <input
@@ -333,12 +333,12 @@ const BecomePartner = () => {
                     name="organizationName"
                     value={formData.organizationName}
                     onChange={handleInputChange}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full p-3 sm:p-3.5 md:p-4 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                     placeholder="Enter your organization name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
                     Contact Person *
                   </label>
                   <input
@@ -346,15 +346,15 @@ const BecomePartner = () => {
                     name="contactName"
                     value={formData.contactName}
                     onChange={handleInputChange}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full p-3 sm:p-3.5 md:p-4 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                     placeholder="Your full name"
                   />
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
                     Email Address *
                   </label>
                   <input
@@ -362,12 +362,12 @@ const BecomePartner = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full p-3 sm:p-3.5 md:p-4 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                     placeholder="your.email@company.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
                     Phone Number *
                   </label>
                   <input
@@ -375,21 +375,21 @@ const BecomePartner = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full p-3 sm:p-3.5 md:p-4 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                     placeholder="+254 700 000 000"
                   />
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
                   Organization Type *
                 </label>
                 <select
                   name="organizationType"
                   value={formData.organizationType}
                   onChange={handleInputChange}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full p-3 sm:p-3.5 md:p-4 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                 >
                   <option value="">Select organization type</option>
                   <option value="hospital">Hospital/Clinic</option>
@@ -402,7 +402,7 @@ const BecomePartner = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
                   Tell us about your organization and partnership goals
                 </label>
                 <textarea
@@ -410,29 +410,29 @@ const BecomePartner = () => {
                   value={formData.message}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full p-3 sm:p-3.5 md:p-4 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                   placeholder="Describe your organization, current challenges, and how you envision partnering with MediLink..."
                 ></textarea>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 px-8 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 sm:py-3.5 md:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
-                  Submit Partnership Request
+                  <span className="whitespace-nowrap">Submit Partnership Request</span>
                 </button>
                 <a
                   href="mailto:partners@medilink.africa"
-                  className="flex-1 border-2 border-blue-300 text-blue-700 hover:border-blue-500 hover:bg-blue-50 py-4 px-8 rounded-xl font-bold text-lg transition-all duration-300 text-center flex items-center justify-center"
+                  className="flex-1 border-2 border-blue-300 text-blue-700 hover:border-blue-500 hover:bg-blue-50 py-3 sm:py-3.5 md:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg transition-all duration-300 text-center flex items-center justify-center"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  Email Us Directly
+                  <span className="whitespace-nowrap">Email Us Directly</span>
                 </a>
               </div>
             </form>
@@ -441,58 +441,58 @@ const BecomePartner = () => {
       </section>
 
       {/* Trust & Support Section */}
-      <section className="py-20 px-4 ">
+      <section className="py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-blue-800 font-serif mb-4">Join Our Trusted Network</h2>
-          <p className="text-xl mb-12 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-800 font-serif mb-3 sm:mb-4 px-2">Join Our Trusted Network</h2>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-8 sm:mb-10 md:mb-12 max-w-3xl mx-auto px-2">
             We support our partners every step of the way with comprehensive onboarding, training, and ongoing support
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-10 md:mb-12">
             <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl font-bold mx-auto mb-3 sm:mb-4">
                 1
               </div>
-              <h3 className="text-xl font-bold text-blue-800 font-serif mb-2">Quick Setup</h3>
-              <p className="">Get integrated with our platform in just a few days with our streamlined onboarding process.</p>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-blue-800 font-serif mb-2">Quick Setup</h3>
+              <p className="text-sm sm:text-base px-2">Get integrated with our platform in just a few days with our streamlined onboarding process.</p>
             </div>
             
             <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl font-bold mx-auto mb-3 sm:mb-4">
                 2
               </div>
-              <h3 className="text-xl font-bold text-blue-800 font-serif mb-2">Training & Support</h3>
-              <p className="">Comprehensive training for your team and 24/7 technical support to ensure smooth operations.</p>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-blue-800 font-serif mb-2">Training & Support</h3>
+              <p className="text-sm sm:text-base px-2">Comprehensive training for your team and 24/7 technical support to ensure smooth operations.</p>
             </div>
             
             <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl font-bold mx-auto mb-3 sm:mb-4">
                 3
               </div>
-              <h3 className="text-xl font-bold text-blue-800 font-serif mb-2">Ongoing Growth</h3>
-              <p className="">Continuous platform updates, new features, and partnership opportunities to grow together.</p>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-blue-800 font-serif mb-2">Ongoing Growth</h3>
+              <p className="text-sm sm:text-base px-2">Continuous platform updates, new features, and partnership opportunities to grow together.</p>
             </div>
           </div>
           
-          <div className=" p-8">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+          <div className="p-4 sm:p-6 md:p-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
               <div className="flex items-center justify-center text-blue-600">
-                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                <span className="font-semibold">HIPAA Compliant</span>
+                <span className="text-sm sm:text-base font-semibold">HIPAA Compliant</span>
               </div>
               <div className="flex items-center justify-center text-blue-600">
-                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                <span className="font-semibold">99.9% Uptime</span>
+                <span className="text-sm sm:text-base font-semibold">99.9% Uptime</span>
               </div>
               <div className="flex items-center justify-center text-blue-600">
-                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
-                <span className="font-semibold">Award Winning</span>
+                <span className="text-sm sm:text-base font-semibold">Award Winning</span>
               </div>
             </div>
           </div>
