@@ -1,6 +1,3 @@
-import Footer from "../../Components/Footer.jsx";
-import Navbar from "../../Components/Navbar.jsx";
-import LiveChatButton from "../../Components/LiveChatButton.jsx";
 
 const Mission = () => {
   return (

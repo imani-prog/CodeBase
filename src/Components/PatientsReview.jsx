@@ -126,80 +126,79 @@ const PatientsReview = () => {
   const getRandomGradient = (index) => gradientColors[index % gradientColors.length];
 
   return (
-    <section className="mb-0 px-2 md:px-6">
+    <section className="mb-0">
       {/* Success Notification */}
       {showNotification && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg z-50 transform transition-transform duration-300">
-          <div className="flex items-center space-x-3">
-            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-              <span className="text-green-500 text-sm">✓</span>
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 sm:px-5 md:px-6 py-3 sm:py-3.5 md:py-4 rounded-xl shadow-lg z-50 transform transition-transform duration-300">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-green-500 text-xs sm:text-sm">✓</span>
             </div>
-            <span className="font-medium">Review submitted successfully!</span>
+            <span className="font-medium text-sm sm:text-base">Review submitted successfully!</span>
           </div>
         </div>
       )}
 
       {/* Header Section */}
-      <div className="text-center mb-12">
-        <h3 className="text-4xl font-bold bg-gradient-to-r bg-clip-text text-blue-900 mb-4 font-serif">
+      <div className="text-center mb-8 sm:mb-10 md:mb-12">
+        <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r bg-clip-text text-blue-900 mb-3 sm:mb-4 font-serif leading-tight">
           Patient Reviews & Testimonials
         </h3>
-        <p className="text-black text-lg max-w-2xl mx-auto">
+        <p className="text-black text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
           Hear what our patients have to say about their experience with MediLink
         </p>
-        <div className="flex items-center justify-center mt-4 space-x-2">
-          <div className="flex space-x-1">
-            <span className="text-yellow-400 text-2xl">★★★★★</span>
+        <div className="flex items-center justify-center mt-3 sm:mt-4 space-x-2">
+          <div className="flex space-x-0.5 sm:space-x-1">
+            <span className="text-yellow-400 text-lg sm:text-xl md:text-2xl">★★★★★</span>
           </div>
-          <span className="text-gray-700 font-semibold">4.9/5</span>
-          <span className="text-gray-500">(1,234 reviews)</span>
+          <span className="text-gray-700 font-semibold text-sm sm:text-base">4.9/5</span>
+          <span className="text-gray-500 text-xs sm:text-sm">(1,234 reviews)</span>
         </div>
       </div>
       
       {/* Reviews Grid */}
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-8 sm:mb-10 md:mb-12">
           {reviews.map((review, index) => (
             <div 
               key={review.id} 
-              className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-all duration-300 min-h-[220px] flex flex-col justify-between"
-              style={{ minWidth: '260px', maxWidth: '340px' }}
+              className="bg-white rounded-lg sm:rounded-xl shadow-md p-3 sm:p-4 hover:shadow-lg transition-all duration-300 min-h-[200px] sm:min-h-[220px] flex flex-col justify-between w-full"
             >
               <div className="flex items-center mb-2">
-                <div className={`w-10 h-10 bg-gradient-to-r ${getRandomGradient(index)} rounded-full flex items-center justify-center text-white font-bold text-base`}>
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gradient-to-r ${getRandomGradient(index)} rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base flex-shrink-0`}>
                   {getInitial(review.name)}
                 </div>
-                <div className="ml-3">
-                  <h4 className="font-semibold text-gray-800 text-base">{review.name}</h4>
+                <div className="ml-2 sm:ml-3 flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-800 text-sm sm:text-base truncate">{review.name}</h4>
                   <div className="flex items-center space-x-1">
-                    <div className="flex space-x-1">
+                    <div className="flex space-x-0.5">
                       {renderStars(review.rating)}
                     </div>
                     <span className="text-gray-500 text-xs">{review.rating}.0</span>
                   </div>
                 </div>
-                <div className="ml-auto text-gray-400 text-xs">{review.timeAgo}</div>
+                <div className="ml-auto text-gray-400 text-[10px] sm:text-xs whitespace-nowrap">{review.timeAgo}</div>
               </div>
-              <p className="text-gray-700 leading-relaxed mb-2 text-sm">
+              <p className="text-gray-700 leading-relaxed mb-2 text-xs sm:text-sm px-1">
                 "{review.comment}"
               </p>
               <div className="flex items-center text-xs mb-2">
-                <span className={`px-2 py-1 rounded-full ${categoryColors[review.categoryColor] || categoryColors.green}`}>
+                <span className={`px-2 py-1 rounded-full text-[10px] sm:text-xs ${categoryColors[review.categoryColor] || categoryColors.green}`}>
                   {review.category}
                 </span>
               </div>
               <div className="flex items-center justify-between mt-2">
                 <button
-                  className={`flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors text-sm px-2 py-1 rounded-full border border-gray-200 bg-gray-50`}
+                  className={`flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors text-xs sm:text-sm px-1.5 sm:px-2 py-1 rounded-full border border-gray-200 bg-gray-50`}
                   onClick={() => handleLike(review.id)}
                   aria-label="Like review"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 122.88 113.41">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 122.88 113.41" className="sm:w-[18px] sm:h-[18px]">
                     <path fill="#065fd4" d="M4.29,47.64h19.3A4.31,4.31,0,0,1,27.88,52V109.1a4.31,4.31,0,0,1-4.29,4.31H4.29A4.31,4.31,0,0,1,0,109.1V52a4.31,4.31,0,0,1,4.29-4.31ZM59,4.77c2.27-11.48,21.07-.91,22.31,17.6A79.82,79.82,0,0,1,79.68,42h26.87c11.17.44,20.92,8.44,14,21.58,1.57,5.72,1.81,12.44-2.45,15.09.53,9-2,14.64-6.65,19.06-.31,4.52-1.27,8.53-3.45,11.62-3.61,5.09-6.54,3.88-12.22,3.88H50.45c-7.19,0-11.11-2-15.81-7.88V54.81C48.16,51.16,55.35,32.66,59,20.51V4.77Z"/>
                   </svg>
                   <span>{review.likes}</span>
                 </button>
-                <span className="text-gray-400 text-xs">{review.likes} people found this helpful</span>
+                <span className="text-gray-400 text-[10px] sm:text-xs">{review.likes} people found this helpful</span>
               </div>
             </div>
           ))}
@@ -209,31 +208,31 @@ const PatientsReview = () => {
       {/*Review Button & Conditional*/}
       <div className="max-w-4xl mx-auto w-full">
         <div className="flex flex-col items-center justify-center">
-          <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4 mb-8">
+          <div className="w-full flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-7 md:mb-8">
             {!showForm && (
               <button
                 onClick={() => setShowForm(true)}
-                className="text-blue-700 border border-blue-300 px-4 py-2 rounded-lg font-bold text-base hover:bg-blue-100 hover:text-blue-900 transition-all duration-200"
+                className="text-blue-700 border border-blue-300 px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base hover:bg-blue-100 hover:text-blue-900 transition-all duration-200 w-full sm:w-auto"
               >
                 Share Your Experience
               </button>
             )}
             <button
-              className="text-blue-700 border border-blue-300 px-4 py-2 rounded-lg font-bold text-base hover:bg-blue-100 hover:text-blue-900 transition-all duration-200"
+              className="text-blue-700 border border-blue-300 px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base hover:bg-blue-100 hover:text-blue-900 transition-all duration-200 w-full sm:w-auto"
               onClick={() => window.location.href = '/register-patient'}
             >
               Register as a Patient
             </button>
             {/* Extra Feature: Quick Links */}
-            <div className="hidden md:flex flex-col gap-2">
+            <div className="hidden md:flex flex-col gap-2 text-sm">
               <a href="/frequent-questions" className="text-blue-700 font-semibold hover:underline">FAQs</a>
               <a href="/contact" className="text-blue-700 font-semibold hover:underline">Contact Support</a>
               <a href="/services/patients" className="text-blue-700 font-semibold hover:underline">Patient Services</a>
             </div>
           </div>
           {showForm && (
-            <div className="relative w-full max-w-lg mb-8">
-              <div className="bg-blue-50 rounded-2xl p-6 shadow-md">
+            <div className="relative w-full max-w-lg mb-6 sm:mb-7 md:mb-8">
+              <div className="bg-blue-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 shadow-md">
                 <button
                   onClick={() => setShowForm(false)}
                   className="absolute top-2 right-2 text-gray-400 hover:text-blue-600 text-xl font-bold focus:outline-none"
@@ -241,24 +240,24 @@ const PatientsReview = () => {
                 >
                   ×
                 </button>
-                <div className="text-left mb-6">
-                  <h4 className="text-xl font-bold mb-1 text-gray-800">Share Your Experience</h4>
-                  <p className="text-gray-500">Help others by sharing your experience with MediLink</p>
+                <div className="text-left mb-4 sm:mb-5 md:mb-6">
+                  <h4 className="text-lg sm:text-xl font-bold mb-1 text-gray-800">Share Your Experience</h4>
+                  <p className="text-gray-500 text-xs sm:text-sm">Help others by sharing your experience with MediLink</p>
                 </div>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4">
                     <div className="space-y-1">
-                      <div className="text-sm font-medium text-gray-700">Your Name</div>
+                      <div className="text-xs sm:text-sm font-medium text-gray-700">Your Name</div>
                       <input
                         type="text"
                         placeholder="Enter your name"
                         value={formData.name}
                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300"
+                        className="w-full px-3 py-2 text-sm sm:text-base rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300"
                       />
                     </div>
                     <div className="space-y-1">
-                      <div className="text-sm font-medium text-gray-700">Rating</div>
+                      <div className="text-xs sm:text-sm font-medium text-gray-700">Rating</div>
                       <div className="flex space-x-1">
                         {renderStars(formData.rating, true, (rating) =>
                           setFormData(prev => ({ ...prev, rating }))
@@ -266,19 +265,19 @@ const PatientsReview = () => {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-sm font-medium text-gray-700">Your Review</div>
+                      <div className="text-xs sm:text-sm font-medium text-gray-700">Your Review</div>
                       <textarea
                         placeholder="Tell us about your experience..."
                         rows="4"
                         value={formData.comment}
                         onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300 resize-none"
+                        className="w-full px-3 py-2 text-sm sm:text-base rounded-lg border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent transition-all duration-300 resize-none"
                       />
                     </div>
                     <div className="text-left">
                       <button
                         onClick={handleSubmit}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-all duration-300 shadow"
+                        className="bg-blue-600 text-white px-5 sm:px-6 py-2 text-sm sm:text-base rounded-lg font-bold hover:bg-blue-700 transition-all duration-300 shadow w-full sm:w-auto"
                       >
                         Submit Review
                       </button>
@@ -289,46 +288,46 @@ const PatientsReview = () => {
             </div>
           )}
           {/*Info Card for Patients */}
-          <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6 ">
-            <div className="p-6 flex-1 max-w-md">
-              <h5 className="text-lg font-bold text-blue-800 mb-2 font-serif">Why Join MediLink?</h5>
-              <ul className="list-none space-y-3 text-gray-700 text-base mb-2">
+          <div className="w-full flex flex-col md:flex-row items-stretch justify-center gap-4 sm:gap-5 md:gap-6">
+            <div className="p-4 sm:p-5 md:p-6 flex-1 max-w-md">
+              <h5 className="text-base sm:text-lg font-bold text-blue-800 mb-2 sm:mb-3 font-serif">Why Join MediLink?</h5>
+              <ul className="list-none space-y-2 sm:space-y-3 text-gray-700 text-xs sm:text-sm md:text-base mb-2">
                 <li className="flex items-start">
-                  <span className="text-blue-400 mr-3 mt-1">✓</span>
-                  <span>Access affordable healthcare from anywhere</span>
+                  <span className="text-blue-400 mr-2 sm:mr-3 mt-0.5 sm:mt-1 flex-shrink-0">✓</span>
+                  <span className="leading-relaxed">Access affordable healthcare from anywhere</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-400 mr-3 mt-1">✓</span>
-                  <span>Book appointments and get reminders easily</span>
+                  <span className="text-blue-400 mr-2 sm:mr-3 mt-0.5 sm:mt-1 flex-shrink-0">✓</span>
+                  <span className="leading-relaxed">Book appointments and get reminders easily</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-400 mr-3 mt-1">✓</span>
-                  <span>Connect with doctors and specialists online</span>
+                  <span className="text-blue-400 mr-2 sm:mr-3 mt-0.5 sm:mt-1 flex-shrink-0">✓</span>
+                  <span className="leading-relaxed">Connect with doctors and specialists online</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-400 mr-3 mt-1">✓</span>
-                  <span>Track your health records securely</span>
+                  <span className="text-blue-400 mr-2 sm:mr-3 mt-0.5 sm:mt-1 flex-shrink-0">✓</span>
+                  <span className="leading-relaxed">Track your health records securely</span>
                 </li>
               </ul>
-              <p className="text-blue-600 italic">"Empowering patients for a healthier tomorrow."</p>
+              <p className="text-blue-600 italic text-xs sm:text-sm">"Empowering patients for a healthier tomorrow."</p>
             </div>
-            <div className="p-6 flex-1 max-w-md">
-              <h5 className="text-lg font-bold text-blue-800 mb-2 font-serif">Need Help?</h5>
-              <ul className="list-none space-y-3 text-gray-700 text-base mb-2">
+            <div className="p-4 sm:p-5 md:p-6 flex-1 max-w-md">
+              <h5 className="text-base sm:text-lg font-bold text-blue-800 mb-2 sm:mb-3 font-serif">Need Help?</h5>
+              <ul className="list-none space-y-2 sm:space-y-3 text-gray-700 text-xs sm:text-sm md:text-base mb-2">
                 <li className="flex items-start">
-                  <span className="text-blue-400 mr-3 mt-1">✓</span>
-                  <span>Visit our <a href="/frequent-questions" className="text-blue-700 hover:underline">FAQ</a> page</span>
+                  <span className="text-blue-400 mr-2 sm:mr-3 mt-0.5 sm:mt-1 flex-shrink-0">✓</span>
+                  <span className="leading-relaxed">Visit our <a href="/frequent-questions" className="text-blue-700 hover:underline">FAQ</a> page</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-400 mr-3 mt-1">✓</span>
-                  <span>Contact our support team for assistance</span>
+                  <span className="text-blue-400 mr-2 sm:mr-3 mt-0.5 sm:mt-1 flex-shrink-0">✓</span>
+                  <span className="leading-relaxed">Contact our support team for assistance</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-400 mr-3 mt-1">✓</span>
-                  <span>Explore patient resources and guides</span>
+                  <span className="text-blue-400 mr-2 sm:mr-3 mt-0.5 sm:mt-1 flex-shrink-0">✓</span>
+                  <span className="leading-relaxed">Explore patient resources and guides</span>
                 </li>
               </ul>
-              <p className="text-blue-600 italic">"We're here for you every step of the way."</p>
+              <p className="text-blue-600 italic text-xs sm:text-sm">"We're here for you every step of the way."</p>
             </div>
           </div>
         </div>
