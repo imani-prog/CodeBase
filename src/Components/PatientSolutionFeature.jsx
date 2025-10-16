@@ -72,34 +72,34 @@ function PatientSolutionFeature() {
   const prev = () => setIndex((prev) => (prev - 1 + features.length) % features.length);
 
   return (
-    <section className="w-full max-w-6xl mx-auto my-20 px-4">
-      <h3 className="text-3xl font-bold text-blue-800 mb-12 text-center font-serif">
+    <section className="w-full max-w-6xl mx-auto my-10 sm:my-14 md:my-20 px-2 sm:px-4 md:px-6">
+      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-800 mb-6 sm:mb-8 md:mb-12 text-center font-serif leading-tight">
         How MediLink Solves Real Patient Problems
       </h3>
 
-      <div className="flex flex-col md:flex-row items-center gap-10">
+      <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8 md:gap-10">
         {/* Left: Feature Display */}
-        <div className="w-full md:w-1/2 p-6 space-y-8">
-          <h4 className="text-2xl font-bold text-blue-900 font-serif">Your Health, Our Priority – Anywhere, Anytime</h4>
+        <div className="w-full md:w-1/2 p-2 sm:p-3 md:p-6 space-y-4 sm:space-y-6 md:space-y-8">
+          <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-900 font-serif leading-tight">Your Health, Our Priority – Anywhere, Anytime</h4>
 
           {/* Animated Feature */}
-          <div className="relative min-h-[160px] overflow-visible flex items-center">
+          <div className="relative min-h-[180px] sm:min-h-[170px] md:min-h-[160px] overflow-visible flex items-center">
             <button
               onClick={prev}
-              className="absolute left-0 md:static w-10 h-10 rounded-full border border-blue-500 text-blue-700 hover:bg-blue-100 transition mr-4"
-              style={{zIndex:2}}
+              className="absolute -left-3 sm:-left-2 md:static w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full border border-blue-500 text-blue-700 hover:bg-blue-100 transition md:mr-4 z-10 bg-white shadow-sm flex-shrink-0"
+              aria-label="Previous feature"
             >
               &lt;
             </button>
-            <div key={index} className="animate-fadeSlide flex-1 px-2">
-              <p className="text-xl font-semibold text-blue-800 mb-2 font-serif">{features[index].title}</p>
-              <p className="font-bold text-base mb-2">{features[index].text}</p>
-              <p className="text-gray-600 text-base">{features[index].desc}</p>
+            <div key={index} className="animate-fadeSlide flex-1 px-6 sm:px-7 md:px-2">
+              <p className="text-base sm:text-lg md:text-xl font-semibold text-blue-800 mb-2 font-serif leading-tight">{features[index].title}</p>
+              <p className="font-bold text-sm sm:text-base mb-2 leading-relaxed">{features[index].text}</p>
+              <p className="text-gray-600 text-xs sm:text-sm md:text-base leading-relaxed">{features[index].desc}</p>
             </div>
             <button
               onClick={next}
-              className="absolute right-0 md:static w-10 h-10 rounded-full border border-blue-500 text-blue-700 hover:bg-blue-100 transition ml-4"
-              style={{zIndex:2}}
+              className="absolute -right-3 sm:-right-2 md:static w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full border border-blue-500 text-blue-700 hover:bg-blue-100 transition md:ml-4 z-10 bg-white shadow-sm flex-shrink-0"
+              aria-label="Next feature"
             >
               &gt;
             </button>
@@ -112,9 +112,13 @@ function PatientSolutionFeature() {
           <img
             src={MedilinkAmbulance}
             alt="MediLink Ambulance"
-            className="rounded-xl w-full max-w-lg object-contain"
+            className="rounded-lg sm:rounded-xl w-full max-w-lg h-auto object-contain max-h-[250px] sm:max-h-[350px] md:max-h-[450px] lg:max-h-[550px] shadow-md sm:shadow-lg"
             style={{
-              boxShadow: `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
+              boxShadow: `
+                -4px 4px 0px rgba(59, 130, 246, 0.3),
+                -8px 8px 0px rgba(59, 130, 246, 0.2),
+                -12px 12px 10px rgba(0, 0, 0, 0.1)
+              `
             }}
           />
         </div>

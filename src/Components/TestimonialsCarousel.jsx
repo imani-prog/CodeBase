@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SolutionTestimonial from "../Pages/solutions/SolutionTestimonial.jsx";
 import PeterImg from "../assets/Brian Wekesa.jpeg";
 import { default as AminaImg, default as EstherImg } from "../assets/Esther Nyambura.jpeg";
@@ -117,20 +117,64 @@ const testimonials = [
 
 function TestimonialsCarousel() {
   const [index, setIndex] = useState(0);
-  const maxIndex = testimonials.length - 2;
-  const canPrev = index > 0;
-  const canNext = index < maxIndex;
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Auto-slide for mobile
+  useEffect(() => {
+    if (isMobile) {
+      const interval = setInterval(() => {
+        setIndex(prevIndex => {
+          const nextIndex = prevIndex + 1;
+          return nextIndex >= testimonials.length ? 0 : nextIndex;
+        });
+      }, 5000); // Slide every 5 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [isMobile]);
+  
+  const maxIndexDesktop = testimonials.length - 2;
+  const canPrev = isMobile ? index > 0 : index > 0;
+  const canNext = isMobile ? index < testimonials.length - 1 : index < maxIndexDesktop;
+  
+  const handlePrev = () => {
+    if (isMobile) {
+      setIndex(Math.max(0, index - 1));
+    } else {
+      setIndex(Math.max(0, index - 2));
+    }
+  };
+  
+  const handleNext = () => {
+    if (isMobile) {
+      setIndex(Math.min(testimonials.length - 1, index + 1));
+    } else {
+      setIndex(Math.min(maxIndexDesktop, index + 2));
+    }
+  };
 
   return (
-    <div className="w-full">
-      <div className="text-center mb-2">
-        <p className="text-base text-black max-w-2xl mx-auto mb-8">Discover how MediLink is transforming healthcare for real patients across Kenya. From telemedicine consults to home visits and easy access to specialists, these stories show the impact of digital health on everyday lives.</p>
+    <div className="w-full overflow-x-hidden">
+      <div className="text-center mb-2 px-2">
+        <p className="text-xs sm:text-sm md:text-base text-black max-w-2xl mx-auto mb-6 sm:mb-7 md:mb-8 leading-relaxed">Discover how MediLink is transforming healthcare for real patients across Kenya. From telemedicine consults to home visits and easy access to specialists, these stories show the impact of digital health on everyday lives.</p>
       </div>
-      <div className="flex items-center justify-center w-full">
-        {/* Previous Button */}
+      <div className="flex items-center justify-center w-full px-2 sm:px-3 md:px-4">
+        {/* Previous Button - Hidden on mobile, shown on md+ */}
         <button
-          className={`mr-6 text-gray-400 text-4xl font-bold transition-colors duration-150 focus:outline-none ${canPrev ? "hover:text-blue-600" : "opacity-50 cursor-not-allowed"}`}
-          style={{ background: "none", border: "none", width: "48px", height: "48px" }}
+          className={`hidden md:block mr-3 md:mr-4 lg:mr-6 text-gray-400 text-2xl md:text-3xl lg:text-4xl font-bold transition-colors duration-150 focus:outline-none ${canPrev ? "hover:text-blue-600" : "opacity-50 cursor-not-allowed"}`}
+          style={{ background: "none", border: "none", width: "40px", height: "40px" }}
           onClick={() => setIndex(index - 2)}
           disabled={!canPrev}
           aria-label="Previous"
@@ -138,7 +182,7 @@ function TestimonialsCarousel() {
           &#60;
         </button>
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 w-full max-w-5xl overflow-hidden">
           {testimonials.slice(index, index + 2).map((t, i) => (
             <SolutionTestimonial
               key={t.name + t.location}
@@ -147,14 +191,34 @@ function TestimonialsCarousel() {
               role={t.role}
               location={t.location}
               avatar={t.avatar}
-              className="p-4 md:p-10 min-h-[320px] w-full md:min-w-[400px] text-base md:text-lg"
+              className="p-3 sm:p-5 md:p-8 lg:p-10 min-h-[280px] sm:min-h-[300px] md:min-h-[320px] w-full text-sm sm:text-base md:text-lg"
             />
           ))}
         </div>
-        {/* Next Button */}
+        {/* Next Button - Hidden on mobile, shown on md+ */}
         <button
-          className={`ml-6 text-gray-400 text-4xl font-bold transition-colors duration-150 focus:outline-none ${canNext ? "hover:text-blue-600" : "opacity-50 cursor-not-allowed"}`}
-          style={{ background: "none", border: "none", width: "48px", height: "48px" }}
+          className={`hidden md:block ml-3 md:ml-4 lg:ml-6 text-gray-400 text-2xl md:text-3xl lg:text-4xl font-bold transition-colors duration-150 focus:outline-none ${canNext ? "hover:text-blue-600" : "opacity-50 cursor-not-allowed"}`}
+          style={{ background: "none", border: "none", width: "40px", height: "40px" }}
+          onClick={() => setIndex(index + 2)}
+          disabled={!canNext}
+          aria-label="Next"
+        >
+          &#62;
+        </button>
+      </div>
+      
+      {/* Mobile Navigation Buttons */}
+      <div className="flex md:hidden justify-center gap-4 mt-4">
+        <button
+          className={`text-gray-400 text-2xl font-bold transition-colors duration-150 focus:outline-none bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200 ${canPrev ? "hover:text-blue-600 hover:bg-blue-50" : "opacity-50 cursor-not-allowed"}`}
+          onClick={() => setIndex(index - 2)}
+          disabled={!canPrev}
+          aria-label="Previous"
+        >
+          &#60;
+        </button>
+        <button
+          className={`text-gray-400 text-2xl font-bold transition-colors duration-150 focus:outline-none bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200 ${canNext ? "hover:text-blue-600 hover:bg-blue-50" : "opacity-50 cursor-not-allowed"}`}
           onClick={() => setIndex(index + 2)}
           disabled={!canNext}
           aria-label="Next"
