@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const DropdownMenu = ({ title, items, mobileOpen, setMobileOpen }) => {
+const DropdownMenu = ({ title, items, mobileOpen, setMobileOpen, icon }) => {
   const [open, setOpen] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
   const location = useLocation();
@@ -91,7 +91,15 @@ const DropdownMenu = ({ title, items, mobileOpen, setMobileOpen }) => {
         onClick={handleClick}
         type="button"
       >
-        <span>{title}</span>
+        <span className="flex items-center gap-2">
+          {/* Show icon only on mobile if provided */}
+          {mobileOpen !== undefined && icon && (
+            <span className="text-blue-700 flex-shrink-0">
+              {icon}
+            </span>
+          )}
+          {title}
+        </span>
         <svg 
           className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`} 
           fill="none" 
