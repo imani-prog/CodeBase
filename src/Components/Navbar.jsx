@@ -318,47 +318,69 @@ const Navbar = () => {
 
   {/* Mobile Menu */}
   {mobileOpen && (
-    <div className="fixed inset-0 text-black bg-blue-50 z-50 flex flex-col">
-      <div className="flex justify-between items-center px-6 py-4 border-b border-blue-200">
-        <Link to="/" className="text-2xl font-bold text-blue-900" aria-label="Go to homepage">MediLink</Link>
-        <button onClick={() => setMobileOpen(false)} aria-label="Close menu">
-          <svg
-            className="w-7 h-7 text-blue-900"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 z-40 md:hidden"
+        onClick={() => setMobileOpen(false)}
+      />
+      
+      {/* Sidebar Menu */}
+      <div className="fixed top-0 right-0 h-full w-[65%] max-w-xs text-black bg-blue-50 z-50 flex flex-col shadow-2xl animate-slide-in">
+        <div className="flex justify-between items-center px-4 sm:px-6 py-4 border-b border-blue-200 bg-blue-900">
+          <Link 
+            to="/" 
+            className="text-xl sm:text-2xl font-bold text-white" 
+            aria-label="Go to homepage"
+            onClick={() => setMobileOpen(false)}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8">
-        {menuGroups.map((group) => (
-          <div key={group.title} className="mb-6">
-            <DropdownMenu
-              title={group.title}
-              items={group.items}
-              mobileOpen={mobileOpen}
-              setMobileOpen={setMobileOpen}
-            />
+            MediLink
+          </Link>
+          <button 
+            onClick={() => setMobileOpen(false)} 
+            aria-label="Close menu"
+            className="p-1 hover:bg-blue-800 rounded-lg transition-colors"
+          >
+            <svg
+              className="w-6 h-6 sm:w-7 sm:h-7 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6">
+          {menuGroups.map((group) => (
+            <div key={group.title} className="mb-4">
+              <DropdownMenu
+                title={group.title}
+                items={group.items}
+                mobileOpen={mobileOpen}
+                setMobileOpen={setMobileOpen}
+              />
+            </div>
+          ))}
+          <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-blue-200">
+            <Link
+              to=""
+              className="w-full text-center text-blue-900 text-sm font-semibold py-2.5 rounded-lg border-2 border-blue-300 hover:bg-blue-100 transition duration-200"
+              onClick={() => setMobileOpen(false)}
+            >
+              Login
+            </Link>
+            <Link
+              to=""
+              className="w-full text-center text-white bg-blue-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-blue-700 transition duration-200"
+              onClick={() => setMobileOpen(false)}
+            >
+              Register
+            </Link>
           </div>
-        ))}
-        <div className="flex gap-4 mt-8">
-          <Link
-            to=""
-            className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
-          >
-            Login
-          </Link>
-          <Link
-            to=""
-            className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
-          >
-            Register
-          </Link>
         </div>
       </div>
-    </div>
+    </>
   )}
 </nav>
 
