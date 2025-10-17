@@ -6,6 +6,11 @@ import DropdownMenu from "./DropdownMenu.jsx";
 const menuGroups = [
   {
     title: "About",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
     items: [
       { 
         label: "About MediLink", 
@@ -48,6 +53,11 @@ const menuGroups = [
   },
   {
     title: "Services",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0v2M8 6v2m0 0v12a2 2 0 002 2h4a2 2 0 002-2V8M8 8v12" />
+      </svg>
+    ),
     items: [
       { 
         label: "Patient Services", 
@@ -90,6 +100,11 @@ const menuGroups = [
   },
   {
     title: "Solutions",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    ),
     items: [
       { 
         label: "For Patients", 
@@ -122,6 +137,11 @@ const menuGroups = [
   },
   {
     title: "Resources",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
     items: [
       { 
         label: "Blog / Health Updates", 
@@ -191,6 +211,11 @@ const menuGroups = [
   },
   {
     title: "Partners",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    ),
     items: [
       { 
         label: "Our Partners", 
@@ -223,6 +248,11 @@ const menuGroups = [
   },
   {
     title: "Engage",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+    ),
     items: [
       { 
         label: "Contact Us", 
@@ -318,47 +348,77 @@ const Navbar = () => {
 
   {/* Mobile Menu */}
   {mobileOpen && (
-    <div className="fixed inset-0 text-black bg-blue-50 z-50 flex flex-col">
-      <div className="flex justify-between items-center px-6 py-4 border-b border-blue-200">
-        <Link to="/" className="text-2xl font-bold text-blue-900" aria-label="Go to homepage">MediLink</Link>
-        <button onClick={() => setMobileOpen(false)} aria-label="Close menu">
-          <svg
-            className="w-7 h-7 text-blue-900"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+    <>
+      {/* Backdrop - blocks content behind */}
+      <div 
+        className="fixed inset-0 z-40 md:hidden"
+        onClick={() => setMobileOpen(false)}
+      />
+      
+      {/* Sidebar Menu */}
+      <div className="fixed top-0 right-0 h-full w-[65%] max-w-xs text-black bg-blue-50 z-50 flex flex-col shadow-2xl animate-slide-in">
+        {/* Header with Menu title and close button */}
+        <div className="flex justify-between items-center px-4 sm:px-6 py-4 border-b border-blue-200 bg-blue-900">
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Menu</h2>
+          <button 
+            onClick={() => setMobileOpen(false)} 
+            aria-label="Close menu"
+            className="p-1 hover:bg-blue-800 rounded-lg transition-colors"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8">
-        {menuGroups.map((group) => (
-          <div key={group.title} className="mb-6">
-            <DropdownMenu
-              title={group.title}
-              items={group.items}
-              mobileOpen={mobileOpen}
-              setMobileOpen={setMobileOpen}
-            />
+            <svg
+              className="w-6 h-6 sm:w-7 sm:h-7 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-2">
+          {/* Home Link - First item, clearly visible */}
+          <Link
+            to="/"
+            className="flex items-center gap-3 w-full text-left text-blue-900 font-semibold px-3 py-2.5 rounded-lg hover:bg-blue-100 transition-colors"
+            onClick={() => setMobileOpen(false)}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>Home</span>
+          </Link>
+
+          {/* Menu Groups */}
+          {menuGroups.map((group) => (
+            <div key={group.title}>
+              <DropdownMenu
+                title={group.title}
+                items={group.items}
+                mobileOpen={mobileOpen}
+                setMobileOpen={setMobileOpen}
+                icon={group.icon}
+              />
+            </div>
+          ))}
+          <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-blue-200">
+            <Link
+              to=""
+              className="w-full text-center text-blue-900 text-sm font-semibold py-2.5 rounded-lg border-2 border-blue-300 hover:bg-blue-100 transition duration-200"
+              onClick={() => setMobileOpen(false)}
+            >
+              Login
+            </Link>
+            <Link
+              to=""
+              className="w-full text-center text-white bg-blue-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-blue-700 transition duration-200"
+              onClick={() => setMobileOpen(false)}
+            >
+              Register
+            </Link>
           </div>
-        ))}
-        <div className="flex gap-4 mt-8">
-          <Link
-            to=""
-            className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
-          >
-            Login
-          </Link>
-          <Link
-            to=""
-            className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
-          >
-            Register
-          </Link>
         </div>
       </div>
-    </div>
+    </>
   )}
 </nav>
 

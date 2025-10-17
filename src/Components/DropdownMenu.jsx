@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const DropdownMenu = ({ title, items, mobileOpen, setMobileOpen }) => {
+const DropdownMenu = ({ title, items, mobileOpen, setMobileOpen, icon }) => {
   const [open, setOpen] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
   const location = useLocation();
@@ -77,14 +76,14 @@ const DropdownMenu = ({ title, items, mobileOpen, setMobileOpen }) => {
   // Render dropdown menu
   return (
     <div 
-      className="relative dropdown-group"
+      className={`${mobileOpen !== undefined ? "" : "relative"} dropdown-group`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <button
-        className={`flex items-center gap-2 font-semibold px-3 py-2 rounded focus:outline-none transition-colors duration-200 ${
+        className={`flex items-center justify-between w-full font-semibold px-3 py-2 rounded focus:outline-none transition-colors duration-200 ${
           mobileOpen !== undefined 
-            ? "text-blue-900 hover:text-blue-600" // Mobile styling
+            ? "text-blue-900 hover:bg-blue-100" // Mobile styling - full width
             : "text-white hover:text-yellow-300"   // Desktop styling
         }`}
         aria-haspopup="true"
@@ -92,12 +91,32 @@ const DropdownMenu = ({ title, items, mobileOpen, setMobileOpen }) => {
         onClick={handleClick}
         type="button"
       >
-        {title}
-        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        <span className="flex items-center gap-2">
+          {/* Show icon only on mobile if provided */}
+          {mobileOpen !== undefined && icon && (
+            <span className="text-blue-700 flex-shrink-0">
+              {icon}
+            </span>
+          )}
+          {title}
+        </span>
+        <svg 
+          className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`} 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
       {/* Dropdown List */}
       <ul
-        className={`absolute left-0 mt-1 w-56 bg-white text-blue-900 rounded shadow-lg z-50 transition-all duration-200 ${open ? "block" : "hidden"}`}
+        className={`
+          ${mobileOpen !== undefined 
+            ? `mt-2 space-y-1 pl-4 transition-all duration-200 ${open ? "block" : "hidden"}` // Mobile: inline, indented
+            : `absolute left-0 mt-1 w-56 bg-white text-blue-900 rounded shadow-lg z-50 transition-all duration-200 ${open ? "block" : "hidden"}` // Desktop: absolute
+          }
+        `}
         role="menu"
         onMouseEnter={handleDropdownMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -106,14 +125,20 @@ const DropdownMenu = ({ title, items, mobileOpen, setMobileOpen }) => {
           <li key={item.to}>
             <Link
               to={item.to}
-              className={` px-4 py-2 hover:bg-blue-100 rounded transition-colors flex items-center gap-3 ${location.pathname === item.to ? "bg-blue-50 font-bold text-blue-700" : ""}`}
+              className={`
+                flex items-center px-3 py-2 rounded transition-colors
+                ${mobileOpen !== undefined 
+                  ? `text-sm text-blue-800 hover:text-blue-600 hover:bg-blue-100 gap-2 ${location.pathname === item.to ? "bg-blue-100 font-semibold text-blue-900" : ""}` // Mobile: inline styling
+                  : `px-4 gap-3 hover:bg-blue-100 ${location.pathname === item.to ? "bg-blue-50 font-bold text-blue-700" : ""}` // Desktop: card styling
+                }
+              `}
               role="menuitem"
               onClick={() => {
                 setOpen(false);
                 setMobileOpen && setMobileOpen(false);
               }}
             >
-              {item.icon && <span className="text-blue-700 flex-shrink-0">{item.icon}</span>}
+              {item.icon && <span className={`${mobileOpen !== undefined ? "text-blue-600 text-base" : "text-blue-700"} flex-shrink-0`}>{item.icon}</span>}
               {item.label}
             </Link>
           </li>
