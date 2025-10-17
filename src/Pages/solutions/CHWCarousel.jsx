@@ -73,19 +73,19 @@ const CHWCarousel = () => {
   const next = () => setTestimonialIndex(i => (i + visibleCount) % testimonials.length);
 
   return (
-    <div className="flex flex-col items-center mt-10 w-full">
-      <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-8 text-center w-full font-serif">What CHWs Say About MediLink</h2>
-      <div className="relative flex flex-row gap-8 w-full justify-center items-center">
+    <div className="flex flex-col items-center mt-6 sm:mt-8 md:mt-10 w-full px-2 sm:px-4">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 mb-6 sm:mb-7 md:mb-8 text-center w-full font-serif leading-tight">What CHWs Say About MediLink</h2>
+      <div className="relative flex flex-row gap-4 sm:gap-6 md:gap-8 w-full justify-center items-center px-8 sm:px-10 md:px-0">
         <button
           aria-label="Previous testimonials"
           onClick={prev}
-          className="absolute left-0 z-10 w-12 h-12 rounded-full border-2 border-blue-300 bg-white text-blue-700 text-3xl flex items-center justify-center shadow hover:bg-blue-50"
+          className="absolute -left-2 sm:-left-3 md:left-0 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-blue-300 bg-white text-blue-700 text-2xl sm:text-3xl flex items-center justify-center shadow hover:bg-blue-50 flex-shrink-0"
           style={{ top: '50%', transform: 'translateY(-50%)' }}
         >
           &#60;
         </button>
         {visible.map((t, idx) => (
-          <div key={idx} className="w-full max-w-lg mx-4">
+          <div key={idx} className="w-full max-w-lg mx-2 sm:mx-3 md:mx-4">
                 <SolutionTestimonial 
                   {...t} 
                   quoteClassName="italic mb-2 text-sm md:text-lg lg:text-xl" 
@@ -95,7 +95,7 @@ const CHWCarousel = () => {
         <button
           aria-label="Next testimonials"
           onClick={next}
-          className="absolute right-0 z-10 w-12 h-12 rounded-full border-2 border-blue-300 bg-white text-blue-700 text-3xl flex items-center justify-center shadow hover:bg-blue-50"
+          className="absolute -right-2 sm:-right-3 md:right-0 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-blue-300 bg-white text-blue-700 text-2xl sm:text-3xl flex items-center justify-center shadow hover:bg-blue-50 flex-shrink-0"
           style={{ top: '50%', transform: 'translateY(-50%)' }}
         >
           &#62;
