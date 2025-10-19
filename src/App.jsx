@@ -49,11 +49,12 @@ import Demo from "./Pages/services/Demo.jsx";
 function AppLayout() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const isClientRoute = location.pathname.startsWith("/client");
 
   return (
     <>
-      {/* Render the normal site navbar only on non-admin routes. AdminLayout renders its own AdminNavbar. */}
-      {!isAdminRoute && <Navbar />}
+      {/* Render the normal site navbar only on non-admin and non-client routes */}
+      {!isAdminRoute && !isClientRoute && <Navbar />}
 
       <Routes>
         {/* Public routes */}
@@ -104,14 +105,14 @@ function AppLayout() {
           path="/client/*"
           element={
             <PrivateRoute role={["chw", "patient"]}>
-              <Routes>
-                {clientRoutes[0].children.map((route) => (
-                  <Route key={route.path} path={route.path} element={route.element} />
-                ))}
-              </Routes>
+              {clientRoutes[0].element}
             </PrivateRoute>
           }
-        />
+        >
+          {clientRoutes[0].children.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
 
         {/* Admin portal (protected) */}
         <Route
@@ -128,7 +129,7 @@ function AppLayout() {
         </Route>
       </Routes>
 
-      {!isAdminRoute && (
+      {!isAdminRoute && !isClientRoute && (
         <>
           <LiveChatButton />
           <Footer />
