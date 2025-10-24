@@ -1,5 +1,7 @@
 import CHWLayout from '../Layouts/CHWLayout';
 import CHWDashboard from '../Pages/Client/CHW/CHWDashboard';
+import MyPatients from '../Pages/Client/CHW/MyPatients';
+import HomeVisits from '../Pages/Client/CHW/HomeVisits';
 import Profile from '../Pages/Client/Profile';
 import Settings from '../Pages/Client/Settings';
 
@@ -9,9 +11,9 @@ export const chwRoutes = [
     element: <CHWLayout />,
     children: [
       { path: 'dashboard', element: <CHWDashboard /> },
-      { path: 'patients', element: <div><h1>My Patients</h1><p>List of patients assigned to this CHW.</p></div> },
+      { path: 'patients', element: <MyPatients /> },
+      { path: 'home-visits', element: <HomeVisits /> },
       { path: 'appointments', element: <div><h1>CHW Appointments</h1><p>Scheduled appointments and visits.</p></div> },
-      { path: 'home-visits', element: <div><h1>Home Visits</h1><p>Scheduled home visits.</p></div> },
       { path: 'tasks', element: <div><h1>Tasks & Follow-ups</h1><p>Tasks and patient follow-ups.</p></div> },
       { path: 'health-assessments', element: <div><h1>Health Assessments</h1><p>Conduct and view health assessments.</p></div> },
       { path: 'messages', element: <div><h1>Messages</h1><p>Messages from patients and staff.</p></div> },
