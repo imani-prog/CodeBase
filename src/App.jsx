@@ -10,7 +10,8 @@ import Login from "./Pages/Login.jsx";
 import Register from "./Pages/Register.jsx";
 import Unauthorized from "./Pages/Unauthorized.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
-import { clientRoutes } from "./routes/clientRoutes.jsx";
+import { patientRoutes } from "./routes/patientRoutes.jsx";
+import { chwRoutes } from "./routes/chwRoutes.jsx";
 import { adminRoutes } from "./routes/adminRoutes.jsx";
 import Accessibility from "./Pages/Accessibility.jsx";
 import DataProtection from "./Pages/DataProtection.jsx";
@@ -99,20 +100,34 @@ function AppLayout() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
-
-        {/* Client portal (protected) */}
+        {/* Patient portal (protected) */}
         <Route
-          path="/client/*"
+          path="/client/patient/*"
           element={
-            <PrivateRoute role={["chw", "patient"]}>
-              {clientRoutes[0].element}
+            <PrivateRoute role="patient">
+              {patientRoutes[0].element}
             </PrivateRoute>
           }
         >
-          {clientRoutes[0].children.map((route) => (
+          {patientRoutes[0].children.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
+
+        {/* CHW portal (protected) */}
+        <Route
+          path="/client/chw/*"
+          element={
+            <PrivateRoute role="chw">
+              {chwRoutes[0].element}
+            </PrivateRoute>
+          }
+        >
+          {chwRoutes[0].children.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
+    
 
         {/* Admin portal (protected) */}
         <Route
