@@ -1,6 +1,6 @@
 
 import AdminLayout from '../Layouts/AdminLayout';
-import AdminDashboard from '../Pages/Admin/AdminDashboard';
+import AdminDashboard from '../Pages/Admin/AdminDashboard_Optimized';
 import AdminProfile from '../Pages/Admin/AdminProfile';
 import ActivePatients from '../Pages/Admin/ActivePatients';
 import ActiveCHW from '../Pages/Admin/ActiveCHW';
