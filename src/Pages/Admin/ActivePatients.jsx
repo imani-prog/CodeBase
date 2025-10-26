@@ -1,8 +1,8 @@
 
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PatientDetailsModal from '../../Components/Admin/PatientDetailsModal';
 import EditPatientModal from '../../Components/Admin/EditPatientModal';
-import AddPatientModal from '../../Components/Admin/AddPatientModal';
 
 const dummyPatients = [
   { 
@@ -73,6 +73,7 @@ const dummyPatients = [
 ];
 
 const ActivePatients = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -80,7 +81,6 @@ const ActivePatients = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [patients, setPatients] = useState(dummyPatients);
@@ -147,7 +147,7 @@ const ActivePatients = () => {
 
   // Button handlers
   const handleAddPatient = () => {
-    setShowAddModal(true);
+    navigate('/admin/add-patient');
   };
 
   const handleExport = () => {
@@ -536,12 +536,6 @@ const ActivePatients = () => {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSave={handleSavePatient}
-      />
-      
-      <AddPatientModal 
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSave={handleAddNewPatient}
       />
     </div>
   );

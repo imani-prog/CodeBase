@@ -1,8 +1,8 @@
 
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CHWDetailsModal from '../../Components/Admin/CHWDetailsModal';
 import EditCHWModal from '../../Components/Admin/EditCHWModal';
-import AddCHWModal from '../../Components/Admin/AddCHWModal';
 
 const dummyCHWs = [
   { 
@@ -98,6 +98,7 @@ const dummyCHWs = [
 ];
 
 const ActiveCHW = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -106,7 +107,6 @@ const ActiveCHW = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [selectedCHW, setSelectedCHW] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [chws, setCHWs] = useState(dummyCHWs);
@@ -167,7 +167,7 @@ const ActiveCHW = () => {
 
   // Button handlers
   const handleAddCHW = () => {
-    setShowAddModal(true);
+    navigate('/admin/add-chw');
   };
 
   const handleExport = () => {
@@ -582,12 +582,6 @@ const ActiveCHW = () => {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSave={handleSaveCHW}
-      />
-      
-      <AddCHWModal 
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSave={handleAddNewCHW}
       />
     </div>
   );
