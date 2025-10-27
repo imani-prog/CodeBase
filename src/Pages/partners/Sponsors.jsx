@@ -1,5 +1,4 @@
 
-
 // Import profile images
 import SarahChenImg from "../../assets/Susan Mwangi.jpeg";
 import MichaelRobertsImg from "../../assets/Kevin Murage.jpeg";

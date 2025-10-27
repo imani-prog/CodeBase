@@ -28,7 +28,7 @@ const RecentActivity = () => {
 
   return (
     <div className="lg:col-span-2">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-white shadow-sm border border-gray-100">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
@@ -61,7 +61,7 @@ const RecentActivity = () => {
             {recentActivities.map((activity) => (
               <div 
                 key={activity.id} 
-                className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between p-4 border border-gray-100  hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center space-x-4">
                   {getStatusIcon(activity.status)}
