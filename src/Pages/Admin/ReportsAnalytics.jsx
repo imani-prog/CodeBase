@@ -55,8 +55,6 @@ import {
   Wifi,
   Signal
 } from 'lucide-react';
-import AdminNavbar from '../../Components/AdminNavbar';
-import AdminSidebar from '../../Components/AdminSidebar';
 
 const ReportsAnalytics = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -222,7 +220,7 @@ const ReportsAnalytics = () => {
     { id: 'geographic', label: 'Geographic Analysis', icon: MapPin },
     { id: 'performance', label: 'Performance KPIs', icon: Target },
     { id: 'forecasting', label: 'Forecasting', icon: TrendingUp },
-    { id: 'custom', label: 'Custom Reports', icon: FileText }``
+    { id: 'custom', label: 'Custom Reports', icon: FileText }
   ];
 
   const formatCurrency = (amount) => {
@@ -893,11 +891,11 @@ const ReportsAnalytics = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminNavbar />
-      <div className="flex">
-        <AdminSidebar />
-        <main className="flex-1 ml-64 p-8">
-          <div className="max-w-7xl mx-auto">
+     
+      <div className="">
+        
+        <main className="">
+          <div className="">
             {/* Header */}
             <div className="mb-8">
               <div className="flex items-center justify-between">

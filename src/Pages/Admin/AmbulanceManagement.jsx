@@ -52,8 +52,6 @@ import {
   Siren,
   Stethoscope
 } from 'lucide-react';
-import AdminNavbar from '../../Components/AdminNavbar';
-import AdminSidebar from '../../Components/AdminSidebar';
 
 const AmbulanceManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -553,26 +551,21 @@ const AmbulanceManagement = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="flex-1 pl-64">
-        <AdminNavbar />
-        
-        <div className="p-6 mt-16">
-          {/* Header Section */}
-          <div className="mb-8">
-            <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-4xl font-bold mb-2">Ambulance Management</h1>
-                  <p className="text-blue-200 text-lg">
-                    Manage ambulance fleet, drivers, dispatch operations, and emergency response
-                  </p>
-                  <div className="mt-4 flex items-center space-x-6">
-                    <div className="flex items-center">
-                      <Truck className="w-5 h-5 mr-2 text-blue-300" />
-                      <span className="text-blue-200">
-                        {ambulances.length} Fleet Vehicles
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Ambulance Management</h1>
+              <p className="text-blue-200 text-lg">
+                Manage ambulance fleet, drivers, dispatch operations, and emergency response
+              </p>
+              <div className="mt-4 flex items-center space-x-6">
+                <div className="flex items-center">
+                  <Truck className="w-5 h-5 mr-2 text-blue-300" />
+                  <span className="text-blue-200">
+                    {ambulances.length} Fleet Vehicles
                       </span>
                     </div>
                     <div className="flex items-center">
@@ -581,6 +574,7 @@ const AmbulanceManagement = () => {
                         {drivers.filter(d => d.status === 'on_duty').length} Drivers On Duty
                       </span>
                     </div>
+                    
                     <div className="flex items-center">
                       <Activity className="w-5 h-5 mr-2 text-yellow-300" />
                       <span className="text-blue-200">
@@ -1394,8 +1388,6 @@ const AmbulanceManagement = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
       {/* Dispatch Modal */}
       {showDispatchModal && (

@@ -29,8 +29,8 @@ import {
   Upload,
   Download
 } from 'lucide-react';
-import AdminNavbar from '../../Components/AdminNavbar';
-import AdminSidebar from '../../Components/AdminSidebar';
+// import AdminNavbar from '../../Components/AdminNavbar';
+// import AdminSidebar from '../../Components/AdminSidebar';
 
 const SystemSettings = () => {
   const [activeTab, setActiveTab] = useState('general');
@@ -153,7 +153,7 @@ const SystemSettings = () => {
   };
 
   const renderGeneralSettings = () => (
-    <div className="space-y-6">
+    <div className="mb-8">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">System Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -797,12 +797,9 @@ const SystemSettings = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="flex-1 pl-64">
-        <AdminNavbar />
+    <div className="min-h-screen bg-gray-50">
+      <div className="">
         
-        <div className="p-6 mt-16">
           {/* Header Section */}
           <div className="mb-8">
             <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
@@ -917,7 +914,6 @@ const SystemSettings = () => {
               </div>
             </div>
           )}
-        </div>
       </div>
     </div>
   );

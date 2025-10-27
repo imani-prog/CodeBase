@@ -949,12 +949,9 @@ const TelemedicineManagement = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="flex-1 pl-64">
-        <AdminNavbar />
-        
-        <div className="p-6 mt-16">
+    <div className="min-h-screen bg-gray-50">
+      <div className="">
+        <div className="">
           {/* Header Section */}
           <div className="mb-8">
             <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">

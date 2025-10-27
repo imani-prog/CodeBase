@@ -26,8 +26,6 @@ import {
   Activity,
   Star
 } from 'lucide-react';
-import AdminNavbar from '../../Components/AdminNavbar';
-import AdminSidebar from '../../Components/AdminSidebar';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -250,24 +248,19 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="flex-1 pl-64">
-        <AdminNavbar />
-        
-        <div className="p-6 mt-16">
-          {/* Header Section */}
-          <div className="mb-8">
-            <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-4xl font-bold mb-2">User Management</h1>
-                  <p className="text-blue-200 text-lg">
-                    Manage user accounts, roles, permissions, and access control across MediLink
-                  </p>
-                  <div className="mt-4 flex items-center space-x-6">
-                    <div className="flex items-center">
-                      <Users className="w-5 h-5 mr-2 text-blue-300" />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">User Management</h1>
+              <p className="text-blue-200 text-lg">
+                Manage user accounts, roles, permissions, and access control across MediLink
+              </p>
+              <div className="mt-4 flex items-center space-x-6">
+                <div className="flex items-center">
+                  <Users className="w-5 h-5 mr-2 text-blue-300" />
                       <span className="text-blue-200">
                         {filteredUsers.length} Total Users
                       </span>
@@ -595,8 +588,6 @@ const UserManagement = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
     </div>
   );
 };

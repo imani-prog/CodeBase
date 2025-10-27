@@ -9,8 +9,8 @@ import {
 const AdminProfile = () => {
   const [activeTab, setActiveTab] = useState("personal");
   const [profile, setProfile] = useState({
-    name: "Dr. Sarah Mitchell",
-    email: "sarah.mitchell@medilink.com",
+    name: "Dr. Timothy Imani",
+    email: "timothy.imani@medilink.com",
     phone: "+254 700 123456",
     role: "Chief Administrator",
     department: "Healthcare Operations",
@@ -461,8 +461,8 @@ const AdminProfile = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">

@@ -39,8 +39,6 @@ import {
   Star,
   Zap
 } from 'lucide-react';
-import AdminNavbar from '../../Components/AdminNavbar';
-import AdminSidebar from '../../Components/AdminSidebar';
 
 const InsuranceManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -1081,11 +1079,9 @@ const InsuranceManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminNavbar />
-      <div className="flex">
-        <AdminSidebar />
-        <main className="flex-1 ml-64 p-8">
-          <div className="max-w-7xl mx-auto">
+      <div className="">
+        <main className="">
+          <div className="">
             {/* Header */}
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Insurance Management</h1>
