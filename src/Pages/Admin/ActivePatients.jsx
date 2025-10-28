@@ -227,7 +227,7 @@ const ActivePatients = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
 
-          <div className="bg-white p-2 shadow-sm border border-gray-100">
+          <div className="p-2 shadow-sm border border-gray-100">
             <div className="flex items-center">
               <div className="p-2">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -241,10 +241,10 @@ const ActivePatients = () => {
             </div>
           </div>
 
-          <div className="bg-white p-2 shadow-sm border border-gray-100">
+          <div className="p-2 shadow-sm border border-gray-100">
             <div className="flex items-center">
               <div className="p-2">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
@@ -256,10 +256,10 @@ const ActivePatients = () => {
           </div>
 
 
-          <div className="bg-white p-4 shadow-sm border border-gray-100">
+          <div className="p-4 shadow-sm border border-gray-100">
             <div className="flex items-center">
               <div className="p-2">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
@@ -270,10 +270,10 @@ const ActivePatients = () => {
             </div>
           </div>
           
-          <div className="bg-white p-4 shadow-sm border border-gray-100">
+          <div className="p-4 shadow-sm border border-gray-100">
             <div className="flex items-center">
               <div className="p-2">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -286,7 +286,7 @@ const ActivePatients = () => {
         </div>
 
         {/* Search and Filter Controls */}
-        <div className="bg-white shadow-sm border border-gray-100 p-4 mb-6">
+        <div className="p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="flex-1">
               <div className="relative">
@@ -298,7 +298,7 @@ const ActivePatients = () => {
                   placeholder="Search patients by name, email, or condition..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300  focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="pl-10 pr-4 py-2 w-full border rounded-lg border-gray-300  focus:ring-1 focus:border"
                 />
               </div>
             </div>
@@ -306,14 +306,14 @@ const ActivePatients = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="critical">Critical</option>
                 <option value="recovering">Recovering</option>
               </select>
-              <button className="px-4 py-2 text-gray-600 border border-gray-300 hover:bg-gray-50 transition-colors">
+              <button className="px-4 rounded-lg py-2 text-gray-600 border border-gray-300 hover:bg-gray-50 transition-colors">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
@@ -436,72 +436,6 @@ const ActivePatients = () => {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
-                  <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredAndSortedPatients.length)}</span> of{' '}
-                  <span className="font-medium">{filteredAndSortedPatients.length}</span> results
-                </p>
-              </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                  <button
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        page === currentPage
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Empty State */}

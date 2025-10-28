@@ -158,9 +158,9 @@ const ActiveCHW = () => {
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      Active: 'bg-green-100 text-green-800 border-green-200',
-      'On Leave': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      Inactive: 'bg-red-100 text-red-800 border-red-200',
+      Active: 'text-green-800 border-green-200',
+      'On Leave': 'text-yellow-800 border-yellow-200',
+      Inactive: 'text-red-800 border-red-200',
     };
     return statusStyles[status] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
@@ -228,7 +228,7 @@ const ActiveCHW = () => {
           <div className="flex space-x-3">
             <button 
               onClick={handleAddCHW}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -237,7 +237,7 @@ const ActiveCHW = () => {
             </button>
             <button 
               onClick={handleExport}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -249,10 +249,10 @@ const ActiveCHW = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="p-4 shadow-sm border border-gray-200">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-2">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
@@ -262,9 +262,9 @@ const ActiveCHW = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="p-4 shadow-sm border border-gray-200">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -275,10 +275,10 @@ const ActiveCHW = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="p-4 shadow-sm border border-gray-200">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-2">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
@@ -288,10 +288,10 @@ const ActiveCHW = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="p-4 shadow-sm border border-gray-200">
             <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-2">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -304,7 +304,7 @@ const ActiveCHW = () => {
         </div>
 
         {/* Search and Filter Controls */}
-        <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
+        <div className="p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="flex-1">
               <div className="relative">
@@ -316,7 +316,7 @@ const ActiveCHW = () => {
                   placeholder="Search CHWs by name, email, region, or specialization..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-1"
                 />
               </div>
             </div>
@@ -324,17 +324,17 @@ const ActiveCHW = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Status</option>
-                <option value="active">Active</option>
+                <option value="active">Active</option>rounded-lg
                 <option value="on leave">On Leave</option>
                 <option value="inactive">Inactive</option>
               </select>
               <select
                 value={regionFilter}
                 onChange={(e) => setRegionFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Regions</option>
                 {uniqueRegions.map(region => (
@@ -352,12 +352,12 @@ const ActiveCHW = () => {
       </div>
 
       {/* CHWs Table */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+      <div className="bg-white shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('name')}>
                   <div className="flex items-center space-x-1">
                     <span>CHW Details</span>
@@ -368,8 +368,8 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Contact</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('region')}>
                   <div className="flex items-center space-x-1">
                     <span>Region</span>
@@ -380,7 +380,7 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('patients')}>
                   <div className="flex items-center space-x-1">
                     <span>Patients</span>
@@ -391,7 +391,7 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('status')}>
                   <div className="flex items-center space-x-1">
                     <span>Status</span>
@@ -402,7 +402,7 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -411,8 +411,8 @@ const ActiveCHW = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-green-800">{chw.avatar}</span>
+                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                          <span className="text-sm font-medium text-blue-800">{chw.avatar}</span>
                         </div>
                       </div>
                       <div className="ml-4">
@@ -477,72 +477,6 @@ const ActiveCHW = () => {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
-                  <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredAndSortedCHWs.length)}</span> of{' '}
-                  <span className="font-medium">{filteredAndSortedCHWs.length}</span> results
-                </p>
-              </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                  <button
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        page === currentPage
-                          ? 'z-10 bg-green-50 border-green-500 text-green-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Empty State */}
