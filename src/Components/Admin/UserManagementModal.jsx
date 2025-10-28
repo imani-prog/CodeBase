@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, UserPlus, Shield, Key, Search } from 'lucide-react';
 
 const UserManagementModal = ({ isOpen, onClose, action }) => {
@@ -6,6 +6,19 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
     name: '', email: '', role: 'user', password: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -142,8 +155,14 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+    <div 
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white shadow-xl max-w-md w-full my-8"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900">{titles[action]}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">

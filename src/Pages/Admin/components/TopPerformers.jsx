@@ -22,7 +22,7 @@ const TopPerformers = () => {
               className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 flex items-center justify-center">
                   <span className="text-sm font-medium text-indigo-700">#{index + 1}</span>
                 </div>
                 <div>

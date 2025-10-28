@@ -1,9 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, TrendingUp, Download, Calendar } from 'lucide-react';
 
 const AnalyticsModal = ({ isOpen, onClose, action }) => {
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [reportType, setReportType] = useState('users');
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -19,24 +32,24 @@ const AnalyticsModal = ({ isOpen, onClose, action }) => {
         return (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="p-4">
                 <p className="text-sm text-gray-600">Active Users</p>
-                <p className="text-2xl font-bold text-blue-600">1,234</p>
+                <p className="text-2xl font-bold text-black ">1,234</p>
                 <p className="text-xs text-green-600 mt-1">↑ 12% from yesterday</p>
               </div>
-              <div className="bg-green-50 p-4 rounded-lg">
+              <div className="p-4">
                 <p className="text-sm text-gray-600">Sessions</p>
-                <p className="text-2xl font-bold text-green-600">3,456</p>
+                <p className="text-2xl font-bold text-black">3,456</p>
                 <p className="text-xs text-green-600 mt-1">↑ 8% from yesterday</p>
               </div>
-              <div className="bg-purple-50 p-4 rounded-lg">
+              <div className="p-4">
                 <p className="text-sm text-gray-600">Page Views</p>
-                <p className="text-2xl font-bold text-purple-600">12,345</p>
+                <p className="text-2xl font-bold text-black">12,345</p>
                 <p className="text-xs text-red-600 mt-1">↓ 3% from yesterday</p>
               </div>
-              <div className="bg-yellow-50 p-4 rounded-lg">
+              <div className="p-4">
                 <p className="text-sm text-gray-600">Avg. Duration</p>
-                <p className="text-2xl font-bold text-yellow-600">5:23</p>
+                <p className="text-2xl font-bold text-black">5:23</p>
                 <p className="text-xs text-green-600 mt-1">↑ 15% from yesterday</p>
               </div>
             </div>
@@ -82,7 +95,7 @@ const AnalyticsModal = ({ isOpen, onClose, action }) => {
             <div className="flex gap-3">
               <button
                 onClick={() => handleExport('pdf')}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Export PDF
               </button>
@@ -105,15 +118,15 @@ const AnalyticsModal = ({ isOpen, onClose, action }) => {
               <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm">90 Days</button>
             </div>
             <div className="space-y-3">
-              <div className="border-l-4 border-blue-500 pl-4 py-2">
+              <div className="border-l-4 pl-4 py-2">
                 <p className="text-sm font-medium text-gray-900">User Growth</p>
                 <p className="text-xs text-gray-600">+234 new users this week</p>
               </div>
-              <div className="border-l-4 border-green-500 pl-4 py-2">
+              <div className="border-l-4 pl-4 py-2">
                 <p className="text-sm font-medium text-gray-900">Engagement Rate</p>
                 <p className="text-xs text-gray-600">78% average engagement</p>
               </div>
-              <div className="border-l-4 border-purple-500 pl-4 py-2">
+              <div className="border-l-4 pl-4 py-2">
                 <p className="text-sm font-medium text-gray-900">Peak Hours</p>
                 <p className="text-xs text-gray-600">2PM - 5PM daily</p>
               </div>
@@ -133,8 +146,14 @@ const AnalyticsModal = ({ isOpen, onClose, action }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full">
+    <div 
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white shadow-xl max-w-2xl w-full my-8"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900">{titles[action]}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">

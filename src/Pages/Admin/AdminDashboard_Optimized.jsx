@@ -25,7 +25,7 @@ const AdminDashboard = () => {
         <ActivityChart />
       </div>
 
-      {/* Data Tables Section */}k
+      {/* Data Tables Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <TopPerformers />
         <RecentRegistrations />

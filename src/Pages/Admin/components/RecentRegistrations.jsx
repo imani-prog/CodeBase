@@ -12,13 +12,13 @@ const RecentRegistrations = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'Active':
-        return 'bg-green-100 text-green-700';
+        return 'text-green-700';
       case 'Pending':
-        return 'bg-yellow-100 text-yellow-700';
+        return 'text-yellow-700';
       case 'Approved':
-        return 'bg-blue-100 text-blue-700';
+        return 'text-blue-700';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'text-gray-700';
     }
   };
 
