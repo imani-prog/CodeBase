@@ -554,38 +554,33 @@ const AmbulanceManagement = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
+        <div className="p-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-2">Ambulance Management</h1>
-              <p className="text-blue-200 text-lg">
+              <p className="text-lg">
                 Manage ambulance fleet, drivers, dispatch operations, and emergency response
               </p>
-              <div className="mt-4 flex items-center space-x-6">
+              <div className="mt-4 flex items-center space-x-6 text-blue-600">
                 <div className="flex items-center">
-                  <Truck className="w-5 h-5 mr-2 text-blue-300" />
-                  <span className="text-blue-200">
+                  <Truck className="w-5 h-5 mr-2" />
+                  <span className="">
                     {ambulances.length} Fleet Vehicles
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Users className="w-5 h-5 mr-2 text-green-300" />
-                      <span className="text-blue-200">
+                      <Users className="w-5 h-5 mr-2" />
+                      <span className="">
                         {drivers.filter(d => d.status === 'on_duty').length} Drivers On Duty
                       </span>
                     </div>
                     
                     <div className="flex items-center">
-                      <Activity className="w-5 h-5 mr-2 text-yellow-300" />
-                      <span className="text-blue-200">
+                      <Activity className="w-5 h-5 mr-2" />
+                      <span className="">
                         {dispatches.filter(d => d.status === 'in_progress').length} Active Dispatches
                       </span>
                     </div>
-                  </div>
-                </div>
-                <div className="hidden md:block">
-                  <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                    <Truck className="w-16 h-16 text-blue-300" />
                   </div>
                 </div>
               </div>
@@ -593,14 +588,14 @@ const AmbulanceManagement = () => {
           </div>
 
           {/* Tabs */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+          <div className="border border-gray-200 mb-6">
             <div className="flex border-b border-gray-200 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('ambulances')}
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'ambulances'
                     ? 'border-blue-500 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Truck className="w-4 h-4 inline mr-2" />
@@ -611,7 +606,7 @@ const AmbulanceManagement = () => {
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'drivers'
                     ? 'border-blue-500 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Users className="w-4 h-4 inline mr-2" />
@@ -621,8 +616,8 @@ const AmbulanceManagement = () => {
                 onClick={() => setActiveTab('dispatch')}
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'dispatch'
-                    ? 'border-red-500 text-red-600 bg-red-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Send className="w-4 h-4 inline mr-2" />
@@ -632,8 +627,8 @@ const AmbulanceManagement = () => {
                 onClick={() => setActiveTab('tracking')}
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'tracking'
-                    ? 'border-green-500 text-green-600 bg-green-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Target className="w-4 h-4 inline mr-2" />
@@ -644,7 +639,7 @@ const AmbulanceManagement = () => {
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'dispatches'
                     ? 'border-blue-500 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Navigation className="w-4 h-4 inline mr-2" />
@@ -713,16 +708,16 @@ const AmbulanceManagement = () => {
           {activeTab === 'ambulances' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredAmbulances.map((ambulance) => (
-                <div key={ambulance.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                <div key={ambulance.id} className="border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                        <h3 className="text-lg font-semibold mb-1">
                           {ambulance.vehicleNumber}
                         </h3>
                         <div className="flex items-center mb-2">
                           {getTypeIcon(ambulance.type)}
-                          <span className="ml-2 text-sm text-gray-600 capitalize">
+                          <span className="ml-2 text-sm capitalize">
                             {ambulance.type.replace('_', ' ')}
                           </span>
                         </div>
