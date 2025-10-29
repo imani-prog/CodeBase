@@ -6,17 +6,33 @@ import EditCHWModal from '../../Components/Admin/EditCHWModal';
 
 const dummyCHWs = [
   { 
-    id: 1, 
-    name: 'Grace Achieng', 
-    email: 'grace@chw.com', 
-    phone: '+254-712-345-678',
+    id: 1,
+    code: 'CHW-001',
+    firstName: 'Grace',
+    middleName: 'Akinyi',
+    lastName: 'Achieng',
+    name: 'Grace Akinyi Achieng',
+    email: 'grace.achieng@medilink.com', 
+    phone: '+254712345678',
+    addressLine1: 'Kimathi Street, Building 12',
+    addressLine2: 'Floor 3, Suite 5A',
+    city: 'Nairobi',
+    state: 'Nairobi County',
+    postalCode: '00100',
+    country: 'Kenya',
+    latitude: -1.286389,
+    longitude: 36.817223,
+    hospitalId: 'HOSP-001',
+    hospitalName: 'Kenyatta National Hospital',
+    status: 'AVAILABLE',
+    specialization: 'Maternal Health',
+    createdAt: '2023-01-15T08:00:00+03:00',
+    updatedAt: '2025-10-28T14:30:00+03:00',
     region: 'Nairobi', 
     patients: 32, 
-    status: 'Active',
     avatar: 'GA',
     startDate: '2023-01-15',
     lastActivity: '2025-09-23',
-    specialization: 'Maternal Health',
     monthlyVisits: 48,
     successRate: 96,
     responseTime: '1.8hrs',
@@ -24,17 +40,33 @@ const dummyCHWs = [
     lastStatusUpdate: '2025-09-24'
   },
   { 
-    id: 2, 
-    name: 'Peter Njoroge', 
-    email: 'peter@chw.com', 
-    phone: '+254-723-456-789',
+    id: 2,
+    code: 'CHW-002',
+    firstName: 'Peter',
+    middleName: 'Kamau',
+    lastName: 'Njoroge',
+    name: 'Peter Kamau Njoroge', 
+    email: 'peter.njoroge@medilink.com', 
+    phone: '+254723456789',
+    addressLine1: 'Moi Avenue, Plot 45',
+    addressLine2: null,
+    city: 'Mombasa',
+    state: 'Mombasa County',
+    postalCode: '80100',
+    country: 'Kenya',
+    latitude: -4.043477,
+    longitude: 39.668206,
+    hospitalId: 'HOSP-002',
+    hospitalName: 'Mombasa General Hospital',
+    status: 'AVAILABLE',
+    specialization: 'General Health',
+    createdAt: '2023-03-20T10:00:00+03:00',
+    updatedAt: '2025-10-27T16:45:00+03:00',
     region: 'Mombasa', 
     patients: 18, 
-    status: 'Active',
     avatar: 'PN',
     startDate: '2023-03-20',
     lastActivity: '2025-09-22',
-    specialization: 'General Health',
     monthlyVisits: 35,
     successRate: 94,
     responseTime: '2.1hrs',
@@ -42,17 +74,33 @@ const dummyCHWs = [
     lastStatusUpdate: '2025-09-23'
   },
   { 
-    id: 3, 
-    name: 'Lucy Wanjiku', 
-    email: 'lucy@chw.com', 
-    phone: '+254-734-567-890',
+    id: 3,
+    code: 'CHW-003',
+    firstName: 'Lucy',
+    middleName: 'Nyambura',
+    lastName: 'Wanjiku',
+    name: 'Lucy Nyambura Wanjiku', 
+    email: 'lucy.wanjiku@medilink.com', 
+    phone: '+254734567890',
+    addressLine1: 'Oginga Odinga Street',
+    addressLine2: 'Near Kisumu Municipal Market',
+    city: 'Kisumu',
+    state: 'Kisumu County',
+    postalCode: '40100',
+    country: 'Kenya',
+    latitude: -0.091702,
+    longitude: 34.767956,
+    hospitalId: 'HOSP-003',
+    hospitalName: 'Kisumu County Hospital',
+    status: 'AVAILABLE',
+    specialization: 'Child Health',
+    createdAt: '2022-11-10T09:30:00+03:00',
+    updatedAt: '2025-10-28T11:20:00+03:00',
     region: 'Kisumu', 
     patients: 25, 
-    status: 'Active',
     avatar: 'LW',
     startDate: '2022-11-10',
     lastActivity: '2025-09-24',
-    specialization: 'Child Health',
     monthlyVisits: 42,
     successRate: 97,
     responseTime: '1.5hrs',
@@ -60,17 +108,33 @@ const dummyCHWs = [
     lastStatusUpdate: '2025-09-24'
   },
   { 
-    id: 4, 
-    name: 'Joseph Otieno', 
-    email: 'joseph@chw.com', 
-    phone: '+254-745-678-901',
+    id: 4,
+    code: 'CHW-004',
+    firstName: 'Joseph',
+    middleName: 'Omondi',
+    lastName: 'Otieno',
+    name: 'Joseph Omondi Otieno', 
+    email: 'joseph.otieno@medilink.com', 
+    phone: '+254745678901',
+    addressLine1: 'Kenyatta Avenue',
+    addressLine2: 'Opposite Nakuru Post Office',
+    city: 'Nakuru',
+    state: 'Nakuru County',
+    postalCode: '20100',
+    country: 'Kenya',
+    latitude: -0.303099,
+    longitude: 36.080026,
+    hospitalId: 'HOSP-004',
+    hospitalName: 'Nakuru Level 5 Hospital',
+    status: 'OFFLINE', // On leave status
+    specialization: 'Elderly Care',
+    createdAt: '2023-06-05T07:15:00+03:00',
+    updatedAt: '2025-09-20T09:00:00+03:00',
     region: 'Nakuru', 
     patients: 29, 
-    status: 'On Leave',
     avatar: 'JO',
     startDate: '2023-06-05',
     lastActivity: '2025-09-20',
-    specialization: 'Elderly Care',
     monthlyVisits: 0,
     successRate: 92,
     responseTime: 'N/A',
@@ -78,17 +142,33 @@ const dummyCHWs = [
     lastStatusUpdate: '2025-09-20'
   },
   { 
-    id: 5, 
-    name: 'Susan Mwangi', 
-    email: 'susan@chw.com', 
-    phone: '+254-756-789-012',
+    id: 5,
+    code: 'CHW-005',
+    firstName: 'Susan',
+    middleName: 'Wanjiru',
+    lastName: 'Mwangi',
+    name: 'Susan Wanjiru Mwangi', 
+    email: 'susan.mwangi@medilink.com', 
+    phone: '+254756789012',
+    addressLine1: 'Uganda Road',
+    addressLine2: 'Eldoret Medical Plaza, 2nd Floor',
+    city: 'Eldoret',
+    state: 'Uasin Gishu County',
+    postalCode: '30100',
+    country: 'Kenya',
+    latitude: 0.514277,
+    longitude: 35.269779,
+    hospitalId: 'HOSP-005',
+    hospitalName: 'Moi Teaching and Referral Hospital',
+    status: 'BUSY',
+    specialization: 'Mental Health',
+    createdAt: '2022-08-12T11:00:00+03:00',
+    updatedAt: '2025-10-28T15:10:00+03:00',
     region: 'Eldoret', 
     patients: 38, 
-    status: 'Active',
     avatar: 'SM',
     startDate: '2022-08-12',
     lastActivity: '2025-09-24',
-    specialization: 'Mental Health',
     monthlyVisits: 52,
     successRate: 98,
     responseTime: '1.2hrs',
@@ -115,10 +195,14 @@ const ActiveCHW = () => {
   const filteredAndSortedCHWs = useMemo(() => {
     let filtered = chws.filter(chw => {
       const matchesSearch = chw.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           chw.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           chw.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           chw.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            chw.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            chw.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           chw.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            (chw.specialization && chw.specialization.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesStatus = statusFilter === 'all' || chw.status.toLowerCase() === statusFilter.toLowerCase();
+      const matchesStatus = statusFilter === 'all' || chw.status === statusFilter || chw.status.toLowerCase() === statusFilter.toLowerCase();
       const matchesRegion = regionFilter === 'all' || chw.region === regionFilter;
       return matchesSearch && matchesStatus && matchesRegion;
     });
@@ -157,12 +241,29 @@ const ActiveCHW = () => {
   };
 
   const getStatusBadge = (status) => {
-    const statusStyles = {
-      Active: 'text-green-800 border-green-200',
-      'On Leave': 'text-yellow-800 border-yellow-200',
-      Inactive: 'text-red-800 border-red-200',
+    // Map backend enum status to display status and colors
+    const statusMap = {
+      'AVAILABLE': { display: 'Active', color: 'text-green-800 border-green-200' },
+      'BUSY': { display: 'Busy', color: 'text-blue-800 border-blue-200' },
+      'OFFLINE': { display: 'On Leave', color: 'text-yellow-800 border-yellow-200' },
+      // Support legacy frontend status for backward compatibility
+      'Active': { display: 'Active', color: 'text-green-800 border-green-200' },
+      'On Leave': { display: 'On Leave', color: 'text-yellow-800 border-yellow-200' },
+      'Inactive': { display: 'Inactive', color: 'text-red-800 border-red-200' }
     };
-    return statusStyles[status] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return statusMap[status]?.color || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+  
+  const getDisplayStatus = (status) => {
+    const statusMap = {
+      'AVAILABLE': 'Active',
+      'BUSY': 'Busy',
+      'OFFLINE': 'On Leave',
+      'Active': 'Active',
+      'On Leave': 'On Leave',
+      'Inactive': 'Inactive'
+    };
+    return statusMap[status] || status;
   };
 
   // Button handlers
@@ -258,7 +359,7 @@ const ActiveCHW = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Active CHWs</p>
-                <p className="text-2xl font-bold text-gray-900">{chws.filter(c => c.status === 'Active').length}</p>
+                <p className="text-2xl font-bold text-gray-900">{chws.filter(c => c.status === 'AVAILABLE' || c.status === 'Active').length}</p>
               </div>
             </div>
           </div>
@@ -297,7 +398,7 @@ const ActiveCHW = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">On Leave</p>
-                <p className="text-2xl font-bold text-gray-900">{chws.filter(c => c.status === 'On Leave').length}</p>
+                <p className="text-2xl font-bold text-gray-900">{chws.filter(c => c.status === 'OFFLINE' || c.status === 'On Leave').length}</p>
               </div>
             </div>
           </div>
@@ -327,9 +428,9 @@ const ActiveCHW = () => {
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Status</option>
-                <option value="active">Active</option>rounded-lg
-                <option value="on leave">On Leave</option>
-                <option value="inactive">Inactive</option>
+                <option value="AVAILABLE">Active</option>
+                <option value="BUSY">Busy</option>
+                <option value="OFFLINE">On Leave / Offline</option>
               </select>
               <select
                 value={regionFilter}
@@ -357,30 +458,22 @@ const ActiveCHW = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('name')}>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('code')}>
                   <div className="flex items-center space-x-1">
-                    <span>CHW Details</span>
-                    {sortField === 'name' && (
+                    <span>CHW Number</span>
+                    {sortField === 'code' && (
                       <svg className={`w-4 h-4 ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                       </svg>
                     )}
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('region')}>
-                  <div className="flex items-center space-x-1">
-                    <span>Region</span>
-                    {sortField === 'region' && (
-                      <svg className={`w-4 h-4 ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                    )}
-                  </div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">CHW Details</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Contact</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Location</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Hospital</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('patients')}>
                   <div className="flex items-center space-x-1">
                     <span>Patients</span>
@@ -391,7 +484,7 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('status')}>
                   <div className="flex items-center space-x-1">
                     <span>Status</span>
@@ -402,50 +495,50 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedCHWs.map((chw) => (
                 <tr key={chw.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-sm font-bold text-blue-600">{chw.code}</div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-800">{chw.avatar}</span>
-                        </div>
-                      </div>
-                      <div className="ml-4">
+                      
+                      <div className="ml-3">
                         <div className="text-sm font-medium text-gray-900">{chw.name}</div>
-                        <div className="text-sm text-gray-500">CHW-{String(chw.id).padStart(4, '0')}</div>
-                        {chw.specialization && (
-                          <div className="text-sm text-gray-500">{chw.specialization}</div>
-                        )}
+                        <div className="text-xs text-gray-500">{chw.specialization}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{chw.email}</div>
-                    <div className="text-sm text-gray-500">{chw.phone}</div>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-xs text-gray-900">{chw.email}</div>
+                    <div className="text-xs text-gray-500">{chw.phone}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{chw.region}</div>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-xs text-gray-900">{chw.city}, {chw.state}</div>
+                    <div className="text-xs text-gray-500">{chw.region}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{chw.patients}</div>
-                    <div className="text-sm text-gray-500">patients assigned</div>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-xs text-gray-900">{chw.hospitalName}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getStatusBadge(chw.status)}`}>
-                      {chw.status}
+                  <td className="px-4 py-3 whitespace-nowrap text-center">
+                    <div className="text-sm font-semibold text-gray-900">{chw.patients}</div>
+                    <div className="text-xs text-gray-500">assigned</div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(chw.status)}`}>
+                      {getDisplayStatus(chw.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button 
                         onClick={() => handleViewCHW(chw)}
                         className="text-green-600 hover:text-green-900 transition-colors"
-                        title="View CHW Details"
+                        title="View Full Details"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

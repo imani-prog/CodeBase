@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   X, Save, User, Mail, Phone, MapPin, Calendar, Activity,
-  AlertCircle, CheckCircle2, Edit3, Users, Briefcase
+  AlertCircle, CheckCircle2, Edit3, Users, Briefcase, Home, Globe, Building2
 } from "lucide-react";
 
 const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
@@ -11,9 +11,28 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
 
   useEffect(() => {
     if (chw) setFormData({
-      name: chw.name || "", email: chw.email || "", phone: chw.phone || "",
-      region: chw.region || "", patients: chw.patients || "", status: chw.status || "",
-      startDate: chw.startDate || "", specialization: chw.specialization || ""
+      code: chw.code || "",
+      firstName: chw.firstName || "",
+      middleName: chw.middleName || "",
+      lastName: chw.lastName || "",
+      name: chw.name || "",
+      email: chw.email || "",
+      phone: chw.phone || "",
+      addressLine1: chw.addressLine1 || "",
+      addressLine2: chw.addressLine2 || "",
+      city: chw.city || "",
+      state: chw.state || "",
+      postalCode: chw.postalCode || "",
+      country: chw.country || "Kenya",
+      latitude: chw.latitude || "",
+      longitude: chw.longitude || "",
+      hospitalId: chw.hospitalId || "",
+      hospitalName: chw.hospitalName || "",
+      status: chw.status || "AVAILABLE",
+      specialization: chw.specialization || "",
+      region: chw.region || "",
+      patients: chw.patients || "",
+      startDate: chw.startDate || ""
     });
   }, [chw]);
 
@@ -24,9 +43,9 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
   };
 
   const validateForm = () => {
-    const req = ["name", "email", "phone", "region", "status"];
+    const req = ["firstName", "lastName", "email", "phone", "city", "state", "country", "status"];
     const newErr = {};
-    req.forEach(f => !formData[f]?.trim() && (newErr[f] = `${f[0].toUpperCase() + f.slice(1)} is required`));
+    req.forEach(f => !formData[f]?.trim() && (newErr[f] = `${f[0].toUpperCase() + f.slice(1).replace(/([A-Z])/g, ' $1')} is required`));
     setErrors(newErr);
     return !Object.keys(newErr).length;
   };
@@ -105,29 +124,66 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
             {/* Personal Info */}
             <Section title="Personal Information" icon={User}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {renderField({ label: "Full Name", name: "name", icon: User, required: true })}
-                {renderField({ label: "Phone Number", name: "phone", icon: Phone, type: "tel", required: true })}
+                {renderField({ label: "CHW Code", name: "code", icon: User })}
+                {renderField({ label: "First Name", name: "firstName", icon: User, required: true })}
+                {renderField({ label: "Middle Name", name: "middleName", icon: User })}
+                {renderField({ label: "Last Name", name: "lastName", icon: User, required: true })}
+              </div>
+            </Section>
+
+            {/* Contact Info */}
+            <Section title="Contact Information" icon={Phone}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {renderField({ label: "Email Address", name: "email", icon: Mail, type: "email", required: true })}
-                {renderField({
-                  label: "Assigned Region", name: "region", icon: MapPin, required: true,
-                  options: ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika", "Machakos"]
-                })}
-                {renderField({ label: "Start Date", name: "startDate", icon: Calendar, type: "date" })}
+                {renderField({ label: "Phone Number", name: "phone", icon: Phone, type: "tel", required: true })}
+              </div>
+            </Section>
+
+            {/* Address */}
+            <Section title="Address" icon={Home}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderField({ label: "Address Line 1", name: "addressLine1", icon: Home })}
+                {renderField({ label: "Address Line 2", name: "addressLine2", icon: Home })}
+                {renderField({ label: "City", name: "city", icon: MapPin, required: true })}
+                {renderField({ label: "State/County", name: "state", icon: MapPin, required: true })}
+                {renderField({ label: "Postal Code", name: "postalCode" })}
+                {renderField({ label: "Country", name: "country", required: true })}
+              </div>
+            </Section>
+
+            {/* Geolocation */}
+            <Section title="Geolocation (GPS Coordinates)" icon={Globe}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderField({ label: "Latitude", name: "latitude", icon: Globe, type: "number" })}
+                {renderField({ label: "Longitude", name: "longitude", icon: Globe, type: "number" })}
+              </div>
+            </Section>
+
+            {/* Hospital Affiliation */}
+            <Section title="Hospital Affiliation" icon={Building2}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderField({ label: "Hospital ID", name: "hospitalId", icon: Building2 })}
+                {renderField({ label: "Hospital Name", name: "hospitalName", icon: Building2 })}
               </div>
             </Section>
 
             {/* Work Info */}
             <Section title="Work Information" icon={Briefcase}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {renderField({ label: "Patients Assigned", name: "patients", icon: Users, type: "number" })}
                 {renderField({
                   label: "Status", name: "status", icon: Activity, required: true,
-                  options: ["Active", "On Leave", "Inactive"]
+                  options: ["AVAILABLE", "BUSY", "OFFLINE"]
                 })}
                 {renderField({
                   label: "Specialization", name: "specialization",
                   options: ["General Health", "Maternal Health", "Child Health", "Elderly Care", "Mental Health", "Chronic Diseases"]
                 })}
+                {renderField({ label: "Patients Assigned", name: "patients", icon: Users, type: "number" })}
+                {renderField({
+                  label: "Assigned Region", name: "region", icon: MapPin,
+                  options: ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika", "Machakos"]
+                })}
+                {renderField({ label: "Start Date", name: "startDate", icon: Calendar, type: "date" })}
               </div>
             </Section>
           </div>

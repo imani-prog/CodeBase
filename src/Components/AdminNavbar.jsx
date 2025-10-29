@@ -67,23 +67,10 @@ const AdminNavbar = () => {
 
   return (
     // fixed top navbar that starts after the sidebar (left-64) so it doesn't touch the left edge
-    <nav className={`fixed top-0 left-64 right-0 z-40 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'} shadow-lg border-b border-gray-200 h-16`}> 
+    <nav className={`fixed top-0 left-64 right-0 z-40 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'} border-b border-gray-200 h-16`}> 
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Brand */}
-          {/* <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-lg">M</span>
-              </div>
-              <div className="ml-3">
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  MediLink
-                </span>
-                
-              </div>
-            </div>
-          </div> */}
+      
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center space-x-1">

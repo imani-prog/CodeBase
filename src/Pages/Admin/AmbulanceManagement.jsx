@@ -63,27 +63,65 @@ const AmbulanceManagement = () => {
   const [selectedAmbulance, setSelectedAmbulance] = useState(null);
   const [_liveTracking, _setLiveTracking] = useState({});
   const [dispatchForm, setDispatchForm] = useState({
-    priority: 'high',
+    priority: 'HIGH', // matches backend DispatchPriority enum
+    incidentType: 'TRAFFIC_ACCIDENT',
     patientName: '',
+    patientId: '',
     patientAge: '',
     condition: '',
-    pickupLocation: '',
-    destination: '',
+    // Pickup location fields (structured address)
+    pickupLocation: '', // legacy
+    pickupAddressLine1: '',
+    pickupAddressLine2: '',
+    pickupCity: '',
+    pickupState: '',
+    pickupPostalCode: '',
+    pickupCountry: 'Kenya',
+    pickupLatitude: '',
+    pickupLongitude: '',
+    // Dropoff location fields
+    destination: '', // legacy
+    hospitalId: '',
+    dropoffAddressLine1: '',
+    dropoffAddressLine2: '',
+    dropoffCity: '',
+    dropoffState: '',
+    dropoffPostalCode: '',
+    dropoffCountry: 'Kenya',
+    dropoffLatitude: '',
+    dropoffLongitude: '',
+    // Caller information
     callerName: '',
     callerPhone: '',
+    callerNotes: '',
+    // Additional fields
     specialInstructions: '',
+    notes: '',
     estimatedDistance: '',
     estimatedTime: ''
   });
 
-  // Sample ambulances data
+  // Sample ambulances data - matches backend Ambulances entity
   const ambulances = useMemo(() => [
     {
       id: 1,
-      vehicleNumber: 'AMB-001-NB',
+      vehiclePlate: 'AMB-001-NB', // matches backend vehiclePlate field
+      vehicleNumber: 'AMB-001-NB', // keeping for backward compatibility
+      registrationNumber: 'KCB-001-2020', // unique registration
+      model: 'Toyota Land Cruiser', // vehicle model
+      year: 2020, // manufacture year
       type: 'advanced_life_support',
-      status: 'available',
+      status: 'AVAILABLE', // matches backend AmbulanceStatus enum
+      fuelType: 'DIESEL', // matches backend FuelType enum
+      capacity: 6, // passenger/patient capacity
+      equippedForICU: true, // ICU capability
+      gpsEnabled: true, // GPS tracking capability
       location: 'Nairobi Central Hospital',
+      driverName: 'John Kamau', // matches backend driverName
+      driverPhone: '+254 712 345 678', // matches backend driverPhone
+      medicName: 'Dr. Sarah Kimani', // assigned medic
+      insurancePolicyNumber: 'INS-KE-2024-001', // insurance policy
+      insuranceProvider: 'Jubilee Insurance', // insurance company
       currentDriver: 'John Kamau',
       driverContact: '+254 712 345 678',
       lastMaintenance: '2024-10-05',
@@ -94,14 +132,28 @@ const AmbulanceManagement = () => {
       lastDispatch: '2024-10-11 14:30:00',
       totalDispatches: 187,
       averageResponseTime: '8.5 minutes',
+      notes: 'Primary emergency response unit for Nairobi Central',
       image: '/src/assets/MedilinkAmbulance.png'
     },
     {
       id: 2,
+      vehiclePlate: 'AMB-002-NB',
       vehicleNumber: 'AMB-002-NB',
+      registrationNumber: 'KCB-002-2021',
+      model: 'Mercedes-Benz Sprinter',
+      year: 2021,
       type: 'basic_life_support',
-      status: 'in_transit',
+      status: 'BUSY', // in transit
+      fuelType: 'DIESEL',
+      capacity: 4,
+      equippedForICU: false,
+      gpsEnabled: true,
       location: 'En route to Mathare',
+      driverName: 'Mary Wanjiku',
+      driverPhone: '+254 723 456 789',
+      medicName: 'Nurse Peter Omondi',
+      insurancePolicyNumber: 'INS-KE-2024-002',
+      insuranceProvider: 'AAR Insurance',
       currentDriver: 'Mary Wanjiku',
       driverContact: '+254 723 456 789',
       lastMaintenance: '2024-09-20',
@@ -112,14 +164,28 @@ const AmbulanceManagement = () => {
       lastDispatch: '2024-10-11 16:15:00',
       totalDispatches: 142,
       averageResponseTime: '12.3 minutes',
+      notes: 'Specialized for non-critical patient transfers',
       image: '/src/assets/MedilinkAmbulance.png'
     },
     {
       id: 3,
+      vehiclePlate: 'AMB-003-NB',
       vehicleNumber: 'AMB-003-NB',
+      registrationNumber: 'KCB-003-2019',
+      model: 'Ford Transit Custom',
+      year: 2019,
       type: 'critical_care',
-      status: 'maintenance',
+      status: 'MAINTENANCE',
+      fuelType: 'DIESEL',
+      capacity: 4,
+      equippedForICU: true,
+      gpsEnabled: true,
       location: 'Maintenance Garage',
+      driverName: 'David Mwangi',
+      driverPhone: '+254 734 567 890',
+      medicName: 'Dr. Elizabeth Wangari',
+      insurancePolicyNumber: 'INS-KE-2024-003',
+      insuranceProvider: 'CIC Insurance',
       currentDriver: 'David Mwangi',
       driverContact: '+254 734 567 890',
       lastMaintenance: '2024-10-10',
@@ -130,14 +196,28 @@ const AmbulanceManagement = () => {
       lastDispatch: '2024-10-09 22:45:00',
       totalDispatches: 98,
       averageResponseTime: '15.2 minutes',
+      notes: 'Critical care unit undergoing routine maintenance',
       image: '/src/assets/MedilinkAmbulance.png'
     },
     {
       id: 4,
+      vehiclePlate: 'AMB-004-NB',
       vehicleNumber: 'AMB-004-NB',
+      registrationNumber: 'KCB-004-2022',
+      model: 'Volkswagen Crafter',
+      year: 2022,
       type: 'patient_transport',
-      status: 'available',
+      status: 'AVAILABLE',
+      fuelType: 'PETROL',
+      capacity: 8,
+      equippedForICU: false,
+      gpsEnabled: true,
       location: 'Kenyatta Hospital',
+      driverName: 'Grace Nyong\'o',
+      driverPhone: '+254 745 678 901',
+      medicName: 'Nurse James Mutua',
+      insurancePolicyNumber: 'INS-KE-2024-004',
+      insuranceProvider: 'ICEA Lion',
       currentDriver: 'Grace Nyong\'o',
       driverContact: '+254 745 678 901',
       lastMaintenance: '2024-09-15',
@@ -148,6 +228,7 @@ const AmbulanceManagement = () => {
       lastDispatch: '2024-10-11 13:20:00',
       totalDispatches: 234,
       averageResponseTime: '18.7 minutes',
+      notes: 'Wheelchair accessible vehicle for scheduled transfers',
       image: '/src/assets/MedilinkAmbulance.png'
     }
   ], []);
@@ -232,72 +313,192 @@ const AmbulanceManagement = () => {
     }
   ];
 
-  // Sample dispatch records
+  // Sample dispatch records - matches backend AmbulanceDispatch entity
   const dispatches = [
     {
       id: 1,
-      callId: 'EMRG-2024-1011-001',
+      incidentId: 'INC-2024-1011-001', // unique incident identifier (backend: incidentId)
+      incidentType: 'CARDIAC_ARREST', // incident category (backend: incidentType)
+      callId: 'EMRG-2024-1011-001', // legacy field
       ambulanceId: 'AMB-002-NB',
+      ambulanceUnitId: 'UNIT-002', // internal unit identifier (backend: ambulanceUnitId)
+      vehiclePlate: 'AMB-002-NB', // matches backend vehiclePlate
       driverId: 2,
-      priority: 'critical',
-      status: 'in_progress',
-      callTime: '2024-10-11 16:15:00',
-      dispatchTime: '2024-10-11 16:16:30',
-      arrivalTime: null,
-      completionTime: null,
+      driverName: 'Mary Wanjiku', // matches backend driverName
+      medicName: 'Nurse Peter Omondi', // matches backend medicName
+      priority: 'CRITICAL', // matches backend DispatchPriority enum: LOW, MEDIUM, HIGH, CRITICAL
+      status: 'TRANSPORTING', // matches backend DispatchStatus enum: REQUESTED, DISPATCHED, EN_ROUTE, ON_SCENE, TRANSPORTING, AT_HOSPITAL, COMPLETED, CANCELED
+      
+      // Caller information
+      callerName: 'Dr. Susan Mwangi',
+      callerPhone: '+254712890123',
+      callerNotes: 'Patient is unconscious, CPR in progress by bystanders',
+      
+      // Patient information
+      patientId: 'PAT-2024-045', // reference to Patient entity (backend: patient)
       patientName: 'Michael Ochieng',
       patientAge: 45,
-      condition: 'Chest Pain - Suspected MI',
-      pickupLocation: 'Mathare Shopping Center',
-      destination: 'Kenyatta Hospital Emergency',
+      condition: 'Chest Pain - Suspected Myocardial Infarction',
+      
+      // Pickup location (structured address matching backend)
+      pickupLocation: 'Mathare Shopping Center', // legacy field
+      pickupAddressLine1: 'Mathare Shopping Center',
+      pickupAddressLine2: 'Juja Road',
+      pickupCity: 'Nairobi',
+      pickupState: 'Nairobi County',
+      pickupPostalCode: '00100',
+      pickupCountry: 'Kenya',
+      pickupLatitude: -1.2541,
+      pickupLongitude: 36.8749,
+      
+      // Dropoff location (structured address matching backend)
+      destination: 'Kenyatta Hospital Emergency', // legacy field
+      hospitalId: 'HOSP-001', // reference to Hospital entity (backend: hospital)
+      dropoffAddressLine1: 'Kenyatta National Hospital',
+      dropoffAddressLine2: 'Hospital Road',
+      dropoffCity: 'Nairobi',
+      dropoffState: 'Nairobi County',
+      dropoffPostalCode: '00202',
+      dropoffCountry: 'Kenya',
+      dropoffLatitude: -1.3018,
+      dropoffLongitude: 36.8073,
+      
+      // Timestamps (matching backend)
+      requestTime: '2024-10-11T16:15:00+03:00', // when call received (backend: requestTime)
+      dispatchTime: '2024-10-11T16:16:30+03:00', // crew dispatched (backend: dispatchTime)
+      enRouteTime: '2024-10-11T16:17:45+03:00', // wheels rolling (backend: enRouteTime)
+      onSceneTime: '2024-10-11T16:25:30+03:00', // arrived at scene (backend: onSceneTime)
+      departSceneTime: '2024-10-11T16:35:15+03:00', // left scene (backend: departSceneTime)
+      arrivalAtHospitalTime: null, // reached hospital (backend: arrivalAtHospitalTime)
+      completionTime: null, // case closed (backend: completionTime)
+      
+      // Legacy fields
+      callTime: '2024-10-11 16:15:00',
+      arrivalTime: null,
+      
       distance: '12.5 km',
       estimatedTime: '15 minutes',
-      callerName: 'Dr. Susan Mwangi',
-      callerPhone: '+254 712 890 123'
+      notes: 'Patient stabilized on scene, transported with ALS support, IV access established'
     },
     {
       id: 2,
+      incidentId: 'INC-2024-1011-002',
+      incidentType: 'TRAFFIC_ACCIDENT',
       callId: 'EMRG-2024-1011-002',
       ambulanceId: 'AMB-001-NB',
+      ambulanceUnitId: 'UNIT-001',
+      vehiclePlate: 'AMB-001-NB',
       driverId: 1,
-      priority: 'high',
-      status: 'completed',
-      callTime: '2024-10-11 14:30:00',
-      dispatchTime: '2024-10-11 14:31:15',
-      arrivalTime: '2024-10-11 14:38:45',
-      completionTime: '2024-10-11 15:15:30',
+      driverName: 'John Kamau',
+      medicName: 'Dr. Sarah Kimani',
+      priority: 'HIGH',
+      status: 'COMPLETED',
+      
+      callerName: 'Traffic Police',
+      callerPhone: '+254700123456',
+      callerNotes: 'Two vehicle collision, multiple casualties, ambulance requested for one critical patient',
+      
+      patientId: 'PAT-2024-032',
       patientName: 'Sarah Wanjiku',
       patientAge: 32,
-      condition: 'Motor Vehicle Accident',
+      condition: 'Motor Vehicle Accident - Multiple Trauma',
+      
       pickupLocation: 'Uhuru Highway Junction',
+      pickupAddressLine1: 'Uhuru Highway',
+      pickupAddressLine2: 'Near Nyayo Stadium',
+      pickupCity: 'Nairobi',
+      pickupState: 'Nairobi County',
+      pickupPostalCode: '00100',
+      pickupCountry: 'Kenya',
+      pickupLatitude: -1.3019,
+      pickupLongitude: 36.8267,
+      
       destination: 'Nairobi Hospital Trauma Center',
+      hospitalId: 'HOSP-002',
+      dropoffAddressLine1: 'Nairobi Hospital',
+      dropoffAddressLine2: 'Argwings Kodhek Road',
+      dropoffCity: 'Nairobi',
+      dropoffState: 'Nairobi County',
+      dropoffPostalCode: '00506',
+      dropoffCountry: 'Kenya',
+      dropoffLatitude: -1.2884,
+      dropoffLongitude: 36.8082,
+      
+      requestTime: '2024-10-11T14:30:00+03:00',
+      dispatchTime: '2024-10-11T14:31:15+03:00',
+      enRouteTime: '2024-10-11T14:32:00+03:00',
+      onSceneTime: '2024-10-11T14:38:45+03:00',
+      departSceneTime: '2024-10-11T14:52:30+03:00',
+      arrivalAtHospitalTime: '2024-10-11T15:05:15+03:00',
+      completionTime: '2024-10-11T15:15:30+03:00',
+      
+      callTime: '2024-10-11 14:30:00',
+      arrivalTime: '2024-10-11 14:38:45',
+      
       distance: '8.2 km',
       estimatedTime: '12 minutes',
       actualTime: '7.5 minutes',
-      callerName: 'Traffic Police',
-      callerPhone: '+254 700 123 456'
+      notes: 'Patient extracted from vehicle, C-spine immobilization, rapid transport to trauma center. GCS 13 on scene.'
     },
     {
       id: 3,
+      incidentId: 'INC-2024-1011-003',
+      incidentType: 'SCHEDULED_TRANSPORT',
       callId: 'EMRG-2024-1011-003',
       ambulanceId: 'AMB-004-NB',
+      ambulanceUnitId: 'UNIT-004',
+      vehiclePlate: 'AMB-004-NB',
       driverId: 4,
-      priority: 'medium',
-      status: 'completed',
-      callTime: '2024-10-11 13:20:00',
-      dispatchTime: '2024-10-11 13:22:30',
-      arrivalTime: '2024-10-11 13:35:15',
-      completionTime: '2024-10-11 14:20:45',
+      driverName: 'Grace Nyong\'o',
+      medicName: 'Nurse James Mutua',
+      priority: 'MEDIUM',
+      status: 'COMPLETED',
+      
+      callerName: 'Family Member',
+      callerPhone: '+254723567890',
+      callerNotes: 'Scheduled dialysis appointment, patient has mobility issues, wheelchair required',
+      
+      patientId: 'PAT-2024-067',
       patientName: 'Peter Kimani',
       patientAge: 67,
-      condition: 'Scheduled Dialysis Transfer',
+      condition: 'Scheduled Dialysis Transfer - ESRD Patient',
+      
       pickupLocation: 'Patient Home - Dandora',
+      pickupAddressLine1: 'House No. 45',
+      pickupAddressLine2: 'Phase 4, Dandora',
+      pickupCity: 'Nairobi',
+      pickupState: 'Nairobi County',
+      pickupPostalCode: '00100',
+      pickupCountry: 'Kenya',
+      pickupLatitude: -1.2574,
+      pickupLongitude: 36.8969,
+      
       destination: 'Nairobi Dialysis Center',
+      hospitalId: 'HOSP-003',
+      dropoffAddressLine1: 'Nairobi Dialysis Center',
+      dropoffAddressLine2: 'Ngong Road',
+      dropoffCity: 'Nairobi',
+      dropoffState: 'Nairobi County',
+      dropoffPostalCode: '00100',
+      dropoffCountry: 'Kenya',
+      dropoffLatitude: -1.2921,
+      dropoffLongitude: 36.7820,
+      
+      requestTime: '2024-10-11T13:20:00+03:00',
+      dispatchTime: '2024-10-11T13:22:30+03:00',
+      enRouteTime: '2024-10-11T13:25:00+03:00',
+      onSceneTime: '2024-10-11T13:35:15+03:00',
+      departSceneTime: '2024-10-11T13:45:30+03:00',
+      arrivalAtHospitalTime: '2024-10-11T14:05:00+03:00',
+      completionTime: '2024-10-11T14:20:45+03:00',
+      
+      callTime: '2024-10-11 13:20:00',
+      arrivalTime: '2024-10-11 13:35:15',
+      
       distance: '15.3 km',
       estimatedTime: '25 minutes',
       actualTime: '12.75 minutes',
-      callerName: 'Family Member',
-      callerPhone: '+254 723 567 890'
+      notes: 'Routine dialysis transport, patient stable, vitals monitored throughout transport. Family notified of safe arrival.'
     }
   ];
 
@@ -373,8 +574,9 @@ const AmbulanceManagement = () => {
         
         Object.keys(updatedData).forEach(vehicleId => {
           const data = updatedData[vehicleId];
-          // Simulate movement for ambulances in transit
-          if (ambulances.find(a => a.vehicleNumber === vehicleId && a.status === 'in_transit')) {
+          // Simulate movement for ambulances in transit (BUSY status or in_transit)
+          const ambulance = ambulances.find(a => a.vehicleNumber === vehicleId);
+          if (ambulance && (ambulance.status === 'BUSY' || ambulance.status === 'in_transit' || ambulance.status === 'TRANSPORTING')) {
             updatedData[vehicleId] = {
               ...data,
               latitude: data.latitude + (Math.random() - 0.5) * 0.001,
@@ -395,9 +597,9 @@ const AmbulanceManagement = () => {
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
-    { value: 'available', label: 'Available' },
-    { value: 'in_transit', label: 'In Transit' },
-    { value: 'maintenance', label: 'Maintenance' },
+    { value: 'AVAILABLE', label: 'Available' },
+    { value: 'BUSY', label: 'Busy' },
+    { value: 'MAINTENANCE', label: 'Maintenance' },
     { value: 'out_of_service', label: 'Out of Service' }
   ];
 
@@ -410,37 +612,57 @@ const AmbulanceManagement = () => {
   ];
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'available': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'in_transit': return <Navigation className="w-4 h-4 text-blue-500" />;
-      case 'maintenance': return <Settings className="w-4 h-4 text-yellow-500" />;
-      case 'out_of_service': return <XCircle className="w-4 h-4 text-red-500" />;
-      case 'on_duty': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'on_trip': return <Navigation className="w-4 h-4 text-blue-500" />;
-      case 'off_duty': return <XCircle className="w-4 h-4 text-gray-500" />;
-      case 'critical': return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      case 'high': return <AlertTriangle className="w-4 h-4 text-orange-500" />;
-      case 'medium': return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
-      case 'in_progress': return <Timer className="w-4 h-4 text-blue-500" />;
-      case 'completed': return <CheckCircle className="w-4 h-4 text-green-500" />;
+    const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : status;
+    switch (normalizedStatus) {
+      case 'AVAILABLE': return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'BUSY': 
+      case 'IN_TRANSIT': 
+      case 'TRANSPORTING':
+      case 'EN_ROUTE':
+      case 'ON_SCENE': return <Navigation className="w-4 h-4 text-blue-500" />;
+      case 'MAINTENANCE': return <Settings className="w-4 h-4 text-yellow-500" />;
+      case 'OUT_OF_SERVICE': return <XCircle className="w-4 h-4 text-red-500" />;
+      case 'ON_DUTY': return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'ON_TRIP': return <Navigation className="w-4 h-4 text-blue-500" />;
+      case 'OFF_DUTY': return <XCircle className="w-4 h-4 text-gray-500" />;
+      case 'CRITICAL': return <AlertTriangle className="w-4 h-4 text-red-500" />;
+      case 'HIGH': return <AlertTriangle className="w-4 h-4 text-orange-500" />;
+      case 'MEDIUM': return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+      case 'LOW': return <Info className="w-4 h-4 text-blue-500" />;
+      case 'IN_PROGRESS':
+      case 'REQUESTED':
+      case 'DISPATCHED': return <Timer className="w-4 h-4 text-blue-500" />;
+      case 'COMPLETED':
+      case 'AT_HOSPITAL': return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'CANCELED': return <XCircle className="w-4 h-4 text-red-500" />;
       default: return <Activity className="w-4 h-4 text-gray-500" />;
     }
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'available': return 'bg-green-100 text-green-800 border-green-200';
-      case 'in_transit': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'maintenance': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'out_of_service': return 'bg-red-100 text-red-800 border-red-200';
-      case 'on_duty': return 'bg-green-100 text-green-800 border-green-200';
-      case 'on_trip': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'off_duty': return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'critical': return 'bg-red-100 text-red-800 border-red-200';
-      case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'in_progress': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'completed': return 'bg-green-100 text-green-800 border-green-200';
+    const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : status;
+    switch (normalizedStatus) {
+      case 'AVAILABLE': return 'bg-green-100 text-green-800 border-green-200';
+      case 'BUSY':
+      case 'IN_TRANSIT':
+      case 'TRANSPORTING':
+      case 'EN_ROUTE':
+      case 'ON_SCENE': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'MAINTENANCE': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'OUT_OF_SERVICE': return 'bg-red-100 text-red-800 border-red-200';
+      case 'ON_DUTY': return 'bg-green-100 text-green-800 border-green-200';
+      case 'ON_TRIP': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'OFF_DUTY': return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'CRITICAL': return 'bg-red-100 text-red-800 border-red-200';
+      case 'HIGH': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'LOW': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'IN_PROGRESS':
+      case 'REQUESTED':
+      case 'DISPATCHED': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'COMPLETED':
+      case 'AT_HOSPITAL': return 'bg-green-100 text-green-800 border-green-200';
+      case 'CANCELED': return 'bg-red-100 text-red-800 border-red-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
@@ -457,9 +679,13 @@ const AmbulanceManagement = () => {
 
   const filteredAmbulances = ambulances.filter(ambulance => {
     const matchesSearch = ambulance.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         ambulance.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         ambulance.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         ambulance.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ambulance.currentDriver.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         ambulance.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ambulance.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || ambulance.status === selectedStatus;
+    const matchesStatus = selectedStatus === 'all' || ambulance.status === selectedStatus || ambulance.status.toLowerCase() === selectedStatus.toLowerCase();
     const matchesType = selectedType === 'all' || ambulance.type === selectedType;
     return matchesSearch && matchesStatus && matchesType;
   });
@@ -510,15 +736,36 @@ const AmbulanceManagement = () => {
 
     setShowDispatchModal(false);
     setDispatchForm({
-      priority: 'high',
+      priority: 'HIGH',
+      incidentType: 'TRAFFIC_ACCIDENT',
       patientName: '',
+      patientId: '',
       patientAge: '',
       condition: '',
       pickupLocation: '',
+      pickupAddressLine1: '',
+      pickupAddressLine2: '',
+      pickupCity: '',
+      pickupState: '',
+      pickupPostalCode: '',
+      pickupCountry: 'Kenya',
+      pickupLatitude: '',
+      pickupLongitude: '',
       destination: '',
+      hospitalId: '',
+      dropoffAddressLine1: '',
+      dropoffAddressLine2: '',
+      dropoffCity: '',
+      dropoffState: '',
+      dropoffPostalCode: '',
+      dropoffCountry: 'Kenya',
+      dropoffLatitude: '',
+      dropoffLongitude: '',
       callerName: '',
       callerPhone: '',
+      callerNotes: '',
       specialInstructions: '',
+      notes: '',
       estimatedDistance: '',
       estimatedTime: ''
     });
@@ -713,8 +960,10 @@ const AmbulanceManagement = () => {
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-lg font-semibold mb-1">
-                          {ambulance.vehicleNumber}
+                          {ambulance.vehiclePlate}
                         </h3>
+                        <p className="text-xs text-gray-500 mb-1">Reg: {ambulance.registrationNumber}</p>
+                        <p className="text-xs text-gray-500 mb-2">{ambulance.model} ({ambulance.year})</p>
                         <div className="flex items-center mb-2">
                           {getTypeIcon(ambulance.type)}
                           <span className="ml-2 text-sm capitalize">
@@ -737,12 +986,64 @@ const AmbulanceManagement = () => {
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
                         <UserCheck className="w-4 h-4 mr-2 text-gray-400" />
-                        {ambulance.currentDriver}
+                        Driver: {ambulance.driverName}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Stethoscope className="w-4 h-4 mr-2 text-gray-400" />
+                        Medic: {ambulance.medicName}
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
                         <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                        {ambulance.driverContact}
+                        {ambulance.driverPhone}
                       </div>
+                    </div>
+
+                    {/* Vehicle Specifications */}
+                    <div className="grid grid-cols-2 gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Fuel className="w-3 h-3 mr-1 text-gray-400" />
+                        {ambulance.fuelType}
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Users className="w-3 h-3 mr-1 text-gray-400" />
+                        Cap: {ambulance.capacity}
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600">
+                        {ambulance.gpsEnabled ? (
+                          <>
+                            <Globe className="w-3 h-3 mr-1 text-green-500" />
+                            GPS Enabled
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="w-3 h-3 mr-1 text-gray-400" />
+                            No GPS
+                          </>
+                        )}
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600">
+                        {ambulance.equippedForICU ? (
+                          <>
+                            <Heart className="w-3 h-3 mr-1 text-red-500" />
+                            ICU Ready
+                          </>
+                        ) : (
+                          <>
+                            <Heart className="w-3 h-3 mr-1 text-gray-400" />
+                            No ICU
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Insurance Information */}
+                    <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                      <div className="flex items-center text-xs text-gray-700 mb-1">
+                        <Shield className="w-3 h-3 mr-1 text-blue-500" />
+                        <span className="font-medium">Insurance:</span>
+                      </div>
+                      <p className="text-xs text-gray-600 ml-4">{ambulance.insuranceProvider}</p>
+                      <p className="text-xs text-gray-500 ml-4">Policy: {ambulance.insurancePolicyNumber}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mb-4">
@@ -768,6 +1069,12 @@ const AmbulanceManagement = () => {
                         ></div>
                       </div>
                     </div>
+
+                    {ambulance.notes && (
+                      <div className="mb-4 p-2 bg-yellow-50 border-l-4 border-yellow-400 text-xs text-gray-700">
+                        <strong>Note:</strong> {ambulance.notes}
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <button className="flex items-center text-blue-600 hover:text-blue-900 transition-colors">
@@ -884,70 +1191,160 @@ const AmbulanceManagement = () => {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {dispatch.callId}
+                        {dispatch.incidentId}
                       </h3>
+                      <p className="text-sm text-gray-500 mb-2">Legacy Call ID: {dispatch.callId}</p>
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center">
                           {getStatusIcon(dispatch.priority)}
                           <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(dispatch.priority)}`}>
-                            {dispatch.priority.toUpperCase()} PRIORITY
+                            {dispatch.priority} PRIORITY
                           </span>
                         </div>
                         <div className="flex items-center">
                           {getStatusIcon(dispatch.status)}
                           <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(dispatch.status)}`}>
-                            {dispatch.status.replace('_', ' ').toUpperCase()}
+                            {dispatch.status.replace('_', ' ')}
                           </span>
+                        </div>
+                        <div className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium border border-purple-200">
+                          {dispatch.incidentType.replace('_', ' ')}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium text-gray-900">{dispatch.ambulanceId}</div>
+                      <div className="text-sm font-medium text-gray-900">{dispatch.vehiclePlate}</div>
+                      <div className="text-xs text-gray-500">Unit: {dispatch.ambulanceUnitId}</div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        Driver: {dispatch.driverName}
+                      </div>
                       <div className="text-sm text-gray-500">
-                        {drivers.find(d => d.id === dispatch.driverId)?.name}
+                        Medic: {dispatch.medicName}
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Patient Information</h4>
+                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                        <Users className="w-4 h-4 mr-1" />
+                        Patient Information
+                      </h4>
                       <div className="space-y-1 text-sm text-gray-600">
                         <div><strong>Name:</strong> {dispatch.patientName}</div>
                         <div><strong>Age:</strong> {dispatch.patientAge} years</div>
+                        <div><strong>Patient ID:</strong> {dispatch.patientId}</div>
                         <div><strong>Condition:</strong> {dispatch.condition}</div>
                       </div>
                     </div>
+                    
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Location Details</h4>
+                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        Pickup Location
+                      </h4>
                       <div className="space-y-1 text-sm text-gray-600">
-                        <div><strong>Pickup:</strong> {dispatch.pickupLocation}</div>
-                        <div><strong>Destination:</strong> {dispatch.destination}</div>
+                        <div>{dispatch.pickupAddressLine1}</div>
+                        {dispatch.pickupAddressLine2 && <div>{dispatch.pickupAddressLine2}</div>}
+                        <div>{dispatch.pickupCity}, {dispatch.pickupState}</div>
+                        <div>{dispatch.pickupPostalCode}, {dispatch.pickupCountry}</div>
+                        <div className="text-xs text-gray-500">
+                          📍 {dispatch.pickupLatitude}, {dispatch.pickupLongitude}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                        <Navigation className="w-4 h-4 mr-1" />
+                        Destination
+                      </h4>
+                      <div className="space-y-1 text-sm text-gray-600">
+                        <div><strong>Hospital ID:</strong> {dispatch.hospitalId}</div>
+                        <div>{dispatch.dropoffAddressLine1}</div>
+                        {dispatch.dropoffAddressLine2 && <div>{dispatch.dropoffAddressLine2}</div>}
+                        <div>{dispatch.dropoffCity}, {dispatch.dropoffState}</div>
+                        <div>{dispatch.dropoffPostalCode}, {dispatch.dropoffCountry}</div>
+                        <div className="text-xs text-gray-500">
+                          📍 {dispatch.dropoffLatitude}, {dispatch.dropoffLongitude}
+                        </div>
                         <div><strong>Distance:</strong> {dispatch.distance}</div>
                       </div>
                     </div>
+                    
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Timing</h4>
+                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        Timeline
+                      </h4>
                       <div className="space-y-1 text-sm text-gray-600">
-                        <div><strong>Call Time:</strong> {new Date(dispatch.callTime).toLocaleTimeString()}</div>
+                        <div><strong>Request:</strong> {new Date(dispatch.requestTime).toLocaleTimeString()}</div>
                         <div><strong>Dispatch:</strong> {new Date(dispatch.dispatchTime).toLocaleTimeString()}</div>
-                        {dispatch.arrivalTime && (
-                          <div><strong>Arrival:</strong> {new Date(dispatch.arrivalTime).toLocaleTimeString()}</div>
+                        {dispatch.enRouteTime && (
+                          <div><strong>En Route:</strong> {new Date(dispatch.enRouteTime).toLocaleTimeString()}</div>
+                        )}
+                        {dispatch.onSceneTime && (
+                          <div><strong>On Scene:</strong> {new Date(dispatch.onSceneTime).toLocaleTimeString()}</div>
+                        )}
+                        {dispatch.departSceneTime && (
+                          <div><strong>Left Scene:</strong> {new Date(dispatch.departSceneTime).toLocaleTimeString()}</div>
+                        )}
+                        {dispatch.arrivalAtHospitalTime && (
+                          <div><strong>At Hospital:</strong> {new Date(dispatch.arrivalAtHospitalTime).toLocaleTimeString()}</div>
+                        )}
+                        {dispatch.completionTime && (
+                          <div><strong>Completed:</strong> {new Date(dispatch.completionTime).toLocaleTimeString()}</div>
                         )}
                         {dispatch.actualTime && (
-                          <div><strong>Response Time:</strong> {dispatch.actualTime}</div>
+                          <div className="text-green-600"><strong>Response Time:</strong> {dispatch.actualTime}</div>
                         )}
                       </div>
                     </div>
                   </div>
 
+                  {/* Caller Information */}
+                  <div className="border-t border-gray-100 pt-4 mb-4">
+                    <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                      <Phone className="w-4 h-4 mr-1" />
+                      Caller Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                      <div>
+                        <strong>Name:</strong> {dispatch.callerName} | <strong>Phone:</strong> {dispatch.callerPhone}
+                      </div>
+                      {dispatch.callerNotes && (
+                        <div className="col-span-2 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                          <strong>Caller Notes:</strong> {dispatch.callerNotes}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Clinical Notes */}
+                  {dispatch.notes && (
+                    <div className="border-t border-gray-100 pt-4 mb-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                        <Activity className="w-4 h-4 mr-1" />
+                        Clinical/Operational Notes
+                      </h4>
+                      <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-400 text-sm text-gray-700">
+                        {dispatch.notes}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="text-sm text-gray-600">
-                      <strong>Caller:</strong> {dispatch.callerName} ({dispatch.callerPhone})
+                    <div className="text-xs text-gray-500">
+                      Estimated Time: {dispatch.estimatedTime}
+                      {dispatch.actualTime && ` | Actual: ${dispatch.actualTime}`}
                     </div>
                     <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900 transition-colors">
-                        <Eye className="w-4 h-4" />
+                      <button className="text-blue-600 hover:text-blue-900 transition-colors flex items-center text-sm">
+                        <Eye className="w-4 h-4 mr-1" />
+                        Full Details
+                      </button>
+                      <button className="text-green-600 hover:text-green-900 transition-colors">
+                        <Download className="w-4 h-4" />
                       </button>
                       <button className="text-gray-400 hover:text-gray-600 transition-colors">
                         <MoreHorizontal className="w-4 h-4" />
@@ -1097,7 +1494,7 @@ const AmbulanceManagement = () => {
                     <div>
                       <p className="text-sm text-gray-600">Available Units</p>
                       <p className="text-2xl font-bold text-green-600">
-                        {ambulances.filter(a => a.status === 'available').length}
+                        {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').length}
                       </p>
                     </div>
                     <CheckCircle className="w-8 h-8 text-green-500" />
@@ -1109,7 +1506,7 @@ const AmbulanceManagement = () => {
                     <div>
                       <p className="text-sm text-gray-600">In Transit</p>
                       <p className="text-2xl font-bold text-blue-600">
-                        {ambulances.filter(a => a.status === 'in_transit').length}
+                        {ambulances.filter(a => a.status === 'BUSY' || a.status === 'in_transit').length}
                       </p>
                     </div>
                     <Navigation className="w-8 h-8 text-blue-500" />
@@ -1121,7 +1518,7 @@ const AmbulanceManagement = () => {
                     <div>
                       <p className="text-sm text-gray-600">Maintenance</p>
                       <p className="text-2xl font-bold text-yellow-600">
-                        {ambulances.filter(a => a.status === 'maintenance').length}
+                        {ambulances.filter(a => a.status === 'MAINTENANCE' || a.status === 'maintenance').length}
                       </p>
                     </div>
                     <Settings className="w-8 h-8 text-yellow-500" />
@@ -1331,7 +1728,7 @@ const AmbulanceManagement = () => {
                   <p className="text-sm font-medium text-gray-600">Fleet Vehicles</p>
                   <p className="text-3xl font-bold text-blue-600">{ambulances.length}</p>
                   <p className="text-sm text-green-600 mt-2">
-                    {ambulances.filter(a => a.status === 'available').length} Available
+                    {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').length} Available
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -1361,7 +1758,13 @@ const AmbulanceManagement = () => {
                   <p className="text-sm font-medium text-gray-600">Today's Dispatches</p>
                   <p className="text-3xl font-bold text-purple-600">{dispatches.length}</p>
                   <p className="text-sm text-purple-600 mt-2">
-                    {dispatches.filter(d => d.status === 'in_progress').length} In Progress
+                    {dispatches.filter(d => 
+                      d.status === 'in_progress' || 
+                      d.status === 'DISPATCHED' || 
+                      d.status === 'EN_ROUTE' || 
+                      d.status === 'ON_SCENE' || 
+                      d.status === 'TRANSPORTING'
+                    ).length} In Progress
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -1400,19 +1803,38 @@ const AmbulanceManagement = () => {
               </div>
             </div>
 
-            <div className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              {/* Priority and Incident Type */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority Level</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority Level *</label>
                   <select
                     value={dispatchForm.priority}
                     onChange={(e) => setDispatchForm({...dispatchForm, priority: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="critical">Critical</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
+                    <option value="CRITICAL">Critical</option>
+                    <option value="HIGH">High</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Incident Type *</label>
+                  <select
+                    value={dispatchForm.incidentType}
+                    onChange={(e) => setDispatchForm({...dispatchForm, incidentType: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="TRAFFIC_ACCIDENT">Traffic Accident</option>
+                    <option value="CARDIAC_ARREST">Cardiac Arrest</option>
+                    <option value="RESPIRATORY_DISTRESS">Respiratory Distress</option>
+                    <option value="STROKE">Stroke</option>
+                    <option value="TRAUMA">Trauma</option>
+                    <option value="OBSTETRIC_EMERGENCY">Obstetric Emergency</option>
+                    <option value="SCHEDULED_TRANSPORT">Scheduled Transport</option>
+                    <option value="OTHER">Other</option>
                   </select>
                 </div>
 
@@ -1424,111 +1846,351 @@ const AmbulanceManagement = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Auto-Select Nearest</option>
-                    {ambulances.filter(a => a.status === 'available').map(ambulance => (
+                    {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').map(ambulance => (
                       <option key={ambulance.vehicleNumber} value={ambulance.vehicleNumber}>
-                        {ambulance.vehicleNumber} - {ambulance.currentDriver}
+                        {ambulance.vehiclePlate} - {ambulance.driverName}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Patient Name</label>
+              {/* Patient Information */}
+              <div className="border-t pt-4">
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <Users className="w-5 h-5 mr-2 text-blue-600" />
+                  Patient Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Patient ID</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.patientId}
+                      onChange={(e) => setDispatchForm({...dispatchForm, patientId: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="PAT-2024-XXX"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Patient Name *</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.patientName}
+                      onChange={(e) => setDispatchForm({...dispatchForm, patientName: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter patient name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Patient Age *</label>
+                    <input
+                      type="number"
+                      value={dispatchForm.patientAge}
+                      onChange={(e) => setDispatchForm({...dispatchForm, patientAge: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Age"
+                    />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Medical Condition *</label>
                   <input
                     type="text"
-                    value={dispatchForm.patientName}
-                    onChange={(e) => setDispatchForm({...dispatchForm, patientName: e.target.value})}
+                    value={dispatchForm.condition}
+                    onChange={(e) => setDispatchForm({...dispatchForm, condition: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter patient name"
+                    placeholder="Describe the medical condition"
                   />
                 </div>
+              </div>
 
+              {/* Pickup Location */}
+              <div className="border-t pt-4">
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <MapPin className="w-5 h-5 mr-2 text-green-600" />
+                  Pickup Location
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 1 *</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.pickupAddressLine1}
+                      onChange={(e) => setDispatchForm({...dispatchForm, pickupAddressLine1: e.target.value, pickupLocation: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Street address, building name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 2</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.pickupAddressLine2}
+                      onChange={(e) => setDispatchForm({...dispatchForm, pickupAddressLine2: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Apartment, floor, etc."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.pickupCity}
+                      onChange={(e) => setDispatchForm({...dispatchForm, pickupCity: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="City"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">State/County *</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.pickupState}
+                      onChange={(e) => setDispatchForm({...dispatchForm, pickupState: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="State/County"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.pickupPostalCode}
+                      onChange={(e) => setDispatchForm({...dispatchForm, pickupPostalCode: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="00100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.pickupCountry}
+                      onChange={(e) => setDispatchForm({...dispatchForm, pickupCountry: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Kenya"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.pickupLatitude}
+                      onChange={(e) => setDispatchForm({...dispatchForm, pickupLatitude: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="-1.2921"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.pickupLongitude}
+                      onChange={(e) => setDispatchForm({...dispatchForm, pickupLongitude: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="36.8219"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Destination/Dropoff Location */}
+              <div className="border-t pt-4">
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <Navigation className="w-5 h-5 mr-2 text-purple-600" />
+                  Destination Hospital
+                </h4>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Hospital ID</label>
+                  <select
+                    value={dispatchForm.hospitalId}
+                    onChange={(e) => {
+                      const hospitalId = e.target.value;
+                      setDispatchForm({...dispatchForm, hospitalId, destination: e.target.options[e.target.selectedIndex].text});
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select destination hospital</option>
+                    <option value="HOSP-001">Kenyatta National Hospital</option>
+                    <option value="HOSP-002">Nairobi Hospital</option>
+                    <option value="HOSP-003">Aga Khan Hospital</option>
+                    <option value="HOSP-004">Mater Hospital</option>
+                    <option value="HOSP-005">MP Shah Hospital</option>
+                    <option value="HOSP-999">Nearest Hospital</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 1</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.dropoffAddressLine1}
+                      onChange={(e) => setDispatchForm({...dispatchForm, dropoffAddressLine1: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Hospital address"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 2</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.dropoffAddressLine2}
+                      onChange={(e) => setDispatchForm({...dispatchForm, dropoffAddressLine2: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Department, wing, etc."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.dropoffCity}
+                      onChange={(e) => setDispatchForm({...dispatchForm, dropoffCity: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="City"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">State/County</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.dropoffState}
+                      onChange={(e) => setDispatchForm({...dispatchForm, dropoffState: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="State/County"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.dropoffPostalCode}
+                      onChange={(e) => setDispatchForm({...dispatchForm, dropoffPostalCode: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="00100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.dropoffCountry}
+                      onChange={(e) => setDispatchForm({...dispatchForm, dropoffCountry: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Kenya"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.dropoffLatitude}
+                      onChange={(e) => setDispatchForm({...dispatchForm, dropoffLatitude: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="-1.3018"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.dropoffLongitude}
+                      onChange={(e) => setDispatchForm({...dispatchForm, dropoffLongitude: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="36.8073"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Caller Information */}
+              <div className="border-t pt-4">
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <Phone className="w-5 h-5 mr-2 text-orange-600" />
+                  Caller Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Caller Name *</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.callerName}
+                      onChange={(e) => setDispatchForm({...dispatchForm, callerName: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Who is calling?"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Caller Phone *</label>
+                    <input
+                      type="tel"
+                      value={dispatchForm.callerPhone}
+                      onChange={(e) => setDispatchForm({...dispatchForm, callerPhone: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="+254 7xx xxx xxx"
+                    />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Caller Notes</label>
+                  <textarea
+                    value={dispatchForm.callerNotes}
+                    onChange={(e) => setDispatchForm({...dispatchForm, callerNotes: e.target.value})}
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Additional information from the caller..."
+                  />
+                </div>
+              </div>
+
+              {/* Clinical/Operational Notes */}
+              <div className="border-t pt-4">
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <Activity className="w-5 h-5 mr-2 text-red-600" />
+                  Clinical & Operational Notes
+                </h4>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Patient Age</label>
-                  <input
-                    type="number"
-                    value={dispatchForm.patientAge}
-                    onChange={(e) => setDispatchForm({...dispatchForm, patientAge: e.target.value})}
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Special Instructions / Notes</label>
+                  <textarea
+                    value={dispatchForm.notes}
+                    onChange={(e) => setDispatchForm({...dispatchForm, notes: e.target.value, specialInstructions: e.target.value})}
+                    rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Age"
+                    placeholder="Any special instructions for the medical team, clinical observations, operational notes..."
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Medical Condition</label>
-                <input
-                  type="text"
-                  value={dispatchForm.condition}
-                  onChange={(e) => setDispatchForm({...dispatchForm, condition: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Describe the medical condition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Pickup Location</label>
-                <input
-                  type="text"
-                  value={dispatchForm.pickupLocation}
-                  onChange={(e) => setDispatchForm({...dispatchForm, pickupLocation: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter exact pickup address"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Destination Hospital</label>
-                <select
-                  value={dispatchForm.destination}
-                  onChange={(e) => setDispatchForm({...dispatchForm, destination: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Select destination</option>
-                  <option value="Kenyatta National Hospital">Kenyatta National Hospital</option>
-                  <option value="Nairobi Hospital">Nairobi Hospital</option>
-                  <option value="Aga Khan Hospital">Aga Khan Hospital</option>
-                  <option value="Mater Hospital">Mater Hospital</option>
-                  <option value="MP Shah Hospital">MP Shah Hospital</option>
-                  <option value="Nearest Hospital">Nearest Hospital</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Caller Name</label>
-                  <input
-                    type="text"
-                    value={dispatchForm.callerName}
-                    onChange={(e) => setDispatchForm({...dispatchForm, callerName: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Who is calling?"
-                  />
+              {/* Estimates */}
+              <div className="border-t pt-4">
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Estimates</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Estimated Distance</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.estimatedDistance}
+                      onChange={(e) => setDispatchForm({...dispatchForm, estimatedDistance: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="e.g., 12.5 km"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Estimated Time</label>
+                    <input
+                      type="text"
+                      value={dispatchForm.estimatedTime}
+                      onChange={(e) => setDispatchForm({...dispatchForm, estimatedTime: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="e.g., 15 minutes"
+                    />
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Caller Phone</label>
-                  <input
-                    type="tel"
-                    value={dispatchForm.callerPhone}
-                    onChange={(e) => setDispatchForm({...dispatchForm, callerPhone: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="+254 7xx xxx xxx"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
-                <textarea
-                  value={dispatchForm.specialInstructions}
-                  onChange={(e) => setDispatchForm({...dispatchForm, specialInstructions: e.target.value})}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Any special instructions for the medical team..."
-                />
               </div>
 
               <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
@@ -1540,12 +2202,19 @@ const AmbulanceManagement = () => {
                 </button>
                 <button
                   onClick={() => {
-                    const ambulanceToDispatch = selectedAmbulance || ambulances.find(a => a.status === 'available')?.vehicleNumber;
-                    if (ambulanceToDispatch && dispatchForm.patientName && dispatchForm.pickupLocation) {
-                      handleDispatch(ambulanceToDispatch, 'manual-dispatch');
-                    } else {
-                      alert('Please fill in all required fields');
+                    const ambulanceToDispatch = selectedAmbulance || ambulances.find(a => a.status === 'AVAILABLE' || a.status === 'available')?.vehicleNumber;
+                    
+                    // Validate required fields
+                    if (!ambulanceToDispatch) {
+                      alert('No ambulance available for dispatch');
+                      return;
                     }
+                    if (!dispatchForm.patientName || !dispatchForm.pickupAddressLine1 || !dispatchForm.callerName) {
+                      alert('Please fill in all required fields (Patient Name, Pickup Address, Caller Name)');
+                      return;
+                    }
+                    
+                    handleDispatch(ambulanceToDispatch, 'manual-dispatch');
                   }}
                   className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
                 >
