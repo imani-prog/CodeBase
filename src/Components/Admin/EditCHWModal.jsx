@@ -220,7 +220,7 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
 };
 
 // Section Wrapper
-const Section = ({ title, icon: Icon, children }) => (
+const Section = ({ title, icon: children }) => (
   <div className="shadow-sm border border-gray-200 p-6">
     <div className="flex items-center mb-4">
       <div className="w-8 h-8 flex items-center justify-center mr-3">
