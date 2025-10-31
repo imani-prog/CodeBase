@@ -53,6 +53,11 @@ import {
   Stethoscope
 } from 'lucide-react';
 
+// Import modal components
+import ViewAmbulanceModal from './AmbulanceManagement/modals/ViewAmbulanceModal';
+import EditAmbulanceModal from './AmbulanceManagement/modals/EditAmbulanceModal';
+import MoreOptionsModal from './AmbulanceManagement/modals/MoreOptionsModal';
+
 const AmbulanceManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -61,6 +66,12 @@ const AmbulanceManagement = () => {
   const [_selectedItems, _setSelectedItems] = useState([]);
   const [showDispatchModal, setShowDispatchModal] = useState(false);
   const [selectedAmbulance, setSelectedAmbulance] = useState(null);
+  
+  // Modal states
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showMoreModal, setShowMoreModal] = useState(false);
+  const [currentAmbulance, setCurrentAmbulance] = useState(null);
   const [_liveTracking, _setLiveTracking] = useState({});
   const [dispatchForm, setDispatchForm] = useState({
     priority: 'HIGH', // matches backend DispatchPriority enum
@@ -101,27 +112,27 @@ const AmbulanceManagement = () => {
     estimatedTime: ''
   });
 
-  // Sample ambulances data - matches backend Ambulances entity
+
   const ambulances = useMemo(() => [
     {
       id: 1,
-      vehiclePlate: 'AMB-001-NB', // matches backend vehiclePlate field
-      vehicleNumber: 'AMB-001-NB', // keeping for backward compatibility
-      registrationNumber: 'KCB-001-2020', // unique registration
-      model: 'Toyota Land Cruiser', // vehicle model
-      year: 2020, // manufacture year
+      vehiclePlate: 'AMB-001-NB',
+      vehicleNumber: 'AMB-001-NB',
+      registrationNumber: 'KCB-001-2020',
+      model: 'Toyota Land Cruiser',
+      year: 2020,
       type: 'advanced_life_support',
-      status: 'AVAILABLE', // matches backend AmbulanceStatus enum
-      fuelType: 'DIESEL', // matches backend FuelType enum
-      capacity: 6, // passenger/patient capacity
-      equippedForICU: true, // ICU capability
-      gpsEnabled: true, // GPS tracking capability
+      status: 'AVAILABLE',
+      fuelType: 'DIESEL',
+      capacity: 6,
+      equippedForICU: true,
+      gpsEnabled: true,
       location: 'Nairobi Central Hospital',
-      driverName: 'John Kamau', // matches backend driverName
-      driverPhone: '+254 712 345 678', // matches backend driverPhone
-      medicName: 'Dr. Sarah Kimani', // assigned medic
-      insurancePolicyNumber: 'INS-KE-2024-001', // insurance policy
-      insuranceProvider: 'Jubilee Insurance', // insurance company
+      driverName: 'John Kamau',
+      driverPhone: '+254 712 345 678',
+      medicName: 'Dr. Sarah Kimani',
+      insurancePolicyNumber: 'INS-KE-2024-001',
+      insuranceProvider: 'Jubilee Insurance', 
       currentDriver: 'John Kamau',
       driverContact: '+254 712 345 678',
       lastMaintenance: '2024-10-05',
@@ -143,7 +154,7 @@ const AmbulanceManagement = () => {
       model: 'Mercedes-Benz Sprinter',
       year: 2021,
       type: 'basic_life_support',
-      status: 'BUSY', // in transit
+      status: 'BUSY',
       fuelType: 'DIESEL',
       capacity: 4,
       equippedForICU: false,
@@ -313,21 +324,21 @@ const AmbulanceManagement = () => {
     }
   ];
 
-  // Sample dispatch records - matches backend AmbulanceDispatch entity
+  // Sample dispatch records
   const dispatches = [
     {
       id: 1,
-      incidentId: 'INC-2024-1011-001', // unique incident identifier (backend: incidentId)
-      incidentType: 'CARDIAC_ARREST', // incident category (backend: incidentType)
-      callId: 'EMRG-2024-1011-001', // legacy field
+      incidentId: 'INC-2024-1011-001',
+      incidentType: 'CARDIAC_ARREST',
+      callId: 'EMRG-2024-1011-001',
       ambulanceId: 'AMB-002-NB',
-      ambulanceUnitId: 'UNIT-002', // internal unit identifier (backend: ambulanceUnitId)
-      vehiclePlate: 'AMB-002-NB', // matches backend vehiclePlate
+      ambulanceUnitId: 'UNIT-002',
+      vehiclePlate: 'AMB-002-NB',
       driverId: 2,
-      driverName: 'Mary Wanjiku', // matches backend driverName
-      medicName: 'Nurse Peter Omondi', // matches backend medicName
-      priority: 'CRITICAL', // matches backend DispatchPriority enum: LOW, MEDIUM, HIGH, CRITICAL
-      status: 'TRANSPORTING', // matches backend DispatchStatus enum: REQUESTED, DISPATCHED, EN_ROUTE, ON_SCENE, TRANSPORTING, AT_HOSPITAL, COMPLETED, CANCELED
+      driverName: 'Mary Wanjiku',
+      medicName: 'Nurse Peter Omondi',
+      priority: 'CRITICAL',
+      status: 'TRANSPORTING',
       
       // Caller information
       callerName: 'Dr. Susan Mwangi',
@@ -335,13 +346,13 @@ const AmbulanceManagement = () => {
       callerNotes: 'Patient is unconscious, CPR in progress by bystanders',
       
       // Patient information
-      patientId: 'PAT-2024-045', // reference to Patient entity (backend: patient)
+      patientId: 'PAT-2024-045',
       patientName: 'Michael Ochieng',
       patientAge: 45,
       condition: 'Chest Pain - Suspected Myocardial Infarction',
       
       // Pickup location (structured address matching backend)
-      pickupLocation: 'Mathare Shopping Center', // legacy field
+      pickupLocation: 'Mathare Shopping Center',
       pickupAddressLine1: 'Mathare Shopping Center',
       pickupAddressLine2: 'Juja Road',
       pickupCity: 'Nairobi',
@@ -352,8 +363,8 @@ const AmbulanceManagement = () => {
       pickupLongitude: 36.8749,
       
       // Dropoff location (structured address matching backend)
-      destination: 'Kenyatta Hospital Emergency', // legacy field
-      hospitalId: 'HOSP-001', // reference to Hospital entity (backend: hospital)
+      destination: 'Kenyatta Hospital Emergency',
+      hospitalId: 'HOSP-001',
       dropoffAddressLine1: 'Kenyatta National Hospital',
       dropoffAddressLine2: 'Hospital Road',
       dropoffCity: 'Nairobi',
@@ -364,13 +375,13 @@ const AmbulanceManagement = () => {
       dropoffLongitude: 36.8073,
       
       // Timestamps (matching backend)
-      requestTime: '2024-10-11T16:15:00+03:00', // when call received (backend: requestTime)
-      dispatchTime: '2024-10-11T16:16:30+03:00', // crew dispatched (backend: dispatchTime)
-      enRouteTime: '2024-10-11T16:17:45+03:00', // wheels rolling (backend: enRouteTime)
-      onSceneTime: '2024-10-11T16:25:30+03:00', // arrived at scene (backend: onSceneTime)
-      departSceneTime: '2024-10-11T16:35:15+03:00', // left scene (backend: departSceneTime)
-      arrivalAtHospitalTime: null, // reached hospital (backend: arrivalAtHospitalTime)
-      completionTime: null, // case closed (backend: completionTime)
+      requestTime: '2024-10-11T16:15:00+03:00',
+      dispatchTime: '2024-10-11T16:16:30+03:00', 
+      enRouteTime: '2024-10-11T16:17:45+03:00', 
+      onSceneTime: '2024-10-11T16:25:30+03:00', 
+      departSceneTime: '2024-10-11T16:35:15+03:00',
+      arrivalAtHospitalTime: null,
+      completionTime: null, 
       
       // Legacy fields
       callTime: '2024-10-11 16:15:00',
@@ -545,7 +556,7 @@ const AmbulanceManagement = () => {
       coordinates: { lat: -1.2676, lng: 36.8108 },
       callerName: 'Security Guard',
       callerPhone: '+254 722 123 456',
-      callTime: new Date(Date.now() - 5 * 60000), // 5 minutes ago
+      callTime: new Date(Date.now() - 5 * 60000),
       estimatedResponse: '8 minutes',
       nearestAmbulances: ['AMB-001-NB', 'AMB-003-NB'],
       status: 'pending'
@@ -559,7 +570,7 @@ const AmbulanceManagement = () => {
       coordinates: { lat: -1.1838, lng: 36.9289 },
       callerName: 'Witness',
       callerPhone: '+254 733 987 654',
-      callTime: new Date(Date.now() - 10 * 60000), // 10 minutes ago
+      callTime: new Date(Date.now() - 10 * 60000),
       estimatedResponse: '12 minutes',
       nearestAmbulances: ['AMB-002-NB', 'AMB-004-NB'],
       status: 'pending'
@@ -642,28 +653,28 @@ const AmbulanceManagement = () => {
   const getStatusColor = (status) => {
     const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : status;
     switch (normalizedStatus) {
-      case 'AVAILABLE': return 'bg-green-100 text-green-800 border-green-200';
+      case 'AVAILABLE': return 'text-green-800 border-green-200';
       case 'BUSY':
       case 'IN_TRANSIT':
       case 'TRANSPORTING':
       case 'EN_ROUTE':
-      case 'ON_SCENE': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'MAINTENANCE': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'OUT_OF_SERVICE': return 'bg-red-100 text-red-800 border-red-200';
-      case 'ON_DUTY': return 'bg-green-100 text-green-800 border-green-200';
-      case 'ON_TRIP': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'OFF_DUTY': return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'CRITICAL': return 'bg-red-100 text-red-800 border-red-200';
-      case 'HIGH': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'LOW': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'ON_SCENE': return 'text-blue-800 border-blue-200';
+      case 'MAINTENANCE': return 'text-yellow-800 border-yellow-200';
+      case 'OUT_OF_SERVICE': return 'text-red-800 border-red-200';
+      case 'ON_DUTY': return 'text-green-800 border-green-200';
+      case 'ON_TRIP': return 'text-blue-800 border-blue-200';
+      case 'OFF_DUTY': return 'text-gray-800 border-gray-200';
+      case 'CRITICAL': return 'text-red-800 border-red-200';
+      case 'HIGH': return 'text-orange-800 border-orange-200';
+      case 'MEDIUM': return 'text-yellow-800 border-yellow-200';
+      case 'LOW': return 'text-blue-800 border-blue-200';
       case 'IN_PROGRESS':
       case 'REQUESTED':
-      case 'DISPATCHED': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'DISPATCHED': return 'text-blue-800 border-blue-200';
       case 'COMPLETED':
-      case 'AT_HOSPITAL': return 'bg-green-100 text-green-800 border-green-200';
-      case 'CANCELED': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'AT_HOSPITAL': return 'text-green-800 border-green-200';
+      case 'CANCELED': return 'text-red-800 border-red-200';
+      default: return 'text-gray-800 border-gray-200';
     }
   };
 
@@ -786,6 +797,73 @@ const AmbulanceManagement = () => {
     handleDispatch(nearestAmbulance.vehicleNumber, call.id);
   };
 
+  // Modal handlers
+  const handleEditSave = (updatedAmbulance) => {
+    // TODO: Implement API call to update ambulance
+    console.log('Saving updated ambulance:', updatedAmbulance);
+    
+    // Update local state (replace with actual API call)
+    // const _updatedAmbulances = ambulances.map(a => 
+    //   a.vehicleNumber === updatedAmbulance.vehicleNumber ? updatedAmbulance : a
+    // );
+    
+    // Close modal
+    setShowEditModal(false);
+    setCurrentAmbulance(null);
+    
+    // Show success message
+    alert('Ambulance updated successfully!');
+  };
+
+  const handleMoreAction = (action, ambulance) => {
+    console.log(`Action: ${action} for ambulance:`, ambulance);
+    
+    switch(action) {
+      case 'track':
+        // TODO: Implement tracking functionality
+        alert(`Tracking ${ambulance.vehiclePlate}...`);
+        break;
+      case 'schedule':
+        // TODO: Open maintenance scheduling
+        alert(`Opening maintenance schedule for ${ambulance.vehiclePlate}...`);
+        break;
+      case 'history':
+        // TODO: Show service history
+        alert(`Loading service history for ${ambulance.vehiclePlate}...`);
+        break;
+      case 'export':
+        // TODO: Export ambulance details
+        alert(`Exporting details for ${ambulance.vehiclePlate}...`);
+        break;
+      case 'print':
+        // TODO: Print report
+        alert(`Printing report for ${ambulance.vehiclePlate}...`);
+        break;
+      case 'refresh':
+        // TODO: Refresh ambulance status
+        alert(`Refreshing status for ${ambulance.vehiclePlate}...`);
+        break;
+      case 'archive':
+        if (confirm(`Are you sure you want to archive ${ambulance.vehiclePlate}?`)) {
+          // TODO: Archive ambulance
+          alert(`${ambulance.vehiclePlate} archived successfully`);
+        }
+        break;
+      case 'delete':
+        if (confirm(`Are you sure you want to delete ${ambulance.vehiclePlate}? This action cannot be undone.`)) {
+          // TODO: Delete ambulance
+          alert(`${ambulance.vehiclePlate} deleted successfully`);
+        }
+        break;
+      default:
+        console.log('Unknown action:', action);
+    }
+    
+    // Close modal
+    setShowMoreModal(false);
+    setCurrentAmbulance(null);
+  };
+
   const _calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Earth's radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -808,7 +886,7 @@ const AmbulanceManagement = () => {
               <p className="text-lg">
                 Manage ambulance fleet, drivers, dispatch operations, and emergency response
               </p>
-              <div className="mt-4 flex items-center space-x-6 text-blue-600">
+              <div className="mt-4 flex items-center space-x-6">
                 <div className="flex items-center">
                   <Truck className="w-5 h-5 mr-2" />
                   <span className="">
@@ -829,10 +907,12 @@ const AmbulanceManagement = () => {
                       </span>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>
           </div>
+
 
           {/* Tabs */}
           <div className="border border-gray-200 mb-6">
@@ -953,147 +1033,134 @@ const AmbulanceManagement = () => {
 
           {/* Ambulances Tab */}
           {activeTab === 'ambulances' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredAmbulances.map((ambulance) => (
-                <div key={ambulance.id} className="border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-1">
-                          {ambulance.vehiclePlate}
-                        </h3>
-                        <p className="text-xs text-gray-500 mb-1">Reg: {ambulance.registrationNumber}</p>
-                        <p className="text-xs text-gray-500 mb-2">{ambulance.model} ({ambulance.year})</p>
-                        <div className="flex items-center mb-2">
-                          {getTypeIcon(ambulance.type)}
-                          <span className="ml-2 text-sm capitalize">
-                            {ambulance.type.replace('_', ' ')}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        {getStatusIcon(ambulance.status)}
-                        <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(ambulance.status)}`}>
-                          {ambulance.status.replace('_', ' ').toUpperCase()}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                        {ambulance.location}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <UserCheck className="w-4 h-4 mr-2 text-gray-400" />
-                        Driver: {ambulance.driverName}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Stethoscope className="w-4 h-4 mr-2 text-gray-400" />
-                        Medic: {ambulance.medicName}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                        {ambulance.driverPhone}
-                      </div>
-                    </div>
-
-                    {/* Vehicle Specifications */}
-                    <div className="grid grid-cols-2 gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center text-xs text-gray-600">
-                        <Fuel className="w-3 h-3 mr-1 text-gray-400" />
-                        {ambulance.fuelType}
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600">
-                        <Users className="w-3 h-3 mr-1 text-gray-400" />
-                        Cap: {ambulance.capacity}
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600">
-                        {ambulance.gpsEnabled ? (
-                          <>
-                            <Globe className="w-3 h-3 mr-1 text-green-500" />
-                            GPS Enabled
-                          </>
-                        ) : (
-                          <>
-                            <Globe className="w-3 h-3 mr-1 text-gray-400" />
-                            No GPS
-                          </>
-                        )}
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600">
-                        {ambulance.equippedForICU ? (
-                          <>
-                            <Heart className="w-3 h-3 mr-1 text-red-500" />
-                            ICU Ready
-                          </>
-                        ) : (
-                          <>
-                            <Heart className="w-3 h-3 mr-1 text-gray-400" />
-                            No ICU
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Insurance Information */}
-                    <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                      <div className="flex items-center text-xs text-gray-700 mb-1">
-                        <Shield className="w-3 h-3 mr-1 text-blue-500" />
-                        <span className="font-medium">Insurance:</span>
-                      </div>
-                      <p className="text-xs text-gray-600 ml-4">{ambulance.insuranceProvider}</p>
-                      <p className="text-xs text-gray-500 ml-4">Policy: {ambulance.insurancePolicyNumber}</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm font-medium text-gray-900">{ambulance.totalDispatches}</div>
-                        <div className="text-xs text-gray-500">Total Trips</div>
-                      </div>
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm font-medium text-gray-900">{ambulance.averageResponseTime}</div>
-                        <div className="text-xs text-gray-500">Avg Response</div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Fuel Level:</span>
-                        <span className="font-medium">{ambulance.fuelLevel}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full ${ambulance.fuelLevel > 50 ? 'bg-green-500' : ambulance.fuelLevel > 25 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                          style={{ width: `${ambulance.fuelLevel}%` }}
-                        ></div>
-                      </div>
-                    </div>
-
-                    {ambulance.notes && (
-                      <div className="mb-4 p-2 bg-yellow-50 border-l-4 border-yellow-400 text-xs text-gray-700">
-                        <strong>Note:</strong> {ambulance.notes}
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <button className="flex items-center text-blue-600 hover:text-blue-900 transition-colors">
-                        <Eye className="w-4 h-4 mr-1" />
-                        View Details
-                      </button>
-                      <div className="flex items-center space-x-2">
-                        <button className="text-green-600 hover:text-green-900 transition-colors">
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                        <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+           <div className="bg-white shadow overflow-x-auto">
+  <table className="min-w-full text-sm text-gray-700">
+    <thead className="bg-gray-100 uppercase text-xs font-semibold text-gray-600">
+      <tr>
+        <th className="px-4 py-3 text-left">Ambulance</th>
+        <th className="px-4 py-3 text-left">Type</th>
+        <th className="px-4 py-3 text-left">Status</th>
+        <th className="px-4 py-3 text-left">Driver / Medic</th>
+        <th className="px-4 py-3 text-center">Trips</th>
+        <th className="px-4 py-3 text-center">Avg Response</th>
+        <th className="px-4 py-3 text-center">Fuel Level</th>
+        <th className="px-4 py-3 text-center">Insurance</th>
+        <th className="px-4 py-3 text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {filteredAmbulances.map((a) => (
+        <tr key={a.id} className="border-b hover:bg-gray-50 transition-colors">
+          {/* Ambulance Column */}
+          <td className="px-4 py-3">
+            <div className="flex items-center space-x-2">
+              {/* {getTypeIcon(a.type)} */}
+              <div>
+                <p className="font-medium text-gray-900">{a.vehiclePlate}</p>
+                <p className="text-xs text-gray-500">
+                  Reg: {a.registrationNumber} ({a.year})
+                </p>
+              </div>
             </div>
+          </td>
+
+          {/* Type */}
+          <td className="px-4 py-3 capitalize">
+            {a.type.replace("_", " ")}
+          </td>
+
+          {/* Status */}
+          <td className="px-4 py-3">
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                a.status
+              )}`}
+            >
+              {a.status.replace("_", " ").toUpperCase()}
+            </span>
+          </td>
+
+          {/* Driver + Medic */}
+          <td className="px-4 py-3">
+            <p className="text-sm font-medium">{a.driverName}</p>
+            <p className="text-xs text-gray-500">{a.medicName}</p>
+          </td>
+
+          {/* Total Trips */}
+          <td className="px-4 py-3 text-center">{a.totalDispatches}</td>
+
+          {/* Avg Response */}
+          <td className="px-4 py-3 text-center">{a.averageResponseTime}</td>
+
+          {/* Fuel */}
+          <td className="px-4 py-3 text-center">
+            <div className="flex flex-col items-center">
+              <div className="w-24 bg-gray-200 h-2 rounded-full mb-1">
+                <div
+                  className={`h-2 rounded-full ${
+                    a.fuelLevel > 50
+                      ? "bg-green-500"
+                      : a.fuelLevel > 25
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  }`}
+                  style={{ width: `${a.fuelLevel}%` }}
+                ></div>
+              </div>
+              <span className="text-xs">{a.fuelLevel}%</span>
+            </div>
+          </td>
+
+          {/* Insurance */}
+          <td className="px-4 py-3 text-xs text-center">
+            <p className="font-medium">{a.insuranceProvider}</p>
+            <p className="text-gray-500">{a.insurancePolicyNumber}</p>
+          </td>
+
+          {/* Actions */}
+          <td className="px-4 py-3 text-center">
+            <div className="flex items-center justify-center space-x-3">
+              <button 
+                className="text-blue-600 hover:text-blue-800"
+                onClick={() => {
+                  setCurrentAmbulance(a);
+                  setShowViewModal(true);
+                }}
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+              <button 
+                className="text-green-600 hover:text-green-800"
+                onClick={() => {
+                  setCurrentAmbulance(a);
+                  setShowEditModal(true);
+                }}
+              >
+                <Edit3 className="w-4 h-4" />
+              </button>
+              <button 
+                className="text-gray-400 hover:text-gray-600"
+                onClick={() => {
+                  setCurrentAmbulance(a);
+                  setShowMoreModal(true);
+                }}
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  {filteredAmbulances.length === 0 && (
+    <div className="text-center py-8 text-gray-500 text-sm">
+      No ambulances found.
+    </div>
+  )}
+</div>
+
           )}
 
           {/* Drivers Tab */}
@@ -1720,73 +1787,6 @@ const AmbulanceManagement = () => {
             </div>
           )}
 
-          {/* Summary Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Fleet Vehicles</p>
-                  <p className="text-3xl font-bold text-blue-600">{ambulances.length}</p>
-                  <p className="text-sm text-green-600 mt-2">
-                    {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').length} Available
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Truck className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Active Drivers</p>
-                  <p className="text-3xl font-bold text-green-600">
-                    {drivers.filter(d => d.status === 'on_duty' || d.status === 'on_trip').length}
-                  </p>
-                  <p className="text-sm text-green-600 mt-2">Out of {drivers.length} total</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Today's Dispatches</p>
-                  <p className="text-3xl font-bold text-purple-600">{dispatches.length}</p>
-                  <p className="text-sm text-purple-600 mt-2">
-                    {dispatches.filter(d => 
-                      d.status === 'in_progress' || 
-                      d.status === 'DISPATCHED' || 
-                      d.status === 'EN_ROUTE' || 
-                      d.status === 'ON_SCENE' || 
-                      d.status === 'TRANSPORTING'
-                    ).length} In Progress
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Navigation className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Avg Response Time</p>
-                  <p className="text-3xl font-bold text-yellow-600">11.5 min</p>
-                  <p className="text-sm text-yellow-600 mt-2">Target: &lt;15 min</p>
-                </div>
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <Timer className="w-6 h-6 text-yellow-600" />
-                </div>
-              </div>
-            </div>
-          </div>
-
       {/* Dispatch Modal */}
       {showDispatchModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -2225,6 +2225,41 @@ const AmbulanceManagement = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modals */}
+      {showViewModal && currentAmbulance && (
+        <ViewAmbulanceModal
+          ambulance={currentAmbulance}
+          onClose={() => {
+            setShowViewModal(false);
+            setCurrentAmbulance(null);
+          }}
+          getStatusColor={getStatusColor}
+          getTypeIcon={getTypeIcon}
+        />
+      )}
+
+      {showEditModal && currentAmbulance && (
+        <EditAmbulanceModal
+          ambulance={currentAmbulance}
+          onClose={() => {
+            setShowEditModal(false);
+            setCurrentAmbulance(null);
+          }}
+          onSave={handleEditSave}
+        />
+      )}
+
+      {showMoreModal && currentAmbulance && (
+        <MoreOptionsModal
+          ambulance={currentAmbulance}
+          onClose={() => {
+            setShowMoreModal(false);
+            setCurrentAmbulance(null);
+          }}
+          onAction={handleMoreAction}
+        />
       )}
     </div>
   );
