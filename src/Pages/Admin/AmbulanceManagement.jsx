@@ -1034,8 +1034,8 @@ const AmbulanceManagement = () => {
           {/* Ambulances Tab */}
           {activeTab === 'ambulances' && (
            <div className="bg-white shadow overflow-x-auto">
-  <table className="min-w-full text-sm text-gray-700">
-    <thead className="bg-gray-100 uppercase text-xs font-semibold text-gray-600">
+  <table className="min-w-full text-sm">
+    <thead className="bg-gray-100 uppercase text-xs font-semibold">
       <tr>
         <th className="px-4 py-3 text-left">Ambulance</th>
         <th className="px-4 py-3 text-left">Type</th>
@@ -1121,7 +1121,7 @@ const AmbulanceManagement = () => {
           <td className="px-4 py-3 text-center">
             <div className="flex items-center justify-center space-x-3">
               <button 
-                className="text-blue-600 hover:text-blue-800"
+                className="text-blue-600"
                 onClick={() => {
                   setCurrentAmbulance(a);
                   setShowViewModal(true);
@@ -1130,7 +1130,7 @@ const AmbulanceManagement = () => {
                 <Eye className="w-4 h-4" />
               </button>
               <button 
-                className="text-green-600 hover:text-green-800"
+                className="text-blue-600"
                 onClick={() => {
                   setCurrentAmbulance(a);
                   setShowEditModal(true);
@@ -1139,7 +1139,7 @@ const AmbulanceManagement = () => {
                 <Edit3 className="w-4 h-4" />
               </button>
               <button 
-                className="text-gray-400 hover:text-gray-600"
+                className=""
                 onClick={() => {
                   setCurrentAmbulance(a);
                   setShowMoreModal(true);
@@ -1165,18 +1165,18 @@ const AmbulanceManagement = () => {
 
           {/* Drivers Tab */}
           {activeTab === 'drivers' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className=" shadow-sm border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Driver</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Trips</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Driver</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Vehicle</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Experience</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Rating</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Total Trips</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -1250,14 +1250,14 @@ const AmbulanceManagement = () => {
             </div>
           )}
 
-          {/* Dispatches Tab */}
+          {/* Dispatches/History Tab */}
           {activeTab === 'dispatches' && (
             <div className="space-y-4">
               {filteredDispatches.map((dispatch) => (
-                <div key={dispatch.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div key={dispatch.id} className="border border-gray-200 p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <h3 className="text-lg font-semibold mb-1">
                         {dispatch.incidentId}
                       </h3>
                       <p className="text-sm text-gray-500 mb-2">Legacy Call ID: {dispatch.callId}</p>
@@ -1274,7 +1274,7 @@ const AmbulanceManagement = () => {
                             {dispatch.status.replace('_', ' ')}
                           </span>
                         </div>
-                        <div className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium border border-purple-200">
+                        <div className="px-3 py-1 text-purple-800 rounded-full text-xs font-medium border border-purple-200">
                           {dispatch.incidentType.replace('_', ' ')}
                         </div>
                       </div>
@@ -1316,7 +1316,7 @@ const AmbulanceManagement = () => {
                         <div>{dispatch.pickupCity}, {dispatch.pickupState}</div>
                         <div>{dispatch.pickupPostalCode}, {dispatch.pickupCountry}</div>
                         <div className="text-xs text-gray-500">
-                          📍 {dispatch.pickupLatitude}, {dispatch.pickupLongitude}
+                           {dispatch.pickupLatitude}, {dispatch.pickupLongitude}
                         </div>
                       </div>
                     </div>
@@ -1333,7 +1333,7 @@ const AmbulanceManagement = () => {
                         <div>{dispatch.dropoffCity}, {dispatch.dropoffState}</div>
                         <div>{dispatch.dropoffPostalCode}, {dispatch.dropoffCountry}</div>
                         <div className="text-xs text-gray-500">
-                          📍 {dispatch.dropoffLatitude}, {dispatch.dropoffLongitude}
+                           {dispatch.dropoffLatitude}, {dispatch.dropoffLongitude}
                         </div>
                         <div><strong>Distance:</strong> {dispatch.distance}</div>
                       </div>
@@ -1380,7 +1380,7 @@ const AmbulanceManagement = () => {
                         <strong>Name:</strong> {dispatch.callerName} | <strong>Phone:</strong> {dispatch.callerPhone}
                       </div>
                       {dispatch.callerNotes && (
-                        <div className="col-span-2 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                        <div className="col-span-2 p-3 rounded-lg border-l-4 border-blue-400">
                           <strong>Caller Notes:</strong> {dispatch.callerNotes}
                         </div>
                       )}
@@ -1394,7 +1394,7 @@ const AmbulanceManagement = () => {
                         <Activity className="w-4 h-4 mr-1" />
                         Clinical/Operational Notes
                       </h4>
-                      <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-400 text-sm text-gray-700">
+                      <div className="p-3 rounded-lg border-l-4 border-green-400 text-sm text-gray-700">
                         {dispatch.notes}
                       </div>
                     </div>
@@ -1427,10 +1427,10 @@ const AmbulanceManagement = () => {
           {activeTab === 'dispatch' && (
             <div className="space-y-6">
               {/* Emergency Calls Queue */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="shadow-sm border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">Emergency Calls Queue</h3>
+                    <h3 className="text-lg font-semibold">Emergency Calls Queue</h3>
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center text-sm text-gray-600">
                         <div className="w-3 h-3 bg-red-500 rounded-full mr-2 animate-pulse"></div>
@@ -1452,9 +1452,9 @@ const AmbulanceManagement = () => {
                           <div className="flex items-center space-x-4 mb-2">
                             <h4 className="text-lg font-semibold text-gray-900">{call.id}</h4>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              call.priority === 'critical' ? 'bg-red-100 text-red-800 border border-red-200' :
-                              call.priority === 'high' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
-                              'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                              call.priority === 'critical' ? 'text-red-800 border border-red-200' :
+                              call.priority === 'high' ? ' text-orange-800 border border-orange-200' :
+                              'text-yellow-800 border border-yellow-200'
                             }`}>
                               {call.priority.toUpperCase()} PRIORITY
                             </span>
@@ -1555,7 +1555,7 @@ const AmbulanceManagement = () => {
               </div>
 
               {/* Fleet Status Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -1603,7 +1603,8 @@ const AmbulanceManagement = () => {
                     <AlertTriangle className="w-8 h-8 text-red-500" />
                   </div>
                 </div>
-              </div>
+              </div> */}
+
             </div>
           )}
 
@@ -1611,12 +1612,12 @@ const AmbulanceManagement = () => {
           {activeTab === 'tracking' && (
             <div className="space-y-6">
               {/* Map Container */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">Live Ambulance Tracking</h3>
+                    <h3 className="text-lg font-semibold">Live Ambulance Tracking</h3>
                     <div className="flex items-center space-x-3">
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm">
                         <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
                         Real-time Updates
                       </div>
@@ -1629,11 +1630,11 @@ const AmbulanceManagement = () => {
                 </div>
 
                 {/* Map Placeholder */}
-                <div className="h-96 bg-gray-100 flex items-center justify-center">
+                <div className="h-96 flex items-center justify-center">
                   <div className="text-center">
                     <Map className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-700 mb-2">Interactive Map View</h3>
-                    <p className="text-gray-500">Integration with Google Maps/Mapbox for live tracking</p>
+                    <h3 className="text-lg font-medium mb-2">Interactive Map View</h3>
+                    <p className="">Integration with Google Maps/Mapbox for live tracking</p>
                     <div className="mt-4 flex justify-center space-x-4">
                       <div className="flex items-center text-sm text-gray-600">
                         <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
@@ -1659,7 +1660,7 @@ const AmbulanceManagement = () => {
                   if (!ambulance) return null;
 
                   return (
-                    <div key={vehicleId} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div key={vehicleId} className="border border-gray-200 overflow-hidden">
                       <div className="p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div>
@@ -1704,13 +1705,15 @@ const AmbulanceManagement = () => {
                                 <div className="text-xs">{data.speed.toFixed(0)} km/h</div>
                               </div>
                             </div>
-                            <div className="flex items-center text-sm text-gray-600">
+
+                            {/* <div className="flex items-center text-sm text-gray-600">
                               <Battery className="w-4 h-4 mr-2 text-gray-400" />
                               <div>
                                 <div className="font-medium">Battery</div>
                                 <div className="text-xs">{data.batteryLevel}%</div>
                               </div>
-                            </div>
+                            </div> */}
+
                           </div>
                         </div>
 
@@ -1767,7 +1770,7 @@ const AmbulanceManagement = () => {
               </div>
 
               {/* Tracking Controls */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Tracking Controls</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <button className="flex items-center justify-center px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
@@ -1783,17 +1786,18 @@ const AmbulanceManagement = () => {
                     Emergency Stop
                   </button>
                 </div>
-              </div>
+              </div> */}
+
             </div>
           )}
 
       {/* Dispatch Modal */}
       {showDispatchModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+          <div className="bg-white shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-gray-900">Dispatch Ambulance</h3>
+                <h3 className="text-xl font-semibold">Dispatch Ambulance</h3>
                 <button
                   onClick={() => setShowDispatchModal(false)}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -1811,7 +1815,7 @@ const AmbulanceManagement = () => {
                   <select
                     value={dispatchForm.priority}
                     onChange={(e) => setDispatchForm({...dispatchForm, priority: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                   >
                     <option value="CRITICAL">Critical</option>
                     <option value="HIGH">High</option>
@@ -1825,7 +1829,7 @@ const AmbulanceManagement = () => {
                   <select
                     value={dispatchForm.incidentType}
                     onChange={(e) => setDispatchForm({...dispatchForm, incidentType: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                   >
                     <option value="TRAFFIC_ACCIDENT">Traffic Accident</option>
                     <option value="CARDIAC_ARREST">Cardiac Arrest</option>
@@ -1843,7 +1847,7 @@ const AmbulanceManagement = () => {
                   <select
                     value={selectedAmbulance || ''}
                     onChange={(e) => setSelectedAmbulance(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                   >
                     <option value="">Auto-Select Nearest</option>
                     {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').map(ambulance => (
@@ -1868,7 +1872,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.patientId}
                       onChange={(e) => setDispatchForm({...dispatchForm, patientId: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="PAT-2024-XXX"
                     />
                   </div>
@@ -1878,7 +1882,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.patientName}
                       onChange={(e) => setDispatchForm({...dispatchForm, patientName: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Enter patient name"
                     />
                   </div>
@@ -1888,7 +1892,7 @@ const AmbulanceManagement = () => {
                       type="number"
                       value={dispatchForm.patientAge}
                       onChange={(e) => setDispatchForm({...dispatchForm, patientAge: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Age"
                     />
                   </div>
@@ -1899,7 +1903,7 @@ const AmbulanceManagement = () => {
                     type="text"
                     value={dispatchForm.condition}
                     onChange={(e) => setDispatchForm({...dispatchForm, condition: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                     placeholder="Describe the medical condition"
                   />
                 </div>
@@ -1908,7 +1912,7 @@ const AmbulanceManagement = () => {
               {/* Pickup Location */}
               <div className="border-t pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                  <MapPin className="w-5 h-5 mr-2 text-green-600" />
+                  <MapPin className="w-5 h-5 mr-2 text-blue-600" />
                   Pickup Location
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1918,7 +1922,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupAddressLine1}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupAddressLine1: e.target.value, pickupLocation: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Street address, building name"
                     />
                   </div>
@@ -1928,7 +1932,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupAddressLine2}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupAddressLine2: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Apartment, floor, etc."
                     />
                   </div>
@@ -1938,7 +1942,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupCity}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupCity: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="City"
                     />
                   </div>
@@ -1948,7 +1952,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupState}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupState: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="State/County"
                     />
                   </div>
@@ -1958,7 +1962,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupPostalCode}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupPostalCode: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="00100"
                     />
                   </div>
@@ -1968,7 +1972,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupCountry}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupCountry: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Kenya"
                     />
                   </div>
@@ -1980,7 +1984,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupLatitude}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupLatitude: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="-1.2921"
                     />
                   </div>
@@ -1990,7 +1994,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupLongitude}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupLongitude: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="36.8219"
                     />
                   </div>
@@ -2000,7 +2004,7 @@ const AmbulanceManagement = () => {
               {/* Destination/Dropoff Location */}
               <div className="border-t pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                  <Navigation className="w-5 h-5 mr-2 text-purple-600" />
+                  <Navigation className="w-5 h-5 mr-2 text-blue-600" />
                   Destination Hospital
                 </h4>
                 <div className="mb-4">
@@ -2011,7 +2015,7 @@ const AmbulanceManagement = () => {
                       const hospitalId = e.target.value;
                       setDispatchForm({...dispatchForm, hospitalId, destination: e.target.options[e.target.selectedIndex].text});
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                   >
                     <option value="">Select destination hospital</option>
                     <option value="HOSP-001">Kenyatta National Hospital</option>
@@ -2029,7 +2033,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffAddressLine1}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffAddressLine1: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Hospital address"
                     />
                   </div>
@@ -2039,7 +2043,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffAddressLine2}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffAddressLine2: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Department, wing, etc."
                     />
                   </div>
@@ -2049,7 +2053,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffCity}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffCity: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="City"
                     />
                   </div>
@@ -2059,7 +2063,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffState}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffState: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="State/County"
                     />
                   </div>
@@ -2069,7 +2073,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffPostalCode}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffPostalCode: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="00100"
                     />
                   </div>
@@ -2079,7 +2083,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffCountry}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffCountry: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Kenya"
                     />
                   </div>
@@ -2091,7 +2095,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffLatitude}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffLatitude: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="-1.3018"
                     />
                   </div>
@@ -2101,7 +2105,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffLongitude}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffLongitude: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="36.8073"
                     />
                   </div>
@@ -2111,7 +2115,7 @@ const AmbulanceManagement = () => {
               {/* Caller Information */}
               <div className="border-t pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                  <Phone className="w-5 h-5 mr-2 text-orange-600" />
+                  <Phone className="w-5 h-5 mr-2 text-blue-600" />
                   Caller Information
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2121,7 +2125,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.callerName}
                       onChange={(e) => setDispatchForm({...dispatchForm, callerName: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="Who is calling?"
                     />
                   </div>
@@ -2131,7 +2135,7 @@ const AmbulanceManagement = () => {
                       type="tel"
                       value={dispatchForm.callerPhone}
                       onChange={(e) => setDispatchForm({...dispatchForm, callerPhone: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="+254 7xx xxx xxx"
                     />
                   </div>
@@ -2142,7 +2146,7 @@ const AmbulanceManagement = () => {
                     value={dispatchForm.callerNotes}
                     onChange={(e) => setDispatchForm({...dispatchForm, callerNotes: e.target.value})}
                     rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                     placeholder="Additional information from the caller..."
                   />
                 </div>
@@ -2151,7 +2155,7 @@ const AmbulanceManagement = () => {
               {/* Clinical/Operational Notes */}
               <div className="border-t pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                  <Activity className="w-5 h-5 mr-2 text-red-600" />
+                  <Activity className="w-5 h-5 mr-2 text-blue-600" />
                   Clinical & Operational Notes
                 </h4>
                 <div>
@@ -2160,7 +2164,7 @@ const AmbulanceManagement = () => {
                     value={dispatchForm.notes}
                     onChange={(e) => setDispatchForm({...dispatchForm, notes: e.target.value, specialInstructions: e.target.value})}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                     placeholder="Any special instructions for the medical team, clinical observations, operational notes..."
                   />
                 </div>
@@ -2176,7 +2180,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.estimatedDistance}
                       onChange={(e) => setDispatchForm({...dispatchForm, estimatedDistance: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="e.g., 12.5 km"
                     />
                   </div>
@@ -2186,7 +2190,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.estimatedTime}
                       onChange={(e) => setDispatchForm({...dispatchForm, estimatedTime: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                       placeholder="e.g., 15 minutes"
                     />
                   </div>
@@ -2216,7 +2220,7 @@ const AmbulanceManagement = () => {
                     
                     handleDispatch(ambulanceToDispatch, 'manual-dispatch');
                   }}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
                 >
                   <Send className="w-4 h-4 mr-2" />
                   Dispatch Ambulance

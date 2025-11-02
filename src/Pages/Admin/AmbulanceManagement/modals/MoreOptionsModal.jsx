@@ -28,48 +28,48 @@ const MoreOptionsModal = ({ ambulance, onClose, onAction }) => {
       icon: Calendar,
       label: 'Schedule Maintenance',
       action: 'schedule',
-      color: 'text-orange-600',
-      bgColor: 'hover:bg-orange-50',
+     color: 'text-blue-600',
+      bgColor: 'hover:bg-blue-50',
       description: 'Schedule next maintenance date'
     },
     {
       icon: FileText,
       label: 'View Service History',
       action: 'history',
-      color: 'text-purple-600',
-      bgColor: 'hover:bg-purple-50',
+      color: 'text-blue-600',
+      bgColor: 'hover:bg-blue-50',
       description: 'View complete service records'
     },
     {
       icon: Download,
       label: 'Export Details',
       action: 'export',
-      color: 'text-green-600',
-      bgColor: 'hover:bg-green-50',
+      color: 'text-blue-600',
+      bgColor: 'hover:bg-blue-50',
       description: 'Download ambulance information'
     },
     {
       icon: Printer,
       label: 'Print Report',
       action: 'print',
-      color: 'text-gray-600',
-      bgColor: 'hover:bg-gray-50',
+     color: 'text-blue-600',
+      bgColor: 'hover:bg-blue-50',
       description: 'Print detailed report'
     },
     {
       icon: RefreshCw,
       label: 'Refresh Status',
       action: 'refresh',
-      color: 'text-indigo-600',
-      bgColor: 'hover:bg-indigo-50',
+      color: 'text-blue-600',
+      bgColor: 'hover:bg-blue-50',
       description: 'Update current status'
     },
     {
       icon: Archive,
       label: 'Archive Vehicle',
       action: 'archive',
-      color: 'text-yellow-600',
-      bgColor: 'hover:bg-yellow-50',
+     color: 'text-blue-600',
+      bgColor: 'hover:bg-blue-50',
       description: 'Move to archived vehicles'
     },
     {
@@ -89,20 +89,20 @@ const MoreOptionsModal = ({ ambulance, onClose, onAction }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+      <div className="bg-white shadow-2xl max-w-2xl w-full">
         {/* Header */}
-        <div className="bg-gradient-to-r from-gray-700 to-gray-800 p-6 text-white rounded-t-xl">
+        <div className="p-6 rounded-t-xl">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-2xl font-bold">More Options</h2>
-              <p className="text-gray-300 mt-1">
+              <p className="mt-1">
                 {ambulance.vehiclePlate} - {ambulance.registrationNumber}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:bg-white/20 rounded-lg p-2 transition-colors"
+              className="hover:bg-white/20 rounded-lg p-2 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -118,11 +118,11 @@ const MoreOptionsModal = ({ ambulance, onClose, onAction }) => {
                 <button
                   key={index}
                   onClick={() => handleAction(item.action)}
-                  className={`flex items-start p-4 rounded-lg border-2 border-gray-100 transition-all ${item.bgColor} ${
+                  className={`flex items-start p-4 border-2 border-gray-100 transition-all ${item.bgColor} ${
                     item.danger ? 'border-red-200' : ''
                   } group`}
                 >
-                  <div className={`p-2 rounded-lg ${item.danger ? 'bg-red-100' : 'bg-gray-100'} mr-4`}>
+                  <div className={`p-2 rounded-lg ${item.danger ? '' : ''} mr-4`}>
                     <Icon className={`w-5 h-5 ${item.color}`} />
                   </div>
                   <div className="flex-1 text-left">

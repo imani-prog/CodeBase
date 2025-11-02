@@ -21,24 +21,24 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
   if (!ambulance) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+      <div className="bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+        <div className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
-                <Truck className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 flex items-center justify-center">
+                <Truck className="w-8 h-8" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold">{ambulance.vehiclePlate}</h2>
-                <p className="text-blue-100">Registration: {ambulance.registrationNumber}</p>
-                <p className="text-blue-100 text-sm">{ambulance.model} ({ambulance.year})</p>
+                <p className="">Registration: {ambulance.registrationNumber}</p>
+                <p className="text-sm">{ambulance.model} ({ambulance.year})</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:bg-white/20 rounded-lg p-2 transition-colors"
+              className="hover:bg-white/20 rounded-lg p-2 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -56,8 +56,8 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Vehicle Information */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Truck className="w-5 h-5 mr-2 text-blue-600" />
                 Vehicle Information
               </h3>
@@ -85,9 +85,9 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
             </div>
 
             {/* Capacity & Specifications */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Activity className="w-5 h-5 mr-2 text-green-600" />
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Activity className="w-5 h-5 mr-2 text-blue-600" />
                 Specifications
               </h3>
               <div className="space-y-3">
@@ -104,13 +104,13 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">ICU Equipped</span>
-                  <span className={`text-sm font-medium ${ambulance.equippedForICU ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className={`text-sm font-medium ${ambulance.equippedForICU ? 'text-blue-600' : 'text-gray-400'}`}>
                     {ambulance.equippedForICU ? '✓ Yes' : '✗ No'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">GPS Enabled</span>
-                  <span className={`text-sm font-medium ${ambulance.gpsEnabled ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className={`text-sm font-medium ${ambulance.gpsEnabled ? 'text-blue-600' : 'text-gray-400'}`}>
                     {ambulance.gpsEnabled ? '✓ Yes' : '✗ No'}
                   </span>
                 </div>
@@ -122,9 +122,9 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
             </div>
 
             {/* Current Location & Driver */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <MapPin className="w-5 h-5 mr-2 text-red-600" />
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <MapPin className="w-5 h-5 mr-2 text-blue-600" />
                 Current Assignment
               </h3>
               <div className="space-y-3">
@@ -148,9 +148,9 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
             </div>
 
             {/* Insurance Information */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Shield className="w-5 h-5 mr-2 text-purple-600" />
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Shield className="w-5 h-5 mr-2 text-blue-600" />
                 Insurance Details
               </h3>
               <div className="space-y-3">
@@ -166,9 +166,9 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
             </div>
 
             {/* Maintenance Information */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Wrench className="w-5 h-5 mr-2 text-orange-600" />
+            <div className="border border-gray-200  p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Wrench className="w-5 h-5 mr-2 text-blue-600" />
                 Maintenance
               </h3>
               <div className="space-y-3">
@@ -190,7 +190,7 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
             </div>
 
             {/* Performance Statistics */}
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="border border-gray-200  p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Activity className="w-5 h-5 mr-2 text-indigo-600" />
                 Performance
@@ -216,9 +216,9 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
           </div>
 
           {/* Fuel Level */}
-          <div className="mt-6 bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Fuel className="w-5 h-5 mr-2 text-yellow-600" />
+          <div className="mt-6 border border-gray-200  p-4">
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <Fuel className="w-5 h-5 mr-2 text-blue-600" />
               Fuel Level
             </h3>
             <div className="space-y-2">
@@ -242,15 +242,15 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
           </div>
 
           {/* Equipment List */}
-          <div className="mt-6 bg-gray-50 rounded-lg p-4">
+          <div className="mt-6 border border-gray-200  p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Heart className="w-5 h-5 mr-2 text-red-600" />
+              <Heart className="w-5 h-5 mr-2 text-blue-600" />
               Medical Equipment
             </h3>
             <div className="grid grid-cols-2 gap-2">
               {ambulance.equipment.map((item, index) => (
                 <div key={index} className="flex items-center space-x-2 text-sm">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <span>{item}</span>
                 </div>
               ))}
@@ -259,7 +259,7 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
 
           {/* Notes */}
           {ambulance.notes && (
-            <div className="mt-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
+            <div className="mt-6 border-l-4 border-blue-500 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-blue-600" />
                 Notes
@@ -270,7 +270,7 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t">
+        <div className="bg-gray-50 px-4 py-2 flex justify-end space-x-3 border-t">
           <button
             onClick={onClose}
             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
