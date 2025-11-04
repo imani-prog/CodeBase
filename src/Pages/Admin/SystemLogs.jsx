@@ -145,40 +145,40 @@ const SystemLogs = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg mb-8">
+      <div className="p-8 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold mb-2">System Logs</h1>
-            <p className="text-blue-200 text-lg">
+            <p className="text-lg">
               Monitor and analyze system activities, errors, and performance
             </p>
             <div className="mt-4 flex items-center space-x-6">
               <div className="flex items-center">
-                <Activity className="w-5 h-5 mr-2 text-blue-300" />
-                <span className="text-blue-200">{filteredLogs.length} Log Entries</span>
+                <Activity className="w-5 h-5 mr-2 " />
+                <span className="">{filteredLogs.length} Log Entries</span>
               </div>
               <div className="flex items-center">
                 <AlertTriangle className="w-5 h-5 mr-2 text-yellow-300" />
-                <span className="text-blue-200">
+                <span className="">
                   {systemLogs.filter(l => l.level === 'error' || l.level === 'warning').length} Issues
                 </span>
               </div>
               <div className="flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-green-300" />
-                <span className="text-blue-200">Real-time Monitoring</span>
+                <span className="">Real-time Monitoring</span>
               </div>
             </div>
           </div>
           <div className="hidden md:block">
             <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-              <Server className="w-16 h-16 text-blue-300" />
+              <Server className="w-16 h-16 " />
             </div>
           </div>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="border border-gray-200 p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
@@ -186,7 +186,7 @@ const SystemLogs = () => {
             <input
               type="text"
               placeholder="Search logs, messages, or sources..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -197,7 +197,7 @@ const SystemLogs = () => {
             <select
               value={selectedLevel}
               onChange={e => setSelectedLevel(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100"
             >
               {levelOptions.map(opt => (
                 <option key={opt.value} value={opt.value}>
@@ -209,7 +209,7 @@ const SystemLogs = () => {
             <select
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100"
             >
               {categoryOptions.map(opt => (
                 <option key={opt.value} value={opt.value}>
@@ -221,7 +221,7 @@ const SystemLogs = () => {
             <select
               value={selectedDateRange}
               onChange={e => setSelectedDateRange(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100"
             >
               {dateRangeOptions.map(opt => (
                 <option key={opt.value} value={opt.value}>
@@ -262,17 +262,17 @@ const SystemLogs = () => {
       </div>
 
       {/* Logs Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Level</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Timestamp</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Message</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase">Level</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase">Timestamp</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase">Category</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase">Source</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase">Message</th>
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">

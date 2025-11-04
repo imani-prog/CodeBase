@@ -281,14 +281,14 @@ const FinancialManagement = () => {
       case 'completed':
       case 'paid':
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-800';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-yellow-800';
       case 'failed':
       case 'maintenance':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-800';
     }
   };
 
@@ -296,7 +296,7 @@ const FinancialManagement = () => {
     <div className="space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
@@ -308,13 +308,13 @@ const FinancialManagement = () => {
                 <span className="text-sm text-green-600">+{financialOverview.monthlyGrowth}%</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Expenses</p>
@@ -326,13 +326,13 @@ const FinancialManagement = () => {
                 <span className="text-sm text-red-600">68.6% of revenue</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
               <TrendingDown className="w-6 h-6 text-red-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Net Profit</p>
@@ -344,13 +344,13 @@ const FinancialManagement = () => {
                 <span className="text-sm text-blue-600">{financialOverview.profitMargin}% margin</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
               <CircleDollarSign className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Pending Payments</p>
@@ -362,7 +362,7 @@ const FinancialManagement = () => {
                 <span className="text-sm text-yellow-600">23 transactions</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
               <AlertCircle className="w-6 h-6 text-yellow-600" />
             </div>
           </div>
@@ -370,13 +370,13 @@ const FinancialManagement = () => {
       </div>
 
       {/* Revenue vs Expenses Chart */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="  shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Monthly Financial Trend</h3>
           <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
           >
             <option value="this-month">This Month</option>
             <option value="last-3-months">Last 3 Months</option>
@@ -395,7 +395,7 @@ const FinancialManagement = () => {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h4 className="font-semibold text-gray-900 mb-4">Quick Actions</h4>
           <div className="space-y-3">
             <button className="w-full flex items-center px-4 py-2 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
@@ -413,7 +413,7 @@ const FinancialManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h4 className="font-semibold text-gray-900 mb-4">Recent Transactions</h4>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -440,7 +440,7 @@ const FinancialManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h4 className="font-semibold text-gray-900 mb-4">Financial Alerts</h4>
           <div className="space-y-3">
             <div className="flex items-start">
@@ -472,11 +472,11 @@ const FinancialManagement = () => {
 
   const renderRevenue = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Revenue Streams Analysis</h3>
           <div className="flex items-center space-x-3">
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
               <option>This Month</option>
               <option>Last Month</option>
               <option>Last 3 Months</option>
@@ -491,7 +491,7 @@ const FinancialManagement = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             {revenueStreams.map((stream, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div key={index} className="border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium text-gray-900">{stream.source}</h4>
                   <div className="flex items-center">
@@ -532,7 +532,7 @@ const FinancialManagement = () => {
             ))}
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-gray-50 p-6">
             <h4 className="font-medium text-gray-900 mb-4">Revenue Distribution</h4>
             <div className="h-64 flex items-center justify-center">
               <div className="text-center">
@@ -549,7 +549,7 @@ const FinancialManagement = () => {
 
   const renderExpenses = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Expense Management</h3>
           <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -560,11 +560,11 @@ const FinancialManagement = () => {
 
         <div className="space-y-4">
           {expenses.map((expense, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div key={index} className="border border-gray-200 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-medium text-gray-900">{expense.category}</h4>
                 <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  expense.variance >= 0 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                  expense.variance >= 0 ? ' text-red-800' : ' text-green-800'
                 }`}>
                   {expense.variance >= 0 ? '+' : ''}{formatCurrency(expense.variance)} vs budget
                 </div>
@@ -619,11 +619,11 @@ const FinancialManagement = () => {
 
   const renderAmbulanceFinances = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Ambulance Financial Performance</h3>
           <div className="flex items-center space-x-3">
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
               <option>All Ambulances</option>
               <option>Active Only</option>
               <option>Maintenance</option>
@@ -639,14 +639,14 @@ const FinancialManagement = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Ambulance</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Fuel Costs</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Maintenance</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Driver Pay</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Net Profit</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Trips</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+                <th className="text-left py-3 px-4 font-bold">Ambulance</th>
+                <th className="text-left py-3 px-4 font-bold">Revenue</th>
+                <th className="text-left py-3 px-4 font-bold">Fuel Costs</th>
+                <th className="text-left py-3 px-4 font-bold">Maintenance</th>
+                <th className="text-left py-3 px-4 font-bold">Driver Pay</th>
+                <th className="text-left py-3 px-4 font-bold">Net Profit</th>
+                <th className="text-left py-3 px-4 font-bold">Trips</th>
+                <th className="text-left py-3 px-4 font-bold">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -697,11 +697,11 @@ const FinancialManagement = () => {
 
   const renderCHWPayments = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Community Health Worker Payments</h3>
           <div className="flex items-center space-x-3">
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100focus:border-transparent">
               <option>All CHWs</option>
               <option>Paid</option>
               <option>Pending</option>
@@ -714,7 +714,7 @@ const FinancialManagement = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="bg-blue-50 rounded-lg p-4">
+          <div className="border border-gray-100 shadow-md p-4">
             <div className="flex items-center">
               <Users className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -723,7 +723,7 @@ const FinancialManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-green-50 rounded-lg p-4">
+          <div className="border border-gray-100 shadow-md p-4">
             <div className="flex items-center">
               <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
               <div>
@@ -732,7 +732,7 @@ const FinancialManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-yellow-50 rounded-lg p-4">
+          <div className="border border-gray-100 shadow-md p-4">
             <div className="flex items-center">
               <Clock className="w-8 h-8 text-yellow-600 mr-3" />
               <div>
@@ -747,14 +747,14 @@ const FinancialManagement = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-medium text-gray-900">CHW</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Base Pay</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Performance</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Transport</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Total</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Patients</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
+                <th className="text-left py-3 px-4 font-bold">CHW</th>
+                <th className="text-left py-3 px-4 font-bold">Base Pay</th>
+                <th className="text-left py-3 px-4 font-bold">Performance</th>
+                <th className="text-left py-3 px-4 font-bold">Transport</th>
+                <th className="text-left py-3 px-4 font-bold">Total</th>
+                <th className="text-left py-3 px-4 font-bold">Patients</th>
+                <th className="text-left py-3 px-4 font-bold">Status</th>
+                <th className="text-left py-3 px-4 font-bold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -804,7 +804,7 @@ const FinancialManagement = () => {
 
   const renderPatientPayments = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Patient Payment Transactions</h3>
           <div className="flex items-center space-x-3">
@@ -815,10 +815,10 @@ const FinancialManagement = () => {
                 placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
               />
             </div>
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
               <option>All Payments</option>
               <option>Completed</option>
               <option>Pending</option>
@@ -828,7 +828,7 @@ const FinancialManagement = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
+          <div className="border border-gray-100 shadow-md p-4">
             <div className="flex items-center">
               <Smartphone className="w-6 h-6 mr-2" />
               <div>
@@ -837,7 +837,7 @@ const FinancialManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
+          <div className="border border-gray-100 shadow-md p-4">
             <div className="flex items-center">
               <CreditCard className="w-6 h-6 mr-2" />
               <div>
@@ -846,7 +846,7 @@ const FinancialManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg p-4 text-white">
+          <div className="border border-gray-100 shadow-md p-4">
             <div className="flex items-center">
               <Banknote className="w-6 h-6 mr-2" />
               <div>
@@ -855,7 +855,7 @@ const FinancialManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-4 text-white">
+          <div className="border border-gray-100 shadow-md p-4">
             <div className="flex items-center">
               <Receipt className="w-6 h-6 mr-2" />
               <div>
@@ -870,13 +870,13 @@ const FinancialManagement = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Patient</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Service</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Amount</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Payment Method</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Date</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
+                <th className="text-left py-3 px-4 font-bold">Patient</th>
+                <th className="text-left py-3 px-4 font-bold">Service</th>
+                <th className="text-left py-3 px-4 font-bold">Amount</th>
+                <th className="text-left py-3 px-4 font-bold">Payment Method</th>
+                <th className="text-left py-3 px-4 font-bold">Status</th>
+                <th className="text-left py-3 px-4 font-bold">Date</th>
+                <th className="text-left py-3 px-4 font-bold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -928,7 +928,7 @@ const FinancialManagement = () => {
 
   const renderReports = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Financial Reports & Analytics</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -940,7 +940,7 @@ const FinancialManagement = () => {
                 <p className="text-sm text-gray-600">Monthly revenue breakdown</p>
               </div>
             </div>
-            <button className="w-full flex items-center justify-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+            <button className="w-full flex items-center shadow-md justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
@@ -948,13 +948,13 @@ const FinancialManagement = () => {
 
           <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center mb-4">
-              <TrendingDown className="w-8 h-8 text-red-600 mr-3" />
+              <TrendingDown className="w-8 h-8 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Expense Report</h4>
                 <p className="text-sm text-gray-600">Detailed expense analysis</p>
               </div>
             </div>
-            <button className="w-full flex items-center justify-center px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors">
+            <button className="w-full flex items-center shadow-md justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
@@ -962,13 +962,13 @@ const FinancialManagement = () => {
 
           <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center mb-4">
-              <Truck className="w-8 h-8 text-green-600 mr-3" />
+              <Truck className="w-8 h-8 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Ambulance P&L</h4>
                 <p className="text-sm text-gray-600">Profit & loss per ambulance</p>
               </div>
             </div>
-            <button className="w-full flex items-center justify-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
+            <button className="w-full flex items-center shadow-md justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
@@ -976,13 +976,13 @@ const FinancialManagement = () => {
 
           <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center mb-4">
-              <UserCheck className="w-8 h-8 text-purple-600 mr-3" />
+              <UserCheck className="w-8 h-8 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">CHW Payment Report</h4>
                 <p className="text-sm text-gray-600">Payment summary for CHWs</p>
               </div>
             </div>
-            <button className="w-full flex items-center justify-center px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors">
+            <button className="w-full flex shadow-md items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
@@ -990,13 +990,13 @@ const FinancialManagement = () => {
 
           <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center mb-4">
-              <PieChart className="w-8 h-8 text-yellow-600 mr-3" />
+              <PieChart className="w-8 h-8 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Financial Summary</h4>
                 <p className="text-sm text-gray-600">Complete financial overview</p>
               </div>
             </div>
-            <button className="w-full flex items-center justify-center px-4 py-2 bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-colors">
+            <button className="w-full flex shadow-md items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
@@ -1004,13 +1004,13 @@ const FinancialManagement = () => {
 
           <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center mb-4">
-              <Activity className="w-8 h-8 text-indigo-600 mr-3" />
+              <Activity className="w-8 h-8 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Budget Analysis</h4>
                 <p className="text-sm text-gray-600">Budget vs actual comparison</p>
               </div>
             </div>
-            <button className="w-full flex items-center justify-center px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors">
+            <button className="w-full flex items-center justify-center border border-gray-100 shadow-md px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
@@ -1027,29 +1027,29 @@ const FinancialManagement = () => {
         <div className="">
           {/* Header Section */}
           <div className="mb-8">
-            <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
+            <div className="p-8 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl font-bold mb-2">Financial Management</h1>
-                  <p className="text-blue-200 text-lg">
+                  <p className="text-lg">
                     Comprehensive financial oversight for MediLink healthcare operations
                   </p>
                   <div className="mt-4 flex items-center space-x-6">
                     <div className="flex items-center">
                       <TrendingUp className="w-5 h-5 mr-2 text-green-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         Revenue: {formatCurrency(financialOverview.totalRevenue)}
                       </span>
                     </div>
                     <div className="flex items-center">
                       <CircleDollarSign className="w-5 h-5 mr-2 text-yellow-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         Profit: {formatCurrency(financialOverview.netProfit)}
                       </span>
                     </div>
                     <div className="flex items-center">
                       <Target className="w-5 h-5 mr-2 text-blue-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         Margin: {financialOverview.profitMargin}%
                       </span>
                     </div>
@@ -1057,7 +1057,7 @@ const FinancialManagement = () => {
                 </div>
                 <div className="hidden md:block">
                   <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-16 h-16 text-blue-300" />
+                    <DollarSign className="w-16 h-16" />
                   </div>
                 </div>
               </div>
@@ -1065,7 +1065,7 @@ const FinancialManagement = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+          <div className="shadow-sm border border-gray-200 mb-6">
             <div className="flex overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;

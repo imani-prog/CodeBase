@@ -409,7 +409,7 @@ const TrainingManagement = () => {
     <div className="space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Courses</p>
@@ -419,13 +419,13 @@ const TrainingManagement = () => {
                 <span className="text-sm text-blue-600">{trainingOverview.activeCourses} active</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <GraduationCap className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Students</p>
@@ -435,13 +435,13 @@ const TrainingManagement = () => {
                 <span className="text-sm text-green-600">+{trainingOverview.monthlyGrowth}% this month</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Users className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
@@ -451,13 +451,13 @@ const TrainingManagement = () => {
                 <span className="text-sm text-yellow-600">From training programs</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-yellow-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Certificates Issued</p>
@@ -467,7 +467,7 @@ const TrainingManagement = () => {
                 <span className="text-sm text-purple-600">{trainingOverview.avgCompletionRate.toFixed(1)}% completion</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Award className="w-6 h-6 text-purple-600" />
             </div>
           </div>
@@ -476,7 +476,7 @@ const TrainingManagement = () => {
 
       {/* Charts and Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Enrollment Trends</h3>
           <div className="space-y-4">
             {enrollmentTrends.map((trend, index) => (
@@ -494,7 +494,7 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue by Category</h3>
           <div className="space-y-3">
             {revenueByCategory.slice(0, 5).map((category, index) => (
@@ -514,22 +514,22 @@ const TrainingManagement = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <button className="flex items-center justify-center px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center justify-center ml-20 mr-20 px-1 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Plus className="w-5 h-5 mr-2" />
             Create New Course
           </button>
-          <button className="flex items-center justify-center px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+          <button className="flex items-center justify-center ml-20 mr-20 px-1 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
             <UserPlus className="w-5 h-5 mr-2" />
             Bulk Enrollment
           </button>
-          <button className="flex items-center justify-center px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          <button className="flex items-center justify-center ml-20 mr-20 px-1 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
             <Award className="w-5 h-5 mr-2" />
             Issue Certificates
           </button>
-          <button className="flex items-center justify-center px-6 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+          <button className="flex items-center justify-center mr-20 ml-20 px-1 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
             <Download className="w-5 h-5 mr-2" />
             Export Reports
           </button>
@@ -540,9 +540,9 @@ const TrainingManagement = () => {
 
   const renderCourses = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Course Management</h3>
+          <h3 className="text-lg font-semibold">Course Management</h3>
           <div className="flex items-center space-x-3">
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
@@ -551,13 +551,13 @@ const TrainingManagement = () => {
                 placeholder="Search courses..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
               />
             </div>
             <select
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
             >
               <option value="all">All Courses</option>
               <option value="active">Active</option>
@@ -684,7 +684,7 @@ const TrainingManagement = () => {
 
   const renderStudents = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Student Enrollment Management</h3>
           <div className="flex items-center space-x-3">
@@ -700,7 +700,7 @@ const TrainingManagement = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-blue-50 rounded-lg p-6">
+          <div className="border border-gray-100 shadow-md p-6">
             <div className="flex items-center">
               <Users className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -709,7 +709,7 @@ const TrainingManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-green-50 rounded-lg p-6">
+          <div className="border border-gray-100 shadow-md p-6">
             <div className="flex items-center">
               <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
               <div>
@@ -718,7 +718,7 @@ const TrainingManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-purple-50 rounded-lg p-6">
+          <div className="border border-gray-100 shadow-md  p-6">
             <div className="flex items-center">
               <Award className="w-8 h-8 text-purple-600 mr-3" />
               <div>
@@ -731,7 +731,7 @@ const TrainingManagement = () => {
 
         <div className="space-y-4">
           {trainingCourses.map((course) => (
-            <div key={course.id} className="border border-gray-200 rounded-lg p-6">
+            <div key={course.id} className="border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h4 className="font-medium text-gray-900">{course.title}</h4>
@@ -794,19 +794,19 @@ const TrainingManagement = () => {
   const renderRevenue = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
               <p className="text-2xl font-bold text-gray-900">{formatCurrency(trainingOverview.totalRevenue)}</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <DollarSign className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Avg Revenue per Course</p>
@@ -814,13 +814,13 @@ const TrainingManagement = () => {
                 {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalCourses)}
               </p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12  flex items-center justify-center">
               <Target className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Avg Revenue per Student</p>
@@ -828,30 +828,30 @@ const TrainingManagement = () => {
                 {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalStudents)}
               </p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Users className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Monthly Growth</p>
               <p className="text-2xl font-bold text-gray-900">{trainingOverview.monthlyGrowth}%</p>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-yellow-600" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Revenue by Category</h3>
         <div className="space-y-4">
           {revenueByCategory.map((category, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div key={index} className="border border-gray-200 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-medium text-gray-900">{category.category}</h4>
                 <div className="text-right">
@@ -892,11 +892,11 @@ const TrainingManagement = () => {
 
   const renderCertificates = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Certificate Management</h3>
+          <h3 className="text-lg font-semibold ">Certificate Management</h3>
           <div className="flex items-center space-x-3">
-            <button className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+            <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
               <Award className="w-4 h-4 mr-2" />
               Issue Certificates
             </button>
@@ -908,7 +908,7 @@ const TrainingManagement = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-purple-50 rounded-lg p-6">
+          <div className="shadow-md border border-gray-200 p-6">
             <div className="flex items-center">
               <Award className="w-8 h-8 text-purple-600 mr-3" />
               <div>
@@ -917,7 +917,7 @@ const TrainingManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-green-50 rounded-lg p-6">
+          <div className="shadow-md border border-gray-200 p-6">
             <div className="flex items-center">
               <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
               <div>
@@ -928,7 +928,7 @@ const TrainingManagement = () => {
               </div>
             </div>
           </div>
-          <div className="bg-blue-50 rounded-lg p-6">
+          <div className="shadow-md border border-gray-200 p-6">
             <div className="flex items-center">
               <Star className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -941,7 +941,7 @@ const TrainingManagement = () => {
 
         <div className="space-y-4">
           {trainingCourses.map((course) => (
-            <div key={course.id} className="border border-gray-200 rounded-lg p-6">
+            <div key={course.id} className="border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h4 className="font-medium text-gray-900">{course.title}</h4>
@@ -958,7 +958,7 @@ const TrainingManagement = () => {
                     <p className="text-sm text-gray-600">Pass Rate</p>
                     <p className="font-semibold text-gray-900">{course.passRate}%</p>
                   </div>
-                  <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     Issue Certificates
                   </button>
                 </div>
@@ -1001,29 +1001,29 @@ const TrainingManagement = () => {
         <div className="">
           {/* Header Section */}
           <div className="mb-8">
-            <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
+            <div className="p-8 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl font-bold mb-2">Training Management</h1>
-                  <p className="text-blue-200 text-lg">
+                  <p className=" text-lg">
                     Comprehensive management of healthcare training programs and certifications
                   </p>
                   <div className="mt-4 flex items-center space-x-6">
                     <div className="flex items-center">
                       <BookOpen className="w-5 h-5 mr-2 text-green-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {trainingOverview.activeCourses}/{trainingOverview.totalCourses} Active Courses
                       </span>
                     </div>
                     <div className="flex items-center">
                       <Users className="w-5 h-5 mr-2 text-blue-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {trainingOverview.totalStudents} Total Students
                       </span>
                     </div>
                     <div className="flex items-center">
                       <DollarSign className="w-5 h-5 mr-2 text-yellow-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {formatCurrency(trainingOverview.totalRevenue)}
                       </span>
                     </div>
@@ -1031,7 +1031,7 @@ const TrainingManagement = () => {
                 </div>
                 <div className="hidden md:block">
                   <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                    <GraduationCap className="w-16 h-16 text-blue-300" />
+                    <GraduationCap className="w-16 h-16 " />
                   </div>
                 </div>
               </div>
@@ -1039,7 +1039,7 @@ const TrainingManagement = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+          <div className="border border-gray-200 mb-6">
             <div className="flex overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;

@@ -164,37 +164,37 @@ const ApproveRequests = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800 border-red-200';
-      case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'urgent': return 'text-red-800 border-red-200';
+      case 'high': return 'text-orange-800 border-orange-200';
+      case 'medium': return 'text-yellow-800 border-yellow-200';
+      case 'low': return 'text-green-800 border-green-200';
+      default: return 'text-gray-800 border-gray-200';
     }
   };
 
   const getTypeIcon = (type) => {
     switch (type) {
       case 'chw_application': return <UserCheck className="w-5 h-5 text-blue-600" />;
-      case 'patient_registration': return <Users className="w-5 h-5 text-green-600" />;
-      case 'system_access': return <Shield className="w-5 h-5 text-purple-600" />;
-      case 'clinic_partnership': return <Hospital className="w-5 h-5 text-indigo-600" />;
-      case 'training_enrollment': return <FileText className="w-5 h-5 text-orange-600" />;
-      case 'equipment_request': return <Stethoscope className="w-5 h-5 text-teal-600" />;
+      case 'patient_registration': return <Users className="w-5 h-5 text-blue-600" />;
+      case 'system_access': return <Shield className="w-5 h-5 text-blue-600" />;
+      case 'clinic_partnership': return <Hospital className="w-5 h-5 text-blue-600" />;
+      case 'training_enrollment': return <FileText className="w-5 h-5 text-blue-600" />;
+      case 'equipment_request': return <Stethoscope className="w-5 h-5 text-blue-600" />;
       default: return <FileText className="w-5 h-5 text-gray-600" />;
     }
   };
 
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'chw_application': return 'bg-blue-50 border-blue-200';
-      case 'patient_registration': return 'bg-green-50 border-green-200';
-      case 'system_access': return 'bg-purple-50 border-purple-200';
-      case 'clinic_partnership': return 'bg-indigo-50 border-indigo-200';
-      case 'training_enrollment': return 'bg-orange-50 border-orange-200';
-      case 'equipment_request': return 'bg-teal-50 border-teal-200';
-      default: return 'bg-gray-50 border-gray-200';
-    }
-  };
+  // const getTypeColor = (type) => {
+  //   switch (type) {
+  //     case 'chw_application': return 'bg-blue-50 border-blue-200';
+  //     case 'patient_registration': return 'bg-green-50 border-green-200';
+  //     case 'system_access': return 'bg-purple-50 border-purple-200';
+  //     case 'clinic_partnership': return 'bg-indigo-50 border-indigo-200';
+  //     case 'training_enrollment': return 'bg-orange-50 border-orange-200';
+  //     case 'equipment_request': return 'bg-teal-50 border-teal-200';
+  //     default: return 'bg-gray-50 border-gray-200';
+  //   }
+  // };
 
   const handleApprove = (id) => console.log('Approving request:', id);
   const handleReject = (id) => console.log('Rejecting request:', id);
@@ -218,21 +218,21 @@ const ApproveRequests = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="mb-8 bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
+      <div className="mb-8 p-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold mb-2">Approve Requests</h1>
-            <p className="text-blue-200 text-lg">
+            <p className="text-lg">
               Review and manage all pending requests in the MediLink system
             </p>
             <div className="mt-4 flex items-center space-x-6">
               <div className="flex items-center">
-                <Clock className="w-5 h-5 mr-2 text-blue-300" />
-                <span className="text-blue-200">{filteredRequests.length} Pending Requests</span>
+                <Clock className="w-5 h-5 mr-2" />
+                <span className="">{filteredRequests.length} Pending Requests</span>
               </div>
               <div className="flex items-center">
-                <AlertTriangle className="w-5 h-5 mr-2 text-yellow-300" />
-                <span className="text-blue-200">
+                <AlertTriangle className="w-5 h-5 mr-2" />
+                <span className="">
                   {requests.filter(r => r.priority === 'urgent' || r.priority === 'high').length} High Priority
                 </span>
               </div>
@@ -240,14 +240,14 @@ const ApproveRequests = () => {
           </div>
           <div className="hidden md:block">
             <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-              <FileText className="w-16 h-16 text-blue-300" />
+              <FileText className="w-16 h-16" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="border border-gray-200 p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex flex-col sm:flex-row gap-4 flex-1">
             {/* Search */}
@@ -256,7 +256,7 @@ const ApproveRequests = () => {
               <input
                 type="text"
                 placeholder="Search requests, names, or types..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -266,7 +266,7 @@ const ApproveRequests = () => {
             <div className="relative">
               <button
                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                className="flex items-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex items-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-gray-100 focus:border-transparent"
               >
                 <Filter className="w-5 h-5 mr-2 text-gray-500" />
                 <span className="text-gray-700">
@@ -285,7 +285,7 @@ const ApproveRequests = () => {
                         setShowFilterDropdown(false);
                       }}
                       className={`w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center justify-between ${
-                        selectedFilter === option.value ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                        selectedFilter === option.value ? 'bg-blue-50 font-bold' : ''
                       }`}
                     >
                       <span>{option.label}</span>
@@ -329,7 +329,7 @@ const ApproveRequests = () => {
         {filteredRequests.map(request => (
           <div
             key={request.id}
-            className={`bg-white rounded-xl shadow-sm border hover:shadow-md transition-all duration-200 ${getTypeColor(request.type)}`}
+            className={`shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200`}
           >
             <div className="p-6 border-b border-gray-100">
               <div className="flex items-start justify-between mb-4">
@@ -340,7 +340,7 @@ const ApproveRequests = () => {
                     onChange={() => toggleSelectRequest(request.id)}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <div className="p-2 bg-white rounded-lg border">{getTypeIcon(request.type)}</div>
+                  <div className="p-4 w-4 h-4">{getTypeIcon(request.type)}</div>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(request.priority)}`}>
                   {request.priority.toUpperCase()}
@@ -444,13 +444,13 @@ const ApproveRequests = () => {
             <div className="p-6 flex items-center space-x-3">
               <button
                 onClick={() => handleApprove(request.id)}
-                className="flex-1 flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                className="ml-10 mr-10 flex-1 flex items-center justify-center py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
               >
                 <Check className="w-4 h-4 mr-2" /> Approve
               </button>
               <button
                 onClick={() => handleReject(request.id)}
-                className="flex-1 flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="ml-10 mr-10 flex-1 flex items-center justify-center py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
                 <X className="w-4 h-4 mr-2" /> Reject
               </button>

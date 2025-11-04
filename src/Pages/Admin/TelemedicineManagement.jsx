@@ -277,32 +277,32 @@ const TelemedicineManagement = () => {
       case 'active':
       case 'available':
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-800';
       case 'busy':
       case 'paused':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-yellow-800';
       case 'offline':
       case 'cancelled':
       case 'terminated':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-800';
       case 'scheduled':
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-800';
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-800';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-yellow-800';
       case 'normal':
       case 'low':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-800';
     }
   };
 
@@ -325,7 +325,7 @@ const TelemedicineManagement = () => {
     <div className="space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Active Sessions</p>
@@ -335,13 +335,13 @@ const TelemedicineManagement = () => {
                 <span className="text-sm text-green-600">Live now</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Video className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Online Doctors</p>
@@ -351,13 +351,13 @@ const TelemedicineManagement = () => {
                 <span className="text-sm text-blue-600">of {platformOverview.totalDoctors} total</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Users className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Today's Revenue</p>
@@ -367,13 +367,13 @@ const TelemedicineManagement = () => {
                 <span className="text-sm text-green-600">+{platformOverview.monthlyGrowth}%</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <DollarSign className="w-6 h-6 text-yellow-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Avg Session Time</p>
@@ -383,7 +383,7 @@ const TelemedicineManagement = () => {
                 <span className="text-sm text-purple-600">Per session</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Timer className="w-6 h-6 text-purple-600" />
             </div>
           </div>
@@ -392,15 +392,15 @@ const TelemedicineManagement = () => {
 
       {/* Platform Usage Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Usage Distribution</h3>
           <div className="space-y-4">
             {Object.entries(platformStats).map(([platform, stats]) => (
               <div key={platform} className="flex items-center justify-between">
                 <div className="flex items-center">
                   {platform === 'videoCall' && <Video className="w-5 h-5 text-blue-600 mr-3" />}
-                  {platform === 'audioCall' && <Phone className="w-5 h-5 text-green-600 mr-3" />}
-                  {platform === 'messaging' && <MessageSquare className="w-5 h-5 text-purple-600 mr-3" />}
+                  {platform === 'audioCall' && <Phone className="w-5 h-5 text-blue-600 mr-3" />}
+                  {platform === 'messaging' && <MessageSquare className="w-5 h-5 text-blue-600 mr-3" />}
                   <div>
                     <p className="font-medium text-gray-900 capitalize">
                       {platform.replace('Call', ' Call')}
@@ -417,10 +417,10 @@ const TelemedicineManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div className="flex items-center justify-between p-3">
               <div className="flex items-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
                 <div>
@@ -430,7 +430,7 @@ const TelemedicineManagement = () => {
               </div>
               <span className="text-xs text-gray-500">2 min ago</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 ">
               <div className="flex items-center">
                 <UserCheck className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
@@ -440,7 +440,7 @@ const TelemedicineManagement = () => {
               </div>
               <span className="text-xs text-gray-500">5 min ago</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+            <div className="flex items-center justify-between p-3">
               <div className="flex items-center">
                 <Calendar className="w-5 h-5 text-yellow-600 mr-3" />
                 <div>
@@ -455,21 +455,21 @@ const TelemedicineManagement = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-20">
           <button
             onClick={handleScheduleSession}
-            className="flex items-center justify-center px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center px-1 ml-50 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5 mr-2" />
             Schedule New Session
           </button>
-          <button className="flex items-center justify-center px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+          <button className="flex items-center justify-center ml-30 mr-30 p1-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
             <Download className="w-5 h-5 mr-2" />
             Export Reports
           </button>
-          <button className="flex items-center justify-center px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          <button className="flex items-center justify-center mr-50 px-1 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
             <Settings className="w-5 h-5 mr-2" />
             Platform Settings
           </button>
@@ -480,14 +480,14 @@ const TelemedicineManagement = () => {
 
   const renderActiveSessions = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Active Telemedicine Sessions</h3>
           <div className="flex items-center space-x-3">
             <select
               value={sessionFilter}
               onChange={(e) => setSessionFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
             >
               <option value="all">All Sessions</option>
               <option value="video">Video Calls</option>
@@ -506,7 +506,7 @@ const TelemedicineManagement = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {activeSessions.map((session) => (
-            <div key={session.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+            <div key={session.id} className="border border-gray-200 p-6 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
@@ -598,7 +598,7 @@ const TelemedicineManagement = () => {
 
   const renderOnlineDoctors = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Online Doctors</h3>
           <div className="flex items-center space-x-3">
@@ -609,10 +609,10 @@ const TelemedicineManagement = () => {
                 placeholder="Search doctors..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
               />
             </div>
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
               <option>All Specialties</option>
               <option>General Medicine</option>
               <option>Cardiology</option>
@@ -624,7 +624,7 @@ const TelemedicineManagement = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {onlineDoctors.map((doctor) => (
-            <div key={doctor.id} className="border border-gray-200 rounded-xl p-6">
+            <div key={doctor.id} className="border border-gray-200 p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
                   <div className="relative">
@@ -639,8 +639,8 @@ const TelemedicineManagement = () => {
                     }`}></div>
                   </div>
                   <div className="ml-4">
-                    <h4 className="font-medium text-gray-900">{doctor.name}</h4>
-                    <p className="text-sm text-gray-600">{doctor.specialty}</p>
+                    <h4 className="font-bold ">{doctor.name}</h4>
+                    <p className="text-sm ">{doctor.specialty}</p>
                     <div className="flex items-center mt-1">
                       <Star className="w-4 h-4 text-yellow-500 mr-1" />
                       <span className="text-sm text-gray-600">{doctor.rating} ({doctor.totalSessions} sessions)</span>
@@ -675,7 +675,7 @@ const TelemedicineManagement = () => {
                 <p className="text-sm text-gray-600 mb-2">Languages</p>
                 <div className="flex flex-wrap gap-1">
                   {doctor.languages.map((language, index) => (
-                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                    <span key={index} className="px-2 py-1 text-blue-700 text-xs rounded">
                       {language}
                     </span>
                   ))}
@@ -708,14 +708,14 @@ const TelemedicineManagement = () => {
 
   const renderSessionHistory = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Session History</h3>
+          <h3 className="text-lg font-semibold ">Session History</h3>
           <div className="flex items-center space-x-3">
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
             >
               <option value="today">Today</option>
               <option value="week">This Week</option>
@@ -733,14 +733,14 @@ const TelemedicineManagement = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Session</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Patient</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Doctor</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Duration</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Cost</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Rating</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
+                <th className="text-left py-3 px-4 font-bold">Session</th>
+                <th className="text-left py-3 px-4 font-bold">Patient</th>
+                <th className="text-left py-3 px-4 font-bold">Doctor</th>
+                <th className="text-left py-3 px-4 font-bold">Duration</th>
+                <th className="text-left py-3 px-4 font-bold">Cost</th>
+                <th className="text-left py-3 px-4 font-bold">Rating</th>
+                <th className="text-left py-3 px-4 font-bold">Status</th>
+                <th className="text-left py-3 px-4 font-bold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -806,48 +806,48 @@ const TelemedicineManagement = () => {
   const renderRevenue = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Daily Revenue</p>
               <p className="text-2xl font-bold text-gray-900">{formatCurrency(revenueData.daily)}</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <DollarSign className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Weekly Revenue</p>
               <p className="text-2xl font-bold text-gray-900">{formatCurrency(revenueData.weekly)}</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Monthly Revenue</p>
               <p className="text-2xl font-bold text-gray-900">{formatCurrency(revenueData.monthly)}</p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12  flex items-center justify-center">
               <Target className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Revenue by Specialty</h3>
         <div className="space-y-4">
           {revenueData.bySpecialty.map((specialty, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div key={index} className="border border-gray-200 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-medium text-gray-900">{specialty.specialty}</h4>
                 <div className="text-right">
@@ -880,12 +880,12 @@ const TelemedicineManagement = () => {
 
   const renderPlatformStats = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Platform Performance Statistics</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-16 h-16  flex items-center justify-center mx-auto mb-3">
               <Video className="w-8 h-8 text-blue-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900">{platformStats.videoCall.sessions}</p>
@@ -894,7 +894,7 @@ const TelemedicineManagement = () => {
           </div>
 
           <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-16 h-16  flex items-center justify-center mx-auto mb-3">
               <Phone className="w-8 h-8 text-green-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900">{platformStats.audioCall.sessions}</p>
@@ -903,7 +903,7 @@ const TelemedicineManagement = () => {
           </div>
 
           <div className="text-center">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-16 h-16  flex items-center justify-center mx-auto mb-3">
               <MessageSquare className="w-8 h-8 text-purple-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900">{platformStats.messaging.sessions}</p>
@@ -912,7 +912,7 @@ const TelemedicineManagement = () => {
           </div>
 
           <div className="text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-16 h-16  flex items-center justify-center mx-auto mb-3">
               <Star className="w-8 h-8 text-yellow-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900">{platformOverview.patientSatisfaction}</p>
@@ -954,29 +954,29 @@ const TelemedicineManagement = () => {
         <div className="">
           {/* Header Section */}
           <div className="mb-8">
-            <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
+            <div className="p-8 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl font-bold mb-2">Telemedicine Management</h1>
-                  <p className="text-blue-200 text-lg">
+                  <p className=" text-lg">
                     Comprehensive oversight of telemedicine services and virtual healthcare delivery
                   </p>
                   <div className="mt-4 flex items-center space-x-6">
                     <div className="flex items-center">
                       <Video className="w-5 h-5 mr-2 text-green-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {platformOverview.activeSessions} Active Sessions
                       </span>
                     </div>
                     <div className="flex items-center">
                       <UserCheck className="w-5 h-5 mr-2 text-blue-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {platformOverview.onlineDoctors}/{platformOverview.totalDoctors} Doctors Online
                       </span>
                     </div>
                     <div className="flex items-center">
                       <DollarSign className="w-5 h-5 mr-2 text-yellow-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {formatCurrency(revenueData.daily)} Today
                       </span>
                     </div>
@@ -984,7 +984,7 @@ const TelemedicineManagement = () => {
                 </div>
                 <div className="hidden md:block">
                   <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                    <Monitor className="w-16 h-16 text-blue-300" />
+                    <Monitor className="w-16 h-16" />
                   </div>
                 </div>
               </div>
@@ -992,7 +992,7 @@ const TelemedicineManagement = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+          <div className="border border-gray-200 mb-6">
             <div className="flex overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;

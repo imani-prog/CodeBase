@@ -206,13 +206,13 @@ const UserManagement = () => {
 
   const getRoleColor = (role) => {
     switch (role) {
-      case 'admin': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'doctor': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'nurse': return 'bg-green-100 text-green-800 border-green-200';
-      case 'chw': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'technician': return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'patient': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'admin': return ' text-purple-800 border-purple-200';
+      case 'doctor': return ' text-blue-800 border-blue-200';
+      case 'nurse': return ' text-green-800 border-green-200';
+      case 'chw': return ' text-orange-800 border-orange-200';
+      case 'technician': return ' text-gray-800 border-gray-200';
+      case 'patient': return ' text-indigo-800 border-indigo-200';
+      default: return ' text-gray-800 border-gray-200';
     }
   };
 
@@ -227,10 +227,10 @@ const UserManagement = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800 border-green-200';
-      case 'inactive': return 'bg-red-100 text-red-800 border-red-200';
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'active': return 'text-green-800 border-green-200';
+      case 'inactive': return 'text-red-800 border-red-200';
+      case 'pending': return 'text-yellow-800 border-yellow-200';
+      default: return 'text-gray-800 border-gray-200';
     }
   };
 
@@ -251,29 +251,29 @@ const UserManagement = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 rounded-2xl p-8 text-white shadow-lg">
+        <div className="p-8 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-2">User Management</h1>
-              <p className="text-blue-200 text-lg">
+              <p className=" text-lg">
                 Manage user accounts, roles, permissions, and access control across MediLink
               </p>
               <div className="mt-4 flex items-center space-x-6">
                 <div className="flex items-center">
                   <Users className="w-5 h-5 mr-2 text-blue-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {filteredUsers.length} Total Users
                       </span>
                     </div>
                     <div className="flex items-center">
                       <CheckCircle className="w-5 h-5 mr-2 text-green-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {users.filter(u => u.status === 'active').length} Active
                       </span>
                     </div>
                     <div className="flex items-center">
                       <Clock className="w-5 h-5 mr-2 text-yellow-300" />
-                      <span className="text-blue-200">
+                      <span className="">
                         {users.filter(u => u.status === 'pending').length} Pending
                       </span>
                     </div>
@@ -281,7 +281,7 @@ const UserManagement = () => {
                 </div>
                 <div className="hidden md:block">
                   <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                    <Users className="w-16 h-16 text-blue-300" />
+                    <Users className="w-16 h-16" />
                   </div>
                 </div>
               </div>
@@ -289,7 +289,7 @@ const UserManagement = () => {
           </div>
 
           {/* Controls Section */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="border border-gray-200 p-6 mb-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               {/* Search and Filters */}
               <div className="flex flex-col sm:flex-row gap-4 flex-1">
@@ -298,7 +298,7 @@ const UserManagement = () => {
                   <input
                     type="text"
                     placeholder="Search users, emails, or departments..."
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -309,7 +309,7 @@ const UserManagement = () => {
                   <select
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value)}
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                   >
                     {roleOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -322,7 +322,7 @@ const UserManagement = () => {
                   <select
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
                   >
                     {statusOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -376,7 +376,7 @@ const UserManagement = () => {
           </div>
 
           {/* Users Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
@@ -394,25 +394,25 @@ const UserManagement = () => {
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                       User
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                       Role & Department
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                       Location
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                       Last Login
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                       Patients
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -530,7 +530,7 @@ const UserManagement = () => {
 
           {/* Summary Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Users</p>
@@ -543,7 +543,7 @@ const UserManagement = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Healthcare Staff</p>
@@ -558,7 +558,7 @@ const UserManagement = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Patients Managed</p>
@@ -573,7 +573,7 @@ const UserManagement = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Pending Approvals</p>
