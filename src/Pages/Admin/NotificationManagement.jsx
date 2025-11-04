@@ -116,7 +116,7 @@ const NotificationManagement = () => {
       type: "emergency",
       category: "System",
       channels: ["push", "sms", "email"],
-      subject: "🚨 Emergency Medical Alert",
+      subject: "Emergency Medical Alert",
       content: "Urgent medical assistance required. Location: {location}. Patient: {patient_name}. ETA: {eta}",
       variables: ["location", "patient_name", "eta"],
       status: "Active",
@@ -131,7 +131,7 @@ const NotificationManagement = () => {
       type: "reminder",
       category: "Healthcare",
       channels: ["push", "email"],
-      subject: "📅 Upcoming Appointment Reminder",
+      subject: "Upcoming Appointment Reminder",
       content: "Hello {patient_name}, you have an appointment with Dr. {doctor_name} on {date} at {time}. Location: {clinic_name}",
       variables: ["patient_name", "doctor_name", "date", "time", "clinic_name"],
       status: "Active",
@@ -146,7 +146,7 @@ const NotificationManagement = () => {
       type: "update",
       category: "Insurance",
       channels: ["push", "email", "sms"],
-      subject: "💳 Insurance Claim Status Update",
+      subject: "Insurance Claim Status Update",
       content: "Your insurance claim #{claim_number} has been {status}. Amount: KES {amount}. Processing time: {processing_time}",
       variables: ["claim_number", "status", "amount", "processing_time"],
       status: "Active",
@@ -161,7 +161,7 @@ const NotificationManagement = () => {
       type: "invitation",
       category: "Training",
       channels: ["push", "email"],
-      subject: "🎓 New Training Program Available",
+      subject: "New Training Program Available",
       content: "You're invited to join our new training program: {course_name}. Duration: {duration}. Starting: {start_date}",
       variables: ["course_name", "duration", "start_date"],
       status: "Active",
@@ -176,7 +176,7 @@ const NotificationManagement = () => {
       type: "maintenance",
       category: "System",
       channels: ["push", "email"],
-      subject: "🔧 Scheduled System Maintenance",
+      subject: "Scheduled System Maintenance",
       content: "System maintenance scheduled for {maintenance_date} from {start_time} to {end_time}. Services affected: {affected_services}",
       variables: ["maintenance_date", "start_time", "end_time", "affected_services"],
       status: "Draft",
@@ -393,24 +393,24 @@ const NotificationManagement = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-50 border-red-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'low': return 'text-green-600 bg-green-50 border-green-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'high': return 'text-red-600 border-red-200';
+      case 'medium': return 'text-yellow-600 border-yellow-200';
+      case 'low': return 'text-green-600 border-green-200';
+      default: return 'text-gray-600 border-gray-200';
     }
   };
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case 'active': return 'text-green-600 bg-green-50';
-      case 'delivered': return 'text-green-600 bg-green-50';
-      case 'sent': return 'text-blue-600 bg-blue-50';
-      case 'scheduled': return 'text-yellow-600 bg-yellow-50';
-      case 'draft': return 'text-gray-600 bg-gray-50';
-      case 'failed': return 'text-red-600 bg-red-50';
-      case 'pending': return 'text-yellow-600 bg-yellow-50';
-      case 'completed': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'active': return 'text-green-600 ';
+      case 'delivered': return 'text-green-600';
+      case 'sent': return 'text-blue-600 ';
+      case 'scheduled': return 'text-yellow-600';
+      case 'draft': return 'text-gray-600';
+      case 'failed': return 'text-red-600';
+      case 'pending': return 'text-yellow-600';
+      case 'completed': return 'text-green-600';
+      default: return 'text-gray-600';
     }
   };
 
@@ -434,53 +434,53 @@ const NotificationManagement = () => {
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Sent</p>
               <p className="text-3xl font-bold text-gray-900">{notificationOverview.totalSent.toLocaleString()}</p>
               <p className="text-sm text-green-600 mt-1">+12.5% this month</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Send className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Delivery Rate</p>
               <p className="text-3xl font-bold text-gray-900">{notificationOverview.deliveryRate}%</p>
               <p className="text-sm text-green-600 mt-1">+0.8% improvement</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Open Rate</p>
               <p className="text-3xl font-bold text-gray-900">{notificationOverview.openRate}%</p>
               <p className="text-sm text-yellow-600 mt-1">-2.1% from last month</p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Eye className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Active Users</p>
               <p className="text-3xl font-bold text-gray-900">{notificationOverview.activeUsers.toLocaleString()}</p>
               <p className="text-sm text-green-600 mt-1">+156 new users</p>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Users className="w-6 h-6 text-yellow-600" />
             </div>
           </div>
@@ -489,8 +489,8 @@ const NotificationManagement = () => {
 
       {/* Channel Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Channel Performance</h3>
+        <div className="shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold mb-4">Channel Performance</h3>
           <div className="space-y-4">
             {notificationChannels.filter(channel => channel.enabled).map((channel) => {
               const Icon = channel.icon;
@@ -513,7 +513,7 @@ const NotificationManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
           <div className="space-y-4">
             {recentNotifications.slice(0, 5).map((notification) => (
@@ -540,22 +540,22 @@ const NotificationManagement = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="flex items-center justify-center p-4 border border-gray-200 hover:bg-gray-50 transition-colors">
             <Plus className="w-5 h-5 text-blue-600 mr-2" />
             Create Template
           </button>
-          <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="flex items-center justify-center p-4 border border-gray-200 hover:bg-gray-50 transition-colors">
             <Send className="w-5 h-5 text-green-600 mr-2" />
             Send Campaign
           </button>
-          <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="flex items-center justify-center p-4 border border-gray-200 hover:bg-gray-50 transition-colors">
             <BarChart3 className="w-5 h-5 text-purple-600 mr-2" />
             View Analytics
           </button>
-          <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="flex items-center justify-center p-4 border border-gray-200 hover:bg-gray-50 transition-colors">
             <Settings className="w-5 h-5 text-gray-600 mr-2" />
             Manage Settings
           </button>
@@ -569,7 +569,7 @@ const NotificationManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Live Notification Feed</h3>
+          <h3 className="text-lg font-semibold">Live Notification Feed</h3>
           <p className="text-sm text-gray-600">Real-time notifications across all MediLink systems</p>
         </div>
         <div className="flex items-center space-x-4">
@@ -597,7 +597,7 @@ const NotificationManagement = () => {
 
       {/* Live Status Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse mr-2"></div>
@@ -606,7 +606,7 @@ const NotificationManagement = () => {
             <span className="text-sm text-green-600">Online</span>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse mr-2"></div>
@@ -615,7 +615,7 @@ const NotificationManagement = () => {
             <span className="text-sm text-blue-600">Active</span>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse mr-2"></div>
@@ -624,7 +624,7 @@ const NotificationManagement = () => {
             <span className="text-sm text-purple-600">Active</span>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse mr-2"></div>
@@ -636,7 +636,7 @@ const NotificationManagement = () => {
       </div>
 
       {/* Live Notifications Stream */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <h4 className="text-lg font-semibold text-gray-900">Live Notification Stream</h4>
         </div>
@@ -690,7 +690,7 @@ const NotificationManagement = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {notificationTemplates.map((template) => (
-          <div key={template.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div key={template.id} className="shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 {getTypeIcon(template.type)}
@@ -711,7 +711,7 @@ const NotificationManagement = () => {
                 <p className="text-sm text-gray-600">Channels:</p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {template.channels.map((channel) => (
-                    <span key={channel} className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                    <span key={channel} className="px-2 py-1 text-xs text-blue-800 rounded-full">
                       {channel}
                     </span>
                   ))}
@@ -766,7 +766,7 @@ const NotificationManagement = () => {
   const renderCampaigns = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Notification Campaigns</h3>
+        <h3 className="text-lg font-semibold">Notification Campaigns</h3>
         <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
           <Plus className="w-4 h-4 mr-2" />
           Create Campaign
@@ -775,7 +775,7 @@ const NotificationManagement = () => {
 
       <div className="space-y-6">
         {notificationCampaigns.map((campaign) => (
-          <div key={campaign.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div key={campaign.id} className="border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h4 className="text-lg font-semibold text-gray-900">{campaign.name}</h4>
@@ -922,7 +922,7 @@ const NotificationManagement = () => {
         {notificationChannels.map((channel) => {
           const Icon = channel.icon;
           return (
-            <div key={channel.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div key={channel.id} className="border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <Icon className="w-8 h-8 text-blue-600 mr-3" />
@@ -1007,10 +1007,10 @@ const NotificationManagement = () => {
   // Render Analytics Tab (placeholder)
   const renderAnalytics = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">Notification Analytics</h3>
+      <h3 className="text-lg font-semibold">Notification Analytics</h3>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Delivery Trends</h4>
           <div className="text-center py-12 text-gray-500">
             <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-400" />
@@ -1019,7 +1019,7 @@ const NotificationManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Channel Performance</h4>
           <div className="text-center py-12 text-gray-500">
             <PieChart className="w-16 h-16 mx-auto mb-4 text-gray-400" />
@@ -1043,7 +1043,7 @@ const NotificationManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <Zap className="w-8 h-8 text-blue-600 mb-3" />
           <h4 className="font-semibold text-gray-900 mb-2">Emergency Alerts</h4>
           <p className="text-sm text-gray-600 mb-4">Automatically send emergency notifications based on system triggers</p>
@@ -1053,7 +1053,7 @@ const NotificationManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <Calendar className="w-8 h-8 text-green-600 mb-3" />
           <h4 className="font-semibold text-gray-900 mb-2">Appointment Reminders</h4>
           <p className="text-sm text-gray-600 mb-4">Send automated reminders 24h and 2h before appointments</p>
@@ -1063,7 +1063,7 @@ const NotificationManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <UserPlus className="w-8 h-8 text-purple-600 mb-3" />
           <h4 className="font-semibold text-gray-900 mb-2">Welcome Series</h4>
           <p className="text-sm text-gray-600 mb-4">Onboard new patients with a series of welcome messages</p>
@@ -1082,7 +1082,7 @@ const NotificationManagement = () => {
       <h3 className="text-lg font-semibold text-gray-900">Notification Settings</h3>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">General Settings</h4>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -1109,7 +1109,7 @@ const NotificationManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Delivery Settings</h4>
           <div className="space-y-4">
             <div>

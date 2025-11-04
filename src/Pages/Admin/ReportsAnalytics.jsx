@@ -254,7 +254,7 @@ const ReportsAnalytics = () => {
     <div className="space-y-6">
       {/* Key Performance Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Patients</p>
@@ -264,13 +264,13 @@ const ReportsAnalytics = () => {
                 <span className="text-sm text-green-600 ml-1">+5.2% this month</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Users className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Monthly Revenue</p>
@@ -280,13 +280,13 @@ const ReportsAnalytics = () => {
                 <span className="text-sm text-green-600 ml-1">+{systemOverview.revenueGrowth}% growth</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <DollarSign className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">System Uptime</p>
@@ -296,13 +296,13 @@ const ReportsAnalytics = () => {
                 <span className="text-sm text-green-600 ml-1">Excellent</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Activity className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Response Time</p>
@@ -312,7 +312,7 @@ const ReportsAnalytics = () => {
                 <span className="text-sm text-green-600 ml-1">-0.3 min improved</span>
               </div>
             </div>
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Timer className="w-6 h-6 text-red-600" />
             </div>
           </div>
@@ -320,14 +320,14 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* Revenue Trend Chart Placeholder */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Revenue Trend Analysis</h3>
           <div className="flex items-center space-x-4">
             <select 
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent text-sm"
             >
               <option value="this-week">This Week</option>
               <option value="this-month">This Month</option>
@@ -339,7 +339,7 @@ const ReportsAnalytics = () => {
             </button>
           </div>
         </div>
-        <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+        <div className="h-64 flex items-center justify-center bg-gray-50">
           <div className="text-center">
             <LineChart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg font-medium">Revenue Trend Chart</p>
@@ -360,7 +360,7 @@ const ReportsAnalytics = () => {
 
       {/* Patient Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Patient Distribution by Service</h3>
           <div className="space-y-4">
             {patientDistribution.map((item) => (
@@ -384,7 +384,7 @@ const ReportsAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Service Utilization Rates</h3>
           <div className="space-y-4">
             {serviceUtilization.map((service) => (
@@ -410,7 +410,7 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* System Performance Metrics */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">System Performance Metrics</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="text-center">
@@ -450,7 +450,7 @@ const ReportsAnalytics = () => {
   const renderFinancialAnalytics = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="text-center">
             <DollarSign className="w-12 h-12 text-green-600 mx-auto mb-3" />
             <p className="text-3xl font-bold text-gray-900">{formatCurrency(systemOverview.totalRevenue)}</p>
@@ -462,7 +462,7 @@ const ReportsAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="text-center">
             <Calculator className="w-12 h-12 text-blue-600 mx-auto mb-3" />
             <p className="text-3xl font-bold text-gray-900">{formatCurrency(revenueData[revenueData.length - 1].profit)}</p>
@@ -474,7 +474,7 @@ const ReportsAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="text-center">
             <Percent className="w-12 h-12 text-purple-600 mx-auto mb-3" />
             <p className="text-3xl font-bold text-gray-900">23.4%</p>
@@ -489,10 +489,10 @@ const ReportsAnalytics = () => {
 
       {/* Revenue Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue by Service Category</h3>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+            <div className="flex items-center justify-between p-3">
               <div className="flex items-center">
                 <Stethoscope className="w-8 h-8 text-blue-600 mr-3" />
                 <div>
@@ -503,7 +503,7 @@ const ReportsAnalytics = () => {
               <p className="text-lg font-bold text-blue-600">{formatCurrency(4040000)}</p>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div className="flex items-center justify-between p-3">
               <div className="flex items-center">
                 <Truck className="w-8 h-8 text-green-600 mr-3" />
                 <div>
@@ -514,7 +514,7 @@ const ReportsAnalytics = () => {
               <p className="text-lg font-bold text-green-600">{formatCurrency(2566000)}</p>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+            <div className="flex items-center justify-between p-3">
               <div className="flex items-center">
                 <Video className="w-8 h-8 text-purple-600 mr-3" />
                 <div>
@@ -525,7 +525,7 @@ const ReportsAnalytics = () => {
               <p className="text-lg font-bold text-purple-600">{formatCurrency(1502000)}</p>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+            <div className="flex items-center justify-between p-3">
               <div className="flex items-center">
                 <GraduationCap className="w-8 h-8 text-yellow-600 mr-3" />
                 <div>
@@ -538,7 +538,7 @@ const ReportsAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Financial Trends</h3>
           <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
             <div className="text-center">
@@ -552,8 +552,8 @@ const ReportsAnalytics = () => {
 
       {/* Payment Methods & Insurance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Methods Distribution</h3>
+        <div className="shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold mb-4">Payment Methods Distribution</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -606,10 +606,10 @@ const ReportsAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Insurance Providers</h3>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+            <div className="flex items-center justify-between p-3 border border-gray-200">
               <div>
                 <p className="font-medium text-gray-900">Social Health Authority</p>
                 <p className="text-sm text-gray-500">1,245 claims processed</p>
@@ -643,7 +643,7 @@ const ReportsAnalytics = () => {
         {performanceMetrics.map((category) => {
           const Icon = category.icon;
           return (
-            <div key={category.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div key={category.id} className="shadow-sm border border-gray-200 p-6">
               <div className="flex items-center mb-4">
                 <Icon className={`w-8 h-8 text-${category.color}-600 mr-3`} />
                 <h4 className="font-semibold text-gray-900">{category.category}</h4>
@@ -666,7 +666,7 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* Operational Efficiency */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Operational Efficiency Dashboard</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-green-50 rounded-lg">
@@ -692,7 +692,7 @@ const ReportsAnalytics = () => {
   // Render Geographic Analysis Tab
   const renderGeographicAnalysis = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Geographic Distribution</h3>
         <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg mb-6">
           <div className="text-center">
@@ -703,7 +703,7 @@ const ReportsAnalytics = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">Regional Performance Summary</h3>
         </div>
@@ -711,11 +711,11 @@ const ReportsAnalytics = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patients</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Growth</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market Share</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Region</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Patients</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Revenue</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Growth</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Market Share</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -765,7 +765,7 @@ const ReportsAnalytics = () => {
   const renderPerformanceKPIs = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-semibold text-gray-900">Patient Satisfaction</h4>
             <Star className="w-6 h-6 text-yellow-500" />
@@ -784,7 +784,7 @@ const ReportsAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-semibold text-gray-900">Service Quality</h4>
             <Target className="w-6 h-6 text-green-500" />
@@ -805,7 +805,7 @@ const ReportsAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-semibold text-gray-900">Operational Metrics</h4>
             <Activity className="w-6 h-6 text-blue-500" />
@@ -828,7 +828,7 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* Detailed KPI Dashboard */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Key Performance Indicators Dashboard</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="text-center p-4 border border-gray-200 rounded-lg">
@@ -900,7 +900,7 @@ const ReportsAnalytics = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Reports & Analytics</h1>
+                  <h1 className="text-3xl font-bold mb-2">Reports & Analytics</h1>
                   <p className="text-gray-600">Comprehensive analytics and reporting dashboard for MediLink healthcare platform</p>
                 </div>
                 <div className="flex items-center space-x-4">
