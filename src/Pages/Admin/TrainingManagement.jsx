@@ -302,13 +302,13 @@ const TrainingManagement = () => {
     }
   ];
 
-  const trainingOverview = {
-    totalCourses: trainingCourses.length,
-    activeCourses: trainingCourses.filter(c => c.status === 'active').length,
-    totalStudents: trainingCourses.reduce((sum, course) => sum + course.participants, 0),
-    totalRevenue: trainingCourses.reduce((sum, course) => sum + course.revenue, 0),
-    avgCompletionRate: trainingCourses.reduce((sum, course) => sum + course.completionRate, 0) / trainingCourses.length,
-    avgRating: trainingCourses.reduce((sum, course) => sum + course.rating, 0) / trainingCourses.length,
+    const trainingOverview = {
+      totalCourses: trainingCourses.length,
+      activeCourses: trainingCourses.filter(c => c.status === 'active').length,
+      totalStudents: trainingCourses.reduce((sum, course) => sum + course.participants, 0),
+      totalRevenue: trainingCourses.reduce((sum, course) => sum + course.revenue, 0),
+      avgCompletionRate: trainingCourses.reduce((sum, course) => sum + course.completionRate, 0) / trainingCourses.length,
+      avgRating: trainingCourses.reduce((sum, course) => sum + course.rating, 0) / trainingCourses.length,
     monthlyGrowth: 24.5,
     certificatesIssued: 856
   };
