@@ -352,7 +352,7 @@ const Navbar = () => {
     </button>
   </div>
 
-  {/* Mobile Menu */}
+   {/* Mobile Menu */}
   {mobileOpen && (
     <>
       {/* Backdrop - blocks content behind */}
@@ -408,7 +408,7 @@ const Navbar = () => {
           ))}
           <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-blue-200">
             <Link
-              to=""
+              to="/login"
               className="flex items-center justify-center gap-2 w-full text-blue-900 text-sm font-semibold py-2.5 rounded-lg border-2 border-blue-400 hover:bg-blue-100 transition duration-200"
               onClick={() => setMobileOpen(false)}
             >
@@ -418,7 +418,7 @@ const Navbar = () => {
               Login
             </Link>
             <Link
-              to=""
+              to="/register"
               className="flex items-center justify-center gap-2 w-full text-white bg-yellow-400 text-sm font-semibold py-2.5 rounded-lg hover:bg-yellow-300 transition duration-200"
               onClick={() => setMobileOpen(false)}
             >
@@ -428,23 +428,6 @@ const Navbar = () => {
               <span className="text-blue-950">Register</span>
             </Link>
           </div>
-<<<<<<< HEAD
-        ))}
-        <div className="flex gap-4 mt-8">
-          <Link
-            to="/login"
-            className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
-          >
-            Login
-          </Link>
-          <Link
-            to="/register"
-            className="w-full text-center text-blue-800 text-sm font-medium py-2 rounded border border-transparent hover:border-blue-500 transition duration-200"
-          >
-            Register
-          </Link>
-=======
->>>>>>> Development
         </div>
       </div>
     </>
