@@ -40,7 +40,7 @@ const Appointments = () => {
         reason: 'Follow-up consultation',
         phone: '+254 723 456 789',
         email: 'dr.mwangi@medilink.co.ke',
-        meetingLink: 'https://medilink.zoom.us/j/1234567890',
+        meetingLink: 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1',
         instructions: 'Ensure you have a stable internet connection. Have your recent test results ready.',
         bookingRef: 'APT-2025-001235'
       }

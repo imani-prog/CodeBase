@@ -19,16 +19,28 @@ import {
   Settings,
   CheckCircle,
   AlertCircle,
+  Mail,
+  MapPin,
+  Download,
 } from 'lucide-react';
 
 const Telemedicine = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedConsultation, setSelectedConsultation] = useState(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [bookingForm, setBookingForm] = useState({
+    specialty: '',
+    date: '',
+    time: '',
+    reason: '',
+    insurance: ''
+  });
 
-  // Mock data for consultations
-  const consultations = {
+  // Mock data for consultations - now using state
+  const [consultations, setConsultations] = useState({
     upcoming: [
       {
         id: 1,
@@ -41,7 +53,12 @@ const Telemedicine = () => {
         type: 'video',
         reason: 'Follow-up consultation',
         prescription: false,
-        meetingLink: 'https://meet.medilink.com/abc123',
+        meetingLink: 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1',
+        phone: '+254 712 345 678',
+        email: 'dr.kamau@medilink.co.ke',
+        location: 'Video Consultation',
+        instructions: 'Ensure you have a stable internet connection. Have your recent medical records ready.',
+        bookingRef: 'TLM-2024-001234',
       },
       {
         id: 2,
@@ -54,7 +71,12 @@ const Telemedicine = () => {
         type: 'video',
         reason: 'Heart checkup',
         prescription: false,
-        meetingLink: null,
+        meetingLink: 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1',
+        phone: '+254 723 456 789',
+        email: 'dr.ochieng@medilink.co.ke',
+        location: 'Video Consultation',
+        instructions: 'Please have your previous heart test results available during the consultation.',
+        bookingRef: 'TLM-2024-001235',
       },
     ],
     past: [
@@ -70,9 +92,13 @@ const Telemedicine = () => {
         reason: 'Skin consultation',
         prescription: true,
         recording: true,
+        phone: '+254 734 567 890',
+        email: 'dr.wanjiku@medilink.co.ke',
+        location: 'Video Consultation',
+        bookingRef: 'TLM-2024-001210',
       },
     ],
-  };
+  });
 
   const handleJoinCall = (consultation) => {
     setSelectedConsultation(consultation);
@@ -80,16 +106,111 @@ const Telemedicine = () => {
   };
 
   const handleStartConsultation = () => {
-    // In a real app, this would launch the video call
+    
     window.open(selectedConsultation.meetingLink, '_blank');
     setShowConsultationModal(false);
   };
 
+  const handleViewDetails = (consultation) => {
+    setSelectedConsultation(consultation);
+    setShowDetailsModal(true);
+  };
+
+  const handleBookingFormChange = (field, value) => {
+    setBookingForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleBookConsultation = (e) => {
+    e.preventDefault();
+    
+    // Generate booking reference
+    const bookingRef = `TLM-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 999999)).padStart(6, '0')}`;
+    
+    // Map specialty to doctor (in real app, this would come from API)
+    const specialtyDoctors = {
+      'general': { name: 'Dr. Peter Njoroge', specialty: 'General Physician', email: 'dr.njoroge@medilink.co.ke', phone: '+254 745 678 901' },
+      'cardiology': { name: 'Dr. James Ochieng', specialty: 'Cardiologist', email: 'dr.ochieng@medilink.co.ke', phone: '+254 723 456 789' },
+      'dermatology': { name: 'Dr. Mary Wanjiku', specialty: 'Dermatologist', email: 'dr.wanjiku@medilink.co.ke', phone: '+254 734 567 890' },
+      'pediatrics': { name: 'Dr. Grace Akinyi', specialty: 'Pediatrician', email: 'dr.akinyi@medilink.co.ke', phone: '+254 756 789 012' },
+      'mental': { name: 'Dr. David Kamau', specialty: 'Mental Health Specialist', email: 'dr.kamau@medilink.co.ke', phone: '+254 767 890 123' }
+    };
+
+    const doctor = specialtyDoctors[bookingForm.specialty] || specialtyDoctors['general'];
+
+    // Create new consultation object
+    const newConsultation = {
+      id: Date.now(),
+      doctor: doctor.name,
+      specialty: doctor.specialty,
+      date: bookingForm.date,
+      time: bookingForm.time,
+      duration: '30 min',
+      status: 'pending',
+      type: 'video',
+      reason: bookingForm.reason,
+      prescription: false,
+      meetingLink: 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1',
+      phone: doctor.phone,
+      email: doctor.email,
+      location: 'Video Consultation',
+      instructions: 'Ensure you have a stable internet connection. You will receive a confirmation email with additional details.',
+      bookingRef: bookingRef,
+      insurance: bookingForm.insurance
+    };
+
+    // Add to consultations list
+    setConsultations(prev => ({
+      ...prev,
+      upcoming: [...prev.upcoming, newConsultation]
+    }));
+
+    // Reset form
+    setBookingForm({
+      specialty: '',
+      date: '',
+      time: '',
+      reason: '',
+      insurance: ''
+    });
+
+    // Close modal and show success message
+    setShowBookingModal(false);
+    setShowSuccessMessage(true);
+
+    // Hide success message after 5 seconds
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 5000);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-green-50 border-2 border-green-500 rounded-lg shadow-lg p-4 max-w-md animate-slide-in">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-green-900">Consultation Booked Successfully!</h3>
+              <p className="text-sm text-green-700 mt-1">
+                Your video consultation has been scheduled. You'll receive a confirmation email within 2 hours.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowSuccessMessage(false)}
+              className="flex-shrink-0 text-green-600 hover:text-green-800"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Telemedicine</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold ">Telemedicine</h1>
         <p className="text-gray-600 mt-2">
           Connect with healthcare providers through secure video consultations
         </p>
@@ -165,11 +286,11 @@ const Telemedicine = () => {
               consultations.upcoming.map((consultation) => (
                 <div
                   key={consultation.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                  className="bg-white shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
                         <Video className="w-6 h-6 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -211,7 +332,10 @@ const Telemedicine = () => {
                           <span>Join Call</span>
                         </button>
                       )}
-                      <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 text-sm">
+                      <button 
+                        onClick={() => handleViewDetails(consultation)}
+                        className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 text-sm"
+                      >
                         <span>View Details</span>
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -242,12 +366,12 @@ const Telemedicine = () => {
               consultations.past.map((consultation) => (
                 <div
                   key={consultation.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+                  className="bg-white shadow-sm border border-gray-200 p-6"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="w-6 h-6 text-green-600" />
+                      <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="w-6 h-6 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-gray-900">{consultation.doctor}</h3>
@@ -270,7 +394,7 @@ const Telemedicine = () => {
                             </span>
                           )}
                           {consultation.recording && (
-                            <span className="flex items-center space-x-1 text-sm text-purple-600">
+                            <span className="flex items-center space-x-1 text-sm text-blue-600">
                               <Video className="w-4 h-4" />
                               <span>Recording Available</span>
                             </span>
@@ -307,14 +431,14 @@ const Telemedicine = () => {
       </div>
 
       {/* How It Works Section */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">How Video Consultations Work</h2>
+      <div className="p-6">
+        <h2 className="text-xl font-bold mb-4">How Video Consultations Work</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mb-3">
               <span className="text-lg font-bold">1</span>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Book Consultation</h3>
+            <h3 className="font-semibold mb-2">Book Consultation</h3>
             <p className="text-sm text-gray-600">
               Choose your preferred doctor and schedule a convenient time
             </p>
@@ -342,7 +466,7 @@ const Telemedicine = () => {
 
       {/* Booking Modal */}
       {showBookingModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">Book Video Consultation</h2>
@@ -353,12 +477,17 @@ const Telemedicine = () => {
                 <X className="w-6 h-6 text-gray-600" />
               </button>
             </div>
-            <form className="p-6 space-y-6">
+            <form className="p-6 space-y-6" onSubmit={handleBookConsultation}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Specialty
                 </label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select 
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={bookingForm.specialty}
+                  onChange={(e) => handleBookingFormChange('specialty', e.target.value)}
+                  required
+                >
                   <option value="">Choose a specialty...</option>
                   <option value="general">General Physician</option>
                   <option value="cardiology">Cardiologist</option>
@@ -376,20 +505,29 @@ const Telemedicine = () => {
                   <input
                     type="date"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={bookingForm.date}
+                    onChange={(e) => handleBookingFormChange('date', e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Preferred Time
                   </label>
-                  <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select 
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={bookingForm.time}
+                    onChange={(e) => handleBookingFormChange('time', e.target.value)}
+                    required
+                  >
                     <option value="">Select time...</option>
-                    <option value="09:00">09:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="14:00">02:00 PM</option>
-                    <option value="15:00">03:00 PM</option>
-                    <option value="16:00">04:00 PM</option>
+                    <option value="09:00 AM">09:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="02:00 PM">02:00 PM</option>
+                    <option value="03:00 PM">03:00 PM</option>
+                    <option value="04:00 PM">04:00 PM</option>
                   </select>
                 </div>
               </div>
@@ -424,6 +562,9 @@ const Telemedicine = () => {
                   rows="4"
                   placeholder="Please describe your symptoms or reason for consultation..."
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={bookingForm.reason}
+                  onChange={(e) => handleBookingFormChange('reason', e.target.value)}
+                  required
                 />
               </div>
 
@@ -431,7 +572,12 @@ const Telemedicine = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Insurance Coverage
                 </label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select 
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={bookingForm.insurance}
+                  onChange={(e) => handleBookingFormChange('insurance', e.target.value)}
+                  required
+                >
                   <option value="">Select insurance...</option>
                   <option value="nhif">NHIF</option>
                   <option value="sha">SHA</option>
@@ -545,6 +691,151 @@ const Telemedicine = () => {
                   <Video className="w-5 h-5" />
                   <span>Start Call</span>
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Details Modal */}
+      {showDetailsModal && selectedConsultation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Consultation Details</h2>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Booking Reference */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-700 font-medium">Booking Reference</p>
+                <p className="text-lg font-bold text-blue-900">{selectedConsultation?.bookingRef}</p>
+              </div>
+
+              {/* Doctor Information */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Healthcare Provider</h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                  <p className="font-semibold text-gray-900">{selectedConsultation?.doctor}</p>
+                  <p className="text-sm text-gray-600">{selectedConsultation?.specialty}</p>
+                  {selectedConsultation?.phone && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Phone className="w-4 h-4 text-blue-600" />
+                      <span>{selectedConsultation.phone}</span>
+                    </div>
+                  )}
+                  {selectedConsultation?.email && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Mail className="w-4 h-4 text-blue-600" />
+                      <span>{selectedConsultation.email}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Consultation Information */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Consultation Information</h3>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                      <p className="text-sm font-medium text-gray-700">Date</p>
+                    </div>
+                    <p className="text-gray-900">{new Date(selectedConsultation?.date).toLocaleDateString('en-KE', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock className="w-4 h-4 text-blue-600" />
+                      <p className="text-sm font-medium text-gray-700">Time</p>
+                    </div>
+                    <p className="text-gray-900">{selectedConsultation?.time} {selectedConsultation?.duration && `(${selectedConsultation.duration})`}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4 sm:col-span-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Video className="w-4 h-4 text-blue-600" />
+                      <p className="text-sm font-medium text-gray-700">Type</p>
+                    </div>
+                    <p className="text-gray-900">{selectedConsultation?.location || 'Video Consultation'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Reason for Consultation */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Reason for Consultation</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-gray-900">{selectedConsultation?.reason}</p>
+                </div>
+              </div>
+
+              {/* Special Instructions */}
+              {selectedConsultation?.instructions && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Special Instructions</h3>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-yellow-900">{selectedConsultation.instructions}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Status */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Status</h3>
+                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
+                  selectedConsultation?.status === 'confirmed' ? 'bg-green-100 text-green-700' :
+                  selectedConsultation?.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                  selectedConsultation?.status === 'completed' ? 'bg-gray-100 text-gray-700' :
+                  'bg-gray-100 text-gray-700'
+                }`}>
+                  <CheckCircle className="w-4 h-4" />
+                  {selectedConsultation?.status.charAt(0).toUpperCase() + selectedConsultation?.status.slice(1)}
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-gray-200">
+                {selectedConsultation?.status === 'confirmed' && selectedConsultation?.meetingLink && (
+                  <button
+                    onClick={() => {
+                      setShowDetailsModal(false);
+                      handleJoinCall(selectedConsultation);
+                    }}
+                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Video className="w-4 h-4" />
+                    Join Video Call
+                  </button>
+                )}
+                {selectedConsultation?.prescription && (
+                  <Link
+                    to="/client/patient/prescriptions"
+                    className="flex-1 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    View Prescription
+                  </Link>
+                )}
+                {selectedConsultation?.recording && (
+                  <button className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                    <Download className="w-4 h-4" />
+                    Download Recording
+                  </button>
+                )}
               </div>
             </div>
           </div>
