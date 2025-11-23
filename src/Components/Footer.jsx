@@ -342,10 +342,10 @@ const Footer = () => {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-24 right-24 p-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 z-50 group"
+          className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-24 md:right-8 p-2 sm:p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 z-40 group"
           aria-label="Back to top"
         >
-          <ArrowUp className="w-5 h-5 group-hover:animate-bounce" />
+          <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 group-hover:animate-bounce" />
         </button>
       )}
     </footer>

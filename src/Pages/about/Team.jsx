@@ -16,27 +16,27 @@ import AdvisoryBoard from "../../Components/AdvisoryBoard";
 
 const Team = () => {
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
       
       
 
-      <main className="flex flex-col items-center w-full px-0 py-10 max-w-[1200px] mx-auto">
+      <main className="flex flex-col items-center w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-[1200px] mx-auto">
         {/* Intro Section */}
-        <section className="w-full flex flex-col items-center mb-10">
+        <section className="w-full flex flex-col items-center mb-6 sm:mb-8 md:mb-10">
           <div className="text-center w-full">
-            <h1 className="text-5xl font-serif font-extrabold text-blue-900 mb-2 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-extrabold text-blue-900 mb-3 sm:mb-4 leading-tight px-2">
               The Team Behind MediLink
             </h1>
             <img
               src={StaffMembersTeam}
               alt="MediLink Team Group"
-              className="w-full h-auto rounded-2xl shadow-lg object-cover mb-4"
-              style={{ maxHeight: '540px' }}
+              className="w-full h-auto rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg object-cover mb-3 sm:mb-4"
+              style={{ maxHeight: '400px', maxHeightMd: '540px' }}
             />
-            <p className="text-lg font-medium">
+            <p className="text-sm sm:text-base md:text-lg font-medium px-2 mb-2 sm:mb-3 leading-relaxed">
               Meet the passionate team, that is united in one mission to transform healthcare through innovation and collaboration.
             </p>
-            <p className="text-lg font-medium">
+            <p className="text-sm sm:text-base md:text-lg font-medium px-2 leading-relaxed">
               Together, we are committed to making a difference in the lives of those we serve.
             </p>
           </div>

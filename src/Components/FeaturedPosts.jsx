@@ -69,18 +69,18 @@ const FeaturedPosts = ({ categories = [] }) => {
   };
 
   return (
-    <section className="mb-16">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold text-blue-900 bg-clip-text font-serif">
+    <section className="mb-12 sm:mb-16 overflow-hidden">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 bg-clip-text font-serif">
           Featured Stories
         </h2>
-        <button className="flex items-center text-blue-600 hover:text-blue-700 font-semibold group">
+        <button className="flex items-center text-blue-600 hover:text-blue-700 font-semibold group text-sm sm:text-base">
           View All
-          <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
       
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {featuredPosts.map((post, index) => (
           <div key={post.id} className={`grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
             {/* Conditional Layout based on index */}
@@ -176,8 +176,8 @@ const FeaturedPosts = ({ categories = [] }) => {
                     
                       style={{
                             boxShadow: post.id % 2 === 1 
-                            ? `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
-                            : `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                            ? `0 8px 16px rgba(0, 0, 0, 0.1)`
+                            : `0 8px 16px rgba(0, 0, 0, 0.1)`
                         }}
                     />
                   </div>
@@ -193,9 +193,7 @@ const FeaturedPosts = ({ categories = [] }) => {
                       alt={post.title}
                       className="w-full h-full object-cover rounded-2xl border-2 border-blue-400 bg-white"
                       style={{
-                            boxShadow: post.id % 2 === 1
-                            ? `-8px 8px 0px rgba(59, 130, 246, 0.3), -16px 16px 0px rgba(59, 130, 246, 0.2), -24px 24px 0px rgba(59, 130, 246, 0.1), -32px 32px 20px rgba(0, 0, 0, 0.1)`
-                            : `8px 8px 0px rgba(59, 130, 246, 0.3), 16px 16px 0px rgba(59, 130, 246, 0.2), 24px 24px 0px rgba(59, 130, 246, 0.1), 32px 32px 20px rgba(0, 0, 0, 0.1)`
+                            boxShadow: `0 8px 16px rgba(0, 0, 0, 0.1)`
                         }}
                     />
                   </div>

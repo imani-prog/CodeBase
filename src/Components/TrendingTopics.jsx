@@ -79,42 +79,42 @@ export default function TrendingHealthTopics() {
   }, []);
 
   return (
-    <section className="mb-20 relative overflow-hidden">
+    <section className="mb-12 sm:mb-16 md:mb-20 relative overflow-hidden">
      
        
       {/* Enhanced Floating elements */}
-      <div className="absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-blue-200/25 to-indigo-200/25 rounded-full blur-xl animate-pulse"></div>
-      <div className="absolute bottom-10 left-10 w-24 h-24 bg-gradient-to-br from-cyan-200/25 to-sky-200/25 rounded-full blur-xl animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-indigo-300/20 to-blue-300/20 rounded-full blur-lg animate-bounce delay-500"></div>
+      <div className="absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-blue-200/25 to-indigo-200/25 rounded-full blur-xl animate-pulse hidden sm:block"></div>
+      <div className="absolute bottom-10 left-10 w-24 h-24 bg-gradient-to-br from-cyan-200/25 to-sky-200/25 rounded-full blur-xl animate-pulse delay-1000 hidden sm:block"></div>
+      <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-indigo-300/20 to-blue-300/20 rounded-full blur-lg animate-bounce delay-500 hidden lg:block"></div>
 
-      <div className="relative z-10 pt-8 px-4">  
+      <div className="relative z-10 pt-6 sm:pt-8">  
         {/* Enhanced Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-12 md:mb-16">
          
           
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-yellow-300 bg-clip-text mb-6 leading-tight font-serif">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-yellow-300 bg-clip-text mb-4 sm:mb-6 leading-tight font-serif px-2">
             Trending Health Topics
           </h2>
 
-          <p className="text-white font-bold text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
+          <p className="text-white font-bold text-sm sm:text-base md:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed px-4">
             Discover cutting-edge healthcare innovations, breakthrough research, and wellness trends that are revolutionizing the medical industry right now
           </p>
           
           {/* Stats bar */}
-         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-8 text-sm">
-            <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
-              <Eye className="w-4 h-4 text-black" />
-              <span className="text-black font-bold">41.2k total views</span>
+         <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 md:gap-6 mt-6 sm:mt-8 text-xs sm:text-sm">
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 py-2">
+              <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-black flex-shrink-0" />
+              <span className="text-black font-bold whitespace-nowrap">41.2k total views</span>
             </div>
 
-            <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
-              <MessageCircle className="w-4 h-4 text-black" />
-              <span className="text-black font-bold">661 discussions</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 py-2">
+              <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 text-black flex-shrink-0" />
+              <span className="text-black font-bold whitespace-nowrap">661 discussions</span>
             </div>
 
-            <div className="flex items-center gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-4 py-2">
-              <TrendingUp className="w-4 h-4 text-black" />
-              <span className="text-black font-bold">+35% this week</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-yellow-300 rounded-xl shadow-lg shadow-gray-500/50 px-3 sm:px-4 py-2">
+              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-black flex-shrink-0" />
+              <span className="text-black font-bold whitespace-nowrap">+35% this week</span>
             </div>
           </div>
 
@@ -123,7 +123,7 @@ export default function TrendingHealthTopics() {
         </div>
 
         {/* Enhanced Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {trendingTopics.map((item, index) => {
             const IconComponent = item.icon;
             const isHovered = hoveredIndex === index;
@@ -132,7 +132,7 @@ export default function TrendingHealthTopics() {
             return (
               <div 
                 key={index} 
-                className="group relative overflow-hidden bg-blue-100 backdrop-blur-sm rounded-3xl p-4 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 transform cursor-pointer border border-blue-100/80 hover:border-blue-200"
+                className="group relative overflow-hidden bg-blue-100 backdrop-blur-sm rounded-3xl p-4 sm:p-5 md:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 transform cursor-pointer border border-blue-100/80 hover:border-blue-200"
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
@@ -240,23 +240,23 @@ export default function TrendingHealthTopics() {
         </div>
 
         {/* Enhanced Bottom CTA */}
-        <div className="text-center mt-16 text-white">
-          <div className="inline-flex flex-col items-center gap-4">
-            <button className="inline-flex items-center gap-3 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold rounded-2xl shadow-2xl relative overflow-hidden">
+        <div className="text-center mt-10 sm:mt-12 md:mt-16 text-white">
+          <div className="inline-flex flex-col items-center gap-3 sm:gap-4">
+            <button className="inline-flex items-center gap-2 sm:gap-3 px-5 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold rounded-2xl shadow-2xl relative overflow-hidden text-sm sm:text-base">
               
               <span className="relative z-10">Explore All Health Innovations</span>
-              <ArrowUpRight className="w-5 sm:w-6 h-5 sm:h-6 relative z-10" />
+              <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 relative z-10 flex-shrink-0" />
             </button>
             
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 font-extrabold text-sm">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 md:gap-6 font-extrabold text-xs sm:text-sm">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                <span>Updated every hour</span>
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="whitespace-nowrap">Updated every hour</span>
               </div>
               <div className="hidden sm:block w-1 h-1 bg-gray-400 rounded-full"></div>
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                <span>Join 50k+ healthcare professionals</span>
+                <Users className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="whitespace-nowrap">Join 50k+ healthcare professionals</span>
               </div>
             </div>
           </div>
