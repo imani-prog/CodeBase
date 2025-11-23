@@ -38,10 +38,10 @@ const PatientDashboard = () => {
   ]);
 
   const [recentActivities] = useState([
-    { id: 1, icon: CheckCircle, text: 'Lab results uploaded', time: '2 hours ago', color: 'text-green-600' },
+    { id: 1, icon: CheckCircle, text: 'Lab results uploaded', time: '2 hours ago', color: 'text-blue-600' },
     { id: 2, icon: Pill, text: 'Prescription refilled', time: '1 day ago', color: 'text-blue-600' },
-    { id: 3, icon: Calendar, text: 'Appointment booked', time: '3 days ago', color: 'text-purple-600' },
-    { id: 4, icon: FileText, text: 'Medical record updated', time: '5 days ago', color: 'text-indigo-600' }
+    { id: 3, icon: Calendar, text: 'Appointment booked', time: '3 days ago', color: 'text-blue-600' },
+    { id: 4, icon: FileText, text: 'Medical record updated', time: '5 days ago', color: 'text-blue-600' }
   ]);
 
   const quickActions = [
@@ -50,72 +50,66 @@ const PatientDashboard = () => {
       description: 'Schedule a clinic visit or home care',
       icon: Calendar,
       link: '/client/patient/appointments',
-      bgColor: 'bg-blue-50',
       iconColor: 'text-blue-600',
-      hoverColor: 'hover:bg-blue-100'
+      hoverColor: 'hover:bg-blue-50'
     },
     {
       title: 'Telemedicine',
       description: 'Connect with a doctor online',
       icon: Video,
       link: '/client/patient/telemedicine',
-      bgColor: 'bg-green-50',
-      iconColor: 'text-green-600',
-      hoverColor: 'hover:bg-green-100'
+      iconColor: 'text-blue-600',
+      hoverColor: 'hover:bg-blue-50'
     },
     {
       title: 'Health Records',
       description: 'View your medical history',
       icon: FileText,
       link: '/client/patient/health-records',
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-600',
-      hoverColor: 'hover:bg-purple-100'
+      iconColor: 'text-blue-600',
+      hoverColor: 'hover:bg-blue-50'
     },
     {
       title: 'Prescriptions',
       description: 'Manage your medications',
       icon: Pill,
       link: '/client/patient/prescriptions',
-      bgColor: 'bg-pink-50',
-      iconColor: 'text-pink-600',
-      hoverColor: 'hover:bg-pink-100'
+      iconColor: 'text-blue-600',
+      hoverColor: 'hover:bg-blue-50'
     },
     {
       title: 'Emergency',
       description: 'Request ambulance service',
       icon: Phone,
       link: '/client/patient/emergency',
-      bgColor: 'bg-red-50',
-      iconColor: 'text-red-600',
-      hoverColor: 'hover:bg-red-100'
+      iconColor: 'text-blue-600',
+      hoverColor: 'hover:bg-blue-50'
     },
     {
       title: 'Wellness',
       description: 'Health tips & community',
       icon: Heart,
       link: '/client/patient/wellness',
-      bgColor: 'bg-yellow-50',
-      iconColor: 'text-yellow-600',
-      hoverColor: 'hover:bg-yellow-100'
+      iconColor: 'text-blue-600',
+      hoverColor: 'hover:bg-blue-50'
     }
   ];
 
   const healthStats = [
-    { label: 'Upcoming Visits', value: '2', icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Active Prescriptions', value: '3', icon: Pill, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Pending Results', value: '1', icon: Clock, color: 'text-orange-600', bg: 'bg-orange-50' },
-    { label: 'Health Score', value: '85%', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
+    { label: 'Upcoming Visits', value: '2', icon: Calendar, color: 'text-blue-600'},
+    { label: 'Active Prescriptions', value: '3', icon: Pill, color: 'text-blue-600'},
+    { label: 'Pending Results', value: '1', icon: Clock, color: 'text-blue-600'},
+    { label: 'Health Score', value: '85%', icon: TrendingUp, color: 'text-blue-600'}
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
           Welcome Back, Patient!
         </h1>
-        <p className="text-gray-600 text-sm sm:text-base">
+        <p className="text-sm sm:text-base">
           Here's an overview of your health journey
         </p>
       </div>
@@ -125,7 +119,7 @@ const PatientDashboard = () => {
         {healthStats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            className="bg-white p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
           >
             <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${stat.bg} mb-3 sm:mb-4`}>
               <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
@@ -140,7 +134,7 @@ const PatientDashboard = () => {
         {/* Left Column - Quick Actions & Appointments */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="bg-white p-4 sm:p-6 shadow-sm border border-gray-100">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Quick Actions</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {quickActions.map((action, index) => (
@@ -164,9 +158,9 @@ const PatientDashboard = () => {
           </div>
 
           {/* Upcoming Appointments */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="bg-white not-odd:p-4 sm:p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Upcoming Appointments</h2>
+              <h2 className="text-lg sm:text-xl font-bold">Upcoming Appointments</h2>
               <Link
                 to="/client/patient/appointments"
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -240,7 +234,7 @@ const PatientDashboard = () => {
         {/* Right Column - Recent Activity & Health Alert */}
         <div className="space-y-6">
           {/* Health Alert */}
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 sm:p-6 text-white shadow-lg">
+          <div className="bg-blue-500 p-4 sm:p-6 text-white shadow-lg">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-white/20 p-2 rounded-lg">
                 <AlertCircle className="w-6 h-6" />
@@ -259,8 +253,8 @@ const PatientDashboard = () => {
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Recent Activity</h2>
+          <div className="p-4 sm:p-6 shadow-sm border border-gray-100">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Recent Activity</h2>
             <div className="space-y-4">
               {recentActivities.map((activity) => (
                 <div key={activity.id} className="flex items-start gap-3">
@@ -277,8 +271,8 @@ const PatientDashboard = () => {
           </div>
 
           {/* Quick Contact */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
-            <h3 className="font-semibold text-gray-900 mb-4">Need Help?</h3>
+          <div className="p-4 sm:p-6 shadow-sm border border-gray-100">
+            <h3 className="font-semibold mb-4">Need Help?</h3>
             <div className="space-y-3">
               <button className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
                 <Phone className="w-4 h-4" />
@@ -286,7 +280,7 @@ const PatientDashboard = () => {
               </button>
               <Link
                 to="/client/patient/emergency"
-                className="w-full bg-red-50 hover:bg-red-100 text-red-700 py-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
               >
                 <AlertCircle className="w-4 h-4" />
                 Emergency Services
