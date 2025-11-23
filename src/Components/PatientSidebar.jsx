@@ -71,8 +71,8 @@ const sidebarLinks = [
 ];
 
 const PatientSidebar = () => (
-  // Fixed sidebar matching admin style
-  <aside className="fixed top-0 left-0 w-64 bg-gradient-to-b from-blue-600 to-blue-800 text-white flex flex-col py-6 px-4 shadow-lg h-screen z-30">
+  
+  <aside className="fixed top-0 left-0 w-64 bg-blue-950 text-white flex flex-col py-6 px-4 shadow-lg h-screen z-30">
     {/* Logo Section */}
     <div className="mb-6 flex items-center space-x-3 px-1">
       <img
@@ -97,7 +97,7 @@ const PatientSidebar = () => (
               link.isEmergency
                 ? 'bg-red-600 hover:bg-red-700 font-semibold'
                 : isActive
-                ? 'bg-blue-700 text-yellow-300 shadow-md'
+                ? 'bg-blue-800 text-yellow-300 shadow-md'
                 : 'hover:bg-blue-700/50'
             }`
           }
