@@ -134,7 +134,7 @@ const Donate = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 md:mb-16">
-            <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
+            <button className="group bg-blue-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center justify-center">
                 
                 Donate Now
@@ -225,7 +225,7 @@ const Donate = () => {
                   onClick={() => setSelectedAmount(amount)}
                   className={`p-3 sm:p-4 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg transition-all duration-300 transform hover:scale-105 ${
                     selectedAmount === amount
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                      ? 'bg-blue-600 text-white shadow-lg'
                       : 'bg-blue-500 text-white hover:bg-blue-600'
                   }`}
                 >
@@ -242,13 +242,13 @@ const Donate = () => {
                 onChange={(e) => setCustomAmount(e.target.value)}
                 className="flex-1 p-3 sm:p-4 border-2 border-gray-200 rounded-lg sm:rounded-xl text-sm sm:text-base focus:border-blue-500 focus:outline-none transition-colors"
               />
-              <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base font-bold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 whitespace-nowrap">
+              <button className="bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base font-bold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 whitespace-nowrap">
                 Donate
               </button>
             </div>
             
             <div className="text-center">
-              <p className="text-white font-bold text-xs sm:text-sm px-2">🔒 All transactions are secure and encrypted</p>
+              <p className="text-white font-bold text-xs sm:text-sm px-2"> All transactions are secure and encrypted</p>
             </div>
           </div>
         </div>
@@ -276,7 +276,7 @@ const Donate = () => {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2 gap-2">
                           <h3 className="text-base sm:text-lg md:text-xl font-bold font-serif text-gray-800">{tier.title}</h3>
-                          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap">
+                          <span className="bg-blue-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap">
                             {tier.amount}
                           </span>
                         </div>

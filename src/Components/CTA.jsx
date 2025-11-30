@@ -86,12 +86,10 @@ const CTA = () => {
       {/* Security Features Section */}
       <div className={`relative p-4 sm:p-6 lg:p-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-12 h-12 sm:w-18 sm:h-18 lg:w-24 lg:h-24 bg-gradient-to-tr from-green-400/20 to-blue-400/20 rounded-full blur-2xl" />
         
         <div className="relative z-10">
           <div className="text-center mb-6 sm:mb-8">
-            <div className="inline-flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3 sm:mb-4">
+            <div className="inline-flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 bg-blue-600  bg-clip-text text-transparent mb-3 sm:mb-4">
               <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center font-serif text-blue-600">Built for Africa, Backed by Security</h3>
             </div>
@@ -118,7 +116,7 @@ const CTA = () => {
                   }`}>
                     {/* Feature highlight badge */}
                     {isActive && (
-                      <div className="absolute -top-2 sm:-top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-semibold">
+                      <div className="absolute -top-2 sm:-top-3 left-1/2 transform -translate-x-1/2 bg-blue-600  text-white px-2 sm:px-3 py-1 rounded-full text-xs font-semibold">
                         {feature.highlight}
                       </div>
                     )}
@@ -177,14 +175,12 @@ const CTA = () => {
       {/* Main CTA Section */}
       <div className={`p-4 sm:p-6 lg:p-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         {/* Animated background elements */}
-        <div className="absolute top-0 left-1/4 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-purple-400/30 to-pink-400/30 rounded-full blur-2xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-400/30 to-cyan-400/30 rounded-full blur-xl animate-pulse delay-1000" />
-        
+       
         <div className="relative z-10 text-center">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <div className="inline-flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3 sm:mb-4">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-2 sm:p-3">
+              <div className="bg-blue-600 rounded-full p-2 sm:p-3">
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
               </div>
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold font-serif text-blue-600 text-center">

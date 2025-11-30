@@ -214,7 +214,7 @@ const Careers = () => {
           
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold mb-4 sm:mb-6 leading-tight px-2">
-            <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
+            <span className="bg-blue-700  bg-clip-text text-transparent">
               Build the Future of Healthcare
             </span>
           </h1>
@@ -227,7 +227,7 @@ const Careers = () => {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-10 sm:mb-12 md:mb-16">
             <button 
               onClick={() => document.getElementById('open-positions').scrollIntoView({behavior: 'smooth'})}
-              className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl transition-all duration-300 transform hover:scale-105"
+              className="group bg-blue-600  text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               <span className="flex items-center justify-center gap-2">
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,7 +420,7 @@ const Careers = () => {
                     >
                       {expandedJob === index ? 'Show Less' : 'View Details'}
                     </button>
-                    <button className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm md:text-base font-semibold transition-all duration-300 transform hover:scale-105">
+                    <button className="flex-1 bg-blue-600 hover:from-blue-700 hover:to-indigo-700 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm md:text-base font-semibold transition-all duration-300 transform hover:scale-105">
                       Apply Now
                     </button>
                   </div>

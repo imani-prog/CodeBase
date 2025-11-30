@@ -45,11 +45,7 @@ const Footer = () => {
   return (
     <footer className="relative w-full bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 text-gray-100 mt-auto overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
-        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-1000"></div>
-      </div>
+      
 
       {/* Main Footer Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
@@ -68,7 +64,7 @@ const Footer = () => {
                 />
               </div>
               <div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <h3 className="text-3xl font-bold bg-blue-400  bg-clip-text text-transparent">
                   MediLink
                 </h3>
                 <p className="text-sm text-gray-300">Healthcare for Africa</p>
@@ -117,7 +113,7 @@ const Footer = () => {
           {/* Quick Links - Enhanced */}
           <div>
             <h4 className="font-bold text-lg mb-6 text-white flex items-center gap-2">
-              <div className="w-1 h-6 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full"></div>
+              <div className="w-1 h-6 bg-blue-400  rounded-full"></div>
               Quick Links
             </h4>
             <div className="grid grid-cols-2 gap-3">
@@ -342,7 +338,7 @@ const Footer = () => {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-24 md:right-8 p-2 sm:p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 z-40 group"
+          className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-24 md:right-8 p-2 sm:p-3 bg-blue-500 text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 z-40 group"
           aria-label="Back to top"
         >
           <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 group-hover:animate-bounce" />

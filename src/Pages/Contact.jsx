@@ -232,23 +232,7 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* Response Time */}
-          {/* <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-xl p-6 text-white">
-            <div className="flex items-center mb-4">
-              
-              <h3 className="text-2xl font-bold">Response Time</h3>
-            </div>
-            <p className="text-blue-100 mb-4">
-              We aim to respond to all messages within 24 hours. For urgent matters, please call or WhatsApp us directly.
-            </p>
-            <div className="flex items-center bg-white/10 rounded-2xl p-3">
-              <span className="text-2xl mr-3">🕐</span>
-              <div>
-                <div className="font-semibold">Business Hours</div>
-                <div className="text-blue-200 text-sm">Mon-Fri: 8AM - 6PM EAT</div>
-              </div>
-            </div>
-          </div> */}
+          
         </aside>
         <section className="lg:w-80 space-y-3 sm:space-y-4">
           <div className="p-3 sm:p-4">

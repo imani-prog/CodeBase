@@ -83,10 +83,7 @@ export default function TrendingHealthTopics() {
      
        
       {/* Enhanced Floating elements */}
-      <div className="absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-blue-200/25 to-indigo-200/25 rounded-full blur-xl animate-pulse hidden sm:block"></div>
-      <div className="absolute bottom-10 left-10 w-24 h-24 bg-gradient-to-br from-cyan-200/25 to-sky-200/25 rounded-full blur-xl animate-pulse delay-1000 hidden sm:block"></div>
-      <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-indigo-300/20 to-blue-300/20 rounded-full blur-lg animate-bounce delay-500 hidden lg:block"></div>
-
+      
       <div className="relative z-10 pt-6 sm:pt-8">  
         {/* Enhanced Header */}
         <div className="text-center mb-10 sm:mb-12 md:mb-16">
@@ -242,7 +239,7 @@ export default function TrendingHealthTopics() {
         {/* Enhanced Bottom CTA */}
         <div className="text-center mt-10 sm:mt-12 md:mt-16 text-white">
           <div className="inline-flex flex-col items-center gap-3 sm:gap-4">
-            <button className="inline-flex items-center gap-2 sm:gap-3 px-5 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold rounded-2xl shadow-2xl relative overflow-hidden text-sm sm:text-base">
+            <button className="inline-flex items-center gap-2 sm:gap-3 px-5 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 bg-blue-600  text-white font-bold rounded-2xl shadow-2xl relative overflow-hidden text-sm sm:text-base">
               
               <span className="relative z-10">Explore All Health Innovations</span>
               <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 relative z-10 flex-shrink-0" />
