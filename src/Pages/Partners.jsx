@@ -95,7 +95,7 @@ const Partners = () => {
         <div className="max-w-6xl mx-auto text-center">
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 bg-clip-text text-transparent font-serif">
+            <span className="bg-blue-700  to-blue-800 bg-clip-text text-transparent font-serif">
               Our Strategic Partners
             </span>
             
@@ -108,7 +108,7 @@ const Partners = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-10 sm:mb-12 md:mb-16">
-            <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
+            <button className="group bg-blue-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center justify-center">
                  Become a Partner
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,7 +180,7 @@ const Partners = () => {
                 {/* Text Content - Left for even index, Right for odd index */}
                 <div className={`${index % 2 === 0 ? 'lg:order-1' : 'lg:order-2'} space-y-6`}>
                   {/* Category Badge */}
-                  <div className="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                  <div className="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
                     {partner.category}
                   </div>
                   
@@ -189,7 +189,7 @@ const Partners = () => {
                     <h3 className="text-3xl font-bold text-yellow-300 font-serif mb-2">
                       {partner.name}
                     </h3>
-                    <p className="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-bold">{partner.fullName}</p>
+                    <p className="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">{partner.fullName}</p>
                     
                     <p className="text-white leading-relaxed mb-6">
                       {partner.description}
@@ -221,7 +221,7 @@ const Partners = () => {
                   </div>
                   
                   {/* Action Button */}
-                  <button className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-3 px-8 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+                  <button className="bg-blue-500 hover:from-blue-600 hover:to-indigo-600 text-white py-3 px-8 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
                     Learn More
                   </button>
                 </div>
@@ -299,7 +299,7 @@ const Partners = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
+            <button className="bg-blue-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105">
               Start Partnership
             </button>
             <button className="border-2 border-blue-300 text-blue-700 hover:border-blue-500 hover:bg-blue-50 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300">
