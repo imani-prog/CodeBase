@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { 
   FileText, Download, Share2, Calendar, Activity, 
-  Heart, Thermometer, Droplet, Weight, Eye, 
-  Upload, Filter, Search, ChevronDown, ChevronUp,
-  AlertCircle, CheckCircle, Clock, Pill
+  File, Upload, Filter, Search, ChevronDown, ChevronUp,
+  AlertCircle, CheckCircle, Clock, Pill, Paperclip,
+  Image, FileCheck, Folder, TrendingUp, Eye
 } from 'lucide-react';
 
 const HealthRecords = () => {
@@ -13,12 +13,90 @@ const HealthRecords = () => {
   const [filterType, setFilterType] = useState('all');
 
   // Sample health data - replace with actual API data
-  const vitalSigns = [
-    { id: 1, type: 'Blood Pressure', value: '120/80', unit: 'mmHg', date: '2025-11-20', status: 'normal', icon: Heart, color: 'green' },
-    { id: 2, type: 'Heart Rate', value: '72', unit: 'bpm', date: '2025-11-20', status: 'normal', icon: Activity, color: 'green' },
-    { id: 3, type: 'Temperature', value: '36.8', unit: '°C', date: '2025-11-20', status: 'normal', icon: Thermometer, color: 'green' },
-    { id: 4, type: 'Weight', value: '70', unit: 'kg', date: '2025-11-15', status: 'normal', icon: Weight, color: 'green' },
-    { id: 5, type: 'Blood Sugar', value: '95', unit: 'mg/dL', date: '2025-11-18', status: 'normal', icon: Droplet, color: 'green' },
+  // Documents uploaded by healthcare providers or patients
+  const uploadedDocuments = [
+    { 
+      id: 1, 
+      name: 'Medical Certificate', 
+      type: 'Medical Document', 
+      uploadedBy: 'Dr. Sarah Johnson',
+      date: '2025-11-20', 
+      size: '0.8 MB',
+      category: 'report',
+      icon: FileCheck,
+      color: 'blue'
+    },
+    { 
+      id: 2, 
+      name: 'Consultation Notes', 
+      type: 'Medical Report', 
+      uploadedBy: 'Dr. Sarah Johnson',
+      date: '2025-11-18', 
+      size: '0.5 MB',
+      category: 'report',
+      icon: FileText,
+      color: 'green'
+    },
+    { 
+      id: 3, 
+      name: 'Prescription - Cetirizine', 
+      type: 'Prescription', 
+      uploadedBy: 'Dr. Sarah Johnson',
+      date: '2025-10-15', 
+      size: '0.3 MB',
+      category: 'prescription',
+      icon: Pill,
+      color: 'orange'
+    },
+    { 
+      id: 4, 
+      name: 'Vaccination Record Card', 
+      type: 'Vaccination Record', 
+      uploadedBy: 'Patient Upload',
+      date: '2025-10-01', 
+      size: '1.2 MB',
+      category: 'vaccination',
+      icon: File,
+      color: 'purple'
+    },
+    { 
+      id: 5, 
+      name: 'Insurance Card Copy', 
+      type: 'Insurance Document', 
+      uploadedBy: 'Patient Upload',
+      date: '2025-09-15', 
+      size: '0.6 MB',
+      category: 'insurance',
+      icon: FileText,
+      color: 'indigo'
+    },
+  ];
+
+  const healthSummary = [
+    {
+      id: 1,
+      category: 'Allergies',
+      items: ['Pollen', 'Dust mites'],
+      severity: 'Moderate',
+      icon: AlertCircle,
+      color: 'yellow'
+    },
+    {
+      id: 2,
+      category: 'Chronic Conditions',
+      items: ['None reported'],
+      severity: 'N/A',
+      icon: CheckCircle,
+      color: 'green'
+    },
+    {
+      id: 3,
+      category: 'Blood Type',
+      items: ['O Positive'],
+      severity: 'N/A',
+      icon: Activity,
+      color: 'red'
+    },
   ];
 
   const medicalHistory = [
@@ -35,10 +113,10 @@ const HealthRecords = () => {
     {
       id: 2,
       date: '2025-09-08',
-      type: 'Lab Test',
-      provider: 'MediLink Laboratory',
-      testName: 'Complete Blood Count',
-      result: 'All values within normal range',
+      type: 'Vaccination',
+      provider: 'Community Health Worker',
+      vaccine: 'Tetanus Booster',
+      notes: 'Vaccination administered at community health outreach.',
       status: 'completed'
     },
     {
@@ -102,8 +180,8 @@ const HealthRecords = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Health Records</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold">Health Records</h1>
+          <p className="mt-2">
             Comprehensive view of your medical history, lab results, and vital signs
           </p>
         </div>
@@ -120,41 +198,41 @@ const HealthRecords = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Records</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">24</p>
+              <p className="text-xs text-gray-600">Total Records</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">24</p>
             </div>
-            <FileText className="w-8 h-8 text-blue-600" />
+            <FileText className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Active Prescriptions</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{prescriptions.filter(p => p.status === 'active').length}</p>
+              <p className="text-xs text-gray-600">Active Prescriptions</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{prescriptions.filter(p => p.status === 'active').length}</p>
             </div>
-            <Pill className="w-8 h-8 text-green-600" />
+            <Pill className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Upcoming Vaccinations</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{upcomingVaccinations.length}</p>
+              <p className="text-xs text-gray-600">Upcoming Vaccinations</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{upcomingVaccinations.length}</p>
             </div>
-            <Calendar className="w-8 h-8 text-purple-600" />
+            <Calendar className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Last Checkup</p>
-              <p className="text-sm font-semibold text-gray-900 mt-1">Oct 15, 2025</p>
+              <p className="text-xs text-gray-600">Last Checkup</p>
+              <p className="text-xs font-semibold text-gray-900 mt-0.5">Oct 15, 2025</p>
             </div>
-            <CheckCircle className="w-8 h-8 text-orange-600" />
+            <CheckCircle className="w-7 h-7 text-blue-600" />
           </div>
         </div>
       </div>
@@ -162,7 +240,7 @@ const HealthRecords = () => {
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="flex space-x-8 overflow-x-auto">
-          {['overview', 'vital-signs', 'medical-history', 'prescriptions'].map((tab) => (
+          {['overview', 'documents', 'medical-history', 'prescriptions'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -180,30 +258,63 @@ const HealthRecords = () => {
 
       {/* Overview Tab */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Vital Signs */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-600" />
-              Recent Vital Signs
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Recent Documents */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Folder className="w-4 h-4 text-blue-600" />
+              Recent Documents
             </h3>
-            <div className="space-y-3">
-              {vitalSigns.slice(0, 3).map((vital) => {
-                const Icon = vital.icon;
+            <div className="space-y-2">
+              {uploadedDocuments.slice(0, 3).map((doc) => {
+                const Icon = doc.icon;
                 return (
-                  <div key={vital.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Icon className={`w-5 h-5 text-${vital.color}-600`} />
-                      <div>
-                        <p className="font-medium text-gray-900">{vital.type}</p>
-                        <p className="text-sm text-gray-600">{vital.date}</p>
+                  <div key={doc.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-1.5 bg-${doc.color}-100 rounded`}>
+                        <Icon className={`w-4 h-4 text-${doc.color}-600`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{doc.name}</p>
+                        <p className="text-xs text-gray-600">{doc.type} • {doc.date}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">{vital.value} {vital.unit}</p>
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(vital.status)}`}>
-                        {vital.status}
-                      </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">{doc.size}</span>
+                      <Download className="w-3.5 h-3.5 text-gray-400 hover:text-blue-600" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Health Summary */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-green-600" />
+              Health Summary
+            </h3>
+            <div className="space-y-2">
+              {healthSummary.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.id} className="p-2 bg-gray-50 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <div className={`p-1.5 bg-${item.color}-100 rounded flex-shrink-0`}>
+                        <Icon className={`w-4 h-4 text-${item.color}-600`} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start mb-0.5">
+                          <p className="text-sm font-medium text-gray-900">{item.category}</p>
+                          {item.severity !== 'N/A' && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+                              {item.severity}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-600">{item.items.join(', ')}</p>
+                      </div>
                     </div>
                   </div>
                 );
@@ -212,20 +323,20 @@ const HealthRecords = () => {
           </div>
 
           {/* Active Prescriptions */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Pill className="w-5 h-5 text-green-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Pill className="w-4 h-4 text-green-600" />
               Active Prescriptions
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {prescriptions.filter(p => p.status === 'active').map((prescription) => (
-                <div key={prescription.id} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between items-start mb-2">
+                <div key={prescription.id} className="p-2 bg-gray-50 rounded-lg">
+                  <div className="flex justify-between items-start mb-1">
                     <div>
-                      <p className="font-medium text-gray-900">{prescription.medication}</p>
-                      <p className="text-sm text-gray-600">{prescription.dosage} - {prescription.frequency}</p>
+                      <p className="text-sm font-medium text-gray-900">{prescription.medication}</p>
+                      <p className="text-xs text-gray-600">{prescription.dosage} - {prescription.frequency}</p>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(prescription.status)}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(prescription.status)}`}>
                       Active
                     </span>
                   </div>
@@ -236,41 +347,41 @@ const HealthRecords = () => {
           </div>
 
           {/* Upcoming Vaccinations */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-purple-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-purple-600" />
               Upcoming Vaccinations
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {upcomingVaccinations.map((vaccination, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-2 bg-purple-50 rounded-lg">
                   <div>
-                    <p className="font-medium text-gray-900">{vaccination.name}</p>
-                    <p className="text-sm text-gray-600">Due: {vaccination.dueDate}</p>
+                    <p className="text-sm font-medium text-gray-900">{vaccination.name}</p>
+                    <p className="text-xs text-gray-600">Due: {vaccination.dueDate}</p>
                   </div>
-                  <AlertCircle className="w-5 h-5 text-purple-600" />
+                  <AlertCircle className="w-4 h-4 text-purple-600" />
                 </div>
               ))}
             </div>
           </div>
 
           {/* Recent Medical History */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-orange-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-orange-600" />
               Recent Medical History
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {medicalHistory.slice(0, 2).map((record) => (
-                <div key={record.id} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between items-start mb-2">
+                <div key={record.id} className="p-2 bg-gray-50 rounded-lg">
+                  <div className="flex justify-between items-start mb-1">
                     <div>
-                      <p className="font-medium text-gray-900">{record.type}</p>
-                      <p className="text-sm text-gray-600">{record.provider}</p>
+                      <p className="text-sm font-medium text-gray-900">{record.type}</p>
+                      <p className="text-xs text-gray-600">{record.provider}</p>
                     </div>
                     <p className="text-xs text-gray-500">{record.date}</p>
                   </div>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-xs text-gray-700">
                     {record.diagnosis || record.testName || record.vaccine}
                   </p>
                 </div>
@@ -280,33 +391,76 @@ const HealthRecords = () => {
         </div>
       )}
 
-      {/* Vital Signs Tab */}
-      {activeTab === 'vital-signs' && (
+      {/* Documents Tab */}
+      {activeTab === 'documents' && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Vital Signs History</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {vitalSigns.map((vital) => {
-                const Icon = vital.icon;
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">My Documents</h3>
+              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <Upload className="w-4 h-4" />
+                Upload Document
+              </button>
+            </div>
+            
+            {/* Filter by category */}
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+              {['all', 'report', 'prescription', 'vaccination', 'insurance'].map((category) => (
+                <button
+                  key={category}
+                  className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                    filterType === category
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                  onClick={() => setFilterType(category)}
+                >
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {uploadedDocuments
+                .filter(doc => filterType === 'all' || doc.category === filterType)
+                .map((doc) => {
+                const Icon = doc.icon;
                 return (
-                  <div key={vital.id} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 bg-${vital.color}-100 rounded-lg`}>
-                          <Icon className={`w-5 h-5 text-${vital.color}-600`} />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{vital.type}</p>
-                          <p className="text-xs text-gray-500">{vital.date}</p>
-                        </div>
+                  <div key={doc.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow bg-white">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`p-2 bg-${doc.color}-100 rounded`}>
+                        <Icon className={`w-4 h-4 text-${doc.color}-600`} />
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(vital.status)}`}>
-                        {vital.status}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm text-gray-900 truncate">{doc.name}</h4>
+                        <p className="text-xs text-gray-500">{doc.type}</p>
+                      </div>
                     </div>
-                    <div className="text-center py-2">
-                      <p className="text-3xl font-bold text-gray-900">{vital.value}</p>
-                      <p className="text-sm text-gray-600">{vital.unit}</p>
+                    <div className="space-y-1 mb-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">By:</span>
+                        <span className="font-medium text-gray-700 truncate ml-2">{doc.uploadedBy}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Date:</span>
+                        <span className="text-gray-700">{doc.date}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Size:</span>
+                        <span className="text-gray-700">{doc.size}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 pt-2 border-t border-gray-100">
+                      <button className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                        <Eye className="w-3 h-3" />
+                        View
+                      </button>
+                      <button className="flex items-center justify-center px-2 py-1.5 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                        <Download className="w-3 h-3" />
+                      </button>
+                      <button className="flex items-center justify-center px-2 py-1.5 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                        <Share2 className="w-3 h-3" />
+                      </button>
                     </div>
                   </div>
                 );
@@ -338,77 +492,65 @@ const HealthRecords = () => {
               >
                 <option value="all">All Records</option>
                 <option value="Consultation">Consultations</option>
-                <option value="Lab Test">Lab Tests</option>
                 <option value="Vaccination">Vaccinations</option>
+                <option value="Referral">Referrals</option>
               </select>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {medicalHistory.map((record) => (
                 <div key={record.id} className="border border-gray-200 rounded-lg overflow-hidden">
                   <div
-                    className="p-4 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
                     onClick={() => toggleRecord(record.id)}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <FileText className="w-5 h-5 text-blue-600" />
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 bg-blue-100 rounded flex-shrink-0">
+                          <FileText className="w-4 h-4 text-blue-600" />
                         </div>
-                        <div>
-                          <p className="font-semibold text-gray-900">{record.type}</p>
-                          <p className="text-sm text-gray-600">{record.provider} {record.specialty && `- ${record.specialty}`}</p>
-                          <p className="text-xs text-gray-500 mt-1">{record.date}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{record.type}</p>
                         </div>
+                        {expandedRecord === record.id ? (
+                          <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        )}
                       </div>
-                      {expandedRecord === record.id ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
-                      )}
+                      <div className="text-xs text-gray-600 truncate">{record.provider} {record.specialty && `- ${record.specialty}`}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{record.date}</div>
                     </div>
                   </div>
                   {expandedRecord === record.id && (
-                    <div className="p-4 bg-white border-t border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="p-3 bg-white border-t border-gray-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                         {record.diagnosis && (
                           <div>
-                            <p className="text-sm font-medium text-gray-700">Diagnosis</p>
-                            <p className="text-gray-900">{record.diagnosis}</p>
-                          </div>
-                        )}
-                        {record.testName && (
-                          <div>
-                            <p className="text-sm font-medium text-gray-700">Test Name</p>
-                            <p className="text-gray-900">{record.testName}</p>
-                          </div>
-                        )}
-                        {record.result && (
-                          <div>
-                            <p className="text-sm font-medium text-gray-700">Result</p>
-                            <p className="text-gray-900">{record.result}</p>
+                            <p className="text-xs font-medium text-gray-700">Diagnosis</p>
+                            <p className="text-sm text-gray-900">{record.diagnosis}</p>
                           </div>
                         )}
                         {record.vaccine && (
                           <div>
-                            <p className="text-sm font-medium text-gray-700">Vaccine</p>
-                            <p className="text-gray-900">{record.vaccine}</p>
+                            <p className="text-xs font-medium text-gray-700">Vaccine</p>
+                            <p className="text-sm text-gray-900">{record.vaccine}</p>
                           </div>
                         )}
                       </div>
                       {record.notes && (
-                        <div className="mb-4">
-                          <p className="text-sm font-medium text-gray-700 mb-1">Notes</p>
-                          <p className="text-gray-600">{record.notes}</p>
+                        <div className="mb-3">
+                          <p className="text-xs font-medium text-gray-700 mb-1">Notes</p>
+                          <p className="text-sm text-gray-600">{record.notes}</p>
                         </div>
                       )}
                       <div className="flex gap-2">
-                        <button className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                          <Download className="w-4 h-4" />
+                        <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                          <Download className="w-3.5 h-3.5" />
                           Download
                         </button>
-                        <button className="flex items-center gap-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                          <Share2 className="w-4 h-4" />
+                        <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                          <Share2 className="w-3.5 h-3.5" />
                           Share
                         </button>
                       </div>
@@ -424,44 +566,46 @@ const HealthRecords = () => {
       {/* Prescriptions Tab */}
       {activeTab === 'prescriptions' && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Current Prescriptions</h3>
-            <div className="space-y-4">
+          <div className="p-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">Current Prescriptions</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {prescriptions.map((prescription) => (
-                <div key={prescription.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Pill className="w-5 h-5 text-green-600" />
+                <div key={prescription.id} className="border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                      <div className="p-1.5 bg-green-100 rounded flex-shrink-0">
+                        <Pill className="w-4 h-4 text-green-600" />
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-lg">{prescription.medication}</h4>
-                        <p className="text-gray-600">{prescription.dosage} - {prescription.frequency}</p>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-gray-900 truncate">{prescription.medication}</h4>
+                        <p className="text-xs text-gray-600">{prescription.dosage} - {prescription.frequency}</p>
                       </div>
                     </div>
-                    <span className={`text-xs px-3 py-1 rounded-full ${getStatusColor(prescription.status)}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ml-2 ${getStatusColor(prescription.status)}`}>
                       {prescription.status}
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="space-y-1.5 text-xs mb-2">
                     <div>
-                      <p className="text-gray-600">Prescribed By</p>
-                      <p className="font-medium text-gray-900">{prescription.prescribedBy}</p>
+                      <p className="text-gray-500">Prescribed By</p>
+                      <p className="font-medium text-gray-900 truncate">{prescription.prescribedBy}</p>
                     </div>
-                    <div>
-                      <p className="text-gray-600">Start Date</p>
-                      <p className="font-medium text-gray-900">{prescription.startDate}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Duration</p>
-                      <p className="font-medium text-gray-900">{prescription.duration}</p>
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <p className="text-gray-500">Start Date</p>
+                        <p className="font-medium text-gray-900">{prescription.startDate}</p>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-gray-500">Duration</p>
+                        <p className="font-medium text-gray-900">{prescription.duration}</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium">{prescription.refills}</span> refills remaining
+                  <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
+                    <p className="text-xs text-gray-600">
+                      <span className="font-medium">{prescription.refills}</span> refills left
                     </p>
-                    <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                    <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">
                       Request Refill
                     </button>
                   </div>

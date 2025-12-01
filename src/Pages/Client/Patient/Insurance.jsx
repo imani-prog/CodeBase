@@ -221,45 +221,45 @@ const Insurance = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Active Claims</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-xs text-gray-600">Active Claims</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">
                 {claims.filter(c => c.status === 'processing').length}
               </p>
             </div>
-            <FileText className="w-8 h-8 text-blue-600" />
+            <FileText className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pending Payments</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-xs text-gray-600">Pending Payments</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">
                 KSh {billingHistory.filter(b => b.status === 'pending').reduce((sum, b) => sum + parseInt(b.balance.replace(/[^0-9]/g, '')), 0).toLocaleString()}
               </p>
             </div>
-            <DollarSign className="w-8 h-8 text-orange-600" />
+            <DollarSign className="w-7 h-7 text-orange-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Coverage Status</p>
-              <p className="text-lg font-bold text-green-600 mt-1">{insuranceInfo.status}</p>
+              <p className="text-xs text-gray-600">Coverage Status</p>
+              <p className="text-base font-bold text-green-600 mt-0.5">{insuranceInfo.status}</p>
             </div>
-            <Shield className="w-8 h-8 text-green-600" />
+            <Shield className="w-7 h-7 text-green-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Payment Methods</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{paymentMethods.length}</p>
+              <p className="text-xs text-gray-600">Payment Methods</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{paymentMethods.length}</p>
             </div>
-            <Wallet className="w-8 h-8 text-purple-600" />
+            <Wallet className="w-7 h-7 text-purple-600" />
           </div>
         </div>
       </div>
@@ -287,63 +287,63 @@ const Insurance = () => {
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* NHIF Coverage */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-green-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-green-600" />
                 NHIF Coverage
               </h3>
-              <span className={`text-xs px-3 py-1 rounded-full border ${getStatusColor(insuranceInfo.status)}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(insuranceInfo.status)}`}>
                 {insuranceInfo.status}
               </span>
             </div>
             
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <div>
-                  <p className="text-sm text-gray-600">Member Number</p>
-                  <p className="font-medium text-gray-900">{insuranceInfo.memberNumber}</p>
+                  <p className="text-xs text-gray-600">Member Number</p>
+                  <p className="text-sm font-medium text-gray-900">{insuranceInfo.memberNumber}</p>
                 </div>
                 <button
                   onClick={() => copyToClipboard(insuranceInfo.memberNumber, 'NHIF')}
-                  className="p-2 hover:bg-gray-200 rounded transition-colors"
+                  className="p-1.5 hover:bg-gray-200 rounded transition-colors"
                 >
                   {copiedText === 'NHIF' ? (
-                    <Check className="w-4 h-4 text-green-600" />
+                    <Check className="w-3.5 h-3.5 text-green-600" />
                   ) : (
-                    <Copy className="w-4 h-4 text-gray-600" />
+                    <Copy className="w-3.5 h-3.5 text-gray-600" />
                   )}
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <p className="text-gray-600">Coverage Type</p>
-                  <p className="font-medium text-gray-900">{insuranceInfo.coverageType}</p>
+                  <p className="text-gray-500">Coverage Type</p>
+                  <p className="text-sm font-medium text-gray-900">{insuranceInfo.coverageType}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Dependents</p>
-                  <p className="font-medium text-gray-900">{insuranceInfo.dependents}</p>
+                  <p className="text-gray-500">Dependents</p>
+                  <p className="text-sm font-medium text-gray-900">{insuranceInfo.dependents}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Valid Until</p>
-                  <p className="font-medium text-gray-900">{insuranceInfo.validUntil}</p>
+                  <p className="text-gray-500">Valid Until</p>
+                  <p className="text-sm font-medium text-gray-900">{insuranceInfo.validUntil}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Monthly Contribution</p>
-                  <p className="font-medium text-gray-900">{insuranceInfo.monthlyContribution}</p>
+                  <p className="text-gray-500">Monthly Contribution</p>
+                  <p className="text-sm font-medium text-gray-900">{insuranceInfo.monthlyContribution}</p>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-gray-200">
-                <p className="text-sm font-medium text-gray-700 mb-2">Covered Services</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="pt-2 border-t border-gray-100">
+                <p className="text-xs font-medium text-gray-700 mb-1.5">Covered Services</p>
+                <div className="flex flex-wrap gap-1.5">
                   {insuranceInfo.coverageServices.slice(0, 4).map((service, index) => (
-                    <span key={index} className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded-full border border-green-200">
+                    <span key={index} className="text-xs px-2 py-0.5 bg-green-50 text-green-700 rounded-full border border-green-200">
                       {service}
                     </span>
                   ))}
-                  <span className="text-xs px-2 py-1 bg-gray-50 text-gray-700 rounded-full border border-gray-200">
+                  <span className="text-xs px-2 py-0.5 bg-gray-50 text-gray-700 rounded-full border border-gray-200">
                     +{insuranceInfo.coverageServices.length - 4} more
                   </span>
                 </div>
@@ -352,58 +352,58 @@ const Insurance = () => {
           </div>
 
           {/* SHA Coverage */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-blue-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-blue-600" />
                 SHA Coverage
               </h3>
-              <span className={`text-xs px-3 py-1 rounded-full border ${getStatusColor(shaInfo.status)}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(shaInfo.status)}`}>
                 {shaInfo.status}
               </span>
             </div>
             
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <div>
-                  <p className="text-sm text-gray-600">Member Number</p>
-                  <p className="font-medium text-gray-900">{shaInfo.memberNumber}</p>
+                  <p className="text-xs text-gray-600">Member Number</p>
+                  <p className="text-sm font-medium text-gray-900">{shaInfo.memberNumber}</p>
                 </div>
                 <button
                   onClick={() => copyToClipboard(shaInfo.memberNumber, 'SHA')}
-                  className="p-2 hover:bg-gray-200 rounded transition-colors"
+                  className="p-1.5 hover:bg-gray-200 rounded transition-colors"
                 >
                   {copiedText === 'SHA' ? (
-                    <Check className="w-4 h-4 text-green-600" />
+                    <Check className="w-3.5 h-3.5 text-green-600" />
                   ) : (
-                    <Copy className="w-4 h-4 text-gray-600" />
+                    <Copy className="w-3.5 h-3.5 text-gray-600" />
                   )}
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <p className="text-gray-600">Package Tier</p>
-                  <p className="font-medium text-gray-900">{shaInfo.tier}</p>
+                  <p className="text-gray-500">Package Tier</p>
+                  <p className="text-sm font-medium text-gray-900">{shaInfo.tier}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Coverage Level</p>
-                  <p className="font-medium text-gray-900">{shaInfo.coverageLevel}</p>
+                  <p className="text-gray-500">Coverage Level</p>
+                  <p className="text-sm font-medium text-gray-900">{shaInfo.coverageLevel}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Valid Until</p>
-                  <p className="font-medium text-gray-900">{shaInfo.validUntil}</p>
+                  <p className="text-gray-500">Valid Until</p>
+                  <p className="text-sm font-medium text-gray-900">{shaInfo.validUntil}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Monthly Contribution</p>
-                  <p className="font-medium text-gray-900">{shaInfo.monthlyContribution}</p>
+                  <p className="text-gray-500">Monthly Contribution</p>
+                  <p className="text-sm font-medium text-gray-900">{shaInfo.monthlyContribution}</p>
                 </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+              <div className="bg-blue-50 border border-blue-200 rounded p-2 mt-2">
                 <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-blue-900">
+                  <Info className="w-3.5 h-3.5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-blue-900">
                     SHA provides enhanced coverage complementing your NHIF benefits with additional services and higher benefit limits.
                   </p>
                 </div>
@@ -412,29 +412,29 @@ const Insurance = () => {
           </div>
 
           {/* Recent Claims Summary */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-orange-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-orange-600" />
               Recent Claims
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {claims.slice(0, 3).map((claim) => {
                 const StatusIcon = getStatusIcon(claim.status);
                 return (
-                  <div key={claim.id} className="p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-start justify-between mb-2">
+                  <div key={claim.id} className="p-2 bg-gray-50 rounded">
+                    <div className="flex items-start justify-between mb-1">
                       <div>
-                        <p className="font-medium text-gray-900">{claim.service}</p>
-                        <p className="text-sm text-gray-600">{claim.provider}</p>
+                        <p className="text-sm font-medium text-gray-900">{claim.service}</p>
+                        <p className="text-xs text-gray-600">{claim.provider}</p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full border flex items-center gap-1 ${getStatusColor(claim.status)}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-0.5 ${getStatusColor(claim.status)}`}>
                         <StatusIcon className="w-3 h-3" />
                         {claim.status}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">{claim.date}</span>
-                      <span className="font-medium text-gray-900">{claim.claimAmount}</span>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-500">{claim.date}</span>
+                      <span className="text-sm font-medium text-gray-900">{claim.claimAmount}</span>
                     </div>
                   </div>
                 );
@@ -443,32 +443,32 @@ const Insurance = () => {
           </div>
 
           {/* Pending Payments */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-red-600" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-red-600" />
               Pending Payments
             </h3>
             {billingHistory.filter(b => b.status === 'pending').length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {billingHistory.filter(b => b.status === 'pending').map((bill) => (
-                  <div key={bill.id} className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-start justify-between mb-2">
+                  <div key={bill.id} className="p-2 bg-yellow-50 border border-yellow-200 rounded">
+                    <div className="flex items-start justify-between mb-1.5">
                       <div>
-                        <p className="font-medium text-gray-900">{bill.service}</p>
-                        <p className="text-sm text-gray-600">Due: {bill.dueDate}</p>
+                        <p className="text-sm font-medium text-gray-900">{bill.service}</p>
+                        <p className="text-xs text-gray-600">Due: {bill.dueDate}</p>
                       </div>
-                      <span className="font-semibold text-red-600">{bill.balance}</span>
+                      <span className="text-sm font-semibold text-red-600">{bill.balance}</span>
                     </div>
-                    <button className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                    <button className="w-full mt-1.5 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-medium">
                       Pay Now
                     </button>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6">
-                <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-2" />
-                <p className="text-gray-600">All payments are up to date</p>
+              <div className="text-center py-4">
+                <CheckCircle className="w-10 h-10 text-green-600 mx-auto mb-2" />
+                <p className="text-sm text-gray-600">All payments are up to date</p>
               </div>
             )}
           </div>
@@ -477,120 +477,137 @@ const Insurance = () => {
 
       {/* Claims Tab */}
       {activeTab === 'claims' && (
-        <div className="space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+        <div>
+          <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
+            <div className="flex items-start gap-2">
+              <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="text-sm font-semibold text-blue-900">Claims Processing</h3>
-                <p className="text-sm text-blue-800 mt-1">
+                <h3 className="text-xs font-semibold text-blue-900">Claims Processing</h3>
+                <p className="text-xs text-blue-800 mt-0.5">
                   Claims are typically processed within 3-5 business days. You'll receive notifications for status updates.
                 </p>
               </div>
             </div>
           </div>
 
-          {claims.map((claim) => {
-            const StatusIcon = getStatusIcon(claim.status);
-            return (
-              <div key={claim.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                <div
-                  className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => toggleClaim(claim.id)}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-gray-900 text-lg">{claim.service}</h3>
-                          <p className="text-sm text-gray-600">{claim.provider}</p>
-                          <p className="text-sm text-gray-600">Claim #: {claim.claimNumber}</p>
-                        </div>
-                        <span className={`text-xs px-3 py-1 rounded-full border flex items-center gap-1 ${getStatusColor(claim.status)}`}>
-                          <StatusIcon className="w-3 h-3" />
-                          {claim.status}
-                        </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {claims.map((claim) => {
+              const StatusIcon = getStatusIcon(claim.status);
+              return (
+                <div key={claim.id} className="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+                  <div
+                    className="p-2 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => toggleClaim(claim.id)}
+                  >
+                    <div className="flex items-start justify-between gap-1.5 mb-1.5">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm truncate">{claim.service}</h3>
+                        <p className="text-xs text-gray-600 truncate">{claim.provider}</p>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3 text-sm">
-                        <div>
-                          <p className="text-gray-600">Service Date</p>
-                          <p className="font-medium text-gray-900">{claim.date}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">Claim Amount</p>
-                          <p className="font-medium text-gray-900">{claim.claimAmount}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">Approved</p>
-                          <p className="font-medium text-green-600">{claim.approvedAmount}</p>
-                        </div>
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full border flex items-center gap-0.5 flex-shrink-0 ${getStatusColor(claim.status)}`}>
+                        <StatusIcon className="w-3 h-3" />
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-1 text-sm mb-1.5">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Claim #:</span>
+                        <span className="font-medium text-gray-900">{claim.claimNumber}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Date:</span>
+                        <span className="font-medium text-gray-900">{claim.date}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Amount:</span>
+                        <span className="font-medium text-gray-900">{claim.claimAmount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Approved:</span>
+                        <span className="font-medium text-green-600">{claim.approvedAmount}</span>
                       </div>
                     </div>
-                    {expandedClaim === claim.id ? (
-                      <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                    )}
-                  </div>
-                </div>
 
-                {expandedClaim === claim.id && (
-                  <div className="p-4 bg-gray-50 border-t border-gray-200">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Submitted Date</p>
-                        <p className="text-gray-900">{claim.submittedDate}</p>
-                      </div>
+                    <button 
+                      className="w-full flex items-center justify-center gap-0.5 text-sm text-blue-600 hover:text-blue-700 py-0.5"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleClaim(claim.id);
+                      }}
+                    >
+                      {expandedClaim === claim.id ? (
+                        <>
+                          <ChevronUp className="w-3 h-3" />
+                          <span>Less</span>
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="w-3 h-3" />
+                          <span>More</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {expandedClaim === claim.id && (
+                    <div className="p-2 bg-gray-50 border-t border-gray-200">
+                      <div className="space-y-1 text-sm mb-2">
+                        {claim.submittedDate && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Submitted:</span>
+                            <span className="text-gray-900">{claim.submittedDate}</span>
+                          </div>
+                        )}
                       {claim.processedDate && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Processed Date</p>
-                          <p className="text-gray-900">{claim.processedDate}</p>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Processed:</span>
+                          <span className="text-gray-900">{claim.processedDate}</span>
                         </div>
                       )}
                       {claim.doctor && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Attending Doctor</p>
-                          <p className="text-gray-900">{claim.doctor}</p>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Doctor:</span>
+                          <span className="text-gray-900 truncate ml-2">{claim.doctor}</span>
                         </div>
                       )}
                       {claim.diagnosis && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Diagnosis</p>
-                          <p className="text-gray-900">{claim.diagnosis}</p>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Diagnosis:</span>
+                          <span className="text-gray-900 truncate ml-2">{claim.diagnosis}</span>
                         </div>
                       )}
                       {claim.tests && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Tests Performed</p>
-                          <p className="text-gray-900">{claim.tests}</p>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Tests:</span>
+                          <span className="text-gray-900 truncate ml-2">{claim.tests}</span>
                         </div>
                       )}
                       {claim.medication && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Medications</p>
-                          <p className="text-gray-900">{claim.medication}</p>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Medication:</span>
+                          <span className="text-gray-900 truncate ml-2">{claim.medication}</span>
                         </div>
                       )}
                       {claim.copayment && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Your Co-payment</p>
-                          <p className="text-orange-600 font-semibold">{claim.copayment}</p>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Co-payment:</span>
+                          <span className="text-orange-600 font-semibold">{claim.copayment}</span>
                         </div>
                       )}
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Payment Status</p>
-                        <p className="text-gray-900 capitalize">{claim.paymentStatus}</p>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Payment:</span>
+                        <span className="text-gray-900 capitalize">{claim.paymentStatus}</span>
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
-                      <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                        <Download className="w-4 h-4" />
-                        Download Receipt
+                    <div className="flex gap-1">
+                      <button className="flex items-center gap-0.5 px-2 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm">
+                        <Download className="w-3 h-3" />
+                        Receipt
                       </button>
-                      <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <ExternalLink className="w-4 h-4" />
-                        View Details
+                      <button className="flex items-center gap-0.5 px-2 py-0.5 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-sm">
+                        <ExternalLink className="w-3 h-3" />
+                        Details
                       </button>
                     </div>
                   </div>
@@ -598,60 +615,61 @@ const Insurance = () => {
               </div>
             );
           })}
+          </div>
         </div>
       )}
 
       {/* Billing Tab */}
       {activeTab === 'billing' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {billingHistory.map((bill) => (
-            <div key={bill.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Receipt className="w-5 h-5 text-blue-600" />
+            <div key={bill.id} className="bg-white rounded shadow-sm border border-gray-200 p-2.5">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 bg-blue-100 rounded flex-shrink-0">
+                    <Receipt className="w-3.5 h-3.5 text-blue-600" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{bill.service}</h3>
-                    <p className="text-sm text-gray-600">Invoice: {bill.invoiceNumber}</p>
-                    <p className="text-sm text-gray-600">Date: {bill.date}</p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900 truncate">{bill.service}</h3>
+                    <p className="text-xs text-gray-600 truncate">Invoice: {bill.invoiceNumber}</p>
+                    <p className="text-xs text-gray-600">{bill.date}</p>
                   </div>
                 </div>
-                <span className={`text-xs px-3 py-1 rounded-full border ${getStatusColor(bill.status)}`}>
+                <span className={`text-xs px-1.5 py-0.5 rounded-full border flex-shrink-0 ml-2 ${getStatusColor(bill.status)}`}>
                   {bill.status}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm mb-3">
-                <div>
-                  <p className="text-gray-600">Total Amount</p>
-                  <p className="font-semibold text-gray-900">{bill.amount}</p>
+              <div className="space-y-1.5 text-sm mb-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Total:</span>
+                  <span className="font-semibold text-gray-900">{bill.amount}</span>
                 </div>
-                <div>
-                  <p className="text-gray-600">Paid</p>
-                  <p className="font-semibold text-green-600">{bill.paid}</p>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Paid:</span>
+                  <span className="font-semibold text-green-600">{bill.paid}</span>
                 </div>
-                <div>
-                  <p className="text-gray-600">Balance</p>
-                  <p className={`font-semibold ${bill.balance === 'KSh 0' ? 'text-gray-600' : 'text-red-600'}`}>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Balance:</span>
+                  <span className={`font-semibold ${bill.balance === 'KSh 0' ? 'text-gray-600' : 'text-red-600'}`}>
                     {bill.balance}
-                  </p>
+                  </span>
                 </div>
-                <div>
-                  <p className="text-gray-600">Payment Method</p>
-                  <p className="font-medium text-gray-900">{bill.paymentMethod}</p>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Method:</span>
+                  <span className="font-medium text-gray-900">{bill.paymentMethod}</span>
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                  <Download className="w-4 h-4" />
-                  Download Invoice
+              <div className="flex gap-1.5">
+                <button className="flex items-center gap-0.5 px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-sm">
+                  <Download className="w-3 h-3" />
+                  Invoice
                 </button>
                 {bill.status === 'pending' && (
-                  <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                    <CreditCard className="w-4 h-4" />
-                    Pay Now
+                  <button className="flex items-center gap-0.5 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                    <CreditCard className="w-3 h-3" />
+                    Pay
                   </button>
                 )}
               </div>
@@ -662,32 +680,32 @@ const Insurance = () => {
 
       {/* Payment Methods Tab */}
       {activeTab === 'payment-methods' && (
-        <div className="space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+        <div className="space-y-3">
+          <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
+            <div className="flex items-start gap-2">
+              <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="text-sm font-semibold text-blue-900">Secure Payments</h3>
-                <p className="text-sm text-blue-800 mt-1">
+                <h3 className="text-xs font-semibold text-blue-900">Secure Payments</h3>
+                <p className="text-xs text-blue-800 mt-0.5">
                   All payment information is encrypted and securely stored. We support M-Pesa, credit/debit cards, and bank transfers.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {paymentMethods.map((method) => {
               const Icon = method.icon;
               return (
-                <div key={method.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Icon className="w-5 h-5 text-blue-600" />
+                <div key={method.id} className="bg-white rounded shadow-sm border border-gray-200 p-2.5">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1 bg-blue-100 rounded">
+                        <Icon className="w-3.5 h-3.5 text-blue-600" />
                       </div>
-                      <div>
-                        <p className="font-semibold text-gray-900">{method.type}</p>
-                        <p className="text-sm text-gray-600">
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-gray-900">{method.type}</p>
+                        <p className="text-xs text-gray-600">
                           {method.number || `•••• ${method.last4}`}
                         </p>
                         {method.expiry && (
@@ -696,18 +714,38 @@ const Insurance = () => {
                       </div>
                     </div>
                     {method.primary && (
-                      <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200">
+                      <span className="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200 flex-shrink-0">
                         Primary
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-2">
-                    <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                      <Edit className="w-4 h-4" />
+                  
+                  <div className="mb-2 p-2 bg-gray-50 rounded">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-600">Status:</span>
+                      <span className="text-green-600 font-medium">Active</span>
+                    </div>
+                    {method.type === 'M-Pesa' && (
+                      <div className="flex justify-between items-center text-xs mt-1">
+                        <span className="text-gray-600">Last used:</span>
+                        <span className="text-gray-900">2 days ago</span>
+                      </div>
+                    )}
+                    {method.type !== 'M-Pesa' && (
+                      <div className="flex justify-between items-center text-xs mt-1">
+                        <span className="text-gray-600">Card type:</span>
+                        <span className="text-gray-900">{method.type.includes('Visa') ? 'Visa' : 'MasterCard'}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-1.5">
+                    <button className="flex items-center gap-0.5 px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-sm">
+                      <Edit className="w-3 h-3" />
                       Edit
                     </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm">
-                      <Trash2 className="w-4 h-4" />
+                    <button className="flex items-center gap-0.5 px-2 py-1 bg-white border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors text-sm">
+                      <Trash2 className="w-3 h-3" />
                       Remove
                     </button>
                   </div>
@@ -718,12 +756,12 @@ const Insurance = () => {
             {/* Add Payment Method Card */}
             <button
               onClick={() => setShowAddCard(true)}
-              className="bg-white rounded-lg shadow-sm border-2 border-dashed border-gray-300 p-6 hover:border-blue-400 hover:bg-blue-50 transition-all group"
+              className="bg-white rounded shadow-sm border-2 border-dashed border-gray-300 p-3 hover:border-blue-400 hover:bg-blue-50 transition-all group"
             >
               <div className="text-center">
-                <Plus className="w-8 h-8 text-gray-400 group-hover:text-blue-600 mx-auto mb-2" />
-                <p className="font-medium text-gray-600 group-hover:text-blue-600">Add Payment Method</p>
-                <p className="text-sm text-gray-500 mt-1">M-Pesa, Card, or Bank Transfer</p>
+                <Plus className="w-6 h-6 text-gray-400 group-hover:text-blue-600 mx-auto mb-1" />
+                <p className="text-sm font-medium text-gray-600 group-hover:text-blue-600">Add Payment Method</p>
+                <p className="text-xs text-gray-500 mt-0.5">M-Pesa, Card, or Bank Transfer</p>
               </div>
             </button>
           </div>

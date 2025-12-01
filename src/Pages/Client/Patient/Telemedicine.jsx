@@ -231,24 +231,24 @@ const Telemedicine = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setShowBookingModal(true)}
-          className="flex items-center justify-center space-x-2 p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
         >
-          <Plus className="w-5 h-5" />
-          <span className="font-medium">Book Consultation</span>
+          <Plus className="w-4 h-4" />
+          <span>Book Consultation</span>
         </button>
         <Link
           to="/client/patient/appointments"
-          className="flex items-center justify-center space-x-2 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors text-gray-700 hover:text-blue-600"
+          className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors text-gray-700 hover:text-blue-600 text-sm"
         >
-          <Calendar className="w-5 h-5" />
-          <span className="font-medium">View All Appointments</span>
+          <Calendar className="w-4 h-4" />
+          <span>All Appointments</span>
         </Link>
-        <button className="flex items-center justify-center space-x-2 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors text-gray-700 hover:text-blue-600">
-          <Settings className="w-5 h-5" />
-          <span className="font-medium">Test Equipment</span>
+        <button className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors text-gray-700 hover:text-blue-600 text-sm">
+          <Settings className="w-4 h-4" />
+          <span>Test Equipment</span>
         </button>
       </div>
 
@@ -279,43 +279,26 @@ const Telemedicine = () => {
       </div>
 
       {/* Consultations List */}
-      <div className="space-y-4">
+      <div>
         {activeTab === 'upcoming' && (
           <>
             {consultations.upcoming.length > 0 ? (
-              consultations.upcoming.map((consultation) => (
-                <div
-                  key={consultation.id}
-                  className="bg-white shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
-                        <Video className="w-6 h-6 text-blue-600" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {consultations.upcoming.map((consultation) => (
+                  <div
+                    key={consultation.id}
+                    className="bg-white shadow-sm border border-gray-200 p-3 hover:shadow-md transition-shadow rounded-lg"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-9 h-9 bg-blue-50 rounded flex items-center justify-center flex-shrink-0">
+                        <Video className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900">{consultation.doctor}</h3>
-                        <p className="text-sm text-gray-600">{consultation.specialty}</p>
-                        <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{new Date(consultation.date).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>
-                              {consultation.time} ({consultation.duration})
-                            </span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <span className="font-medium">Reason:</span> {consultation.reason}
-                        </p>
+                        <h3 className="text-base font-semibold text-gray-900 truncate">{consultation.doctor}</h3>
+                        <p className="text-sm text-gray-600 truncate">{consultation.specialty}</p>
                       </div>
-                    </div>
-                    <div className="flex flex-col items-end space-y-2">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
                           consultation.status === 'confirmed'
                             ? 'bg-green-100 text-green-700'
                             : 'bg-yellow-100 text-yellow-700'
@@ -323,26 +306,39 @@ const Telemedicine = () => {
                       >
                         {consultation.status.charAt(0).toUpperCase() + consultation.status.slice(1)}
                       </span>
+                    </div>
+                    <div className="space-y-1 mb-2 text-sm">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{new Date(consultation.date).toLocaleDateString()}</span>
+                        <Clock className="w-3.5 h-3.5 ml-2" />
+                        <span>{consultation.time} ({consultation.duration})</span>
+                      </div>
+                      <p className="text-gray-600 line-clamp-1">
+                        <span className="font-medium">Reason:</span> {consultation.reason}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 pt-2 border-t border-gray-100">
                       {consultation.status === 'confirmed' && (
                         <button
                           onClick={() => handleJoinCall(consultation)}
-                          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                          className="flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
                         >
-                          <Video className="w-4 h-4" />
-                          <span>Join Call</span>
+                          <Video className="w-3.5 h-3.5" />
+                          <span>Join</span>
                         </button>
                       )}
                       <button 
                         onClick={() => handleViewDetails(consultation)}
-                        className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 text-sm"
+                        className="flex items-center justify-center gap-1 px-3 py-1.5 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors text-sm"
                       >
-                        <span>View Details</span>
-                        <ChevronRight className="w-4 h-4" />
+                        <span>Details</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : (
               <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                 <Video className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -363,62 +359,59 @@ const Telemedicine = () => {
         {activeTab === 'past' && (
           <>
             {consultations.past.length > 0 ? (
-              consultations.past.map((consultation) => (
-                <div
-                  key={consultation.id}
-                  className="bg-white shadow-sm border border-gray-200 p-6"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900">{consultation.doctor}</h3>
-                        <p className="text-sm text-gray-600">{consultation.specialty}</p>
-                        <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{new Date(consultation.date).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{consultation.time}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 mt-3">
-                          {consultation.prescription && (
-                            <span className="flex items-center space-x-1 text-sm text-blue-600">
-                              <FileText className="w-4 h-4" />
-                              <span>Prescription Available</span>
-                            </span>
-                          )}
-                          {consultation.recording && (
-                            <span className="flex items-center space-x-1 text-sm text-blue-600">
-                              <Video className="w-4 h-4" />
-                              <span>Recording Available</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {consultations.past.map((consultation) => (
+                  <div
+                    key={consultation.id}
+                    className="bg-white shadow-sm border border-gray-200 p-3 rounded-lg"
+                  >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-9 h-9 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
                     </div>
-                    <div className="flex flex-col space-y-2">
-                      <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                        <FileText className="w-4 h-4" />
-                        <span>View Summary</span>
-                      </button>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-semibold text-gray-900 truncate">{consultation.doctor}</h3>
+                      <p className="text-sm text-gray-600 truncate">{consultation.specialty}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1 mb-2 text-sm">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>{new Date(consultation.date).toLocaleDateString()}</span>
+                      <Clock className="w-3.5 h-3.5 ml-2" />
+                      <span>{consultation.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
                       {consultation.prescription && (
-                        <Link
-                          to="/client/patient/prescriptions"
-                          className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm"
-                        >
-                          <span>View Prescription</span>
-                        </Link>
+                        <span className="flex items-center space-x-1 text-sm text-blue-600">
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Prescription</span>
+                        </span>
+                      )}
+                      {consultation.recording && (
+                        <span className="flex items-center space-x-1 text-sm text-purple-600">
+                          <Video className="w-3.5 h-3.5" />
+                          <span>Recording</span>
+                        </span>
                       )}
                     </div>
                   </div>
+                  <div className="flex gap-2 pt-2 border-t border-gray-100">
+                    <button className="flex items-center justify-center gap-1 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors text-sm">
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Summary</span>
+                    </button>
+                    {consultation.prescription && (
+                      <Link
+                        to="/client/patient/prescriptions"
+                        className="flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors text-sm"
+                      >
+                        <span>Prescription</span>
+                      </Link>
+                    )}
+                  </div>
                 </div>
-              ))
+                ))}\n              </div>
             ) : (
               <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                 <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />

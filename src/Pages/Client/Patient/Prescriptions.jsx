@@ -323,45 +323,45 @@ const Prescriptions = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Active Prescriptions</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{prescriptions.active.length}</p>
+              <p className="text-xs text-gray-600">Active Prescriptions</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{prescriptions.active.length}</p>
             </div>
-            <Pill className="w-8 h-8 text-blue-600" />
+            <Pill className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Refills Available</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-xs text-gray-600">Refills Available</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">
                 {prescriptions.active.reduce((sum, p) => sum + p.refillsRemaining, 0)}
               </p>
             </div>
-            <Repeat className="w-8 h-8 text-green-600" />
+            <Repeat className="w-7 h-7 text-green-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Reminders Set</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-xs text-gray-600">Reminders Set</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">
                 {prescriptions.active.filter(p => p.reminderSet).length}
               </p>
             </div>
-            <Bell className="w-8 h-8 text-blue-600" />
+            <Bell className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Nearby Pharmacies</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{nearbyPharmacies.length}</p>
+              <p className="text-xs text-gray-600">Nearby Pharmacies</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{nearbyPharmacies.length}</p>
             </div>
-            <MapPin className="w-8 h-8 text-orange-600" />
+            <MapPin className="w-7 h-7 text-orange-600" />
           </div>
         </div>
       </div>
@@ -400,7 +400,7 @@ const Prescriptions = () => {
 
       {/* Active Prescriptions Tab */}
       {activeTab === 'active' && (
-        <div className="space-y-4">
+        <div>
           <div className="flex items-center gap-4 mb-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -414,46 +414,47 @@ const Prescriptions = () => {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {prescriptions.active.map((prescription) => (
             <div key={prescription.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div
-                className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                className="p-3 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => togglePrescription(prescription.id)}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="p-3 bg-blue-100 rounded-lg">
-                      <Pill className="w-6 h-6 text-blue-600" />
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <div className="p-2 bg-blue-100 rounded flex-shrink-0">
+                      <Pill className="w-5 h-5 text-blue-600" />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-gray-900 text-lg">{prescription.medication}</h3>
-                          <p className="text-sm text-gray-600">{prescription.genericName}</p>
-                          <p className="text-sm text-gray-700 mt-1">{prescription.dosage} • {prescription.frequency}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-1">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-base truncate">{prescription.medication}</h3>
+                          <p className="text-xs text-gray-600 truncate">{prescription.genericName}</p>
+                          <p className="text-xs text-gray-700 mt-0.5">{prescription.dosage} • {prescription.frequency}</p>
                         </div>
-                        <span className={`text-xs px-3 py-1 rounded-full border ${getStatusColor(prescription.status)}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ml-2 flex-shrink-0 ${getStatusColor(prescription.status)}`}>
                           {prescription.status}
                         </span>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Clock className="w-4 h-4" />
-                          <span>Next dose: {new Date(prescription.nextDose).toLocaleString()}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-2 text-xs">
+                        <div className="flex items-center gap-1.5 text-gray-600">
+                          <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span className="truncate">Next: {new Date(prescription.nextDose).toLocaleString()}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Repeat className="w-4 h-4" />
-                          <span>{prescription.refillsRemaining} refills remaining</span>
+                        <div className="flex items-center gap-1.5 text-gray-600">
+                          <Repeat className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span>{prescription.refillsRemaining} refills left</span>
                         </div>
                       </div>
-                      <div className="mt-3">
-                        <div className="flex items-center justify-between text-sm mb-1">
+                      <div className="mt-2">
+                        <div className="flex items-center justify-between text-xs mb-1">
                           <span className="text-gray-600">Treatment Progress</span>
                           <span className="font-medium text-gray-900">{prescription.progress}%</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
                           <div
-                            className="bg-blue-600 h-2 rounded-full transition-all"
+                            className="bg-blue-600 h-1.5 rounded-full transition-all"
                             style={{ width: `${prescription.progress}%` }}
                           ></div>
                         </div>
@@ -461,58 +462,58 @@ const Prescriptions = () => {
                     </div>
                   </div>
                   {expandedPrescription === prescription.id ? (
-                    <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
                   )}
                 </div>
               </div>
 
               {expandedPrescription === prescription.id && (
-                <div className="p-4 bg-gray-50 border-t border-gray-200">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="p-3 bg-gray-50 border-t border-gray-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">Prescribed By</p>
-                      <p className="text-gray-900">{prescription.prescribedBy}</p>
-                      <p className="text-sm text-gray-600">{prescription.specialty}</p>
+                      <p className="text-xs font-medium text-gray-700 mb-0.5">Prescribed By</p>
+                      <p className="text-sm text-gray-900">{prescription.prescribedBy}</p>
+                      <p className="text-xs text-gray-600">{prescription.specialty}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">Duration</p>
-                      <p className="text-gray-900">{prescription.duration}</p>
-                      <p className="text-sm text-gray-600">{prescription.startDate} to {prescription.endDate}</p>
+                      <p className="text-xs font-medium text-gray-700 mb-0.5">Duration</p>
+                      <p className="text-sm text-gray-900">{prescription.duration}</p>
+                      <p className="text-xs text-gray-600">{prescription.startDate} to {prescription.endDate}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">Purpose</p>
-                      <p className="text-gray-900">{prescription.purpose}</p>
+                      <p className="text-xs font-medium text-gray-700 mb-0.5">Purpose</p>
+                      <p className="text-sm text-gray-900">{prescription.purpose}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">Pharmacy</p>
-                      <p className="text-gray-900">{prescription.pharmacy}</p>
+                      <p className="text-xs font-medium text-gray-700 mb-0.5">Pharmacy</p>
+                      <p className="text-sm text-gray-900">{prescription.pharmacy}</p>
                     </div>
                   </div>
 
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-700 mb-1">Instructions</p>
-                    <p className="text-gray-700 text-sm">{prescription.instructions}</p>
+                  <div className="mb-3">
+                    <p className="text-xs font-medium text-gray-700 mb-0.5">Instructions</p>
+                    <p className="text-gray-700 text-xs">{prescription.instructions}</p>
                   </div>
 
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-700 mb-1">Possible Side Effects</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="mb-3">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Possible Side Effects</p>
+                    <div className="flex flex-wrap gap-1.5">
                       {prescription.sideEffects.map((effect, index) => (
-                        <span key={index} className="text-xs px-3 py-1 bg-orange-50 text-orange-700 rounded-full border border-orange-200">
+                        <span key={index} className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full border border-orange-200">
                           {effect}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded p-2 mb-3">
                     <div className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                      <AlertCircle className="w-3.5 h-3.5 text-yellow-600 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-yellow-900">Important Warnings</p>
-                        <p className="text-sm text-yellow-800 mt-1">{prescription.warnings}</p>
+                        <p className="text-xs font-medium text-yellow-900">Important Warnings</p>
+                        <p className="text-xs text-yellow-800 mt-0.5">{prescription.warnings}</p>
                       </div>
                     </div>
                   </div>
@@ -520,21 +521,21 @@ const Prescriptions = () => {
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => handleRefillRequest(prescription)}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-medium"
                     >
-                      <Repeat className="w-4 h-4" />
+                      <Repeat className="w-3.5 h-3.5" />
                       Request Refill
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-                      <Download className="w-4 h-4" />
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-xs font-medium">
+                      <Download className="w-3.5 h-3.5" />
                       Download
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-                      <Share2 className="w-4 h-4" />
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-xs font-medium">
+                      <Share2 className="w-3.5 h-3.5" />
                       Share
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-                      <Bell className="w-4 h-4" />
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-xs font-medium">
+                      <Bell className="w-3.5 h-3.5" />
                       {prescription.reminderSet ? 'Edit Reminder' : 'Set Reminder'}
                     </button>
                   </div>
@@ -542,42 +543,45 @@ const Prescriptions = () => {
               )}
             </div>
           ))}
+          </div>
         </div>
       )}
 
       {/* History Tab */}
       {activeTab === 'history' && (
-        <div className="space-y-4">
-          <p className="text-sm text-gray-600 mb-4">
+        <div>
+          <p className="text-xs text-gray-600 mb-3">
             View your completed and expired prescriptions
           </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {prescriptions.history.map((prescription) => (
-            <div key={prescription.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div key={prescription.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
               <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-gray-100 rounded-lg">
-                    <Pill className="w-6 h-6 text-gray-600" />
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-gray-100 rounded flex-shrink-0">
+                    <Pill className="w-5 h-5 text-gray-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{prescription.medication}</h3>
-                    <p className="text-sm text-gray-600">{prescription.dosage} • {prescription.frequency}</p>
-                    <p className="text-sm text-gray-600 mt-1">Prescribed by {prescription.prescribedBy}</p>
-                    <p className="text-sm text-gray-600">{prescription.startDate} to {prescription.endDate}</p>
-                    <p className="text-sm text-gray-700 mt-2">Purpose: {prescription.purpose}</p>
+                    <h3 className="font-semibold text-gray-900 text-sm">{prescription.medication}</h3>
+                    <p className="text-xs text-gray-600">{prescription.dosage} • {prescription.frequency}</p>
+                    <p className="text-xs text-gray-600 mt-0.5">Prescribed by {prescription.prescribedBy}</p>
+                    <p className="text-xs text-gray-600">{prescription.startDate} to {prescription.endDate}</p>
+                    <p className="text-xs text-gray-700 mt-1">Purpose: {prescription.purpose}</p>
                   </div>
                 </div>
-                <span className={`text-xs px-3 py-1 rounded-full border ${getStatusColor(prescription.status)}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(prescription.status)}`}>
                   {prescription.status}
                 </span>
               </div>
             </div>
           ))}
+          </div>
         </div>
       )}
 
       {/* Pharmacies Tab */}
       {activeTab === 'pharmacies' && (
-        <div className="space-y-4">
+        <div>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
             <div className="flex items-start gap-3">
               <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
@@ -590,38 +594,39 @@ const Prescriptions = () => {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {nearbyPharmacies.map((pharmacy) => (
-            <div key={pharmacy.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-lg">{pharmacy.name}</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <MapPin className="w-4 h-4 text-gray-600" />
-                    <p className="text-sm text-gray-600">{pharmacy.address}</p>
+            <div key={pharmacy.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-base truncate">{pharmacy.name}</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                    <p className="text-xs text-gray-600 truncate">{pharmacy.address}</p>
                   </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Clock className="w-4 h-4 text-gray-600" />
-                    <p className="text-sm text-gray-600">{pharmacy.hours}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <Clock className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                    <p className="text-xs text-gray-600">{pharmacy.hours}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{pharmacy.distance} away</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <span className="text-yellow-500">★</span>
-                    <span className="text-sm font-medium text-gray-900">{pharmacy.rating}</span>
+                <div className="text-right ml-2 flex-shrink-0">
+                  <p className="text-xs font-medium text-gray-900">{pharmacy.distance} away</p>
+                  <div className="flex items-center gap-0.5 mt-0.5">
+                    <span className="text-yellow-500 text-sm">★</span>
+                    <span className="text-xs font-medium text-gray-900">{pharmacy.rating}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-3">
+              <div className="flex flex-wrap gap-1.5 mb-2">
                 {pharmacy.services.map((service, index) => (
-                  <span key={index} className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded-full border border-green-200">
+                  <span key={index} className="text-xs px-2 py-0.5 bg-green-50 text-green-700 rounded-full border border-green-200">
                     {service}
                   </span>
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+              <div className="grid grid-cols-2 gap-2 mb-2 text-xs">
                 <div className="bg-gray-50 p-2 rounded">
                   <p className="text-gray-600">Delivery Fee</p>
                   <p className="font-medium text-gray-900">{pharmacy.deliveryFee}</p>
@@ -633,17 +638,18 @@ const Prescriptions = () => {
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                  <Phone className="w-4 h-4" />
-                  Call Now
+                <button className="flex items-center justify-center gap-1 px-2.5 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-medium">
+                  <Phone className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Call</span>
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-                  <MapPin className="w-4 h-4" />
-                  Get Directions
+                <button className="flex items-center justify-center gap-1 px-2.5 py-1.5 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-xs font-medium">
+                  <MapPin className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Directions</span>
                 </button>
               </div>
             </div>
           ))}
+          </div>
         </div>
       )}
 
