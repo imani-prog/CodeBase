@@ -168,11 +168,11 @@ const Emergency = () => {
   return (
     <div className="space-y-4">
       {/* Header and Notice */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         {/* Header */}
-        <div className="bg-white border-l-4 border-red-600 rounded-lg p-2.5 shadow-md">
+        <div className="rounded-lg p-2.5">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
               <AlertCircle className="w-4 h-4 text-red-600" />
             </div>
             <div>
@@ -185,12 +185,12 @@ const Emergency = () => {
         </div>
 
         {/* Important Notice */}
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-2.5 rounded-lg">
+        <div className=" border-yellow-400 p-2.5 rounded-lg">
           <div className="flex items-start space-x-2">
             <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
             <div>
-              <h3 className="text-sm font-semibold text-yellow-800">Life-Threatening Emergency?</h3>
-              <p className="text-xs text-yellow-700 mt-0.5">
+              <h3 className="text-sm font-semibold ">Life-Threatening Emergency?</h3>
+              <p className="text-xs mt-0.5">
                 Call <strong>999</strong> or <strong>0700 000 000</strong>
               </p>
             </div>
@@ -202,18 +202,18 @@ const Emergency = () => {
       <EmergencyFeatures />
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-md p-2">
-        <div className="flex space-x-2 overflow-x-auto">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'bg-red-600 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -228,51 +228,51 @@ const Emergency = () => {
       <div className="space-y-4">
         {/* Emergency Hotlines Tab */}
         {activeTab === 'hotline' && (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {/* Primary Emergency Numbers */}
-            <div className="bg-white rounded-xl shadow-md p-3">
-              <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
-                <Phone className="w-4 h-4 mr-2 text-red-600" />
+            <div className="p-2">
+              <h2 className="text-base font-bold text-gray-900 mb-1.5 flex items-center">
+                <Phone className="w-4 h-4 mr-2 text-blue-600" />
                 Primary Emergency Contacts
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 <a
                   href="tel:999"
-                  className="group flex flex-col items-center p-2 border-2 border-red-200 bg-red-50 hover:border-red-400 hover:bg-red-100 rounded-lg transition-all"
+                  className="group flex flex-col items-center p-2"
                 >
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mb-1">
                     <Phone className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-center">
-                    <div className="text-xs text-gray-600">National</div>
+                    <div className="font-bold">National</div>
                     <div className="text-base font-bold text-red-600">999</div>
                   </div>
                 </a>
 
                 <a
                   href="tel:+254700000000"
-                  className="group flex flex-col items-center p-2 border-2 border-blue-200 bg-blue-50 hover:border-blue-400 hover:bg-blue-100 rounded-lg transition-all"
+                  className="group flex flex-col items-center p-2"
                 >
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mb-1">
                     <Shield className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-center">
                     <div className="text-xs text-gray-600">MediLink</div>
-                    <div className="text-sm font-bold text-blue-600">0700 000 000</div>
+                    <div className="text-sm font-bold text-blue-600">0743669252</div>
                   </div>
                 </a>
               </div>
             </div>
 
             {/* Additional Emergency Numbers */}
-            <div className="bg-white rounded-xl shadow-md p-3">
-              <h2 className="text-base font-bold text-gray-900 mb-2">Additional Emergency Services</h2>
+            <div className="p-2">
+              <h2 className="text-base font-bold text-gray-900 mb-1.5">Additional Emergency Services</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 <a
                   href="tel:911"
-                  className="flex items-center space-x-2 p-2 border-2 border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-all group"
+                  className="flex items-center space-x-2 p-2  group"
                 >
-                  <Ambulance className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
+                  <Ambulance className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
                   <div>
                     <div className="text-sm font-semibold text-gray-900">Ambulance</div>
                     <div className="text-base font-bold text-gray-700">911</div>
@@ -280,21 +280,21 @@ const Emergency = () => {
                 </a>
 
                 <a
-                  href="tel:+254722123456"
-                  className="flex items-center space-x-2 p-2 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                  href="tel:+254743669252"
+                  className="flex items-center space-x-2 p-2  group"
                 >
                   <Heart className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
                   <div>
                     <div className="text-sm font-semibold text-gray-900">Poison Control</div>
-                    <div className="text-base font-bold text-gray-700">0722 123 456</div>
+                    <div className="text-base font-bold text-gray-700">0743669252</div>
                   </div>
                 </a>
 
                 <a
                   href="tel:1195"
-                  className="flex items-center space-x-2 p-2 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all group"
+                  className="flex items-center space-x-2 p-2  group"
                 >
-                  <Activity className="w-4 h-4 text-gray-600 group-hover:text-purple-600" />
+                  <Activity className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
                   <div>
                     <div className="text-sm font-semibold text-gray-900">Mental Health</div>
                     <div className="text-base font-bold text-gray-700">1195</div>
@@ -310,13 +310,13 @@ const Emergency = () => {
           <div className="space-y-4">
             {/* Map Placeholder */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="bg-gradient-to-br from-blue-100 to-blue-200 h-64 flex items-center justify-center relative">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 h-64 flex items-center justify-center relative">
                 <MapIcon className="w-16 h-16 text-blue-600 opacity-50" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-2" />
-                    <p className="text-blue-900 font-semibold">Google Maps Integration</p>
-                    <p className="text-sm text-blue-700 mt-1">Showing CHWs near your location</p>
+                    <p className="text-blue-600 font-semibold">Google Maps Integration</p>
+                    <p className="text-sm text-blue-600 mt-1">Showing CHWs near your location</p>
                   </div>
                 </div>
                 {/* Simulated markers */}
@@ -471,7 +471,7 @@ const Emergency = () => {
                             <span className="font-semibold text-gray-700">{ambulance.distance}</span>
                           </div>
                           <div className="flex items-center text-xs">
-                            <Clock className="w-3 h-3 mr-1 text-gray-500" />
+                            <Clock className="w-3 h-3 mr-1 text-blue-600" />
                             <span className="font-semibold text-blue-600">ETA: {ambulance.eta}</span>
                           </div>
                           <div className="flex items-center text-xs">
@@ -486,7 +486,7 @@ const Emergency = () => {
                           {ambulance.equipment.map((item, index) => (
                             <span
                               key={index}
-                              className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full"
+                              className="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full"
                             >
                               {item}
                             </span>
@@ -623,8 +623,8 @@ const Emergency = () => {
                     </div>
                   </div>
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h5 className="text-xs font-semibold text-gray-900 mb-1.5">Your Location</h5>
-                    <div className="flex items-start space-x-1.5 text-xs text-gray-600">
+                    <h5 className="text-xs font-semibold text-blue-600 mb-1.5">Your Location</h5>
+                    <div className="flex items-start space-x-1.5 text-xs text-blue-600">
                       <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
                       <span>Lat: {userLocation.lat.toFixed(6)}, Lng: {userLocation.lng.toFixed(6)}</span>
                     </div>
@@ -668,15 +668,15 @@ const Emergency = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Link
           to="/client/patient/dashboard"
-          className="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors"
+          className="flex items-center justify-center space-x-2 p-3transition-colors"
         >
-          <span className="text-sm text-gray-700 hover:text-blue-600 font-medium">← Back to Dashboard</span>
+          <span className="hover:text-blue-600 font-medium">← Back to Dashboard</span>
         </Link>
         <Link
           to="/client/patient/health-records"
-          className="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors"
+          className="flex items-center justify-center space-x-2 p-3 transition-colors"
         >
-          <span className="text-sm text-gray-700 hover:text-blue-600 font-medium">View Medical Records →</span>
+          <span className="text-sm hover:text-blue-600 font-medium">View Medical Records →</span>
         </Link>
       </div>
     </div>

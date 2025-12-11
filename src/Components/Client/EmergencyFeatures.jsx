@@ -208,73 +208,43 @@ const EmergencyFeatures = () => {
 
   return (
     <>
-      {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        {/* Left Column */}
-        <div className="space-y-4">
-          {/* Emergency Tip Banner */}
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-2.5 rounded-lg">
-            <div className="flex items-start space-x-2">
-              <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="text-sm font-semibold text-blue-800">Emergency Tip</h3>
-                <p className="text-xs text-blue-700 mt-0.5">{emergencyTip}</p>
-              </div>
+      {/* Compact Horizontal Grid Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-4">
+        {/* Emergency Tip Banner */}
+        <div className="border-l-4 border-blue-400 p-2.5 rounded-lg sm:col-span-2 lg:col-span-3 xl:col-span-4">
+          <div className="flex items-start space-x-2">
+            <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="text-sm font-semibold text-blue-800">Emergency Tip</h3>
+              <p className="text-xs text-blue-700 mt-0.5">{emergencyTip}</p>
             </div>
           </div>
+        </div>
 
-          {/* Quick Medical Summary Card */}
-          <div className="bg-white rounded-lg shadow-md p-3 max-w-md">
+        {/* Quick Medical Summary Card */}
+        <div className="bg-white rounded-lg shadow-md p-2 text-center">
             <button
-              onClick={() => setShowMedicalSummary(!showMedicalSummary)}
-              className="w-full flex items-center justify-between text-left"
+              onClick={() => setShowMedicalSummary(true)}
+              className="w-full flex items-center justify-between text-left hover:bg-gray-50 transition-colors p-1.5 rounded cursor-pointer"
             >
               <div className="flex items-center space-x-2">
-                <FileText className="w-4 h-4 text-red-600" />
-                <h3 className="text-base font-bold text-gray-900">Quick Medical Summary</h3>
+                <FileText className="w-6 h-6 text-blue-600" />
+                <h3 className="text-sm font-bold text-gray-900">Quick Medical Summary</h3>
               </div>
-              {showMedicalSummary ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              <ChevronDown className="w-6 h-6 font-bold" />
             </button>
-            
-            {showMedicalSummary && (
-              <div className="mt-3 space-y-2 pt-3 border-t border-gray-200">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="p-2 bg-red-50 rounded border border-red-200">
-                    <div className="flex items-center space-x-1 mb-1">
-                      <Droplet className="w-3 h-3 text-red-600" />
-                      <span className="text-xs font-semibold text-gray-700">Blood Type</span>
-                    </div>
-                    <p className="text-sm font-bold text-red-600">{medicalInfo.bloodType}</p>
-                  </div>
-                  <div className="p-2 bg-orange-50 rounded border border-orange-200">
-                    <div className="flex items-center space-x-1 mb-1">
-                      <AlertCircle className="w-3 h-3 text-orange-600" />
-                      <span className="text-xs font-semibold text-gray-700">Allergies</span>
-                    </div>
-                    <p className="text-xs text-gray-900">{medicalInfo.allergies.join(', ')}</p>
-                  </div>
-                </div>
-                <div className="p-2 bg-blue-50 rounded border border-blue-200">
-                  <p className="text-xs font-semibold text-gray-700 mb-1">Current Medications</p>
-                  <p className="text-xs text-gray-900">{medicalInfo.medications.join(', ')}</p>
-                </div>
-                <div className="p-2 bg-yellow-50 rounded border border-yellow-200">
-                  <p className="text-xs font-semibold text-gray-700 mb-1">Emergency Notes</p>
-                  <p className="text-xs text-gray-900">{medicalInfo.emergencyNotes}</p>
-                </div>
-              </div>
-            )}
           </div>
+
 
           {/* Cost Calculator */}
           {ambulanceOrdered && (
-            <div className="bg-white rounded-lg shadow-md p-3 max-w-md">
+            <div className="bg-white rounded-lg shadow-md p-2">
               <button
                 onClick={() => setShowCostCalculator(!showCostCalculator)}
                 className="w-full flex items-center justify-between text-left"
               >
                 <div className="flex items-center space-x-2">
-                  <DollarSign className="w-4 h-4 text-green-600" />
+                  <DollarSign className="w-4 h-4 text-blue-600" />
                   <h3 className="text-base font-bold text-gray-900">Order Cost Breakdown</h3>
                 </div>
                 {showCostCalculator ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -307,10 +277,10 @@ const EmergencyFeatures = () => {
           )}
 
           {/* Auto-Notify Emergency Contacts Toggle */}
-          <div className="bg-white rounded-lg shadow-md p-3 max-w-md">
+          <div className="bg-white rounded-lg shadow-md p-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Bell className="w-4 h-4 text-orange-600" />
+                <Bell className="w-6 h-6 text-blue-600" />
                 <div>
                   <h3 className="text-sm font-bold text-gray-900">Auto-Notify Emergency Contacts</h3>
                   <p className="text-xs text-gray-600">SMS family when ambulance ordered</p>
@@ -319,7 +289,7 @@ const EmergencyFeatures = () => {
               <button
                 onClick={() => setAutoNotify(!autoNotify)}
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  autoNotify ? 'bg-green-500' : 'bg-gray-300'
+                  autoNotify ? 'bg-blue-500' : 'bg-gray-500'
                 }`}
               >
                 <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
@@ -328,55 +298,25 @@ const EmergencyFeatures = () => {
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Right Column */}
-        <div className="space-y-4">
-          {/* Emergency Request History */}
-          <div className="bg-white rounded-lg shadow-md p-3">
+        {/* Emergency Request History */}
+        <div className="bg-white rounded-lg shadow-md p-2">
             <button
-              onClick={() => setShowHistory(!showHistory)}
-              className="w-full flex items-center justify-between text-left"
+              onClick={() => setShowHistory(true)}
+              className="w-full flex items-center justify-between text-left hover:bg-gray-50 transition-colors p-1.5 rounded cursor-pointer"
             >
               <div className="flex items-center space-x-2">
-                <Clock className="w-4 h-4 text-blue-600" />
-                <h3 className="text-base font-bold text-gray-900">Emergency Request History</h3>
+                <Clock className="w-6 h-6 text-blue-600" />
+                <h3 className="text-sm font-bold text-gray-900">Emergency Request History</h3>
               </div>
-              {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              <ChevronDown className="w-6 h-6 font-bold" />
             </button>
-            
-            {showHistory && (
-              <div className="mt-3 space-y-2 pt-3 border-t border-gray-200">
-                {emergencyHistory.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
-                    <div className="flex items-center space-x-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        item.type === 'Ambulance' ? 'bg-red-100' : 'bg-blue-100'
-                      }`}>
-                        {item.type === 'Ambulance' ? 
-                          <Siren className="w-4 h-4 text-red-600" /> : 
-                          <Users className="w-4 h-4 text-blue-600" />
-                        }
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">{item.service}</p>
-                        <p className="text-xs text-gray-600">{item.date} at {item.time}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      {[...Array(item.rating)].map((_, i) => (
-                        <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
+
 
           {/* Active Emergency Tracking - Shows when emergency is active */}
           {showActiveTracking && (
-            <div className="bg-white rounded-lg shadow-md p-3 border-2 border-red-500 animate-pulse">
+            <div className="bg-white rounded-lg shadow-md p-2 border-2 border-red-500 animate-pulse">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
@@ -419,22 +359,107 @@ const EmergencyFeatures = () => {
           )}
 
           {/* Broadcast to All CHWs */}
-          <div className="bg-white rounded-lg shadow-md p-3">
+          <div className="bg-white rounded-lg shadow-md p-2">
             <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center">
-              <Users className="w-4 h-4 mr-2 text-purple-600" />
+              <Users className="w-6 h-6 mr-2 text-blue-600" />
               Emergency Broadcast
             </h3>
             <button
               onClick={handleBroadcastToAllCHWs}
-              className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm font-semibold flex items-center justify-center space-x-2"
+              className="w-60 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-semibold flex items-center justify-center space-x-2"
             >
-              <Siren className="w-4 h-4" />
+              <Siren className="w-6 h-6" />
               <span>Alert ALL Nearby CHWs</span>
             </button>
             <p className="text-xs text-gray-500 mt-2">Send emergency alert to all community health workers in your area</p>
           </div>
-        </div>
       </div>
+
+      {/* Medical Summary Modal */}
+      {showMedicalSummary && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-lg w-full p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                Quick Medical Summary
+              </h3>
+              <button onClick={() => setShowMedicalSummary(false)}>
+                <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center space-x-1 mb-1">
+                    <Droplet className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-semibold text-gray-700">Blood Type</span>
+                  </div>
+                  <p className="text-lg font-bold text-blue-600">{medicalInfo.bloodType}</p>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center space-x-1 mb-1">
+                    <AlertCircle className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-semibold text-gray-700">Allergies</span>
+                  </div>
+                  <p className="text-sm text-gray-900">{medicalInfo.allergies.join(', ')}</p>
+                </div>
+              </div>
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm font-semibold text-gray-700 mb-2">Current Medications</p>
+                <p className="text-sm text-gray-900">{medicalInfo.medications.join(', ')}</p>
+              </div>
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm font-semibold text-gray-700 mb-2">Emergency Notes</p>
+                <p className="text-sm text-gray-900">{medicalInfo.emergencyNotes}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Emergency History Modal */}
+      {showHistory && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-lg w-full p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center">
+                <Clock className="w-5 h-5 mr-2 text-blue-600" />
+                Emergency Request History
+              </h3>
+              <button onClick={() => setShowHistory(false)}>
+                <X className="w-5 h-5 font-bold hover:text-gray-600" />
+              </button>
+            </div>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {emergencyHistory.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      item.type === 'Ambulance' ? '' : ''
+                    }`}>
+                      {item.type === 'Ambulance' ? 
+                        <Siren className="w-5 h-5 text-blue-600" /> : 
+                        <Users className="w-5 h-5 text-blue-600" />
+                      }
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{item.service}</p>
+                      <p className="text-xs text-gray-600">{item.date} at {item.time}</p>
+                      <p className="text-xs text-gray-500">{item.type}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    {[...Array(item.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-blue-400 text-blue-400" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Share Location Modal */}
       {showLocationShare && (
