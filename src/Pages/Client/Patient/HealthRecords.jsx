@@ -35,7 +35,7 @@ const HealthRecords = () => {
       size: '0.5 MB',
       category: 'report',
       icon: FileText,
-      color: 'green'
+      color: 'blue'
     },
     { 
       id: 3, 
@@ -46,7 +46,7 @@ const HealthRecords = () => {
       size: '0.3 MB',
       category: 'prescription',
       icon: Pill,
-      color: 'orange'
+      color: 'blue'
     },
     { 
       id: 4, 
@@ -57,7 +57,7 @@ const HealthRecords = () => {
       size: '1.2 MB',
       category: 'vaccination',
       icon: File,
-      color: 'purple'
+      color: 'blue'
     },
     { 
       id: 5, 
@@ -68,7 +68,7 @@ const HealthRecords = () => {
       size: '0.6 MB',
       category: 'insurance',
       icon: FileText,
-      color: 'indigo'
+      color: 'blue'
     },
   ];
 
@@ -79,7 +79,7 @@ const HealthRecords = () => {
       items: ['Pollen', 'Dust mites'],
       severity: 'Moderate',
       icon: AlertCircle,
-      color: 'yellow'
+      color: 'blue'
     },
     {
       id: 2,
@@ -87,7 +87,7 @@ const HealthRecords = () => {
       items: ['None reported'],
       severity: 'N/A',
       icon: CheckCircle,
-      color: 'green'
+      color: 'blue'
     },
     {
       id: 3,
@@ -95,7 +95,7 @@ const HealthRecords = () => {
       items: ['O Positive'],
       severity: 'N/A',
       icon: Activity,
-      color: 'red'
+      color: 'blue'
     },
   ];
 
@@ -271,7 +271,7 @@ const HealthRecords = () => {
                 return (
                   <div key={doc.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
                     <div className="flex items-center gap-2">
-                      <div className={`p-1.5 bg-${doc.color}-100 rounded`}>
+                      <div className={`p-1.5 ${doc.color} rounded`}>
                         <Icon className={`w-4 h-4 text-${doc.color}-600`} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -292,7 +292,7 @@ const HealthRecords = () => {
           {/* Health Summary */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-600" />
+              <TrendingUp className="w-4 h-4 text-blue-600" />
               Health Summary
             </h3>
             <div className="space-y-2">
@@ -301,7 +301,7 @@ const HealthRecords = () => {
                 return (
                   <div key={item.id} className="p-2 bg-gray-50 rounded-lg">
                     <div className="flex items-start gap-2">
-                      <div className={`p-1.5 bg-${item.color}-100 rounded flex-shrink-0`}>
+                      <div className={`p-1.5 ${item.color} rounded flex-shrink-0`}>
                         <Icon className={`w-4 h-4 text-${item.color}-600`} />
                       </div>
                       <div className="flex-1">
@@ -325,7 +325,7 @@ const HealthRecords = () => {
           {/* Active Prescriptions */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Pill className="w-4 h-4 text-green-600" />
+              <Pill className="w-4 h-4 text-blue-600" />
               Active Prescriptions
             </h3>
             <div className="space-y-2">
@@ -349,17 +349,17 @@ const HealthRecords = () => {
           {/* Upcoming Vaccinations */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-purple-600" />
+              <Calendar className="w-4 h-4 text-blue-600" />
               Upcoming Vaccinations
             </h3>
             <div className="space-y-2">
               {upcomingVaccinations.map((vaccination, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-purple-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                   <div>
                     <p className="text-sm font-medium text-gray-900">{vaccination.name}</p>
                     <p className="text-xs text-gray-600">Due: {vaccination.dueDate}</p>
                   </div>
-                  <AlertCircle className="w-4 h-4 text-purple-600" />
+                  <AlertCircle className="w-4 h-4 text-blue-600" />
                 </div>
               ))}
             </div>
@@ -368,7 +368,7 @@ const HealthRecords = () => {
           {/* Recent Medical History */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-orange-600" />
+              <FileText className="w-4 h-4 text-blue-600" />
               Recent Medical History
             </h3>
             <div className="space-y-2">
@@ -393,7 +393,7 @@ const HealthRecords = () => {
 
       {/* Documents Tab */}
       {activeTab === 'documents' && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">My Documents</h3>
@@ -428,7 +428,7 @@ const HealthRecords = () => {
                 return (
                   <div key={doc.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow bg-white">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className={`p-2 bg-${doc.color}-100 rounded`}>
+                      <div className={`p-2 ${doc.color} rounded`}>
                         <Icon className={`w-4 h-4 text-${doc.color}-600`} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -506,7 +506,7 @@ const HealthRecords = () => {
                   >
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="p-1.5 bg-blue-100 rounded flex-shrink-0">
+                        <div className="p-1.5 rounded flex-shrink-0">
                           <FileText className="w-4 h-4 text-blue-600" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -565,7 +565,7 @@ const HealthRecords = () => {
 
       {/* Prescriptions Tab */}
       {activeTab === 'prescriptions' && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="rounded-lg border border-gray-200">
           <div className="p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-4">Current Prescriptions</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -573,8 +573,8 @@ const HealthRecords = () => {
                 <div key={prescription.id} className="border border-gray-200 rounded-lg p-3">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-start gap-2 flex-1 min-w-0">
-                      <div className="p-1.5 bg-green-100 rounded flex-shrink-0">
-                        <Pill className="w-4 h-4 text-green-600" />
+                      <div className="p-1.5 rounded flex-shrink-0">
+                        <Pill className="w-4 h-4 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-semibold text-gray-900 truncate">{prescription.medication}</h4>

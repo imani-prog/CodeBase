@@ -183,8 +183,8 @@ const Prescriptions = () => {
   };
 
   const RefillModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-opacity-50 z-50 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">Request Refill</h2>
@@ -199,7 +199,7 @@ const Prescriptions = () => {
 
         {selectedMedication && (
           <div className="p-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="border border-blue-200 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
                 <Pill className="w-6 h-6 text-blue-600 mt-1" />
                 <div>
@@ -235,7 +235,7 @@ const Prescriptions = () => {
                         <div className="text-right">
                           <p className="text-sm font-medium text-gray-900">{pharmacy.distance}</p>
                           <div className="flex items-center gap-1 mt-1">
-                            <span className="text-yellow-500">★</span>
+                            <span className="text-blue-500">★</span>
                             <span className="text-sm text-gray-600">{pharmacy.rating}</span>
                           </div>
                         </div>
@@ -266,7 +266,7 @@ const Prescriptions = () => {
                   Additional Instructions (Optional)
                 </label>
                 <textarea
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg"
                   rows="3"
                   placeholder="Any special delivery instructions or questions..."
                 ></textarea>
@@ -341,7 +341,7 @@ const Prescriptions = () => {
                 {prescriptions.active.reduce((sum, p) => sum + p.refillsRemaining, 0)}
               </p>
             </div>
-            <Repeat className="w-7 h-7 text-green-600" />
+            <Repeat className="w-7 h-7 text-blue-600" />
           </div>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
@@ -361,13 +361,13 @@ const Prescriptions = () => {
               <p className="text-xs text-gray-600">Nearby Pharmacies</p>
               <p className="text-xl font-bold text-gray-900 mt-0.5">{nearbyPharmacies.length}</p>
             </div>
-            <MapPin className="w-7 h-7 text-orange-600" />
+            <MapPin className="w-7 h-7 text-blue-600" />
           </div>
         </div>
       </div>
 
       {/* Important Alert */}
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
+      {/* <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
           <div>
@@ -377,7 +377,7 @@ const Prescriptions = () => {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -423,7 +423,7 @@ const Prescriptions = () => {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="p-2 bg-blue-100 rounded flex-shrink-0">
+                    <div className="p-2 rounded flex-shrink-0">
                       <Pill className="w-5 h-5 text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -501,7 +501,7 @@ const Prescriptions = () => {
                     <p className="text-xs font-medium text-gray-700 mb-1">Possible Side Effects</p>
                     <div className="flex flex-wrap gap-1.5">
                       {prescription.sideEffects.map((effect, index) => (
-                        <span key={index} className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full border border-orange-200">
+                        <span key={index} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200">
                           {effect}
                         </span>
                       ))}
@@ -558,7 +558,7 @@ const Prescriptions = () => {
             <div key={prescription.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-gray-100 rounded flex-shrink-0">
+                  <div className="p-2 rounded flex-shrink-0">
                     <Pill className="w-5 h-5 text-gray-600" />
                   </div>
                   <div>
@@ -612,7 +612,7 @@ const Prescriptions = () => {
                 <div className="text-right ml-2 flex-shrink-0">
                   <p className="text-xs font-medium text-gray-900">{pharmacy.distance} away</p>
                   <div className="flex items-center gap-0.5 mt-0.5">
-                    <span className="text-yellow-500 text-sm">★</span>
+                    <span className="text-blue-500 text-sm">★</span>
                     <span className="text-xs font-medium text-gray-900">{pharmacy.rating}</span>
                   </div>
                 </div>
@@ -620,7 +620,7 @@ const Prescriptions = () => {
 
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {pharmacy.services.map((service, index) => (
-                  <span key={index} className="text-xs px-2 py-0.5 bg-green-50 text-green-700 rounded-full border border-green-200">
+                  <span key={index} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200">
                     {service}
                   </span>
                 ))}

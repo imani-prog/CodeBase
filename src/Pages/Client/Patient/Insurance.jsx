@@ -241,7 +241,7 @@ const Insurance = () => {
                 KSh {billingHistory.filter(b => b.status === 'pending').reduce((sum, b) => sum + parseInt(b.balance.replace(/[^0-9]/g, '')), 0).toLocaleString()}
               </p>
             </div>
-            <DollarSign className="w-7 h-7 text-orange-600" />
+            <DollarSign className="w-7 h-7 text-blue-600" />
           </div>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
@@ -250,7 +250,7 @@ const Insurance = () => {
               <p className="text-xs text-gray-600">Coverage Status</p>
               <p className="text-base font-bold text-green-600 mt-0.5">{insuranceInfo.status}</p>
             </div>
-            <Shield className="w-7 h-7 text-green-600" />
+            <Shield className="w-7 h-7 text-blue-600" />
           </div>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
@@ -259,7 +259,7 @@ const Insurance = () => {
               <p className="text-xs text-gray-600">Payment Methods</p>
               <p className="text-xl font-bold text-gray-900 mt-0.5">{paymentMethods.length}</p>
             </div>
-            <Wallet className="w-7 h-7 text-purple-600" />
+            <Wallet className="w-7 h-7 text-blue-600" />
           </div>
         </div>
       </div>
@@ -290,7 +290,7 @@ const Insurance = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-green-600" />
+                <Shield className="w-4 h-4 text-blue-600" />
                 NHIF Coverage
               </h3>
               <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(insuranceInfo.status)}`}>
@@ -309,7 +309,7 @@ const Insurance = () => {
                   className="p-1.5 hover:bg-gray-200 rounded transition-colors"
                 >
                   {copiedText === 'NHIF' ? (
-                    <Check className="w-3.5 h-3.5 text-green-600" />
+                    <Check className="w-3.5 h-3.5 text-blue-600" />
                   ) : (
                     <Copy className="w-3.5 h-3.5 text-gray-600" />
                   )}
@@ -339,7 +339,7 @@ const Insurance = () => {
                 <p className="text-xs font-medium text-gray-700 mb-1.5">Covered Services</p>
                 <div className="flex flex-wrap gap-1.5">
                   {insuranceInfo.coverageServices.slice(0, 4).map((service, index) => (
-                    <span key={index} className="text-xs px-2 py-0.5 bg-green-50 text-green-700 rounded-full border border-green-200">
+                    <span key={index} className="text-xs px-2 py-0.5 bg-green-50 text-blue-700 rounded-full border border-blue-200">
                       {service}
                     </span>
                   ))}
@@ -374,7 +374,7 @@ const Insurance = () => {
                   className="p-1.5 hover:bg-gray-200 rounded transition-colors"
                 >
                   {copiedText === 'SHA' ? (
-                    <Check className="w-3.5 h-3.5 text-green-600" />
+                    <Check className="w-3.5 h-3.5 text-blue-600" />
                   ) : (
                     <Copy className="w-3.5 h-3.5 text-gray-600" />
                   )}
@@ -414,7 +414,7 @@ const Insurance = () => {
           {/* Recent Claims Summary */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-orange-600" />
+              <FileText className="w-4 h-4 text-blue-600" />
               Recent Claims
             </h3>
             <div className="space-y-2">
@@ -445,13 +445,13 @@ const Insurance = () => {
           {/* Pending Payments */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-red-600" />
+              <DollarSign className="w-4 h-4 text-blue-600" />
               Pending Payments
             </h3>
             {billingHistory.filter(b => b.status === 'pending').length > 0 ? (
               <div className="space-y-2">
                 {billingHistory.filter(b => b.status === 'pending').map((bill) => (
-                  <div key={bill.id} className="p-2 bg-yellow-50 border border-yellow-200 rounded">
+                  <div key={bill.id} className="p-2">
                     <div className="flex items-start justify-between mb-1.5">
                       <div>
                         <p className="text-sm font-medium text-gray-900">{bill.service}</p>
@@ -459,7 +459,7 @@ const Insurance = () => {
                       </div>
                       <span className="text-sm font-semibold text-red-600">{bill.balance}</span>
                     </div>
-                    <button className="w-full mt-1.5 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-medium">
+                    <button className="w-40% mt-1.5 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-medium">
                       Pay Now
                     </button>
                   </div>
@@ -512,19 +512,19 @@ const Insurance = () => {
                     <div className="space-y-1 text-sm mb-1.5">
                       <div className="flex justify-between">
                         <span className="text-gray-500">Claim #:</span>
-                        <span className="font-medium text-gray-900">{claim.claimNumber}</span>
+                        <span className="font-bold">{claim.claimNumber}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Date:</span>
-                        <span className="font-medium text-gray-900">{claim.date}</span>
+                        <span className="font-bold">{claim.date}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Amount:</span>
-                        <span className="font-medium text-gray-900">{claim.claimAmount}</span>
+                        <span className="font-bold">{claim.claimAmount}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Approved:</span>
-                        <span className="font-medium text-green-600">{claim.approvedAmount}</span>
+                        <span className="font-bold">{claim.approvedAmount}</span>
                       </div>
                     </div>
 
@@ -555,37 +555,37 @@ const Insurance = () => {
                         {claim.submittedDate && (
                           <div className="flex justify-between">
                             <span className="text-gray-600">Submitted:</span>
-                            <span className="text-gray-900">{claim.submittedDate}</span>
+                            <span className="font-semibold">{claim.submittedDate}</span>
                           </div>
                         )}
                       {claim.processedDate && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Processed:</span>
-                          <span className="text-gray-900">{claim.processedDate}</span>
+                          <span className="font-semibold">{claim.processedDate}</span>
                         </div>
                       )}
                       {claim.doctor && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Doctor:</span>
-                          <span className="text-gray-900 truncate ml-2">{claim.doctor}</span>
+                          <span className="font-semibold truncate ml-2">{claim.doctor}</span>
                         </div>
                       )}
                       {claim.diagnosis && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Diagnosis:</span>
-                          <span className="text-gray-900 truncate ml-2">{claim.diagnosis}</span>
+                          <span className="font-semibold truncate ml-2">{claim.diagnosis}</span>
                         </div>
                       )}
                       {claim.tests && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Tests:</span>
-                          <span className="text-gray-900 truncate ml-2">{claim.tests}</span>
+                          <span className="font-semibold truncate ml-2">{claim.tests}</span>
                         </div>
                       )}
                       {claim.medication && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Medication:</span>
-                          <span className="text-gray-900 truncate ml-2">{claim.medication}</span>
+                          <span className="font-semibold truncate ml-2">{claim.medication}</span>
                         </div>
                       )}
                       {claim.copayment && (
@@ -596,7 +596,7 @@ const Insurance = () => {
                       )}
                       <div className="flex justify-between">
                         <span className="text-gray-600">Payment:</span>
-                        <span className="text-gray-900 capitalize">{claim.paymentStatus}</span>
+                        <span className="font-semibold capitalize">{claim.paymentStatus}</span>
                       </div>
                     </div>
 
@@ -626,11 +626,11 @@ const Insurance = () => {
             <div key={bill.id} className="bg-white rounded shadow-sm border border-gray-200 p-2.5">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-start gap-2 flex-1 min-w-0">
-                  <div className="p-1.5 bg-blue-100 rounded flex-shrink-0">
+                  <div className="p-1.5 rounded flex-shrink-0">
                     <Receipt className="w-3.5 h-3.5 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-gray-900 truncate">{bill.service}</h3>
+                    <h3 className="text-sm font-semibold truncate">{bill.service}</h3>
                     <p className="text-xs text-gray-600 truncate">Invoice: {bill.invoiceNumber}</p>
                     <p className="text-xs text-gray-600">{bill.date}</p>
                   </div>
@@ -643,15 +643,15 @@ const Insurance = () => {
               <div className="space-y-1.5 text-sm mb-2">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Total:</span>
-                  <span className="font-semibold text-gray-900">{bill.amount}</span>
+                  <span className="font-semibold">{bill.amount}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Paid:</span>
-                  <span className="font-semibold text-green-600">{bill.paid}</span>
+                  <span className="font-semibold">{bill.paid}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Balance:</span>
-                  <span className={`font-semibold ${bill.balance === 'KSh 0' ? 'text-gray-600' : 'text-red-600'}`}>
+                  <span className={`font-semibold ${bill.balance === 'KSh 0' ? '' : 'text-red-600'}`}>
                     {bill.balance}
                   </span>
                 </div>
@@ -700,7 +700,7 @@ const Insurance = () => {
                 <div key={method.id} className="bg-white rounded shadow-sm border border-gray-200 p-2.5">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="p-1 bg-blue-100 rounded">
+                      <div className="p-1 rounded">
                         <Icon className="w-3.5 h-3.5 text-blue-600" />
                       </div>
                       <div className="flex-1">
