@@ -113,9 +113,9 @@ const CHWAppointments = () => {
 
   const stats = [
     { label: 'Today\'s Appointments', value: '2', color: 'blue' },
-    { label: 'This Week', value: '7', color: 'green' },
-    { label: 'Pending Confirmation', value: '1', color: 'yellow' },
-    { label: 'Completed This Month', value: '24', color: 'purple' }
+    { label: 'This Week', value: '7', color: 'blue' },
+    { label: 'Pending Confirmation', value: '1', color: 'blue' },
+    { label: 'Completed This Month', value: '24', color: 'blue' }
   ];
 
   const tabs = [
@@ -127,9 +127,9 @@ const CHWAppointments = () => {
   const getTypeIcon = (type) => {
     switch (type) {
       case 'Video Call':
-        return <Video className="w-5 h-5 text-purple-600" />;
+        return <Video className="w-5 h-5 text-blue-600" />;
       case 'Phone Call':
-        return <Phone className="w-5 h-5 text-green-600" />;
+        return <Phone className="w-5 h-5 text-blue-600" />;
       default:
         return <MapPin className="w-5 h-5 text-blue-600" />;
     }
@@ -138,11 +138,11 @@ const CHWAppointments = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'confirmed':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-800';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-800';
     }
   };
 
@@ -151,8 +151,8 @@ const CHWAppointments = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Appointments</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold">Appointments</h1>
+          <p className="mt-2">
             Manage patient appointments and consultations
           </p>
         </div>
@@ -166,14 +166,14 @@ const CHWAppointments = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
+            <p className="text-sm mb-1">{stat.label}</p>
             <p className={`text-3xl font-bold text-${stat.color}-600`}>{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -182,7 +182,7 @@ const CHWAppointments = () => {
               placeholder="Search appointments..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
             />
           </div>
           <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
@@ -193,16 +193,16 @@ const CHWAppointments = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-md p-2">
-        <div className="flex space-x-2">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               <span>{tab.label}</span>
@@ -218,62 +218,62 @@ const CHWAppointments = () => {
 
       {/* Upcoming Appointments */}
       {activeTab === 'upcoming' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {appointments.upcoming.map((appointment) => (
             <div
               key={appointment.id}
-              className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-shadow max-w-md"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <h3 className="text-xl font-bold text-gray-900">{appointment.patientName}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(appointment.status)}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-base font-bold text-gray-900">{appointment.patientName}</h3>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(appointment.status)}`}>
                       {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">Patient ID: {appointment.patientId}</p>
+                  <p className="text-xs text-gray-600 mb-3">Patient ID: {appointment.patientId}</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-blue-600" />
-                      <span className="font-semibold">{new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                      <span className="font-medium">{new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Clock className="w-5 h-5 mr-2 text-blue-600" />
-                      <span className="font-semibold">{appointment.time} ({appointment.duration})</span>
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Clock className="w-4 h-4 mr-2 text-blue-600" />
+                      <span className="font-medium">{appointment.time} ({appointment.duration})</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
+                    <div className="flex items-center text-gray-700 text-sm">
                       {getTypeIcon(appointment.type)}
-                      <span className="ml-2">{appointment.type} - {appointment.location}</span>
+                      <span className="ml-2">{appointment.type}</span>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 rounded-lg p-3 mb-4">
+                  <div className="bg-blue-50 rounded p-2 mb-3">
                     <p className="text-sm text-gray-700">
                       <span className="font-semibold">Reason:</span> {appointment.reason}
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex flex-wrap gap-2">
                     {appointment.type === 'Video Call' && (
-                      <button className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors">
-                        <Video className="w-4 h-4" />
+                      <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors">
+                        <Video className="w-3 h-3" />
                         <span>Join Call</span>
                       </button>
                     )}
                     {appointment.type === 'Phone Call' && (
-                      <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors">
-                        <Phone className="w-4 h-4" />
-                        <span>Call Patient</span>
+                      <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors">
+                        <Phone className="w-3 h-3" />
+                        <span>Call</span>
                       </button>
                     )}
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                      <Edit className="w-4 h-4" />
+                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                      <Edit className="w-3 h-3" />
                       <span>Edit</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-red-300 hover:bg-red-50 text-red-600 rounded-lg font-semibold transition-colors">
-                      <XCircle className="w-4 h-4" />
+                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-red-600 hover:text-white text-red-600 rounded font-medium transition-colors">
+                      <XCircle className="w-3 h-3" />
                       <span>Cancel</span>
                     </button>
                   </div>
@@ -286,33 +286,33 @@ const CHWAppointments = () => {
 
       {/* Completed Appointments */}
       {activeTab === 'completed' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {appointments.completed.map((appointment) => (
-            <div key={appointment.id} className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-              <div className="flex items-start justify-between">
+            <div key={appointment.id} className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 max-w-md">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                    <h3 className="text-xl font-bold text-gray-900">{appointment.patientName}</h3>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <CheckCircle className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-base font-bold">{appointment.patientName}</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">Patient ID: {appointment.patientId}</p>
+                  <p className="text-xs text-gray-600 mb-3">Patient ID: {appointment.patientId}</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-gray-500" />
-                      <span>{new Date(appointment.date).toLocaleDateString()}</span>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                      <span>{new Date(appointment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Clock className="w-5 h-5 mr-2 text-gray-500" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Clock className="w-4 h-4 mr-2 text-gray-500" />
                       <span>{appointment.time} ({appointment.duration})</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
+                    <div className="flex items-center text-gray-700 text-sm">
                       {getTypeIcon(appointment.type)}
                       <span className="ml-2">{appointment.type}</span>
                     </div>
                   </div>
 
-                  <div className="bg-green-50 rounded-lg p-3">
+                  <div className="bg-green-50 rounded p-2">
                     <p className="text-sm text-gray-700">
                       <span className="font-semibold">Reason:</span> {appointment.reason}
                     </p>
@@ -331,39 +331,39 @@ const CHWAppointments = () => {
 
       {/* Cancelled Appointments */}
       {activeTab === 'cancelled' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {appointments.cancelled.map((appointment) => (
-            <div key={appointment.id} className="bg-white rounded-xl shadow-md p-6 border-l-4 border-gray-400">
-              <div className="flex items-start justify-between">
+            <div key={appointment.id} className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 max-w-md">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <XCircle className="w-6 h-6 text-gray-600" />
-                    <h3 className="text-xl font-bold text-gray-900">{appointment.patientName}</h3>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <XCircle className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-base font-bold">{appointment.patientName}</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">Patient ID: {appointment.patientId}</p>
+                  <p className="text-xs text-gray-600 mb-3">Patient ID: {appointment.patientId}</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-gray-500" />
-                      <span>{new Date(appointment.date).toLocaleDateString()}</span>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                      <span>{new Date(appointment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Clock className="w-5 h-5 mr-2 text-gray-500" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Clock className="w-4 h-4 mr-2 text-gray-500" />
                       <span>{appointment.time} ({appointment.duration})</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
+                    <div className="flex items-center text-gray-700 text-sm">
                       {getTypeIcon(appointment.type)}
                       <span className="ml-2">{appointment.type}</span>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                    <p className="text-sm text-gray-700">
+                  <div className="bg-gray-50 rounded p-2 mb-3">
+                    <p className="text-xs text-gray-700">
                       <span className="font-semibold">Reason:</span> {appointment.cancelReason}
                     </p>
                   </div>
 
-                  <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
+                  <button className="ml-20 w-1/2 items-center px-0.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors">
                     Reschedule Appointment
                   </button>
                 </div>

@@ -21,7 +21,7 @@ const MyPatients = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Sample patient data - replace with actual API data
+  // Sample patient data
   const patients = [
     {
       id: 'PT-2023-001',
@@ -104,9 +104,9 @@ const MyPatients = () => {
 
   const stats = [
     { label: 'Total Patients', value: patients.length, color: 'blue' },
-    { label: 'Active', value: patients.filter(p => p.status === 'active').length, color: 'green' },
-    { label: 'High Risk', value: patients.filter(p => p.riskLevel === 'high').length, color: 'red' },
-    { label: 'Visits This Week', value: 5, color: 'purple' }
+    { label: 'Active', value: patients.filter(p => p.status === 'active').length, color: 'blue' },
+    { label: 'High Risk', value: patients.filter(p => p.riskLevel === 'high').length, color: 'blue' },
+    { label: 'Visits This Week', value: 5, color: 'blue' }
   ];
 
   return (
@@ -114,8 +114,8 @@ const MyPatients = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Patients</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold">My Patients</h1>
+          <p className="mt-2">
             Manage and monitor patients assigned to you
           </p>
         </div>
@@ -136,7 +136,7 @@ const MyPatients = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
@@ -146,7 +146,7 @@ const MyPatients = () => {
               placeholder="Search by name or patient ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg "
             />
           </div>
 
@@ -157,7 +157,7 @@ const MyPatients = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg"
               >
                 <option value="all">All Patients</option>
                 <option value="active">Active</option>
@@ -178,25 +178,25 @@ const MyPatients = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Patient
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Contact
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Location
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Conditions
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Next Visit
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -206,25 +206,25 @@ const MyPatients = () => {
                 <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div>
-                      <p className="font-semibold text-gray-900">{patient.name}</p>
-                      <p className="text-sm text-gray-600">{patient.id}</p>
-                      <p className="text-sm text-gray-500">{patient.age} yrs, {patient.gender}</p>
+                      <p className="font-semibold">{patient.name}</p>
+                      <p className="text-sm">{patient.id}</p>
+                      <p className="text-sm">{patient.age} yrs, {patient.gender}</p>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="space-y-1">
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm">
                         <Phone className="w-4 h-4 mr-2" />
                         {patient.phone}
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm">
                         <Mail className="w-4 h-4 mr-2" />
                         {patient.email}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-start text-sm text-gray-600">
+                    <div className="flex items-start text-sm">
                       <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
                       {patient.location}
                     </div>
@@ -234,7 +234,7 @@ const MyPatients = () => {
                       {patient.conditions.map((condition, index) => (
                         <span
                           key={index}
-                          className="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full mr-1"
+                          className="inline-block px-2 py-1 text-blue-700 text-xs rounded-full mr-1"
                         >
                           {condition}
                         </span>
@@ -243,7 +243,7 @@ const MyPatients = () => {
                   </td>
                   <td className="px-6 py-4">
                     {patient.nextVisit ? (
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm">
                         <Calendar className="w-4 h-4 mr-2" />
                         {new Date(patient.nextVisit).toLocaleDateString()}
                       </div>
@@ -256,8 +256,8 @@ const MyPatients = () => {
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                           patient.status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'text-green-800'
+                            : 'text-gray-800'
                         }`}
                       >
                         {patient.status === 'active' ? 'Active' : 'Inactive'}

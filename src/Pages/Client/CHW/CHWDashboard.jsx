@@ -15,7 +15,7 @@ import {
 import { Link } from 'react-router-dom';
 
 const CHWDashboard = () => {
-  // Sample data - replace with actual API data
+  // Sample data
   const stats = [
     {
       label: 'Total Patients',
@@ -116,33 +116,33 @@ const CHWDashboard = () => {
     }
   ];
 
-  const alerts = [
-    {
-      id: 1,
-      message: 'Critical: Patient Sarah Wanjiru missed appointment',
-      type: 'urgent',
-      time: '1 hour ago'
-    },
-    {
-      id: 2,
-      message: 'Reminder: Submit weekly report by Friday',
-      type: 'warning',
-      time: '3 hours ago'
-    }
-  ];
+  // const alerts = [
+  //   {
+  //     id: 1,
+  //     message: 'Critical: Patient Sarah Wanjiru missed appointment',
+  //     type: 'urgent',
+  //     time: '1 hour ago'
+  //   },
+  //   {
+  //     id: 2,
+  //     message: 'Reminder: Submit weekly report by Friday',
+  //     type: 'warning',
+  //     time: '3 hours ago'
+  //   }
+  // ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">CHW Dashboard</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold">CHW Dashboard</h1>
+        <p className="mt-2">
           Community Health Worker overview and daily activities
         </p>
       </div>
 
       {/* Alerts Section */}
-      {alerts.length > 0 && (
+      {/* {alerts.length > 0 && (
         <div className="space-y-3">
           {alerts.map((alert) => (
             <div
@@ -175,23 +175,23 @@ const CHWDashboard = () => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
           const colorClasses = {
-            blue: 'bg-blue-100 text-blue-600',
-            yellow: 'bg-yellow-100 text-yellow-600',
-            green: 'bg-green-100 text-green-600',
-            purple: 'bg-purple-100 text-purple-600'
+            blue: 'text-blue-600',
+            yellow: 'text-blue-600',
+            green: 'text-blue-600',
+            purple: 'text-blue-600'
           };
 
           return (
             <div
               key={stat.label}
-              className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-xl shadow-md p-2 border border-gray-200 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses[stat.color]}`}>
@@ -212,9 +212,9 @@ const CHWDashboard = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upcoming Visits */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+        <div className="lg:col-span-2 bg-white shadow-md p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+            <h2 className="text-xl font-bold flex items-center">
               <MapPin className="w-6 h-6 mr-2 text-blue-600" />
               Upcoming Home Visits
             </h2>
@@ -229,16 +229,16 @@ const CHWDashboard = () => {
             {upcomingVisits.map((visit) => (
               <div
                 key={visit.id}
-                className={`p-4 rounded-lg border-2 transition-all hover:shadow-md ${
+                className={`p-4 rounded-lg border transition-all hover:shadow-md ${
                   visit.urgent
                     ? 'border-red-200 bg-red-50'
-                    : 'border-gray-200 hover:border-blue-300'
+                    : 'border-gray-200 hover:border-blue-200'
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold text-gray-900">{visit.patientName}</h3>
+                      <h3 className="font-semibold">{visit.patientName}</h3>
                       {visit.urgent && (
                         <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
                           Urgent
@@ -267,8 +267,8 @@ const CHWDashboard = () => {
         </div>
 
         {/* Recent Activities */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+        <div className="bg-white shadow-md p-6">
+          <h2 className="text-xl font-bold mb-6 flex items-center">
             <Activity className="w-6 h-6 mr-2 text-blue-600" />
             Recent Activity
           </h2>
@@ -276,10 +276,10 @@ const CHWDashboard = () => {
             {recentActivities.map((activity) => {
               const Icon = activity.icon;
               const colorClasses = {
-                green: 'bg-green-100 text-green-600',
-                blue: 'bg-blue-100 text-blue-600',
-                purple: 'bg-purple-100 text-purple-600',
-                yellow: 'bg-yellow-100 text-yellow-600'
+                green: 'text-blue-600',
+                blue: 'text-blue-600',
+                purple: 'text-blue-600',
+                yellow: 'text-blue-600'
               };
 
               return (
@@ -288,7 +288,7 @@ const CHWDashboard = () => {
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                    <p className="text-sm font-semibold">{activity.action}</p>
                     <p className="text-sm text-gray-600">{activity.patient}</p>
                     <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
                   </div>
@@ -300,7 +300,7 @@ const CHWDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link

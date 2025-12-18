@@ -24,25 +24,25 @@ const sidebarLinks = [
     to: '/client/chw/patients',
     label: 'My Patients',
     icon: <Users className="w-5 h-5 mr-3" />,
-    badge: 12,
+    // badge: 12,
   },
   {
     to: '/client/chw/appointments',
     label: 'Appointments',
     icon: <Calendar className="w-5 h-5 mr-3" />,
-    badge: 5,
+    // badge: 5,
   },
   {
     to: '/client/chw/home-visits',
     label: 'Home Visits',
     icon: <MapPin className="w-5 h-5 mr-3" />,
-    badge: 3,
+    // badge: 3,
   },
   {
     to: '/client/chw/tasks',
     label: 'Tasks & Follow-ups',
     icon: <ClipboardList className="w-5 h-5 mr-3" />,
-    badge: 8,
+    // badge: 8,
   },
   {
     to: '/client/chw/health-assessments',
@@ -53,7 +53,7 @@ const sidebarLinks = [
     to: '/client/chw/messages',
     label: 'Messages',
     icon: <MessageSquare className="w-5 h-5 mr-3" />,
-    badge: 4,
+    // badge: 4,
   },
   {
     to: '/client/chw/reports',

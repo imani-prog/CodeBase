@@ -28,7 +28,7 @@ const Emergency = () => {
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [userLocation, setUserLocation] = useState({ lat: -1.286389, lng: 36.817223 }); // Default: Nairobi
 
-  // Sample CHW data - Replace with actual API data
+  // Sample CHW data
   const communityHealthWorkers = [
     {
       id: 1,
