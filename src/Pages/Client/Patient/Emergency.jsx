@@ -310,7 +310,7 @@ const Emergency = () => {
           <div className="space-y-4">
             {/* Map Placeholder */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 h-64 flex items-center justify-center relative">
+              <div className="h-64 flex items-center justify-center relative">
                 <MapIcon className="w-16 h-16 text-blue-600 opacity-50" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
@@ -334,62 +334,62 @@ const Emergency = () => {
             </div>
 
             {/* CHW List */}
-            <div className="bg-white rounded-xl shadow-md p-3">
+            <div className="p-3">
               <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
                 <Users className="w-4 h-4 mr-2 text-blue-600" />
                 Available Community Health Workers Near You
               </h2>
-              <div className="space-y-2">
+              <div className="grid grid-cols-4 gap-2">
                 {communityHealthWorkers.map((chw) => (
                   <div
                     key={chw.id}
                     className={`p-2 border-2 rounded-lg transition-all ${
                       chw.available
-                        ? 'border-green-200 bg-green-50 hover:border-green-400'
+                        ? 'border-blue-200 hover:border-blue-400'
                         : 'border-gray-200 bg-gray-50 opacity-60'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                    <div className="flex flex-col">
+                      <div className="flex items-center space-x-2 mb-1">
                         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                           {chw.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div>
                           <h3 className="text-sm font-semibold text-gray-900">{chw.name}</h3>
                           <p className="text-xs text-gray-600">{chw.specialization}</p>
-                          <div className="flex items-center space-x-3 mt-1">
-                            <span className="flex items-center text-xs text-gray-500">
-                              <MapPin className="w-3 h-3 mr-0.5" />
-                              {chw.distance}
-                            </span>
-                            <span className="flex items-center text-xs text-gray-500">
-                              <Clock className="w-3 h-3 mr-0.5" />
-                              {chw.responseTime}
-                            </span>
-                            <span className="flex items-center text-xs text-yellow-600">
-                              <Star className="w-3 h-3 mr-0.5 fill-current" />
-                              {chw.rating}
-                            </span>
-                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex flex-col space-y-1">
+                        <span className="flex items-center text-xs">
+                          <MapPin className="w-3 h-3 mr-0.5" />
+                          {chw.distance}
+                        </span>
+                        <span className="flex items-center text-xs">
+                          <Clock className="w-3 h-3 mr-0.5" />
+                          {chw.responseTime}
+                        </span>
+                        <span className="flex items-center text-xs text-blue-600">
+                          <Star className="w-3 h-3 mr-0.5 fill-current" />
+                          {chw.rating}
+                        </span>
+                      </div>
+                      <div className="mt-2">
                         {chw.available ? (
-                          <>
+                          <div className="flex flex-col space-y-1 items-center">
                             <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
                               Available
                             </span>
                             <a
                               href={`tel:${chw.phone}`}
-                              className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors flex items-center space-x-1"
+                              className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors flex items-center space-x-1"
                               onClick={() => handleCallCHW(chw)}
                             >
                               <Phone className="w-3 h-3" />
                               <span>Call</span>
                             </a>
-                          </>
+                          </div>
                         ) : (
-                          <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full">
+                          <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full block text-center">
                             Unavailable
                           </span>
                         )}
@@ -438,72 +438,70 @@ const Emergency = () => {
             </div>
 
             {/* Ambulance List */}
-            <div className="bg-white rounded-xl shadow-md p-3">
+            <div className="p-3">
               <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
-                <Ambulance className="w-4 h-4 mr-2 text-red-600" />
+                <Ambulance className="w-4 h-4 mr-2 text-blue-600" />
                 Available Ambulances Near You
               </h2>
-              <div className="space-y-2">
+              <div className="grid grid-cols-4 gap-2">
                 {ambulances.map((ambulance) => (
                   <div
                     key={ambulance.id}
                     className={`p-2 border-2 rounded-lg transition-all ${
                       ambulance.available
-                        ? 'border-green-200 bg-gradient-to-r from-white to-green-50 hover:border-green-400 hover:shadow-lg'
+                        ? 'border-blue-200 hover:border-blue-400 hover:shadow-lg'
                         : 'border-gray-200 bg-gray-50 opacity-60'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <Ambulance className={`w-5 h-5 ${ambulance.available ? 'text-red-600' : 'text-gray-400'}`} />
-                          <h3 className="text-sm font-bold text-gray-900">{ambulance.name}</h3>
-                          {ambulance.available && (
-                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-                              Available
-                            </span>
-                          )}
+                    <div className="flex flex-col">
+                      <div className="flex items-center space-x-1 mb-1">
+                        <Ambulance className={`w-4 h-4 ${ambulance.available ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <h3 className="text-xs font-bold text-gray-900">{ambulance.name}</h3>
+                      </div>
+                      {ambulance.available && (
+                        <span className="px-1.5 py-0.5 text-green-700 text-xs font-semibold rounded-full text-center mb-1">
+                          Available
+                        </span>
+                      )}
+                      <p className="text-xs text-gray-600 mb-2">{ambulance.type}</p>
+                      <div className="flex flex-col space-y-1 mb-2">
+                        <div className="flex items-center text-xs">
+                          <MapPin className="w-3 h-3 mr-1 text-gray-500" />
+                          <span className="font-semibold text-gray-700">{ambulance.distance}</span>
                         </div>
-                        <p className="text-xs text-gray-600 mb-2">{ambulance.type}</p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
-                          <div className="flex items-center text-xs">
-                            <MapPin className="w-3 h-3 mr-1 text-gray-500" />
-                            <span className="font-semibold text-gray-700">{ambulance.distance}</span>
-                          </div>
-                          <div className="flex items-center text-xs">
-                            <Clock className="w-3 h-3 mr-1 text-blue-600" />
-                            <span className="font-semibold text-blue-600">ETA: {ambulance.eta}</span>
-                          </div>
-                          <div className="flex items-center text-xs">
-                            <Activity className="w-3 h-3 mr-1 text-gray-500" />
-                            <span className="font-semibold text-gray-700">{ambulance.equipment.length} Equipment</span>
-                          </div>
-                          <div className="flex items-center text-xs">
-                            <span className="font-semibold text-green-600">{ambulance.cost}</span>
-                          </div>
+                        <div className="flex items-center text-xs">
+                          <Clock className="w-3 h-3 mr-1 text-blue-600" />
+                          <span className="font-bold">ETA: {ambulance.eta}</span>
                         </div>
-                        <div className="flex flex-wrap gap-1">
-                          {ambulance.equipment.map((item, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full"
-                            >
-                              {item}
-                            </span>
-                          ))}
+                        <div className="flex items-center text-xs">
+                          <Activity className="w-3 h-3 mr-1 text-gray-500" />
+                          <span className="font-semibold text-gray-700">{ambulance.equipment.length} Equipment</span>
+                        </div>
+                        <div className="flex items-center text-xs">
+                          <span className="font-bold">{ambulance.cost}</span>
                         </div>
                       </div>
-                      <div className="ml-2">
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {ambulance.equipment.map((item, index) => (
+                          <span
+                            key={index}
+                            className="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex justify-center">
                         {ambulance.available ? (
                           <button
                             onClick={() => handleOrderAmbulance(ambulance)}
-                            className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1"
+                            className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1"
                           >
                             <Ambulance className="w-3 h-3" />
                             <span>Order</span>
                           </button>
                         ) : (
-                          <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs font-semibold">
+                          <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-xs font-semibold">
                             Unavailable
                           </span>
                         )}
@@ -515,7 +513,7 @@ const Emergency = () => {
             </div>
 
             {/* Emergency Tips */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div className="bg-yellow-50 w-1/4 border border-yellow-200 rounded-lg p-3">
               <h3 className="text-sm font-bold text-yellow-900 mb-1.5 flex items-center">
                 <AlertCircle className="w-3 h-3 mr-1.5" />
                 While waiting for the ambulance:
@@ -589,7 +587,7 @@ const Emergency = () => {
             {!orderConfirmed ? (
               <>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">Confirm Ambulance Order</h3>
+                  <h3 className="text-lg font-bold">Confirm Ambulance Order</h3>
                   <button
                     onClick={() => setShowAmbulanceModal(false)}
                     className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
@@ -598,10 +596,10 @@ const Emergency = () => {
                   </button>
                 </div>
                 <div className="space-y-3 mb-4">
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="p-3 border border-blue-200 rounded-lg">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Ambulance className="w-5 h-5 text-red-600" />
-                      <h4 className="text-sm font-bold text-gray-900">{selectedAmbulance.name}</h4>
+                      <Ambulance className="w-5 h-5 text-blue-600" />
+                      <h4 className="text-sm font-bold">{selectedAmbulance.name}</h4>
                     </div>
                     <div className="space-y-1.5 text-xs">
                       <div className="flex justify-between">
@@ -614,11 +612,11 @@ const Emergency = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">ETA:</span>
-                        <span className="font-semibold text-blue-600">{selectedAmbulance.eta}</span>
+                        <span className="font-semibold ">{selectedAmbulance.eta}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Cost:</span>
-                        <span className="font-semibold text-green-600">{selectedAmbulance.cost}</span>
+                        <span className="font-bold">{selectedAmbulance.cost}</span>
                       </div>
                     </div>
                   </div>
@@ -630,17 +628,17 @@ const Emergency = () => {
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col items-center space-y-2">
                   <button
                     onClick={confirmAmbulanceOrder}
-                    className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors flex items-center justify-center space-x-2"
+                    className="w-40 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors flex items-center justify-center space-x-2"
                   >
                     <CheckCircle className="w-4 h-4" />
                     <span>Confirm Order</span>
                   </button>
                   <button
                     onClick={() => setShowAmbulanceModal(false)}
-                    className="w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
+                    className="w-40 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
                   >
                     Cancel
                   </button>
@@ -670,13 +668,13 @@ const Emergency = () => {
           to="/client/patient/dashboard"
           className="flex items-center justify-center space-x-2 p-3transition-colors"
         >
-          <span className="hover:text-blue-600 font-medium">← Back to Dashboard</span>
+          <span className="hover:text-blue-600 font-bold">← Back to Dashboard</span>
         </Link>
         <Link
           to="/client/patient/health-records"
           className="flex items-center justify-center space-x-2 p-3 transition-colors"
         >
-          <span className="text-sm hover:text-blue-600 font-medium">View Medical Records →</span>
+          <span className="hover:text-blue-600 font-bold">View Medical Records →</span>
         </Link>
       </div>
     </div>

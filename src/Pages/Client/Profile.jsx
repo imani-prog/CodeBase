@@ -20,11 +20,32 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
+// Move InputField component outside to prevent recreation on each render
+const InputField = ({ label, value, field, type = 'text', icon: Icon, disabled = false, isEditing, editedData, handleChange }) => (
+  <div className="space-y-1">
+    <label className="text-xs font-medium text-gray-700 flex items-center">
+      {Icon && <Icon className="w-3.5 h-3.5 mr-1 text-blue-600" />}
+      {label}
+    </label>
+    <input
+      type={type}
+      value={isEditing ? editedData[field] : value}
+      onChange={(e) => handleChange(field, e.target.value)}
+      disabled={!isEditing || disabled}
+      className={`w-full max-w-md px-3 py-2 text-sm border rounded-md transition-all ${
+        isEditing && !disabled
+          ? 'border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white'
+          : 'border-gray-300 bg-gray-50'
+      }`}
+    />
+  </div>
+);
+
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('personal');
   
-  // Sample patient data - replace with actual data from auth context/API
+  
   const [profileData, setProfileData] = useState({
     // Personal Information
     firstName: 'John',
@@ -94,35 +115,15 @@ const Profile = () => {
     setEditedData({ ...editedData, [field]: value });
   };
 
-  const InputField = ({ label, value, field, type = 'text', icon: Icon, disabled = false }) => (
-    <div className="space-y-1">
-      <label className="text-sm font-medium text-gray-700 flex items-center">
-        {Icon && <Icon className="w-4 h-4 mr-1 text-blue-600" />}
-        {label}
-      </label>
-      <input
-        type={type}
-        value={isEditing ? editedData[field] : value}
-        onChange={(e) => handleChange(field, e.target.value)}
-        disabled={!isEditing || disabled}
-        className={`w-full px-4 py-2 border rounded-lg transition-all ${
-          isEditing && !disabled
-            ? 'border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white'
-            : 'border-gray-300 bg-gray-50'
-        }`}
-      />
-    </div>
-  );
-
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="mx-auto space-y-6">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-8 text-white">
+      <div className=" bg-white shadow-md p-8">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-6">
             {/* Avatar */}
             <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-white text-blue-600 flex items-center justify-center text-3xl font-bold shadow-lg">
+              <div className="w-24 h-24 border rounded-full flex items-center justify-center text-3xl font-bold shadow-lg">
                 {profileData.firstName[0]}{profileData.lastName[0]}
               </div>
               <button className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 p-2 rounded-full shadow-lg transition-colors">
@@ -135,13 +136,13 @@ const Profile = () => {
               <h1 className="text-3xl font-bold">
                 {profileData.firstName} {profileData.lastName}
               </h1>
-              <p className="text-blue-100 mt-1">Patient ID: {profileData.patientId}</p>
+              <p className="mt-1">Patient ID: {profileData.patientId}</p>
               <div className="flex items-center space-x-4 mt-3">
                 <span className="flex items-center bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                   <CheckCircle className="w-4 h-4 mr-1" />
                   {profileData.status}
                 </span>
-                <span className="text-blue-100 text-sm">
+                <span className="text-sm">
                   Member since {new Date(profileData.memberSince).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </span>
               </div>
@@ -181,21 +182,21 @@ const Profile = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-md p-2">
-        <div className="flex space-x-2 overflow-x-auto">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all whitespace-nowrap ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-4 h-4 mr-1" />
                 <span>{tab.label}</span>
               </button>
             );
@@ -204,11 +205,11 @@ const Profile = () => {
       </div>
 
       {/* Content Sections */}
-      <div className="bg-white rounded-xl shadow-md p-8">
+      <div className="bg-white shadow-md p-8">
         {/* Personal Information Tab */}
         {activeTab === 'personal' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3">Personal Information</h2>
+            <h2 className="text-2xl font-bold">Personal Information</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
@@ -216,12 +217,18 @@ const Profile = () => {
                 value={profileData.firstName}
                 field="firstName"
                 icon={User}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Last Name"
                 value={profileData.lastName}
                 field="lastName"
                 icon={User}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Email Address"
@@ -229,6 +236,9 @@ const Profile = () => {
                 field="email"
                 type="email"
                 icon={Mail}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Phone Number"
@@ -236,6 +246,9 @@ const Profile = () => {
                 field="phone"
                 type="tel"
                 icon={Phone}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Date of Birth"
@@ -243,23 +256,35 @@ const Profile = () => {
                 field="dateOfBirth"
                 type="date"
                 icon={Calendar}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Gender"
                 value={profileData.gender}
                 field="gender"
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Blood Type"
                 value={profileData.bloodType}
                 field="bloodType"
                 icon={Droplet}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Patient ID"
                 value={profileData.patientId}
                 field="patientId"
                 disabled={true}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
             </div>
 
@@ -270,33 +295,48 @@ const Profile = () => {
                 Address Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
+                <div className="md:col-span-2 max-w-2xl">
                   <InputField
                     label="Street Address"
                     value={profileData.street}
                     field="street"
                     icon={MapPin}
+                    isEditing={isEditing}
+                    editedData={editedData}
+                    handleChange={handleChange}
                   />
                 </div>
                 <InputField
                   label="City"
                   value={profileData.city}
                   field="city"
+                  isEditing={isEditing}
+                  editedData={editedData}
+                  handleChange={handleChange}
                 />
                 <InputField
                   label="State/Province"
                   value={profileData.state}
                   field="state"
+                  isEditing={isEditing}
+                  editedData={editedData}
+                  handleChange={handleChange}
                 />
                 <InputField
                   label="ZIP/Postal Code"
                   value={profileData.zipCode}
                   field="zipCode"
+                  isEditing={isEditing}
+                  editedData={editedData}
+                  handleChange={handleChange}
                 />
                 <InputField
                   label="Country"
                   value={profileData.country}
                   field="country"
+                  isEditing={isEditing}
+                  editedData={editedData}
+                  handleChange={handleChange}
                 />
               </div>
             </div>
@@ -306,11 +346,11 @@ const Profile = () => {
         {/* Medical Information Tab */}
         {activeTab === 'medical' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3">Medical Information</h2>
+            <h2 className="text-2xl font-bold">Medical Information</h2>
             
             {/* Vital Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Height</p>
@@ -320,50 +360,49 @@ const Profile = () => {
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Weight</p>
-                    <p className="text-2xl font-bold text-green-600">{profileData.weight}</p>
+                    <p className="text-2xl font-bold text-blue-600">{profileData.weight}</p>
                   </div>
-                  <Weight className="w-8 h-8 text-green-600" />
+                  <Weight className="w-8 h-8 text-blue-600" />
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Blood Type</p>
-                    <p className="text-2xl font-bold text-red-600">{profileData.bloodType}</p>
+                    <p className="text-2xl font-bold text-blue-600">{profileData.bloodType}</p>
                   </div>
-                  <Droplet className="w-8 h-8 text-red-600" />
+                  <Droplet className="w-8 h-8 text-blue-600" />
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Status</p>
-                    <p className="text-2xl font-bold text-purple-600">{profileData.status}</p>
+                    <p className="text-2xl font-bold text-blue-600">{profileData.status}</p>
                   </div>
-                  <Activity className="w-8 h-8 text-purple-600" />
+                  <Activity className="w-8 h-8 text-blue-600" />
                 </div>
               </div>
             </div>
 
             {/* Medical Details */}
-            <div className="grid grid-cols-1 gap-6 mt-6">
-              <div className="space-y-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div className="space-y-1 flex flex-col">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <AlertCircle className="w-4 h-4 mr-1 text-red-600" />
+                  <AlertCircle className="w-4 h-4 mr-1 text-blue-600" />
                   Allergies
                 </label>
                 <textarea
                   value={isEditing ? editedData.allergies : profileData.allergies}
                   onChange={(e) => handleChange('allergies', e.target.value)}
                   disabled={!isEditing}
-                  rows={3}
-                  className={`w-full px-4 py-2 border rounded-lg transition-all ${
+                  className={`w-full h-28 px-4 py-2 border rounded-lg transition-all resize-none ${
                     isEditing
                       ? 'border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white'
                       : 'border-gray-300 bg-gray-50'
@@ -371,7 +410,7 @@ const Profile = () => {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1 flex flex-col">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
                   <Activity className="w-4 h-4 mr-1 text-blue-600" />
                   Current Medications
@@ -380,8 +419,7 @@ const Profile = () => {
                   value={isEditing ? editedData.medications : profileData.medications}
                   onChange={(e) => handleChange('medications', e.target.value)}
                   disabled={!isEditing}
-                  rows={3}
-                  className={`w-full px-4 py-2 border rounded-lg transition-all ${
+                  className={`w-full h-28 px-4 py-2 border rounded-lg transition-all resize-none ${
                     isEditing
                       ? 'border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white'
                       : 'border-gray-300 bg-gray-50'
@@ -389,7 +427,7 @@ const Profile = () => {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1 flex flex-col">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
                   <Heart className="w-4 h-4 mr-1 text-red-600" />
                   Medical Conditions
@@ -398,8 +436,7 @@ const Profile = () => {
                   value={isEditing ? editedData.conditions : profileData.conditions}
                   onChange={(e) => handleChange('conditions', e.target.value)}
                   disabled={!isEditing}
-                  rows={3}
-                  className={`w-full px-4 py-2 border rounded-lg transition-all ${
+                  className={`w-full h-28 px-4 py-2 border rounded-lg transition-all resize-none ${
                     isEditing
                       ? 'border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white'
                       : 'border-gray-300 bg-gray-50'
@@ -413,7 +450,7 @@ const Profile = () => {
         {/* Emergency Contact Tab */}
         {activeTab === 'emergency' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3">Emergency Contact</h2>
+            <h2 className="text-2xl font-bold">Emergency Contact</h2>
             <p className="text-gray-600">
               This person will be contacted in case of a medical emergency.
             </p>
@@ -424,11 +461,17 @@ const Profile = () => {
                 value={profileData.emergencyName}
                 field="emergencyName"
                 icon={User}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Relationship"
                 value={profileData.emergencyRelation}
                 field="emergencyRelation"
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Phone Number"
@@ -436,6 +479,9 @@ const Profile = () => {
                 field="emergencyPhone"
                 type="tel"
                 icon={Phone}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
             </div>
 
@@ -457,7 +503,7 @@ const Profile = () => {
         {/* Insurance Tab */}
         {activeTab === 'insurance' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3">Insurance Information</h2>
+            <h2 className="text-2xl font-bold">Insurance Information</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
@@ -465,16 +511,25 @@ const Profile = () => {
                 value={profileData.insuranceProvider}
                 field="insuranceProvider"
                 icon={Shield}
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Policy Number"
                 value={profileData.policyNumber}
                 field="policyNumber"
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
               <InputField
                 label="Group Number"
                 value={profileData.groupNumber}
                 field="groupNumber"
+                isEditing={isEditing}
+                editedData={editedData}
+                handleChange={handleChange}
               />
             </div>
 
@@ -495,7 +550,7 @@ const Profile = () => {
       </div>
 
       {/* Account Information Card */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="bg-white shadow-md p-6">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Account Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">

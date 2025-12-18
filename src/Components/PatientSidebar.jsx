@@ -53,11 +53,11 @@ const sidebarLinks = [
     icon: <AlertCircle className="w-5 h-5 mr-3" />,
     isEmergency: true,
   },
-  {
-    to: '/client/patient/wellness',
-    label: 'Health & Wellness',
-    icon: <Heart className="w-5 h-5 mr-3" />,
-  },
+  // {
+  //   to: '/client/patient/wellness',
+  //   label: 'Health & Wellness',
+  //   icon: <Heart className="w-5 h-5 mr-3" />,
+  // },
   {
     to: '/client/patient/profile',
     label: 'Profile',
