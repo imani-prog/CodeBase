@@ -14,6 +14,14 @@ const sidebarLinks = [
     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m13-7.13A4 4 0 0016 4a4 4 0 00-4 4v1a4 4 0 01-4 4H4a4 4 0 00-4 4v2a4 4 0 004 4h16a4 4 0 004-4v-2a4 4 0 00-4-4z" /></svg>
   ) },
 
+  { to: '/admin/hospital-management', label: 'Hospital Management', icon: (
+    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+  ) },
+
+  { to: '/admin/chw-assignments', label: 'CHW Assignments', icon: (
+    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+  ) },
+
   { to: '/admin/ambulance-management', label: 'Ambulance Management', icon: (
     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
   ) },
@@ -73,7 +81,12 @@ const AdminSidebar = () => (
         <div className="text-xs opacity-90">Admin Panel</div>
       </div>
     </div>
-    <nav className="flex-1 space-y-2">
+    <nav className="flex-1 space-y-2 overflow-y-auto pr-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <style jsx>{`
+        nav::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
       {sidebarLinks.map(link => (
         <NavLink
           key={link.to}
