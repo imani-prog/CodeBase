@@ -8,8 +8,8 @@ import HealthAssessments from '../Pages/Client/CHW/HealthAssessments';
 import CHWMessages from '../Pages/Client/CHW/CHWMessages';
 import ReportsAnalytics from '../Pages/Client/CHW/ReportsAnalytics';
 import ResourcesTraining from '../Pages/Client/CHW/ResourcesTraining';
-import Profile from '../Pages/Client/Profile';
-import Settings from '../Pages/Client/Settings';
+import CHWProfile from '../Pages/Client/CHW/CHWProfile';
+import CHWSettings from '../Pages/Client/CHW/CHWSettings';
 
 export const chwRoutes = [
   {
@@ -26,8 +26,8 @@ export const chwRoutes = [
       { path: 'messages', element: <CHWMessages /> },
       { path: 'reports', element: <ReportsAnalytics /> },
       { path: 'resources', element: <ResourcesTraining /> },
-      { path: 'profile', element: <Profile /> },
-      { path: 'settings', element: <Settings /> }
+      { path: 'profile', element: <CHWProfile /> },
+      { path: 'settings', element: <CHWSettings /> }
     ]
   },
 ];

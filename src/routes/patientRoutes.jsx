@@ -1,6 +1,6 @@
 import ClientLayout from '../Layouts/ClientLayout';
-import Profile from '../Pages/Client/Profile';
-import Settings from '../Pages/Client/Settings';
+import PatientProfile from '../Pages/Client/Patient/PatientProfile';
+import PatientSettings from '../Pages/Client/Patient/PatientSettings';
 import PatientDashboard from '../Pages/Client/Patient/PatientDashboard';
 import Appointments from '../Pages/Client/Patient/Appointments';
 import Telemedicine from '../Pages/Client/Patient/Telemedicine';
@@ -23,8 +23,8 @@ export const patientRoutes = [
       { path: 'insurance', element: <Insurance /> },
       { path: 'emergency', element: <Emergency /> },
       { path: 'wellness', element: <Wellness /> },
-      { path: 'profile', element: <Profile /> },
-      { path: 'settings', element: <Settings /> },
+      { path: 'profile', element: <PatientProfile /> },
+      { path: 'settings', element: <PatientSettings /> },
     ],
   },
 ];
