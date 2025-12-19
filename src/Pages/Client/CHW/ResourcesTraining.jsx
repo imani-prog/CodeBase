@@ -219,7 +219,7 @@ const ResourcesTraining = () => {
                 <Icon className={`w-8 h-8 text-${stat.color}-600`} />
               </div>
               <p className={`text-3xl font-bold text-${stat.color}-600 mb-1`}>{stat.value}</p>
-              <p className="text-sm text-gray-600">{stat.label}</p>
+              <p className="">{stat.label}</p>
             </div>
           );
         })}
