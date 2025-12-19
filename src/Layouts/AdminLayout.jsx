@@ -5,8 +5,7 @@ import AdminSidebar from '../Components/AdminSidebar';
 import AdminNavbar from '../Components/AdminNavbar';
 
 const AdminLayout = ({ children }) => (
-  // add top padding to account for fixed navbar height (h-16)
-  // and left padding/margin to account for fixed sidebar (w-64)
+  
   <div className="min-h-screen bg-gray-50 flex flex-col pt-16">
     <AdminNavbar />
     <AdminSidebar />
