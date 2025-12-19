@@ -118,11 +118,11 @@ const HomeVisits = () => {
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'urgent':
-        return 'bg-red-100 text-red-800 border-red-300';
+        return 'text-red-800 border-red-300';
       case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-300';
+        return 'text-orange-800 border-orange-300';
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'text-blue-800 border-blue-300';
     }
   };
 
@@ -170,18 +170,18 @@ const HomeVisits = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-md p-2">
-        <div className="flex space-x-2">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -199,67 +199,67 @@ const HomeVisits = () => {
 
       {/* Upcoming Visits */}
       {activeTab === 'upcoming' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {homeVisits.upcoming.map((visit) => (
             <div
               key={visit.id}
-              className={`bg-white rounded-xl shadow-md p-6 border-l-4 ${
+              className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 max-w-md ${
                 visit.priority === 'urgent'
-                  ? 'border-red-500'
+                  ? ''
                   : visit.priority === 'high'
-                  ? 'border-orange-500'
-                  : 'border-blue-500'
+                  ? ''
+                  : ''
               }`}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <h3 className="text-xl font-bold text-gray-900">{visit.patientName}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getPriorityColor(visit.priority)}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-base font-bold">{visit.patientName}</h3>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getPriorityColor(visit.priority)}`}>
                       {visit.priority.charAt(0).toUpperCase() + visit.priority.slice(1)}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">Patient ID: {visit.patientId}</p>
+                  <p className="text-xs text-gray-600 mb-3">Patient ID: {visit.patientId}</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-blue-600" />
-                      <span className="font-semibold">{new Date(visit.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                      <span className="font-medium">{new Date(visit.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Clock className="w-5 h-5 mr-2 text-blue-600" />
-                      <span className="font-semibold">{visit.time}</span>
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Clock className="w-4 h-4 mr-2 text-blue-600" />
+                      <span className="font-medium">{visit.time}</span>
                     </div>
-                    <div className="flex items-start text-gray-700">
-                      <MapPin className="w-5 h-5 mr-2 text-blue-600 mt-0.5" />
+                    <div className="flex items-start text-gray-700 text-sm">
+                      <MapPin className="w-4 h-4 mr-2 text-blue-600 mt-0.5" />
                       <span>{visit.location}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Home className="w-5 h-5 mr-2 text-blue-600" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Home className="w-4 h-4 mr-2 text-blue-600" />
                       <span>{visit.type}</span>
                     </div>
                   </div>
 
                   {visit.notes && (
-                    <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                      <p className="text-sm text-gray-700">
+                    <div className="p-2 mb-3">
+                      <p className="text-gray-700">
                         <span className="font-semibold">Notes:</span> {visit.notes}
                       </p>
                     </div>
                   )}
 
-                  <div className="flex items-center space-x-3">
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                      <Navigation className="w-4 h-4" />
-                      <span>Get Directions</span>
+                  <div className="flex flex-wrap gap-2">
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                      <Navigation className="w-3 h-3" />
+                      <span>Directions</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors">
-                      <Phone className="w-4 h-4" />
-                      <span>Call Patient</span>
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                      <Phone className="w-3 h-3" />
+                      <span>Call</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Mark Complete</span>
+                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                      <CheckCircle className="w-3 h-3" />
+                      <span>Complete</span>
                     </button>
                   </div>
                 </div>
@@ -271,34 +271,34 @@ const HomeVisits = () => {
 
       {/* Completed Visits */}
       {activeTab === 'completed' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {homeVisits.completed.map((visit) => (
-            <div key={visit.id} className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-              <div className="flex items-start justify-between">
+            <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 max-w-md">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                    <h3 className="text-xl font-bold text-gray-900">{visit.patientName}</h3>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <CheckCircle className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-base font-bold">{visit.patientName}</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">Patient ID: {visit.patientId}</p>
+                  <p className="text-xs text-gray-600 mb-3">Patient ID: {visit.patientId}</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-gray-500" />
-                      <span>{new Date(visit.date).toLocaleDateString()}</span>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                      <span>{new Date(visit.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Clock className="w-5 h-5 mr-2 text-gray-500" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Clock className="w-4 h-4 mr-2 text-gray-500" />
                       <span>{visit.time}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Home className="w-5 h-5 mr-2 text-gray-500" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Home className="w-4 h-4 mr-2 text-gray-500" />
                       <span>{visit.type}</span>
                     </div>
                   </div>
 
-                  <div className="bg-green-50 rounded-lg p-3">
-                    <p className="text-sm text-green-900">
+                  <div className="rounded p-2">
+                    <p className="text-gray-900">
                       <span className="font-semibold">Outcome:</span> {visit.outcome}
                     </p>
                   </div>
@@ -311,39 +311,39 @@ const HomeVisits = () => {
 
       {/* Cancelled Visits */}
       {activeTab === 'cancelled' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {homeVisits.cancelled.map((visit) => (
-            <div key={visit.id} className="bg-white rounded-xl shadow-md p-6 border-l-4 border-gray-400">
-              <div className="flex items-start justify-between">
+            <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 max-w-md">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <XCircle className="w-6 h-6 text-gray-600" />
-                    <h3 className="text-xl font-bold text-gray-900">{visit.patientName}</h3>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <XCircle className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-base font-bold">{visit.patientName}</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">Patient ID: {visit.patientId}</p>
+                  <p className="text-xs text-gray-600 mb-3">Patient ID: {visit.patientId}</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-gray-500" />
-                      <span>{new Date(visit.date).toLocaleDateString()}</span>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                      <span>{new Date(visit.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Clock className="w-5 h-5 mr-2 text-gray-500" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Clock className="w-4 h-4 mr-2 text-gray-500" />
                       <span>{visit.time}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Home className="w-5 h-5 mr-2 text-gray-500" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Home className="w-4 h-4 mr-2 text-gray-500" />
                       <span>{visit.type}</span>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                    <p className="text-sm text-gray-700">
+                  <div className="p-2 mb-3">
+                    <p className="text-gray-700">
                       <span className="font-semibold">Reason:</span> {visit.reason}
                     </p>
                   </div>
 
-                  <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
+                  <button className="ml-20 w-1/2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
                     Reschedule Visit
                   </button>
                 </div>

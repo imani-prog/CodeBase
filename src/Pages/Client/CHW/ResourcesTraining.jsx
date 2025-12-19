@@ -271,82 +271,84 @@ const ResourcesTraining = () => {
 
       {/* Training Courses */}
       {activeTab === 'courses' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {courses.map((course) => (
             <div
               key={course.id}
-              className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow max-w-md"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col mb-3">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-xl font-bold text-gray-900">{course.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(course.status)}`}>
-                      {course.status.replace('-', ' ')}
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(course.category)}`}>
-                      {course.category}
-                    </span>
+                  <div className="mb-2">
+                    <h3 className="text-base font-bold text-gray-900 mb-2">{course.title}</h3>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(course.status)}`}>
+                        {course.status.replace('-', ' ')}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(course.category)}`}>
+                        {course.category}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-gray-700 mb-4">{course.description}</p>
+                  <p className="text-xs text-gray-700 mb-3">{course.description}</p>
 
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <Clock className="w-5 h-5 mr-2 text-blue-600" />
-                      <span className="text-sm">{course.duration}</span>
+                  <div className="space-y-1 mb-3">
+                    <div className="flex items-center text-gray-700 text-xs">
+                      <Clock className="w-3 h-3 mr-1 text-blue-600" />
+                      <span>{course.duration}</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
-                      <span className="text-sm">{course.modules} modules</span>
+                    <div className="flex items-center text-gray-700 text-xs">
+                      <BookOpen className="w-3 h-3 mr-1 text-blue-600" />
+                      <span>{course.modules} modules</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Users className="w-5 h-5 mr-2 text-blue-600" />
-                      <span className="text-sm">{course.enrolled} enrolled</span>
+                    <div className="flex items-center text-gray-700 text-xs">
+                      <Users className="w-3 h-3 mr-1 text-blue-600" />
+                      <span>{course.enrolled} enrolled</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Star className="w-5 h-5 mr-2 text-yellow-500 fill-yellow-500" />
-                      <span className="text-sm font-semibold">{course.rating}</span>
+                    <div className="flex items-center text-gray-700 text-xs">
+                      <Star className="w-3 h-3 mr-1 text-yellow-500 fill-yellow-500" />
+                      <span className="font-semibold">{course.rating}</span>
                     </div>
-                    <div className="text-gray-700">
-                      <p className="text-sm font-semibold">By {course.instructor}</p>
+                    <div className="text-gray-700 text-xs">
+                      <p>By {course.instructor}</p>
                     </div>
                   </div>
 
                   {course.progress > 0 && (
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-gray-700">Progress</span>
-                        <span className="text-sm font-semibold text-blue-600">{course.progress}%</span>
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold text-gray-700">Progress</span>
+                        <span className="text-xs font-semibold text-blue-600">{course.progress}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-blue-600 h-3 rounded-full transition-all"
+                          className="bg-blue-600 h-2 rounded-full transition-all"
                           style={{ width: `${course.progress}%` }}
                         ></div>
                       </div>
                     </div>
                   )}
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex flex-wrap gap-2">
                     {course.status === 'completed' ? (
                       <>
-                        <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors">
-                          <Award className="w-4 h-4" />
-                          <span>View Certificate</span>
+                        <button className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors">
+                          <Award className="w-3 h-3" />
+                          <span>Certificate</span>
                         </button>
-                        <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                          <Play className="w-4 h-4" />
-                          <span>Review Course</span>
+                        <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                          <Play className="w-3 h-3" />
+                          <span>Review</span>
                         </button>
                       </>
                     ) : course.status === 'in-progress' ? (
-                      <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                        <Play className="w-4 h-4" />
+                      <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                        <Play className="w-3 h-3" />
                         <span>Continue Learning</span>
                       </button>
                     ) : (
-                      <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                        <Play className="w-4 h-4" />
+                      <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                        <Play className="w-3 h-3" />
                         <span>Start Course</span>
                       </button>
                     )}
@@ -417,44 +419,44 @@ const ResourcesTraining = () => {
 
       {/* Certificates */}
       {activeTab === 'certificates' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {certifications.map((cert) => (
             <div
               key={cert.id}
-              className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500"
+              className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500 max-w-md"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <Award className="w-8 h-8 text-green-600" />
-                    <h3 className="text-xl font-bold text-gray-900">{cert.title}</h3>
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                      Active
-                    </span>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Award className="w-6 h-6 text-green-600" />
+                    <h3 className="text-base font-bold text-gray-900">{cert.title}</h3>
+                  </div>
+                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-3">
+                    Active
+                  </span>
+
+                  <div className="space-y-2 mb-3">
+                    <div>
+                      <p className="text-xs text-gray-600">Issue Date</p>
+                      <p className="text-sm font-semibold text-gray-900">{new Date(cert.issueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-600">Expiry Date</p>
+                      <p className="text-sm font-semibold text-gray-900">{new Date(cert.expiryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-600">Credential ID</p>
+                      <p className="text-sm font-semibold text-gray-900">{cert.credentialId}</p>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Issue Date</p>
-                      <p className="font-semibold text-gray-900">{new Date(cert.issueDate).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Expiry Date</p>
-                      <p className="font-semibold text-gray-900">{new Date(cert.expiryDate).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Credential ID</p>
-                      <p className="font-semibold text-gray-900">{cert.credentialId}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                      <Download className="w-4 h-4" />
-                      <span>Download Certificate</span>
+                  <div className="flex flex-wrap gap-2">
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                      <Download className="w-3 h-3" />
+                      <span>Download</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                      <FileText className="w-4 h-4" />
+                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                      <FileText className="w-3 h-3" />
                       <span>Verify</span>
                     </button>
                   </div>

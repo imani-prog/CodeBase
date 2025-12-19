@@ -124,9 +124,9 @@ const TasksFollowups = () => {
 
   const stats = [
     { label: 'Pending Tasks', value: tasks.pending.length, color: 'blue' },
-    { label: 'In Progress', value: tasks.inProgress.length, color: 'yellow' },
-    { label: 'Due Today', value: '2', color: 'red' },
-    { label: 'Completed This Week', value: '12', color: 'green' }
+    { label: 'In Progress', value: tasks.inProgress.length, color: 'blue' },
+    { label: 'Due Today', value: '2', color: 'blue' },
+    { label: 'Completed This Week', value: '12', color: 'blue' }
   ];
 
   const tabs = [
@@ -135,40 +135,30 @@ const TasksFollowups = () => {
     { id: 'completed', label: 'Completed', count: tasks.completed.length }
   ];
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'urgent':
-        return 'border-red-500 bg-red-50';
-      case 'high':
-        return 'border-orange-500 bg-orange-50';
-      default:
-        return 'border-blue-500 bg-blue-50';
-    }
-  };
 
   const getPriorityBadge = (priority) => {
     switch (priority) {
       case 'urgent':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-800';
       case 'high':
-        return 'bg-orange-100 text-orange-800';
+        return 'text-orange-800';
       default:
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-800';
     }
   };
 
   const getCategoryColor = (category) => {
     switch (category) {
       case 'Medical Follow-up':
-        return 'bg-purple-100 text-purple-800';
+        return 'text-blue-800';
       case 'Medication':
-        return 'bg-green-100 text-green-800';
+        return 'text-blue-800';
       case 'Education':
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-800';
       case 'Assessment':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-blue-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-blue-800';
     }
   };
 
@@ -177,8 +167,8 @@ const TasksFollowups = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Tasks & Follow-ups</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold">Tasks & Follow-ups</h1>
+          <p className="mt-2">
             Manage patient tasks and follow-up activities
           </p>
         </div>
@@ -192,14 +182,14 @@ const TasksFollowups = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
+            <p className="mb-1">{stat.label}</p>
             <p className={`text-3xl font-bold text-${stat.color}-600`}>{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -208,7 +198,7 @@ const TasksFollowups = () => {
               placeholder="Search tasks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
             />
           </div>
           <div className="flex items-center space-x-3">
@@ -221,16 +211,16 @@ const TasksFollowups = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-md p-2">
-        <div className="flex space-x-2">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'tborder-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               <span>{tab.label}</span>
@@ -246,64 +236,66 @@ const TasksFollowups = () => {
 
       {/* Pending Tasks */}
       {activeTab === 'pending' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {tasks.pending.map((task) => (
             <div
               key={task.id}
-              className={`bg-white rounded-xl shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow ${getPriorityColor(task.priority)}`}
+              className={`bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-shadow max-w-md `}
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col mb-3">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-xl font-bold text-gray-900">{task.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getPriorityBadge(task.priority)}`}>
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <h3 className="text-base font-bold">{task.title}</h3>
+                  </div>
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getPriorityBadge(task.priority)}`}>
                       {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(task.category)}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(task.category)}`}>
                       {task.category}
                     </span>
                   </div>
-                  <p className="text-gray-700 mb-4">{task.description}</p>
+                  <p className="mb-3">{task.description}</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <User className="w-5 h-5 mr-2 text-blue-600" />
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <User className="w-4 h-4 mr-2 text-blue-600" />
                       <div>
-                        <p className="font-semibold">{task.patient}</p>
-                        <p className="text-sm text-gray-500">{task.patientId}</p>
+                        <p className="font-medium">{task.patient}</p>
+                        <p className="text-xs text-gray-500">{task.patientId}</p>
                       </div>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
                       <div>
-                        <p className="font-semibold">{new Date(task.dueDate).toLocaleDateString()}</p>
-                        <p className="text-sm text-gray-500">Due Date</p>
+                        <p className="font-medium">{new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                        <p className="text-xs text-gray-500">Due Date</p>
                       </div>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Clock className="w-5 h-5 mr-2 text-blue-600" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Clock className="w-4 h-4 mr-2 text-blue-600" />
                       <div>
-                        <p className="font-semibold">{task.dueTime}</p>
-                        <p className="text-sm text-gray-500">Due Time</p>
+                        <p className="font-medium">{task.dueTime}</p>
+                        <p className="text-xs text-gray-500">Due Time</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Mark Complete</span>
+                  <div className="flex flex-wrap gap-2">
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors">
+                      <CheckCircle className="w-3 h-3" />
+                      <span>Complete</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                      <ChevronRight className="w-4 h-4" />
-                      <span>Start Task</span>
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors">
+                      <ChevronRight className="w-3 h-3" />
+                      <span>Start</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                      <Edit className="w-4 h-4" />
+                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded font-medium transition-colors">
+                      <Edit className="w-3 h-3" />
                       <span>Edit</span>
                     </button>
-                    <button className="p-2 border border-red-300 hover:bg-red-50 text-red-600 rounded-lg transition-colors">
-                      <Trash2 className="w-4 h-4" />
+                    <button className="p-1.5 border border-red-300 hover:bg-red-50 text-red-600 rounded transition-colors">
+                      <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
@@ -315,61 +307,63 @@ const TasksFollowups = () => {
 
       {/* In Progress Tasks */}
       {activeTab === 'inProgress' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {tasks.inProgress.map((task) => (
             <div
               key={task.id}
-              className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500"
+              className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 max-w-md"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col mb-3">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <AlertCircle className="w-6 h-6 text-yellow-600" />
-                    <h3 className="text-xl font-bold text-gray-900">{task.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(task.category)}`}>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <AlertCircle className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-base font-bold">{task.title}</h3>
+                  </div>
+                  <div className="mb-2">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(task.category)}`}>
                       {task.category}
                     </span>
                   </div>
-                  <p className="text-gray-700 mb-4">{task.description}</p>
+                  <p className="mb-3">{task.description}</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-2 mb-3">
                     <div className="flex items-center text-gray-700">
-                      <User className="w-5 h-5 mr-2 text-blue-600" />
+                      <User className="w-4 h-4 mr-2 text-blue-600" />
                       <div>
-                        <p className="font-semibold">{task.patient}</p>
-                        <p className="text-sm text-gray-500">{task.patientId}</p>
+                        <p className="font-medium">{task.patient}</p>
+                        <p className="text-xs text-gray-500">{task.patientId}</p>
                       </div>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
                       <div>
-                        <p className="font-semibold">Started: {new Date(task.startedDate).toLocaleDateString()}</p>
+                        <p className="font-medium">Started: {new Date(task.startedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Progress</span>
-                      <span className="text-sm font-semibold text-gray-700">{task.progress}%</span>
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-gray-700">Progress</span>
+                      <span className="text-xs font-semibold text-gray-700">{task.progress}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-yellow-500 h-3 rounded-full transition-all"
+                        className="bg-blue-500 h-2 rounded-full transition-all"
                         style={{ width: `${task.progress}%` }}
                       ></div>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Complete Task</span>
+                  <div className="flex flex-wrap gap-2">
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors">
+                      <CheckCircle className="w-3 h-3" />
+                      <span>Complete</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                      <Edit className="w-4 h-4" />
-                      <span>Update Progress</span>
+                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded font-medium transition-colors">
+                      <Edit className="w-3 h-3" />
+                      <span>Update</span>
                     </button>
                   </div>
                 </div>
@@ -381,35 +375,37 @@ const TasksFollowups = () => {
 
       {/* Completed Tasks */}
       {activeTab === 'completed' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {tasks.completed.map((task) => (
             <div
               key={task.id}
-              className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500"
+              className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 max-w-md"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                    <h3 className="text-xl font-bold text-gray-900">{task.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(task.category)}`}>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <CheckCircle className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-base font-bold">{task.title}</h3>
+                  </div>
+                  <div className="mb-2">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(task.category)}`}>
                       {task.category}
                     </span>
                   </div>
                   
-                  <div className="flex items-center text-gray-700 mb-4">
-                    <User className="w-5 h-5 mr-2 text-blue-600" />
+                  <div className="flex items-center text-gray-700">
+                    <User className="w-4 h-4 mr-2 text-blue-600" />
                     <div>
-                      <p className="font-semibold">{task.patient}</p>
-                      <p className="text-sm text-gray-500">{task.patientId}</p>
+                      <p className="font-medium">{task.patient}</p>
+                      <p className="text-xs text-gray-500">{task.patientId}</p>
                     </div>
                   </div>
 
-                  <div className="bg-green-50 rounded-lg p-4 mb-4">
-                    <p className="text-sm text-gray-700">
-                      <span className="font-semibold">Completed:</span> {new Date(task.completedDate).toLocaleDateString()}
+                  <div className="p-2">
+                    <p className="text-gray-700">
+                      <span className="font-semibold">Completed:</span> {new Date(task.completedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </p>
-                    <p className="text-sm text-gray-700 mt-2">
+                    <p className="text-gray-700 mt-1">
                       <span className="font-semibold">Notes:</span> {task.notes}
                     </p>
                   </div>

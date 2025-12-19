@@ -249,180 +249,180 @@ const HealthAssessments = () => {
 
       {/* Recent Assessments */}
       {activeTab === 'recent' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {assessments.recent.map((assessment) => (
             <div
               key={assessment.id}
-              className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow max-w-md"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col mb-3">
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{assessment.patientName}</h3>
-                      <p className="text-sm text-gray-600">Patient ID: {assessment.patientId}</p>
+                      <h3 className="text-base font-bold text-gray-900">{assessment.patientName}</h3>
+                      <p className="text-xs text-gray-600">Patient ID: {assessment.patientId}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-600">Assessment Date</p>
-                      <p className="font-semibold text-gray-900">{new Date(assessment.date).toLocaleDateString()}</p>
+                      <p className="text-xs text-gray-600">Assessment Date</p>
+                      <p className="text-xs font-semibold text-gray-900">{new Date(assessment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 rounded-lg p-3 mb-4">
-                    <p className="text-sm font-semibold text-blue-900">{assessment.type}</p>
+                  <div className="bg-blue-50 rounded p-2 mb-3">
+                    <p className="text-xs font-semibold text-blue-900">{assessment.type}</p>
                   </div>
 
                   {/* Metrics Display */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  <div className="grid grid-cols-2 gap-2 mb-3">
                     {assessment.metrics.bloodPressure && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <Heart className="w-5 h-5 text-red-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <Heart className="w-4 h-4 text-red-600 mr-1" />
                           <span className="text-xs text-gray-600">Blood Pressure</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.bloodPressure.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.bloodPressure.status)}`}>
                           {assessment.metrics.bloodPressure.systolic}/{assessment.metrics.bloodPressure.diastolic}
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.bloodPressure.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.bloodPressure.status)}`}>
                           {assessment.metrics.bloodPressure.status}
                         </span>
                       </div>
                     )}
                     
                     {assessment.metrics.heartRate && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <Activity className="w-5 h-5 text-red-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <Activity className="w-4 h-4 text-red-600 mr-1" />
                           <span className="text-xs text-gray-600">Heart Rate</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.heartRate.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.heartRate.status)}`}>
                           {assessment.metrics.heartRate.value} bpm
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.heartRate.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.heartRate.status)}`}>
                           {assessment.metrics.heartRate.status}
                         </span>
                       </div>
                     )}
 
                     {assessment.metrics.temperature && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <Thermometer className="w-5 h-5 text-orange-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <Thermometer className="w-4 h-4 text-orange-600 mr-1" />
                           <span className="text-xs text-gray-600">Temperature</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.temperature.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.temperature.status)}`}>
                           {assessment.metrics.temperature.value}°F
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.temperature.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.temperature.status)}`}>
                           {assessment.metrics.temperature.status}
                         </span>
                       </div>
                     )}
 
                     {assessment.metrics.oxygenSaturation && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <Wind className="w-5 h-5 text-blue-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <Wind className="w-4 h-4 text-blue-600 mr-1" />
                           <span className="text-xs text-gray-600">O₂ Saturation</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.oxygenSaturation.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.oxygenSaturation.status)}`}>
                           {assessment.metrics.oxygenSaturation.value}%
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.oxygenSaturation.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.oxygenSaturation.status)}`}>
                           {assessment.metrics.oxygenSaturation.status}
                         </span>
                       </div>
                     )}
 
                     {assessment.metrics.bloodGlucose && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <Droplet className="w-5 h-5 text-blue-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <Droplet className="w-4 h-4 text-blue-600 mr-1" />
                           <span className="text-xs text-gray-600">Blood Glucose</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.bloodGlucose.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.bloodGlucose.status)}`}>
                           {assessment.metrics.bloodGlucose.value} mg/dL
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.bloodGlucose.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.bloodGlucose.status)}`}>
                           {assessment.metrics.bloodGlucose.status}
                         </span>
                       </div>
                     )}
 
                     {assessment.metrics.weight && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <Scale className="w-5 h-5 text-green-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <Scale className="w-4 h-4 text-green-600 mr-1" />
                           <span className="text-xs text-gray-600">Weight</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.weight.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.weight.status)}`}>
                           {assessment.metrics.weight.value} kg
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.weight.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.weight.status)}`}>
                           {assessment.metrics.weight.status}
                         </span>
                       </div>
                     )}
 
                     {assessment.metrics.bmi && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <TrendingUp className="w-5 h-5 text-purple-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <TrendingUp className="w-4 h-4 text-purple-600 mr-1" />
                           <span className="text-xs text-gray-600">BMI</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.bmi.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.bmi.status)}`}>
                           {assessment.metrics.bmi.value}
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.bmi.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.bmi.status)}`}>
                           {assessment.metrics.bmi.status}
                         </span>
                       </div>
                     )}
 
                     {assessment.metrics.hemoglobin && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <Droplet className="w-5 h-5 text-red-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <Droplet className="w-4 h-4 text-red-600 mr-1" />
                           <span className="text-xs text-gray-600">Hemoglobin</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.hemoglobin.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.hemoglobin.status)}`}>
                           {assessment.metrics.hemoglobin.value} g/dL
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.hemoglobin.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.hemoglobin.status)}`}>
                           {assessment.metrics.hemoglobin.status}
                         </span>
                       </div>
                     )}
 
                     {assessment.metrics.fetalHeartRate && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center mb-2">
-                          <Heart className="w-5 h-5 text-pink-600 mr-2" />
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="flex items-center mb-1">
+                          <Heart className="w-4 h-4 text-pink-600 mr-1" />
                           <span className="text-xs text-gray-600">Fetal Heart Rate</span>
                         </div>
-                        <p className={`text-lg font-bold ${getStatusColor(assessment.metrics.fetalHeartRate.status)}`}>
+                        <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.fetalHeartRate.status)}`}>
                           {assessment.metrics.fetalHeartRate.value} bpm
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBadge(assessment.metrics.fetalHeartRate.status)}`}>
+                        <span className={`text-xs px-1 py-0.5 rounded-full ${getStatusBadge(assessment.metrics.fetalHeartRate.status)}`}>
                           {assessment.metrics.fetalHeartRate.status}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  <div className="bg-yellow-50 rounded-lg p-4 mb-4 border border-yellow-200">
-                    <p className="text-sm text-gray-700">
+                  <div className="bg-yellow-50 rounded p-2 mb-3 border border-yellow-200">
+                    <p className="text-xs text-gray-700">
                       <span className="font-semibold">Notes:</span> {assessment.notes}
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-3">
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                      <Eye className="w-4 h-4" />
-                      <span>View Full Report</span>
+                  <div className="flex flex-wrap gap-2">
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                      <Eye className="w-3 h-3" />
+                      <span>View Report</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                      <Download className="w-4 h-4" />
+                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                      <Download className="w-3 h-3" />
                       <span>Download</span>
                     </button>
                   </div>
@@ -435,55 +435,55 @@ const HealthAssessments = () => {
 
       {/* Scheduled Assessments */}
       {activeTab === 'scheduled' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {assessments.scheduled.map((assessment) => (
             <div
               key={assessment.id}
-              className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-yellow-500 hover:shadow-md transition-shadow max-w-md"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col">
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{assessment.patientName}</h3>
-                      <p className="text-sm text-gray-600">Patient ID: {assessment.patientId}</p>
+                      <h3 className="text-base font-bold text-gray-900">{assessment.patientName}</h3>
+                      <p className="text-xs text-gray-600">Patient ID: {assessment.patientId}</p>
                     </div>
                   </div>
 
-                  <div className="bg-yellow-50 rounded-lg p-3 mb-4">
-                    <p className="text-sm font-semibold text-yellow-900">{assessment.type}</p>
+                  <div className="bg-yellow-50 rounded p-2 mb-3">
+                    <p className="text-xs font-semibold text-yellow-900">{assessment.type}</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="flex items-center text-gray-700">
-                      <Calendar className="w-5 h-5 mr-2 text-yellow-600" />
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-yellow-600" />
                       <div>
-                        <p className="font-semibold">{new Date(assessment.scheduledDate).toLocaleDateString()}</p>
-                        <p className="text-sm text-gray-500">Scheduled Date</p>
+                        <p className="font-medium">{new Date(assessment.scheduledDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                        <p className="text-xs text-gray-500">Scheduled Date</p>
                       </div>
                     </div>
-                    <div className="flex items-center text-gray-700">
-                      <Activity className="w-5 h-5 mr-2 text-yellow-600" />
+                    <div className="flex items-center text-gray-700 text-sm">
+                      <Activity className="w-4 h-4 mr-2 text-yellow-600" />
                       <div>
-                        <p className="font-semibold">{assessment.scheduledTime}</p>
-                        <p className="text-sm text-gray-500">Scheduled Time</p>
+                        <p className="font-medium">{assessment.scheduledTime}</p>
+                        <p className="text-xs text-gray-500">Scheduled Time</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                    <p className="text-sm text-gray-700">
+                  <div className="bg-gray-50 rounded p-2 mb-3">
+                    <p className="text-xs text-gray-700">
                       <span className="font-semibold">Reason:</span> {assessment.reason}
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-3">
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors">
-                      <Plus className="w-4 h-4" />
-                      <span>Start Assessment</span>
+                  <div className="flex flex-wrap gap-2">
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors">
+                      <Plus className="w-3 h-3" />
+                      <span>Start</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                      <Calendar className="w-4 h-4" />
+                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                      <Calendar className="w-3 h-3" />
                       <span>Reschedule</span>
                     </button>
                   </div>

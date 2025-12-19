@@ -351,32 +351,31 @@ const ReportsAnalytics = () => {
       {/* Recent Reports */}
       <div className="bg-white rounded-xl shadow-md p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Reports</h2>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {recentReports.map((report) => (
             <div
               key={report.id}
-              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex flex-col p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors max-w-md"
             >
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <FileText className="w-6 h-6 text-blue-600" />
+              <div className="flex items-start space-x-3 mb-3">
+                <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                  <FileText className="w-5 h-5 text-blue-600" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{report.title}</h3>
-                  <div className="flex items-center space-x-3 mt-1">
-                    <span className="text-sm text-gray-600">{report.period}</span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-sm text-gray-600">Generated: {new Date(report.generated).toLocaleDateString()}</span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${getTypeColor(report.type)}`}>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900 truncate">{report.title}</h3>
+                  <div className="flex flex-col space-y-1 mt-1">
+                    <span className="text-xs text-gray-600">{report.period}</span>
+                    <span className="text-xs text-gray-600">Generated: {new Date(report.generated).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full self-start ${getTypeColor(report.type)}`}>
                       {report.type}
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-sm font-semibold text-green-600">{report.status}</span>
-                <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors">
-                  <Download className="w-4 h-4" />
+              <div className="flex items-center justify-between mt-3">
+                <span className="text-xs font-semibold text-green-600">{report.status}</span>
+                <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                  <Download className="w-3 h-3" />
                   <span>Download</span>
                 </button>
               </div>
