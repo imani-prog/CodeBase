@@ -1,5 +1,5 @@
 import { User, Bell, Lock, CreditCard, Globe, Moon, Shield, Heart, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+
 import SettingsBase from '../../../Components/SettingsBase';
 
 const PatientSettings = () => {
