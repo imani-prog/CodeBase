@@ -44,11 +44,11 @@ const sidebarLinks = [
     icon: <ClipboardList className="w-5 h-5 mr-3" />,
     // badge: 8,
   },
-  {
-    to: '/client/chw/health-assessments',
-    label: 'Health Assessments',
-    icon: <Activity className="w-5 h-5 mr-3" />,
-  },
+  // {
+  //   to: '/client/chw/health-assessments',
+  //   label: 'Health Assessments',
+  //   icon: <Activity className="w-5 h-5 mr-3" />,
+  // },
   {
     to: '/client/chw/messages',
     label: 'Messages',

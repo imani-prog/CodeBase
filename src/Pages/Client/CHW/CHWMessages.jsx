@@ -141,7 +141,7 @@ const CHWMessages = () => {
 
   const handleSendMessage = () => {
     if (messageText.trim()) {
-      // Here you would typically send the message to your backend
+      
       console.log('Sending message:', messageText);
       setMessageText('');
     }
@@ -151,8 +151,8 @@ const CHWMessages = () => {
     <div className="h-[calc(100vh-8rem)]">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold ">Messages</h1>
+        <p className="mt-2">
           Communicate with your patients
         </p>
       </div>
@@ -170,7 +170,7 @@ const CHWMessages = () => {
                 placeholder="Search conversations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
               />
             </div>
           </div>
@@ -300,7 +300,7 @@ const CHWMessages = () => {
                       }}
                       placeholder="Type a message..."
                       rows="1"
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg resize-none"
                     />
                     <button className="absolute right-3 bottom-3 hover:bg-gray-100 p-1 rounded-full transition-colors">
                       <Smile className="w-5 h-5 text-gray-600" />

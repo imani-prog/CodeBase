@@ -103,9 +103,9 @@ const HealthAssessments = () => {
 
   const stats = [
     { label: 'Assessments This Month', value: '28', color: 'blue', icon: FileText },
-    { label: 'Scheduled', value: '6', color: 'yellow', icon: Calendar },
-    { label: 'High Risk Identified', value: '3', color: 'red', icon: Activity },
-    { label: 'Follow-ups Needed', value: '5', color: 'purple', icon: TrendingUp }
+    { label: 'Scheduled', value: '6', color: 'blue', icon: Calendar },
+    { label: 'High Risk Identified', value: '3', color: 'blue', icon: Activity },
+    { label: 'Follow-ups Needed', value: '5', color: 'blue', icon: TrendingUp }
   ];
 
   const tabs = [
@@ -114,12 +114,12 @@ const HealthAssessments = () => {
   ];
 
   const assessmentTypes = [
-    { name: 'Blood Pressure & Vitals', icon: Heart, color: 'red' },
+    { name: 'Blood Pressure & Vitals', icon: Heart, color: 'blue' },
     { name: 'Diabetes Screening', icon: Droplet, color: 'blue' },
-    { name: 'Prenatal Assessment', icon: Activity, color: 'purple' },
-    { name: 'Nutrition Assessment', icon: Scale, color: 'green' },
-    { name: 'Mental Health Screening', icon: User, color: 'indigo' },
-    { name: 'General Health Checkup', icon: FileText, color: 'gray' }
+    { name: 'Prenatal Assessment', icon: Activity, color: 'blue' },
+    { name: 'Nutrition Assessment', icon: Scale, color: 'blue' },
+    { name: 'Mental Health Screening', icon: User, color: 'blue' },
+    { name: 'General Health Checkup', icon: FileText, color: 'blue' }
   ];
 
   const getStatusColor = (status) => {
@@ -141,14 +141,14 @@ const HealthAssessments = () => {
     switch (status) {
       case 'elevated':
       case 'high':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-800';
       case 'low':
       case 'underweight':
-        return 'bg-orange-100 text-orange-800';
+        return 'text-orange-800';
       case 'overweight':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-yellow-800';
       default:
-        return 'bg-green-100 text-green-800';
+        return 'text-green-800';
     }
   };
 
@@ -157,8 +157,8 @@ const HealthAssessments = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Health Assessments</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold">Health Assessments</h1>
+          <p className="mt-2">
             Track patient health assessments and screenings
           </p>
         </div>
@@ -178,25 +178,25 @@ const HealthAssessments = () => {
                 <Icon className={`w-8 h-8 text-${stat.color}-600`} />
               </div>
               <p className={`text-3xl font-bold text-${stat.color}-600 mb-1`}>{stat.value}</p>
-              <p className="text-sm text-gray-600">{stat.label}</p>
+              <p className="">{stat.label}</p>
             </div>
           );
         })}
       </div>
 
       {/* Assessment Types */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Assessment Types</h2>
+      <div className="p-6">
+        <h2 className="text-xl font-bold mb-4">Assessment Types</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {assessmentTypes.map((type) => {
             const Icon = type.icon;
             return (
               <button
                 key={type.name}
-                className={`flex flex-col items-center p-4 rounded-lg border-2 border-${type.color}-200 hover:border-${type.color}-400 hover:bg-${type.color}-50 transition-all`}
+                className={`flex flex-col items-center p-4 rounded-lg border border-${type.color}-200 hover:border-${type.color}-400 hover:bg-${type.color}-50 transition-all`}
               >
                 <Icon className={`w-8 h-8 text-${type.color}-600 mb-2`} />
-                <span className="text-xs text-center text-gray-700 font-medium">{type.name}</span>
+                <span className="text-center font-medium">{type.name}</span>
               </button>
             );
           })}
@@ -204,7 +204,7 @@ const HealthAssessments = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -213,7 +213,7 @@ const HealthAssessments = () => {
               placeholder="Search assessments..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
             />
           </div>
           <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
@@ -224,16 +224,16 @@ const HealthAssessments = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-md p-2">
-        <div className="flex space-x-2">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               <span>{tab.label}</span>
@@ -253,22 +253,22 @@ const HealthAssessments = () => {
           {assessments.recent.map((assessment) => (
             <div
               key={assessment.id}
-              className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow max-w-md"
+              className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-shadow max-w-md"
             >
               <div className="flex flex-col mb-3">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h3 className="text-base font-bold text-gray-900">{assessment.patientName}</h3>
-                      <p className="text-xs text-gray-600">Patient ID: {assessment.patientId}</p>
+                      <h3 className="text-base font-bold">{assessment.patientName}</h3>
+                      <p className="text-xs">Patient ID: {assessment.patientId}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-gray-600">Assessment Date</p>
-                      <p className="text-xs font-semibold text-gray-900">{new Date(assessment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                      <p className="text-xs font-semibold">{new Date(assessment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 rounded p-2 mb-3">
+                  <div className="p-2 mb-3">
                     <p className="text-xs font-semibold text-blue-900">{assessment.type}</p>
                   </div>
 
@@ -367,7 +367,7 @@ const HealthAssessments = () => {
                     {assessment.metrics.bmi && (
                       <div className="bg-gray-50 rounded p-2">
                         <div className="flex items-center mb-1">
-                          <TrendingUp className="w-4 h-4 text-purple-600 mr-1" />
+                          <TrendingUp className="w-4 h-4 text-blue-600 mr-1" />
                           <span className="text-xs text-gray-600">BMI</span>
                         </div>
                         <p className={`text-sm font-bold ${getStatusColor(assessment.metrics.bmi.status)}`}>
@@ -439,31 +439,31 @@ const HealthAssessments = () => {
           {assessments.scheduled.map((assessment) => (
             <div
               key={assessment.id}
-              className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-yellow-500 hover:shadow-md transition-shadow max-w-md"
+              className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-shadow max-w-md"
             >
               <div className="flex flex-col">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h3 className="text-base font-bold text-gray-900">{assessment.patientName}</h3>
-                      <p className="text-xs text-gray-600">Patient ID: {assessment.patientId}</p>
+                      <h3 className="text-base font-bold">{assessment.patientName}</h3>
+                      <p className="text-xs">Patient ID: {assessment.patientId}</p>
                     </div>
                   </div>
 
-                  <div className="bg-yellow-50 rounded p-2 mb-3">
-                    <p className="text-xs font-semibold text-yellow-900">{assessment.type}</p>
+                  <div className="p-2 mb-3">
+                    <p className="text-xs font-semibold text-blue-900">{assessment.type}</p>
                   </div>
 
                   <div className="space-y-2 mb-3">
                     <div className="flex items-center text-gray-700 text-sm">
-                      <Calendar className="w-4 h-4 mr-2 text-yellow-600" />
+                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
                       <div>
                         <p className="font-medium">{new Date(assessment.scheduledDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                         <p className="text-xs text-gray-500">Scheduled Date</p>
                       </div>
                     </div>
                     <div className="flex items-center text-gray-700 text-sm">
-                      <Activity className="w-4 h-4 mr-2 text-yellow-600" />
+                      <Activity className="w-4 h-4 mr-2 text-blue-600" />
                       <div>
                         <p className="font-medium">{assessment.scheduledTime}</p>
                         <p className="text-xs text-gray-500">Scheduled Time</p>
@@ -478,7 +478,7 @@ const HealthAssessments = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors">
+                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
                       <Plus className="w-3 h-3" />
                       <span>Start</span>
                     </button>

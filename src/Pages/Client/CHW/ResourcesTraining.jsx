@@ -153,10 +153,10 @@ const ResourcesTraining = () => {
   ];
 
   const stats = [
-    { label: 'Courses Completed', value: '8', color: 'green', icon: CheckCircle },
+    { label: 'Courses Completed', value: '8', color: 'blue', icon: CheckCircle },
     { label: 'In Progress', value: '3', color: 'blue', icon: Clock },
-    { label: 'Certificates Earned', value: '5', color: 'purple', icon: Award },
-    { label: 'Learning Hours', value: '42', color: 'yellow', icon: TrendingUp }
+    { label: 'Certificates Earned', value: '5', color: 'blue', icon: Award },
+    { label: 'Learning Hours', value: '42', color: 'blue', icon: TrendingUp }
   ];
 
   const tabs = [
@@ -168,32 +168,32 @@ const ResourcesTraining = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-800';
       case 'in-progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-800';
       case 'not-started':
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-800';
     }
   };
 
   const getCategoryColor = (category) => {
     switch (category) {
       case 'Fundamentals':
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-800';
       case 'Specialized':
-        return 'bg-purple-100 text-purple-800';
+        return 'text-blue-800';
       case 'Guidelines':
-        return 'bg-green-100 text-green-800';
+        return 'text-blue-800';
       case 'Forms':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-blue-800';
       case 'Reference':
-        return 'bg-indigo-100 text-indigo-800';
+        return 'text-blue-800';
       case 'Training':
-        return 'bg-red-100 text-red-800';
+        return 'text-blue-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-blue-800';
     }
   };
 
@@ -202,8 +202,8 @@ const ResourcesTraining = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Resources & Training</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold">Resources & Training</h1>
+          <p className="mt-2">
             Access training materials and professional resources
           </p>
         </div>
@@ -226,7 +226,7 @@ const ResourcesTraining = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -246,16 +246,16 @@ const ResourcesTraining = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-md p-2">
-        <div className="flex space-x-2">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               <span>{tab.label}</span>
@@ -275,25 +275,25 @@ const ResourcesTraining = () => {
           {courses.map((course) => (
             <div
               key={course.id}
-              className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow max-w-md"
+              className="bg-white rounded-lg shadow-sm p-4 border-gray-200 hover:shadow-md transition-shadow max-w-md"
             >
               <div className="flex flex-col mb-3">
                 <div className="flex-1">
                   <div className="mb-2">
-                    <h3 className="text-base font-bold text-gray-900 mb-2">{course.title}</h3>
+                    <h3 className="font-bold mb-2">{course.title}</h3>
                     <div className="flex flex-wrap gap-1 mb-2">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(course.status)}`}>
+                      <span className={`px-2 py-0.5 rounded-full font-semibold ${getStatusColor(course.status)}`}>
                         {course.status.replace('-', ' ')}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(course.category)}`}>
+                      <span className={`px-2 py-0.5 rounded-full font-semibold ${getCategoryColor(course.category)}`}>
                         {course.category}
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-700 mb-3">{course.description}</p>
+                  <p className="mb-3">{course.description}</p>
 
                   <div className="space-y-1 mb-3">
-                    <div className="flex items-center text-gray-700 text-xs">
+                    <div className="flex items-center text-xs">
                       <Clock className="w-3 h-3 mr-1 text-blue-600" />
                       <span>{course.duration}</span>
                     </div>
@@ -305,11 +305,11 @@ const ResourcesTraining = () => {
                       <Users className="w-3 h-3 mr-1 text-blue-600" />
                       <span>{course.enrolled} enrolled</span>
                     </div>
-                    <div className="flex items-center text-gray-700 text-xs">
-                      <Star className="w-3 h-3 mr-1 text-yellow-500 fill-yellow-500" />
+                    <div className="flex items-center text-xs">
+                      <Star className="w-3 h-3 mr-1 text-blue-500 fill-blue-500" />
                       <span className="font-semibold">{course.rating}</span>
                     </div>
-                    <div className="text-gray-700 text-xs">
+                    <div className="">
                       <p>By {course.instructor}</p>
                     </div>
                   </div>
@@ -362,16 +362,16 @@ const ResourcesTraining = () => {
 
       {/* Resources */}
       {activeTab === 'resources' && (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="bg-white shadow-md">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Resource</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Category</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Type</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Size</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Downloads</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold">Resource</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold">Category</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold">Type</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold">Size</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold">Downloads</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -380,7 +380,7 @@ const ResourcesTraining = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
                       {resource.type === 'Video' ? (
-                        <Video className="w-8 h-8 text-purple-600" />
+                        <Video className="w-8 h-8 text-blue-600" />
                       ) : (
                         <FileText className="w-8 h-8 text-blue-600" />
                       )}
@@ -423,15 +423,15 @@ const ResourcesTraining = () => {
           {certifications.map((cert) => (
             <div
               key={cert.id}
-              className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500 max-w-md"
+              className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 max-w-md"
             >
               <div className="flex flex-col">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">
-                    <Award className="w-6 h-6 text-green-600" />
+                    <Award className="w-6 h-6 text-blue-600" />
                     <h3 className="text-base font-bold text-gray-900">{cert.title}</h3>
                   </div>
-                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-3">
+                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold text-blue-800 mb-3">
                     Active
                   </span>
 

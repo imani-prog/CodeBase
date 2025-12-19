@@ -14,6 +14,18 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
+import {
+  LineChart as RechartsLineChart,
+  Line,
+  BarChart as RechartsBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 const ReportsAnalytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
@@ -34,7 +46,7 @@ const ReportsAnalytics = () => {
       value: '87',
       change: '+18%',
       trend: 'up',
-      color: 'green',
+      color: 'blue',
       icon: CheckCircle
     },
     {
@@ -42,7 +54,7 @@ const ReportsAnalytics = () => {
       value: '2.3 hrs',
       change: '-15%',
       trend: 'down',
-      color: 'yellow',
+      color: 'blue',
       icon: Clock
     },
     {
@@ -50,7 +62,7 @@ const ReportsAnalytics = () => {
       value: '12',
       change: '-5%',
       trend: 'down',
-      color: 'red',
+      color: 'blue',
       icon: AlertCircle
     }
   ];
@@ -65,11 +77,11 @@ const ReportsAnalytics = () => {
   ];
 
   const patientCategories = [
-    { category: 'Hypertension', count: 45, percentage: 32, color: 'red' },
+    { category: 'Hypertension', count: 45, percentage: 32, color: 'blue' },
     { category: 'Diabetes', count: 38, percentage: 27, color: 'blue' },
-    { category: 'Prenatal Care', count: 28, percentage: 20, color: 'purple' },
-    { category: 'Nutrition Support', count: 18, percentage: 13, color: 'green' },
-    { category: 'Other', count: 13, percentage: 8, color: 'gray' }
+    { category: 'Prenatal Care', count: 28, percentage: 20, color: 'blue' },
+    { category: 'Nutrition Support', count: 18, percentage: 13, color: 'blue' },
+    { category: 'Other', count: 13, percentage: 8, color: 'blue' }
   ];
 
   const recentReports = [
@@ -124,15 +136,15 @@ const ReportsAnalytics = () => {
   const getTypeColor = (type) => {
     switch (type) {
       case 'Performance':
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-800';
       case 'Outcomes':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-800';
       case 'Activity':
-        return 'bg-purple-100 text-purple-800';
+        return 'text-purple-800';
       case 'Assessment':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-800';
     }
   };
 
@@ -141,8 +153,8 @@ const ReportsAnalytics = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold">Reports & Analytics</h1>
+          <p className="mt-2">
             Track performance and analyze patient care data
           </p>
         </div>
@@ -153,8 +165,8 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           <div className="flex items-center space-x-3">
             <span className="text-sm font-semibold text-gray-700">Period:</span>
             <div className="flex space-x-2">
@@ -162,10 +174,10 @@ const ReportsAnalytics = () => {
                 <button
                   key={period.id}
                   onClick={() => setSelectedPeriod(period.id)}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                     selectedPeriod === period.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
                   {period.label}
@@ -196,25 +208,25 @@ const ReportsAnalytics = () => {
                 </span>
               </div>
               <p className={`text-3xl font-bold text-${stat.color}-600 mb-1`}>{stat.value}</p>
-              <p className="text-sm text-gray-600">{stat.label}</p>
+              <p className="">{stat.label}</p>
             </div>
           );
         })}
       </div>
 
       {/* Report Type Tabs */}
-      <div className="bg-white rounded-xl shadow-md p-2">
-        <div className="flex space-x-2">
+      <div className="border-b border-gray-200">
+        <div className="flex space-x-8 overflow-x-auto">
           {reportTypes.map((type) => {
             const Icon = type.icon;
             return (
               <button
                 key={type.id}
                 onClick={() => setSelectedReportType(type.id)}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap  ${
                   selectedReportType === type.id
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -227,70 +239,102 @@ const ReportsAnalytics = () => {
 
       {/* Charts and Visualizations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Visit Trends Chart */}
-        <div className="bg-white rounded-xl shadow-md p-6">
+        {/* Visit Trends Chart - Line Chart */}
+        <div className="bg-white shadow-md p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Visit & Assessment Trends</h2>
             <LineChart className="w-6 h-6 text-blue-600" />
           </div>
-          <div className="space-y-4">
-            {visitStats.map((stat) => (
-              <div key={stat.month}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-gray-700">{stat.month}</span>
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm text-blue-600 font-semibold">{stat.visits} visits</span>
-                    <span className="text-sm text-purple-600 font-semibold">{stat.assessments} assessments</span>
-                  </div>
-                </div>
-                <div className="flex space-x-2">
-                  <div className="flex-1">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-blue-600 rounded-full"
-                        style={{ width: `${(stat.visits / 100) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-purple-600 rounded-full"
-                        style={{ width: `${(stat.assessments / 100) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <RechartsLineChart data={visitStats}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis 
+                dataKey="month" 
+                tick={{ fill: '#6b7280', fontSize: 12 }}
+                tickLine={{ stroke: '#e5e7eb' }}
+              />
+              <YAxis 
+                tick={{ fill: '#6b7280', fontSize: 12 }}
+                tickLine={{ stroke: '#e5e7eb' }}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#fff', 
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '12px'
+                }}
+              />
+              <Legend 
+                wrapperStyle={{ fontSize: '14px', paddingTop: '10px' }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="visits" 
+                stroke="#2563eb" 
+                strokeWidth={3}
+                dot={{ fill: '#2563eb', r: 5 }}
+                activeDot={{ r: 7 }}
+                name="Visits"
+              />
+              <Line 
+                type="monotone" 
+                dataKey="assessments" 
+                stroke="#9333ea" 
+                strokeWidth={3}
+                dot={{ fill: '#9333ea', r: 5 }}
+                activeDot={{ r: 7 }}
+                name="Assessments"
+              />
+            </RechartsLineChart>
+          </ResponsiveContainer>
         </div>
 
-        {/* Patient Categories Chart */}
-        <div className="bg-white rounded-xl shadow-md p-6">
+        {/* Patient Categories Chart - Bar Chart */}
+        <div className="bg-white shadow-md p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Patient Categories</h2>
             <PieChart className="w-6 h-6 text-blue-600" />
           </div>
-          <div className="space-y-4">
-            {patientCategories.map((category) => (
-              <div key={category.category}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-gray-700">{category.category}</span>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">{category.count} patients</span>
-                    <span className={`text-sm font-bold text-${category.color}-600`}>{category.percentage}%</span>
-                  </div>
-                </div>
-                <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full bg-${category.color}-600 rounded-full transition-all`}
-                    style={{ width: `${category.percentage}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <RechartsBarChart data={patientCategories} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis 
+                type="number" 
+                tick={{ fill: '#6b7280', fontSize: 12 }}
+                tickLine={{ stroke: '#e5e7eb' }}
+              />
+              <YAxis 
+                type="category" 
+                dataKey="category" 
+                tick={{ fill: '#6b7280', fontSize: 12 }}
+                tickLine={{ stroke: '#e5e7eb' }}
+                width={120}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#fff', 
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '12px'
+                }}
+                formatter={(value, name) => {
+                  if (name === 'count') return [`${value} patients`, 'Patients'];
+                  if (name === 'percentage') return [`${value}%`, 'Percentage'];
+                  return [value, name];
+                }}
+              />
+              <Legend 
+                wrapperStyle={{ fontSize: '14px', paddingTop: '10px' }}
+              />
+              <Bar 
+                dataKey="count" 
+                fill="#2563eb" 
+                radius={[0, 8, 8, 0]}
+                name="Patients"
+              />
+            </RechartsBarChart>
+          </ResponsiveContainer>
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-700">Total Active Patients</span>
@@ -301,56 +345,11 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* Performance Metrics */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Performance Metrics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-blue-900">Patient Satisfaction</span>
-              <Activity className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="flex items-end space-x-2">
-              <span className="text-3xl font-bold text-blue-600">4.8</span>
-              <span className="text-sm text-blue-600 mb-1">/5.0</span>
-            </div>
-            <div className="mt-3 h-2 bg-blue-200 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-600 rounded-full" style={{ width: '96%' }}></div>
-            </div>
-          </div>
-
-          <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-green-900">Follow-up Completion</span>
-              <CheckCircle className="w-5 h-5 text-green-600" />
-            </div>
-            <div className="flex items-end space-x-2">
-              <span className="text-3xl font-bold text-green-600">92</span>
-              <span className="text-sm text-green-600 mb-1">%</span>
-            </div>
-            <div className="mt-3 h-2 bg-green-200 rounded-full overflow-hidden">
-              <div className="h-full bg-green-600 rounded-full" style={{ width: '92%' }}></div>
-            </div>
-          </div>
-
-          <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-purple-900">Health Improvement</span>
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-            </div>
-            <div className="flex items-end space-x-2">
-              <span className="text-3xl font-bold text-purple-600">78</span>
-              <span className="text-sm text-purple-600 mb-1">%</span>
-            </div>
-            <div className="mt-3 h-2 bg-purple-200 rounded-full overflow-hidden">
-              <div className="h-full bg-purple-600 rounded-full" style={{ width: '78%' }}></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Recent Reports */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Reports</h2>
+      <div className="bg-white shadow-md p-6">
+        <h2 className="text-xl font-bold mb-6">Recent Reports</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {recentReports.map((report) => (
             <div
@@ -358,7 +357,7 @@ const ReportsAnalytics = () => {
               className="flex flex-col p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors max-w-md"
             >
               <div className="flex items-start space-x-3 mb-3">
-                <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                <div className="p-2 flex-shrink-0">
                   <FileText className="w-5 h-5 text-blue-600" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -385,15 +384,15 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* Generate New Report */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-md p-8 text-white">
+      <div className="shadow-md p-8">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold mb-2">Generate Custom Report</h2>
-            <p className="text-blue-100">
+            <p className="">
               Create detailed reports with custom date ranges and specific metrics
             </p>
           </div>
-          <button className="px-6 py-3 bg-white text-blue-600 hover:bg-blue-50 rounded-lg font-semibold transition-colors shadow-md">
+          <button className="px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-semibold transition-colors shadow-md">
             Create Report
           </button>
         </div>
