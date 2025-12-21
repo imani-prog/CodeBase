@@ -25,7 +25,7 @@ const PatientNavbar = () => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Sample patient data - replace with actual auth context
+  // Sample patient data
   const patient = {
     name: 'John Doe',
     email: 'john.doe@example.com',
