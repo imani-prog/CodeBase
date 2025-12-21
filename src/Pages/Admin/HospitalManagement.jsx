@@ -503,20 +503,20 @@ const HospitalManagement = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'ACTIVE': return 'bg-green-100 text-green-800';
-      case 'INACTIVE': return 'bg-gray-100 text-gray-800';
-      case 'SUSPENDED': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'ACTIVE': return 'text-green-800';
+      case 'INACTIVE': return 'text-gray-800';
+      case 'SUSPENDED': return 'text-red-800';
+      default: return 'text-gray-800';
     }
   };
 
   const getTypeColor = (type) => {
     switch (type) {
-      case 'PUBLIC': return 'bg-blue-100 text-blue-800';
-      case 'PRIVATE': return 'bg-purple-100 text-purple-800';
-      case 'FAITH_BASED': return 'bg-amber-100 text-amber-800';
-      case 'NGO': return 'bg-teal-100 text-teal-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'PUBLIC': return 'text-blue-800';
+      case 'PRIVATE': return 'text-purple-800';
+      case 'FAITH_BASED': return 'text-amber-800';
+      case 'NGO': return 'text-teal-800';
+      default: return 'text-gray-800';
     }
   };
 
@@ -531,18 +531,16 @@ const HospitalManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 mb-8">
+      <div className="mb-8">
         <div className="px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <Building2 className="w-8 h-8 text-white" />
-              </div>
+              
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Hospital Management</h1>
-                <p className="text-gray-600 mt-1">Manage healthcare facilities and hospital information</p>
+                <h1 className="text-3xl font-bold">Hospital Management</h1>
+                <p className="mt-1">Manage healthcare facilities and hospital information</p>
               </div>
             </div>
             <button 
@@ -559,7 +557,7 @@ const HospitalManagement = () => {
       <div className="px-8">
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Hospitals</p>
@@ -569,7 +567,7 @@ const HospitalManagement = () => {
                   {stats.active} Active
                 </p>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-blue-100 flex items-center justify-center">
+              <div className="h-14 w-14 rounded-xl flex items-center justify-center">
                 <Building2 className="w-7 h-7 text-blue-600" />
               </div>
             </div>
