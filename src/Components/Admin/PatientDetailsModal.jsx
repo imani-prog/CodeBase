@@ -76,6 +76,7 @@ const PatientDetailsModal = ({ patient, isOpen, onClose }) => {
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="relative bg-white shadow-2xl transform transition-all max-w-4xl w-full overflow-hidden">
+          
           {/* Header */}
           <div className="relative px-8 py-8">
             <button

@@ -36,6 +36,7 @@ import {
   Syringe,
   Ambulance
 } from 'lucide-react';
+import HospitalFormModal from '../../Components/Admin/EditHospitalModal';
 
 const HospitalManagement = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -513,10 +514,10 @@ const HospitalManagement = () => {
   const getTypeColor = (type) => {
     switch (type) {
       case 'PUBLIC': return 'text-blue-800';
-      case 'PRIVATE': return 'text-purple-800';
-      case 'FAITH_BASED': return 'text-amber-800';
-      case 'NGO': return 'text-teal-800';
-      default: return 'text-gray-800';
+      case 'PRIVATE': return 'text-blue-800';
+      case 'FAITH_BASED': return 'text-blue-800';
+      case 'NGO': return 'text-tblue-800';
+      default: return 'text-blue-800';
     }
   };
 
@@ -534,8 +535,8 @@ const HospitalManagement = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="mb-8">
-        <div className="px-8 py-6">
-          <div className="flex items-center justify-between">
+        <div className="">
+          <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-4">
               
               <div>
@@ -554,14 +555,16 @@ const HospitalManagement = () => {
         </div>
       </div>
 
-      <div className="px-8">
+      <div className="">
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+
+
           <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Total Hospitals</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-sm mb-1">Total Hospitals</p>
+                <p className="text-3xl font-bold ">{stats.total}</p>
                 <p className="text-sm text-green-600 mt-2 flex items-center">
                   <TrendingUp className="w-4 h-4 mr-1" />
                   {stats.active} Active
@@ -573,57 +576,57 @@ const HospitalManagement = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Total Beds</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.totalBeds.toLocaleString()}</p>
-                <p className="text-sm text-gray-500 mt-2">Across all facilities</p>
+                <p className="text-sm mb-1">Total Beds</p>
+                <p className="text-3xl font-bold ">{stats.totalBeds.toLocaleString()}</p>
+                <p className="text-sm mt-2">Across all facilities</p>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-green-100 flex items-center justify-center">
-                <Bed className="w-7 h-7 text-green-600" />
+              <div className="h-14 w-14 flex items-center justify-center">
+                <Bed className="w-7 h-7 text-blue-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Ambulances</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.totalAmbulances}</p>
-                <p className="text-sm text-gray-500 mt-2">Fleet vehicles</p>
+                <p className="text-sm mb-1">Ambulances</p>
+                <p className="text-3xl font-bold ">{stats.totalAmbulances}</p>
+                <p className="text-sm mt-2">Fleet vehicles</p>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-red-100 flex items-center justify-center">
-                <Truck className="w-7 h-7 text-red-600" />
+              <div className="h-14 w-14  flex items-center justify-center">
+                <Truck className="w-7 h-7 text-blue-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Hospital Types</p>
+                <p className="text-sm mb-1">Hospital Types</p>
                 <div className="flex items-center space-x-2 mt-2">
                   <span className="text-sm font-medium text-blue-600">{stats.public} Public</span>
                   <span className="text-gray-300">•</span>
-                  <span className="text-sm font-medium text-purple-600">{stats.private} Private</span>
+                  <span className="text-sm font-medium text-blue-600">{stats.private} Private</span>
                 </div>
                 <div className="flex items-center space-x-2 mt-1">
-                  <span className="text-sm font-medium text-amber-600">{stats.faithBased} Faith</span>
+                  <span className="text-sm font-medium text-blue-600">{stats.faithBased} Faith</span>
                   <span className="text-gray-300">•</span>
-                  <span className="text-sm font-medium text-teal-600">{stats.ngo} NGO</span>
+                  <span className="text-sm font-medium text-blue-600">{stats.ngo} NGO</span>
                 </div>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Target className="w-7 h-7 text-purple-600" />
+              <div className="h-14 w-14  flex items-center justify-center">
+                <Target className="w-7 h-7 text-blue-600" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+        <div className="p-4 mb-6">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -631,7 +634,7 @@ const HospitalManagement = () => {
                 placeholder="Search by hospital name, code, or city..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
               />
             </div>
 
@@ -641,7 +644,7 @@ const HospitalManagement = () => {
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
                 >
                   <option value="all">All Types</option>
                   {hospitalTypes.map(type => (
@@ -653,7 +656,7 @@ const HospitalManagement = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2  focus:border-transparent"
               >
                 <option value="all">All Status</option>
                 {hospitalStatuses.map(status => (
@@ -673,30 +676,30 @@ const HospitalManagement = () => {
         </div>
 
         {/* Hospitals Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
                     Hospital
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
                     Type
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
                     Location
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
                     Capacity
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
                     Contact
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right font-bold  uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -706,21 +709,21 @@ const HospitalManagement = () => {
                   <tr key={hospital.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
-                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                        {/* <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                           <Building2 className="w-6 h-6 text-white" />
-                        </div>
+                        </div> */}
                         <div>
-                          <p className="font-semibold text-gray-900">{hospital.name}</p>
+                          <p className="font-semibold ">{hospital.name}</p>
                           <p className="text-sm text-gray-500">{hospital.code}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-3">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(hospital.type)}`}>
                         {hospital.type.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-3">
                       <div className="flex items-start space-x-2">
                         <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                         <div>
@@ -729,7 +732,7 @@ const HospitalManagement = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-3">
                       <div className="space-y-1">
                         <div className="flex items-center space-x-2">
                           <Bed className="w-4 h-4 text-gray-400" />
@@ -741,7 +744,7 @@ const HospitalManagement = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-3">
                       <div className="space-y-1">
                         <div className="flex items-center space-x-2">
                           <Phone className="w-4 h-4 text-gray-400" />
@@ -753,7 +756,7 @@ const HospitalManagement = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-3">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(hospital.status)}`}>
                         {hospital.status === 'ACTIVE' && <CheckCircle className="w-3 h-3 mr-1" />}
                         {hospital.status === 'INACTIVE' && <XCircle className="w-3 h-3 mr-1" />}
@@ -761,7 +764,7 @@ const HospitalManagement = () => {
                         {hospital.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-3">
                       <div className="flex items-center justify-end space-x-2">
                         <button 
                           onClick={() => handleViewHospital(hospital)}
@@ -772,7 +775,7 @@ const HospitalManagement = () => {
                         </button>
                         <button 
                           onClick={() => handleEditHospital(hospital)}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Edit"
                         >
                           <Edit className="w-5 h-5" />
@@ -794,24 +797,25 @@ const HospitalManagement = () => {
 
         {/* View Modal */}
         {showViewModal && selectedHospital && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="flex items-center justify-center z-50 p-4 fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity">
+            <div className="relative bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                    {/* <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                       <Building2 className="w-7 h-7 text-white" />
-                    </div>
+                    </div> */}
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">{selectedHospital.name}</h2>
-                      <p className="text-sm text-gray-500 mt-1">{selectedHospital.code}</p>
+                      <h2 className="text-2xl font-bold">{selectedHospital.name}</h2>
+                      <p className="text-sm mt-1">{selectedHospital.code}</p>
                     </div>
                   </div>
                   <button 
                     onClick={() => setShowViewModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="font-bold hover:text-red-600 cursor-pointer transition-colors "
                   >
-                    <XCircle className="w-6 h-6" />
+                    <XCircle className="w-8 h-8" />
                   </button>
                 </div>
               </div>
@@ -819,64 +823,64 @@ const HospitalManagement = () => {
               <div className="p-6 space-y-6">
                 {/* Basic Info */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                  <h3 className="text-lg font-semibold  mb-4">Basic Information</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-gray-500">Type</p>
+                      <p className="font-bold">Type</p>
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(selectedHospital.type)} mt-1`}>
                         {selectedHospital.type.replace('_', ' ')}
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Status</p>
+                      <p className="font-bold">Status</p>
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedHospital.status)} mt-1`}>
                         {selectedHospital.status}
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Registration Number</p>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedHospital.registrationNumber}</p>
+                      <p className="font-bold">Registration Number</p>
+                      <p className="text-sm font-medium mt-1">{selectedHospital.registrationNumber}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Tax ID</p>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedHospital.taxId}</p>
+                      <p className="font-bold">Tax ID</p>
+                      <p className="text-sm font-medium mt-1">{selectedHospital.taxId}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Contact Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
+                  <h3 className="text-lg font-semibold  mb-4">Contact Information</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center space-x-3">
-                      <Phone className="w-5 h-5 text-gray-400" />
+                      <Phone className="w-5 h-5 " />
                       <div>
-                        <p className="text-sm text-gray-500">Phone</p>
-                        <p className="text-sm font-medium text-gray-900">{selectedHospital.phone}</p>
+                        <p className="font-bold">Phone</p>
+                        <p className="text-sm font-medium mt-1">{selectedHospital.phone}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <Mail className="w-5 h-5 text-gray-400" />
+                      <Mail className="w-5 h-5 " />
                       <div>
-                        <p className="text-sm text-gray-500">Email</p>
-                        <p className="text-sm font-medium text-gray-900">{selectedHospital.email}</p>
+                        <p className="font-bold">Email</p>
+                        <p className="text-sm font-medium mt-1">{selectedHospital.email}</p>
                       </div>
                     </div>
                     {selectedHospital.website && (
                       <div className="flex items-center space-x-3">
-                        <Globe className="w-5 h-5 text-gray-400" />
+                        <Globe className="w-5 h-5 " />
                         <div>
-                          <p className="text-sm text-gray-500">Website</p>
+                          <p className="font-bold">Website</p>
                           <p className="text-sm font-medium text-blue-600">{selectedHospital.website}</p>
                         </div>
                       </div>
                     )}
                     {selectedHospital.fax && (
                       <div className="flex items-center space-x-3">
-                        <Phone className="w-5 h-5 text-gray-400" />
+                        <Phone className="w-5 h-5 " />
                         <div>
-                          <p className="text-sm text-gray-500">Fax</p>
-                          <p className="text-sm font-medium text-gray-900">{selectedHospital.fax}</p>
+                          <p className="font-bold">Fax</p>
+                          <p className="text-sm font-medium mt-1">{selectedHospital.fax}</p>
                         </div>
                       </div>
                     )}
@@ -885,19 +889,19 @@ const HospitalManagement = () => {
 
                 {/* Address */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Address</h3>
+                  <h3 className="text-lg font-semibold  mb-4">Address</h3>
                   <div className="flex items-start space-x-3">
-                    <MapPin className="w-5 h-5 text-gray-400 mt-1" />
+                    <MapPin className="w-5 h-5 mt-1" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{selectedHospital.addressLine1}</p>
+                      <p className="text-sm font-medium ">{selectedHospital.addressLine1}</p>
                       {selectedHospital.addressLine2 && (
-                        <p className="text-sm text-gray-600">{selectedHospital.addressLine2}</p>
+                        <p className="text-sm ">{selectedHospital.addressLine2}</p>
                       )}
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm ">
                         {selectedHospital.city}, {selectedHospital.state} {selectedHospital.postalCode}
                       </p>
-                      <p className="text-sm text-gray-600">{selectedHospital.country}</p>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-sm ">{selectedHospital.country}</p>
+                      <p className="text-xs mt-2">
                         Coordinates: {selectedHospital.latitude}, {selectedHospital.longitude}
                       </p>
                     </div>
@@ -906,20 +910,20 @@ const HospitalManagement = () => {
 
                 {/* Capacity */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Capacity</h3>
+                  <h3 className="text-lg font-semibold  mb-4">Capacity</h3>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-blue-50 rounded-xl p-4">
+                    <div className="border border-gray-200 shadow-md p-4">
                       <Bed className="w-8 h-8 text-blue-600 mb-2" />
                       <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfBeds}</p>
                       <p className="text-sm text-gray-600">Total Beds</p>
                     </div>
-                    <div className="bg-red-50 rounded-xl p-4">
-                      <Heart className="w-8 h-8 text-red-600 mb-2" />
+                    <div className="border border-gray-200 shadow-md p-4">
+                      <Heart className="w-8 h-8 text-blue-600 mb-2" />
                       <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfICUBeds}</p>
                       <p className="text-sm text-gray-600">ICU Beds</p>
                     </div>
-                    <div className="bg-green-50 rounded-xl p-4">
-                      <Truck className="w-8 h-8 text-green-600 mb-2" />
+                    <div className="border border-gray-200 shadow-md p-4">
+                      <Truck className="w-8 h-8 text-blue-600 mb-2" />
                       <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfAmbulances}</p>
                       <p className="text-sm text-gray-600">Ambulances</p>
                     </div>
@@ -928,10 +932,10 @@ const HospitalManagement = () => {
 
                 {/* Services Offered */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Services Offered</h3>
+                  <h3 className="text-lg font-semibold  mb-4">Services Offered</h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedHospital.servicesOffered.map((service, index) => (
-                      <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                      <span key={index} className="px-3 py-1  border border-blue-200 text-blue-800 rounded-full font-medium">
                         {service}
                       </span>
                     ))}
@@ -940,11 +944,11 @@ const HospitalManagement = () => {
 
                 {/* Facilities */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Facilities Available</h3>
+                  <h3 className="text-lg font-semibold  mb-4">Facilities Available</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {selectedHospital.facilities.map((facility, index) => (
                       <div key={index} className="flex items-center space-x-2 text-sm text-gray-700">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <CheckCircle className="w-4 h-4 text-blue-600" />
                         <span>{facility}</span>
                       </div>
                     ))}
@@ -956,7 +960,7 @@ const HospitalManagement = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Insurance Providers Accepted</h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedHospital.insuranceProvidersAccepted.map((provider, index) => (
-                      <span key={index} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium flex items-center space-x-1">
+                      <span key={index} className="px-3 py-1 border border-blue-200 text-blue-800 rounded-full font-medium flex items-center space-x-1">
                         <Shield className="w-3 h-3" />
                         <span>{provider}</span>
                       </span>
@@ -986,25 +990,23 @@ const HospitalManagement = () => {
           </div>
         )}
 
-        {/* Add/Edit Modal Placeholder */}
+        {/* Add/Edit Modal */}
         {(showAddModal || showEditModal) && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-2xl w-full p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {showAddModal ? 'Add New Hospital' : 'Edit Hospital'}
-              </h2>
-              <p className="text-gray-600 mb-6">Form implementation pending - backend integration required</p>
-              <button 
-                onClick={() => {
-                  setShowAddModal(false);
-                  setShowEditModal(false);
-                }}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          <HospitalFormModal
+            hospital={showEditModal ? selectedHospital : null}
+            isOpen={showAddModal || showEditModal}
+            onClose={() => {
+              setShowAddModal(false);
+              setShowEditModal(false);
+              setSelectedHospital(null);
+            }}
+            onSave={(hospitalData) => {
+              // Here you would make API call to save/update hospital
+              console.log('Saving hospital:', hospitalData);
+              // Modal will handle success notification and closing
+            }}
+            facilityTypes={facilityTypes}
+          />
         )}
       </div>
     </div>

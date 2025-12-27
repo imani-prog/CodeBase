@@ -110,7 +110,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links - Enhanced */}
+          {/* Quick Links */}
           <div>
             <h4 className="font-bold text-lg mb-6 text-white flex items-center gap-2">
               <div className="w-1 h-6 bg-blue-400  rounded-full"></div>
@@ -153,7 +153,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Contact Info - Enhanced */}
+          {/* Contact Info */}
           <div>
             <h4 className="font-bold text-lg mb-6 text-white flex items-center gap-2">
               <div className="w-1 h-6 bg-gradient-to-b from-green-400 to-blue-500 rounded-full"></div>
