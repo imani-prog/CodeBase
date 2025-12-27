@@ -47,16 +47,16 @@ const SystemLogs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // Event types matching backend enum
+  // Event types 
   const eventTypes = ['LOGIN', 'LOGOUT', 'READ', 'CREATE', 'UPDATE', 'DELETE', 'EXPORT', 'INTEGRATION'];
   
   // Entity types that can be audited
   const entityTypes = ['PATIENT', 'CHW', 'HOSPITAL', 'APPOINTMENT', 'INSURANCE_CLAIM', 'USER', 'REPORT', 'AMBULANCE_DISPATCH'];
   
-  // Status types matching backend enum
+  // Status types 
   const statusTypes = ['SUCCESS', 'FAILURE'];
 
-  // Comprehensive audit logs matching backend structure
+  // Comprehensive audit logs
   const auditLogs = [
     {
       id: 1,
@@ -484,31 +484,31 @@ const SystemLogs = () => {
     uniqueUsers: new Set(auditLogs.map(l => l.userId).filter(Boolean)).size
   };
 
-  const getEventIcon = (eventType) => {
-    switch (eventType) {
-      case 'LOGIN': return <LogIn className="w-5 h-5 text-blue-600" />;
-      case 'LOGOUT': return <LogOut className="w-5 h-5 text-gray-600" />;
-      case 'CREATE': return <Plus className="w-5 h-5 text-green-600" />;
-      case 'UPDATE': return <Edit className="w-5 h-5 text-yellow-600" />;
-      case 'DELETE': return <Trash2 className="w-5 h-5 text-red-600" />;
-      case 'READ': return <Eye className="w-5 h-5 text-blue-500" />;
-      case 'EXPORT': return <Download className="w-5 h-5 text-purple-600" />;
-      case 'INTEGRATION': return <Link className="w-5 h-5 text-indigo-600" />;
-      default: return <Activity className="w-5 h-5 text-gray-500" />;
-    }
-  };
+  // const getEventIcon = (eventType) => {
+  //   switch (eventType) {
+  //     case 'LOGIN': return <LogIn className="w-5 h-5 text-blue-600" />;
+  //     case 'LOGOUT': return <LogOut className="w-5 h-5 text-gray-600" />;
+  //     case 'CREATE': return <Plus className="w-5 h-5 text-green-600" />;
+  //     case 'UPDATE': return <Edit className="w-5 h-5 text-blue-600" />;
+  //     case 'DELETE': return <Trash2 className="w-5 h-5 text-red-600" />;
+  //     case 'READ': return <Eye className="w-5 h-5 text-blue-500" />;
+  //     case 'EXPORT': return <Download className="w-5 h-5 text-blue-600" />;
+  //     case 'INTEGRATION': return <Link className="w-5 h-5 text-blue-600" />;
+  //     default: return <Activity className="w-5 h-5 text-gray-500" />;
+  //   }
+  // };
 
   const getStatusBadge = (status) => {
     if (status === 'SUCCESS') {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-green-800">
           <CheckCircle className="w-3 h-3 mr-1" />
           Success
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-red-800">
         <XCircle className="w-3 h-3 mr-1" />
         Failure
       </span>
@@ -535,12 +535,12 @@ const SystemLogs = () => {
 
   const refreshLogs = () => {
     console.log('Refreshing audit logs...');
-    // Here you would call your API to refresh logs
+    
   };
 
   const exportLogs = () => {
     console.log('Exporting audit logs...');
-    // Here you would call your API to export logs
+    
   };
 
   useEffect(() => {
@@ -550,73 +550,72 @@ const SystemLogs = () => {
   }, [autoRefresh, refreshInterval]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 mb-8">
-        <div className="px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center shadow-lg">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
+      <div className="mb-8">
+        <div className="">
+          <div className="flex justify-between items-center mb-4">
+            <div className="">
+             
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
-                <p className="text-gray-600 mt-1">Comprehensive system audit trail and activity monitoring</p>
+                <h1 className="text-3xl font-bold">Audit Logs</h1>
+                <p className="mt-1">Comprehensive system audit trail and activity monitoring</p>
               </div>
             </div>
           </div>
 
           {/* Statistics */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-6">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
+            <div className="border border-gray-200 shadow-md p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <Activity className="w-5 h-5 text-blue-600" />
-                <span className="text-xs font-medium text-blue-600">Total Events</span>
+                <span className="font-medium">Total Events</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-2xl font-bold">{stats.total}</p>
             </div>
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4">
+
+            <div className="border border-gray-200 shadow-md p-4">
               <div className="flex items-center space-x-2 mb-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-xs font-medium text-green-600">Success</span>
+                <CheckCircle className="w-5 h-5 text-blue-600" />
+                <span className="font-medium">Success</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stats.success}</p>
+              <p className="text-2xl font-bold">{stats.success}</p>
             </div>
-            <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4">
+            <div className="border border-gray-200 shadow-md p-4">
               <div className="flex items-center space-x-2 mb-2">
-                <XCircle className="w-5 h-5 text-red-600" />
-                <span className="text-xs font-medium text-red-600">Failures</span>
+                <XCircle className="w-5 h-5 text-blue-600" />
+                <span className="font-medium">Failures</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stats.failure}</p>
+              <p className="text-2xl font-bold">{stats.failure}</p>
             </div>
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+            <div className="border border-gray-200 shadow-md p-4">
               <div className="flex items-center space-x-2 mb-2">
-                <LogIn className="w-5 h-5 text-purple-600" />
-                <span className="text-xs font-medium text-purple-600">Logins</span>
+                <LogIn className="w-5 h-5 text-blue-600" />
+                <span className="font-medium">Logins</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stats.loginAttempts}</p>
+              <p className="text-2xl font-bold">{stats.loginAttempts}</p>
             </div>
-            <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4">
+            <div className="border border-gray-200 shadow-md p-4">
               <div className="flex items-center space-x-2 mb-2">
-                <Download className="w-5 h-5 text-indigo-600" />
-                <span className="text-xs font-medium text-indigo-600">Exports</span>
+                <Download className="w-5 h-5 text-blue-600" />
+                <span className="font-medium">Exports</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stats.dataExports}</p>
+              <p className="text-2xl font-bold">{stats.dataExports}</p>
             </div>
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4">
+            <div className="border border-gray-200 shadow-md p-4">
               <div className="flex items-center space-x-2 mb-2">
-                <User className="w-5 h-5 text-amber-600" />
-                <span className="text-xs font-medium text-amber-600">Active Users</span>
+                <User className="w-5 h-5 text-blue-600" />
+                <span className="font-medium">Active Users</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stats.uniqueUsers}</p>
+              <p className="text-2xl font-bold">{stats.uniqueUsers}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="px-8">
+      <div className="">
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <div className=" p-6 mb-8">
           <div className="flex flex-col space-y-4">
             {/* Search */}
             <div className="relative flex-1">
@@ -626,7 +625,7 @@ const SystemLogs = () => {
                 placeholder="Search by user, event type, entity, IP address, or failure reason..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 "
               />
             </div>
 
@@ -637,7 +636,7 @@ const SystemLogs = () => {
                 <select
                   value={selectedEventType}
                   onChange={(e) => setSelectedEventType(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
                 >
                   <option value="all">All Events ({auditLogs.length})</option>
                   {eventTypes.map(type => (
@@ -651,7 +650,7 @@ const SystemLogs = () => {
               <select
                 value={selectedEntityType}
                 onChange={(e) => setSelectedEntityType(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
               >
                 <option value="all">All Entities</option>
                 {entityTypes.map(type => (
@@ -664,7 +663,7 @@ const SystemLogs = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
               >
                 <option value="all">All Status</option>
                 {statusTypes.map(status => (
@@ -712,51 +711,51 @@ const SystemLogs = () => {
         </div>
 
         {/* Audit Logs Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     Event
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     Timestamp
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     User
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     Entity
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     IP Address
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     Session
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 bg-white">
                 {paginatedLogs.map(log => (
                   <tr key={log.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
-                        {getEventIcon(log.eventType)}
+                        {/* {getEventIcon(log.eventType)} */}
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{log.eventType}</p>
+                          <p className="text-sm font-bold">{log.eventType}</p>
                           <p className="text-xs text-gray-500">{log.userRole}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2 text-sm text-gray-900">
+                      <div className="flex items-center space-x-2 text-sm">
                         <Calendar className="w-4 h-4 text-gray-400" />
                         <span>{formatDateTime(log.performedAt)}</span>
                       </div>
@@ -765,25 +764,25 @@ const SystemLogs = () => {
                       <div className="flex items-center space-x-2">
                         <User className="w-4 h-4 text-gray-400" />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{log.userName}</p>
+                          <p className="text-sm font-bold">{log.userName}</p>
                           <p className="text-xs text-gray-500">ID: {log.userId}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{log.entityType}</p>
+                        <p className="text-sm font-bold">{log.entityType}</p>
                         <p className="text-xs text-gray-500">ID: {log.entityId}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2 text-sm text-gray-700">
+                      <div className="flex items-center space-x-2 text-sm font-semibold">
                         <Globe className="w-4 h-4 text-gray-400" />
                         <span>{log.ipAddress}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2 text-xs text-gray-600 font-mono">
+                      <div className="flex items-center space-x-2 text-sm font-bold">
                         <Hash className="w-4 h-4 text-gray-400" />
                         <span className="truncate max-w-[100px]" title={log.sessionId}>
                           {log.sessionId}
@@ -830,7 +829,7 @@ const SystemLogs = () => {
 
         {/* Pagination */}
         {filteredLogs.length > 0 && (
-          <div className="mt-6 flex items-center justify-between bg-white rounded-xl shadow-sm border border-gray-200 px-6 py-4">
+          <div className="mt-6 flex items-center justify-between  shadow-sm border border-gray-200 px-6 py-4">
             <div className="text-sm text-gray-600">
               Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
               <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredLogs.length)}</span> of{' '}
@@ -885,19 +884,19 @@ const SystemLogs = () => {
         {/* Detail Modal */}
         {showDetailsModal && selectedLog && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               {/* Modal Header */}
-              <div className="sticky top-0 bg-gradient-to-r from-gray-700 to-gray-900 text-white px-8 py-6 flex items-center justify-between rounded-t-2xl">
+              <div className="top-0 px-8 py-6 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  {getEventIcon(selectedLog.eventType)}
+                  {/* {getEventIcon(selectedLog.eventType)} */}
                   <div>
                     <h2 className="text-2xl font-bold">{selectedLog.eventType} Event</h2>
-                    <p className="text-gray-300 text-sm mt-1">Audit Log Details - ID: {selectedLog.id}</p>
+                    <p className="text-sm mt-1">Audit Log Details - ID: {selectedLog.id}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowDetailsModal(false)}
-                  className="text-white hover:text-gray-300 transition-colors"
+                  className=" font-bold hover:text-red-600 cursor-pointer"
                 >
                   <XCircle className="w-8 h-8" />
                 </button>
@@ -906,10 +905,10 @@ const SystemLogs = () => {
               {/* Modal Content */}
               <div className="p-8">
                 {/* Status Banner */}
-                <div className={`rounded-xl p-4 mb-6 ${
+                <div className={`p-4 mb-6 ${
                   selectedLog.status === 'SUCCESS' 
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'bg-red-50 border border-red-200'
+                    ? 'border-green-200' 
+                    : 'border border-red-200'
                 }`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -920,7 +919,7 @@ const SystemLogs = () => {
                         {selectedLog.status === 'SUCCESS' ? 'Operation Successful' : 'Operation Failed'}
                       </span>
                     </div>
-                    <span className="text-sm text-gray-600">
+                    <span className="">
                       {formatDateTime(selectedLog.performedAt)}
                     </span>
                   </div>
@@ -935,19 +934,19 @@ const SystemLogs = () => {
                 {/* Information Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   {/* User Information */}
-                  <div className="bg-blue-50 rounded-xl p-5 border border-blue-100">
-                    <h3 className="text-sm font-semibold text-blue-900 mb-4 flex items-center">
+                  <div className=" p-5 border border-gray-200 shadow-md">
+                    <h3 className="text-sm font-semibold mb-4 flex items-center">
                       <User className="w-4 h-4 mr-2" />
                       User Information
                     </h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs text-blue-600 font-medium">User Name</p>
-                        <p className="text-sm text-gray-900 font-medium">{selectedLog.userName}</p>
+                        <p className="text-xs font-medium">User Name</p>
+                        <p className="text-sm  font-bold">{selectedLog.userName}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-blue-600 font-medium">User ID</p>
-                        <p className="text-sm text-gray-700">{selectedLog.userId}</p>
+                        <p className="text-xs font-medium">User ID</p>
+                        <p className="text-sm">{selectedLog.userId}</p>
                       </div>
                       <div>
                         <p className="text-xs text-blue-600 font-medium">Role</p>
@@ -959,54 +958,54 @@ const SystemLogs = () => {
                   </div>
 
                   {/* Entity Information */}
-                  <div className="bg-purple-50 rounded-xl p-5 border border-purple-100">
-                    <h3 className="text-sm font-semibold text-purple-900 mb-4 flex items-center">
+                  <div className="p-5 border border-gray-200 shadow-md">
+                    <h3 className="text-sm font-semibold mb-4 flex items-center">
                       <FileText className="w-4 h-4 mr-2" />
                       Entity Information
                     </h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs text-purple-600 font-medium">Entity Type</p>
-                        <p className="text-sm text-gray-900 font-medium">{selectedLog.entityType}</p>
+                        <p className="text-xs font-medium">Entity Type</p>
+                        <p className="text-sm font-bold">{selectedLog.entityType}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-purple-600 font-medium">Entity ID</p>
-                        <p className="text-sm text-gray-700">{selectedLog.entityId}</p>
+                        <p className="text-xs  font-medium">Entity ID</p>
+                        <p className="text-sm font-bold">{selectedLog.entityId}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Network Information */}
-                  <div className="bg-green-50 rounded-xl p-5 border border-green-100">
-                    <h3 className="text-sm font-semibold text-green-900 mb-4 flex items-center">
+                  <div className=" p-5 border border-gray-200 shadow-md">
+                    <h3 className="text-sm font-semibold mb-4 flex items-center">
                       <Globe className="w-4 h-4 mr-2" />
                       Network Information
                     </h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs text-green-600 font-medium">IP Address</p>
-                        <p className="text-sm text-gray-900 font-mono">{selectedLog.ipAddress}</p>
+                        <p className="text-xs font-medium">IP Address</p>
+                        <p className="text-sm font-mono">{selectedLog.ipAddress}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-green-600 font-medium">Session ID</p>
-                        <p className="text-sm text-gray-700 font-mono truncate">{selectedLog.sessionId}</p>
+                        <p className="text-xs font-medium">Session ID</p>
+                        <p className="text-sm font-mono truncate">{selectedLog.sessionId}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-green-600 font-medium">Correlation ID</p>
-                        <p className="text-sm text-gray-700 font-mono truncate">{selectedLog.correlationId}</p>
+                        <p className="text-xs font-medium">Correlation ID</p>
+                        <p className="text-sm font-mono truncate">{selectedLog.correlationId}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Device Information */}
-                  <div className="bg-amber-50 rounded-xl p-5 border border-amber-100">
-                    <h3 className="text-sm font-semibold text-amber-900 mb-4 flex items-center">
+                  <div className="p-5 border border-gray-200 shadow-md">
+                    <h3 className="text-sm font-semibold mb-4 flex items-center">
                       <Smartphone className="w-4 h-4 mr-2" />
                       Device Information
                     </h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs text-amber-600 font-medium">User Agent</p>
+                        <p className="text-xs font-medium">User Agent</p>
                         <p className="text-sm text-gray-700 break-words">{selectedLog.userAgent}</p>
                       </div>
                     </div>
@@ -1015,7 +1014,7 @@ const SystemLogs = () => {
 
                 {/* Event Details */}
                 {selectedLog.details && (
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="bg-gray-50 p-5 border border-gray-200">
                     <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center">
                       <FileText className="w-4 h-4 mr-2" />
                       Event Details
