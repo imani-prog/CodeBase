@@ -1001,9 +1001,9 @@ const HospitalManagement = () => {
               setSelectedHospital(null);
             }}
             onSave={(hospitalData) => {
-              // Here you would make API call to save/update hospital
+              
               console.log('Saving hospital:', hospitalData);
-              // Modal will handle success notification and closing
+             
             }}
             facilityTypes={facilityTypes}
           />

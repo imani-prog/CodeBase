@@ -40,10 +40,10 @@ const CHWAssignments = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
 
-  // Assignment statuses matching backend enum
+  
   const assignmentStatuses = ['ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELED'];
 
-  // Sample CHWs data (would come from backend)
+  // Sample CHWs data
   const chws = [
     {
       id: 1,
@@ -80,7 +80,7 @@ const CHWAssignments = () => {
     }
   ];
 
-  // Sample patients data (would come from backend)
+  // Sample patients data
   const patients = [
     {
       id: 1,
@@ -108,7 +108,7 @@ const CHWAssignments = () => {
     }
   ];
 
-  // Sample assignments matching backend CommunityHealthWorkerAssignment entity
+  // Sample assignments
   const assignments = [
     {
       id: 1,
@@ -264,11 +264,11 @@ const CHWAssignments = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'ASSIGNED': return 'bg-blue-100 text-blue-800';
-      case 'IN_PROGRESS': return 'bg-green-100 text-green-800';
-      case 'COMPLETED': return 'bg-gray-100 text-gray-800';
-      case 'CANCELED': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'ASSIGNED': return 'text-blue-800';
+      case 'IN_PROGRESS': return 'text-green-800';
+      case 'COMPLETED': return 'text-gray-800';
+      case 'CANCELED': return 'text-red-800';
+      default: return 'text-gray-800';
     }
   };
 
@@ -284,11 +284,11 @@ const CHWAssignments = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'CRITICAL': return 'bg-red-100 text-red-800';
-      case 'HIGH': return 'bg-orange-100 text-orange-800';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
-      case 'LOW': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'CRITICAL': return 'text-red-800';
+      case 'HIGH': return 'text-orange-800';
+      case 'MEDIUM': return 'text-yellow-800';
+      case 'LOW': return 'text-green-800';
+      default: return 'text-gray-800';
     }
   };
 
@@ -309,95 +309,99 @@ const CHWAssignments = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 mb-8">
-        <div className="px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
-                <UserCheck className="w-8 h-8 text-white" />
-              </div>
+      <div className="mb-8">
+        <div className="">
+          <div className="flex justify-between items-center mb-4">
+            <div className="">
+              
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">CHW Assignments</h1>
-                <p className="text-gray-600 mt-1">Manage Community Health Worker patient assignments</p>
+                <h1 className="text-3xl font-bold ">CHW Assignments</h1>
+                <p className="mt-1">Manage Community Health Worker patient assignments</p>
               </div>
             </div>
+
+            <div className="flex space-x-3">
             <button 
               onClick={() => setShowAddModal(true)}
-              className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
+              className="px-3 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
             >
               <Plus className="w-5 h-5" />
               <span className="font-medium">New Assignment</span>
             </button>
+            </div>
+
           </div>
         </div>
       </div>
+      
 
-      <div className="px-8">
+      <div className="">
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Total Assignments</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-sm  mb-1">Total Assignments</p>
+                <p className="text-3xl font-bold ">{stats.total}</p>
                 <p className="text-sm text-blue-600 mt-2 flex items-center">
                   <Activity className="w-4 h-4 mr-1" />
                   {stats.assigned + stats.inProgress} Active
                 </p>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-blue-100 flex items-center justify-center">
+              <div className="h-14 w-14 rounded-xl flex items-center justify-center">
                 <FileText className="w-7 h-7 text-blue-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">In Progress</p>
-                <p className="text-3xl font-bold text-green-600">{stats.inProgress}</p>
+                <p className="text-sm  mb-1">In Progress</p>
+                <p className="text-3xl font-bold text-blue-600">{stats.inProgress}</p>
                 <p className="text-sm text-gray-500 mt-2">Active care plans</p>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-green-100 flex items-center justify-center">
-                <Play className="w-7 h-7 text-green-600" />
+              <div className="h-14 w-14 rounded-xl flex items-center justify-center">
+                <Play className="w-7 h-7 text-blue-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Completed</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.completed}</p>
-                <p className="text-sm text-green-600 mt-2 flex items-center">
+                <p className="text-sm  mb-1">Completed</p>
+                <p className="text-3xl font-bold ">{stats.completed}</p>
+                <p className="text-sm text-blue-600 mt-2 flex items-center">
                   <CheckCircle className="w-4 h-4 mr-1" />
                   Successfully finished
                 </p>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-gray-100 flex items-center justify-center">
-                <CheckCircle className="w-7 h-7 text-gray-600" />
+              <div className="h-14 w-14 rounded-xl  flex items-center justify-center">
+                <CheckCircle className="w-7 h-7 text-blue-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Active CHWs</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.activeCHWs}</p>
-                <p className="text-sm text-gray-500 mt-2">{stats.activePatients} patients</p>
+                <p className="text-sm  mb-1">Active CHWs</p>
+                <p className="text-3xl font-bold ">{stats.activeCHWs}</p>
+                <p className="text-sm  mt-2">{stats.activePatients} patients</p>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Users className="w-7 h-7 text-purple-600" />
+              <div className="h-14 w-14 rounded-xlflex items-center justify-center">
+                <Users className="w-7 h-7 text-blue-600" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Status Tabs */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
+        {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
           <div className="flex items-center space-x-1 p-2 overflow-x-auto">
             <button
               onClick={() => setActiveTab('all')}
@@ -440,11 +444,11 @@ const CHWAssignments = () => {
               Completed ({stats.completed})
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+        <div className="p-4 mb-6">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -452,7 +456,7 @@ const CHWAssignments = () => {
                 placeholder="Search by patient name, CHW name, code, or condition..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
@@ -462,7 +466,7 @@ const CHWAssignments = () => {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 >
                   <option value="all">All Status</option>
                   {assignmentStatuses.map(status => (
@@ -483,61 +487,61 @@ const CHWAssignments = () => {
         </div>
 
         {/* Assignments Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
                     Patient
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
                     CHW Assigned
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
                     Priority
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
                     Timeline
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
                     Next Visit
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-semibold  uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 bg-white">
                 {filteredAssignments.map((assignment) => (
                   <tr key={assignment.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
-                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                        {/* <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
                           <User className="w-6 h-6 text-white" />
-                        </div>
+                        </div> */}
                         <div>
-                          <p className="font-semibold text-gray-900">{assignment.patientName}</p>
-                          <p className="text-sm text-gray-500">{assignment.patientCondition}</p>
+                          <p className="font-semibold">{assignment.patientName}</p>
+                          <p className="text-sm ">{assignment.patientCondition}</p>
                           <div className="flex items-center space-x-2 mt-1">
-                            <MapPin className="w-3 h-3 text-gray-400" />
-                            <span className="text-xs text-gray-500">{assignment.patientCity}</span>
+                            <MapPin className="w-3 h-3 " />
+                            <span className="text-xs ">{assignment.patientCity}</span>
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
-                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                          <UserCheck className="w-5 h-5 text-white" />
-                        </div>
+                        {/* <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                          <UserCheck className="w-6 h-6 text-white" />
+                        </div> */}
                         <div>
-                          <p className="font-medium text-gray-900">{assignment.chwName}</p>
-                          <p className="text-xs text-gray-500">{assignment.chwCode}</p>
-                          <p className="text-xs text-green-600">{assignment.chwSpecialization}</p>
+                          <p className="font-semibold">{assignment.chwName}</p>
+                          <p className="text-xs ">{assignment.chwCode}</p>
+                          <p className="text-xs text-blue-600">{assignment.chwSpecialization}</p>
                         </div>
                       </div>
                     </td>
@@ -595,14 +599,14 @@ const CHWAssignments = () => {
                           <Eye className="w-5 h-5" />
                         </button>
                         <button 
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          className="p-2 text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Edit"
                         >
                           <Edit className="w-5 h-5" />
                         </button>
                         {assignment.status === 'ASSIGNED' && (
                           <button 
-                            className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Start Assignment"
                           >
                             <Play className="w-5 h-5" />
@@ -627,19 +631,19 @@ const CHWAssignments = () => {
 
         {/* View Modal */}
         {showViewModal && selectedAssignment && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity p-4">
+            <div className="bg-white max-w-3xl w-full max-h-[90vh] overflow-y-auto  shadow-2xl">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Assignment Details</h2>
-                    <p className="text-sm text-gray-500 mt-1">Assignment ID: #{selectedAssignment.id}</p>
+                    <h2 className="text-2xl font-bold ">Assignment Details</h2>
+                    <p className="text-sm mt-1">Assignment ID: #{selectedAssignment.id}</p>
                   </div>
                   <button 
                     onClick={() => setShowViewModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="font-bold hover:text-red-600 cursor-pointer"
                   >
-                    <XCircle className="w-6 h-6" />
+                    <XCircle className="w-7 h-7" />
                   </button>
                 </div>
               </div>
@@ -657,8 +661,8 @@ const CHWAssignments = () => {
                 </div>
 
                 {/* Patient Information */}
-                <div className="bg-blue-50 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                <div className="border border-gray-200 bg-white shadow-md p-6">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
                     <User className="w-5 h-5" />
                     <span>Patient Information</span>
                   </h3>
@@ -683,8 +687,8 @@ const CHWAssignments = () => {
                 </div>
 
                 {/* CHW Information */}
-                <div className="bg-green-50 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                <div className="border border-gray-200 bg-white shadow-md p-6">
+                  <h3 className="text-lg font-semibold  mb-4 flex items-center space-x-2">
                     <UserCheck className="w-5 h-5" />
                     <span>Assigned CHW</span>
                   </h3>
@@ -710,10 +714,10 @@ const CHWAssignments = () => {
 
                 {/* Timeline */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Timeline</h3>
+                  <h3 className="text-lg font-semibold  mb-4">Timeline</h3>
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3">
-                      <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Calendar className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1">
@@ -723,8 +727,8 @@ const CHWAssignments = () => {
                     </div>
                     {selectedAssignment.startedAt && (
                       <div className="flex items-start space-x-3">
-                        <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                          <Play className="w-5 h-5 text-green-600" />
+                        <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Play className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">Started</p>
@@ -734,7 +738,7 @@ const CHWAssignments = () => {
                     )}
                     {selectedAssignment.completedAt && (
                       <div className="flex items-start space-x-3">
-                        <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0">
                           <CheckCircle className="w-5 h-5 text-gray-600" />
                         </div>
                         <div className="flex-1">
@@ -780,12 +784,13 @@ const CHWAssignments = () => {
                   Close
                 </button>
                 <button 
-                  className="px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
                 >
                   Edit Assignment
                 </button>
               </div>
             </div>
+
           </div>
         )}
 
@@ -885,7 +890,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
       return;
     }
 
-    // Create new assignment object matching backend structure
+    // Create new assignment object
     const newAssignment = {
       id: Date.now(),
       patientId: formData.patientId,
@@ -909,7 +914,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
     };
 
     console.log('New assignment created:', newAssignment);
-    // Here you would typically send to backend via API
+    
     
     // Reset form and close modal
     setFormData({
@@ -925,7 +930,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
     setSearchCHW('');
     setShowModal(false);
     
-    // Show success message (you can implement a toast notification)
+    // Show success message
     alert('Assignment created successfully!');
   };
 
@@ -947,36 +952,34 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'CRITICAL': return 'bg-red-100 text-red-800 border-red-300';
-      case 'HIGH': return 'bg-orange-100 text-orange-800 border-orange-300';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      case 'LOW': return 'bg-green-100 text-green-800 border-green-300';
-      default: return 'bg-gray-100 text-gray-800 border-gray-300';
+      case 'CRITICAL': return 'text-red-800';
+      case 'HIGH': return 'text-orange-800';
+      case 'MEDIUM': return 'text-yellow-800';
+      case 'LOW': return 'text-green-800';
+      default: return 'text-gray-800';
     }
   };
 
   if (!showModal) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity p-4">
+      <div className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-green-50 to-blue-50">
+        <div className="p-6 border-b border-gray-200 ">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
-                <Plus className="w-7 h-7 text-white" />
-              </div>
+              
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Create New Assignment</h2>
-                <p className="text-sm text-gray-600 mt-1">Assign a Community Health Worker to a patient</p>
+                <h2 className="text-2xl font-bold ">Create New Assignment</h2>
+                <p className="text-sm  mt-1">Assign a Community Health Worker to a patient</p>
               </div>
             </div>
             <button 
               onClick={handleCancel}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="font-bold hover:text-red-600 cursor-pointer"
             >
-              <XCircle className="w-6 h-6" />
+              <XCircle className="w-7 h-7" />
             </button>
           </div>
         </div>
@@ -1000,7 +1003,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
                     setShowPatientDropdown(true);
                   }}
                   onFocus={() => setShowPatientDropdown(true)}
-                  className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 ${
                     errors.patientId ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
@@ -1014,12 +1017,10 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
                         key={patient.id}
                         type="button"
                         onClick={() => handlePatientSelect(patient)}
-                        className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
+                        className="w-full text-left px-4 py-3 transition-colors border-b border-gray-100 last:border-b-0"
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-                            <User className="w-5 h-5 text-white" />
-                          </div>
+                          
                           <div className="flex-1">
                             <p className="font-semibold text-gray-900">{patient.name}</p>
                             <div className="flex items-center space-x-3 text-xs text-gray-500 mt-1">
@@ -1053,12 +1054,10 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
             )}
             
             {selectedPatient && (
-              <div className="mt-3 p-4 bg-blue-50 rounded-xl border border-blue-200">
+              <div className="mt-3 p-4 rounded-xl border border-blue-200">
                 <p className="text-sm font-medium text-gray-900 mb-2">Selected Patient:</p>
                 <div className="flex items-center space-x-3">
-                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                    <User className="w-6 h-6 text-white" />
-                  </div>
+                  
                   <div>
                     <p className="font-semibold text-gray-900">{selectedPatient.name}</p>
                     <p className="text-sm text-gray-600">{selectedPatient.condition}</p>
@@ -1086,7 +1085,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
                     setShowCHWDropdown(true);
                   }}
                   onFocus={() => setShowCHWDropdown(true)}
-                  className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2  ${
                     errors.chwId ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
@@ -1100,17 +1099,17 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
                         key={chw.id}
                         type="button"
                         onClick={() => handleCHWSelect(chw)}
-                        className="w-full text-left px-4 py-3 hover:bg-green-50 transition-colors border-b border-gray-100 last:border-b-0"
+                        className="w-full text-left px-4 py-3  transition-colors border-b border-gray-100 last:border-b-0"
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center flex-shrink-0">
+                          <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0">
                             <UserCheck className="w-5 h-5 text-white" />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center space-x-2">
                               <p className="font-semibold text-gray-900">{chw.name}</p>
                               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                chw.status === 'AVAILABLE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                chw.status === 'AVAILABLE' ? ' text-green-800' : 'bg-gray-100 text-gray-800'
                               }`}>
                                 {chw.status}
                               </span>
@@ -1148,12 +1147,10 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
             )}
             
             {selectedCHW && (
-              <div className="mt-3 p-4 bg-green-50 rounded-xl border border-green-200">
+              <div className="mt-3 p-4 rounded-xl border border-green-200">
                 <p className="text-sm font-medium text-gray-900 mb-2">Selected CHW:</p>
                 <div className="flex items-center space-x-3">
-                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                    <UserCheck className="w-6 h-6 text-white" />
-                  </div>
+                  
                   <div>
                     <p className="font-semibold text-gray-900">{selectedCHW.name}</p>
                     <p className="text-sm text-gray-600">{selectedCHW.specialization}</p>
@@ -1198,7 +1195,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
                 name="visitFrequency"
                 value={formData.visitFrequency}
                 onChange={handleChange}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 "
               >
                 {visitFrequencies.map(freq => (
                   <option key={freq} value={freq}>{freq}</option>
@@ -1221,7 +1218,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
                   value={formData.nextVisitDate}
                   onChange={handleChange}
                   min={new Date().toISOString().split('T')[0]}
-                  className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2  ${
                     errors.nextVisitDate ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
@@ -1245,7 +1242,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
                   name="nextVisitTime"
                   value={formData.nextVisitTime}
                   onChange={handleChange}
-                  className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2  ${
                     errors.nextVisitTime ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
@@ -1272,7 +1269,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
                 onChange={handleChange}
                 rows="5"
                 placeholder="Enter initial assessment, care plan, and any relevant medical information..."
-                className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 resize-none ${
+                className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2  resize-none ${
                   errors.notes ? 'border-red-300' : 'border-gray-300'
                 }`}
               />
@@ -1304,7 +1301,7 @@ const AddAssignmentModal = ({ showModal, setShowModal, patients, chws }) => {
             </button>
             <button 
               onClick={handleSubmit}
-              className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-medium flex items-center space-x-2 shadow-lg hover:shadow-xl"
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2 shadow-lg hover:shadow-xl"
             >
               <CheckCircle className="w-5 h-5" />
               <span>Create Assignment</span>
