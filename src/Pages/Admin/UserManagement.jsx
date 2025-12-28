@@ -194,24 +194,24 @@ const UserManagement = () => {
 
   const getRoleIcon = (role) => {
     switch (role) {
-      case 'admin': return <Shield className="w-5 h-5 text-purple-600" />;
+      case 'admin': return <Shield className="w-5 h-5 text-blue-600" />;
       case 'doctor': return <Stethoscope className="w-5 h-5 text-blue-600" />;
-      case 'nurse': return <UserCheck className="w-5 h-5 text-green-600" />;
-      case 'chw': return <Users className="w-5 h-5 text-orange-600" />;
-      case 'technician': return <Settings className="w-5 h-5 text-gray-600" />;
-      case 'patient': return <Activity className="w-5 h-5 text-indigo-600" />;
-      default: return <Users className="w-5 h-5 text-gray-600" />;
+      case 'nurse': return <UserCheck className="w-5 h-5 text-blue-600" />;
+      case 'chw': return <Users className="w-5 h-5 text-blue-600" />;
+      case 'technician': return <Settings className="w-5 h-5 text-blue-600" />;
+      case 'patient': return <Activity className="w-5 h-5 text-blue-600" />;
+      default: return <Users className="w-5 h-5 text-blue-600" />;
     }
   };
 
   const getRoleColor = (role) => {
     switch (role) {
-      case 'admin': return ' text-purple-800 border-purple-200';
+      case 'admin': return ' text-blue-800 border-blue-200';
       case 'doctor': return ' text-blue-800 border-blue-200';
-      case 'nurse': return ' text-green-800 border-green-200';
-      case 'chw': return ' text-orange-800 border-orange-200';
-      case 'technician': return ' text-gray-800 border-gray-200';
-      case 'patient': return ' text-indigo-800 border-indigo-200';
+      case 'nurse': return ' text-blue-800 border-blue-200';
+      case 'chw': return ' text-blue-800 border-blue-200';
+      case 'technician': return ' text-blue-800 border-blue-200';
+      case 'patient': return ' text-blue-800 border-blue-200';
       default: return ' text-gray-800 border-gray-200';
     }
   };
@@ -248,12 +248,12 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 p-6">
       {/* Header Section */}
       <div className="mb-8">
-        <div className="p-8">
-          <div className="flex items-center justify-between">
-            <div>
+        <div className="">
+          <div className="flex justify-between items-center mb-4">
+            <div className="items-center space-x-4">
               <h1 className="text-4xl font-bold mb-2">User Management</h1>
               <p className=" text-lg">
                 Manage user accounts, roles, permissions, and access control across MediLink
@@ -266,61 +266,62 @@ const UserManagement = () => {
           </div>
 
            {/* Summary Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-            <div className="shadow-sm border border-gray-200 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+
+            <div className="bg-white shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Users</p>
-                  <p className="text-3xl font-bold text-gray-900">{users.length}</p>
+                  <p className="text-sm font-semibold">Total Users</p>
+                  <p className="text-3xl font-bold">{users.length}</p>
                   <p className="text-sm text-blue-600 mt-2">All registered users</p>
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 flex items-center justify-center">
                   <Users className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="shadow-sm border border-gray-200 p-6">
+            <div className="bg-white shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Healthcare Staff</p>
-                  <p className="text-3xl font-bold text-green-600">
+                  <p className="text-sm font-semibold">Healthcare Staff</p>
+                  <p className="text-3xl font-bold">
                     {users.filter(u => ['doctor', 'nurse', 'chw'].includes(u.role)).length}
                   </p>
-                  <p className="text-sm text-green-600 mt-2">Active healthcare workers</p>
+                  <p className="text-sm text-blue-600 mt-2">Active healthcare workers</p>
                 </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Stethoscope className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <Stethoscope className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="shadow-sm border border-gray-200 p-6">
+            <div className="bg-white shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Patients Managed</p>
-                  <p className="text-3xl font-bold text-purple-600">
+                  <p className="text-sm font-semibold">Patients Managed</p>
+                  <p className="text-3xl font-bold">
                     {users.reduce((total, user) => total + user.patientsManaged, 0)}
                   </p>
-                  <p className="text-sm text-purple-600 mt-2">Total patient interactions</p>
+                  <p className="text-sm text-blue-600 mt-2">Total patient interactions</p>
                 </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Activity className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <Activity className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="shadow-sm border border-gray-200 p-6">
+            <div className="bg-white shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Pending Approvals</p>
-                  <p className="text-3xl font-bold text-yellow-600">
+                  <p className="text-sm font-semibold">Pending Approvals</p>
+                  <p className="text-3xl font-bold">
                     {users.filter(u => u.status === 'pending').length}
                   </p>
-                  <p className="text-sm text-yellow-600 mt-2">Awaiting approval</p>
+                  <p className="text-sm text-blue-600 mt-2">Awaiting approval</p>
                 </div>
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-yellow-600" />
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
             </div>
@@ -414,7 +415,7 @@ const UserManagement = () => {
           </div>
 
           {/* Users Table */}
-          <div className="shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
@@ -455,7 +456,7 @@ const UserManagement = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200">
                   {filteredUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
