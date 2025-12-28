@@ -1,7 +1,7 @@
 import React from 'react';
 import StatsCards from './components/StatsCards';
 import QuickActions from './components/QuickActions';
-import UserGrowthChart from './components/UserGrowthChart';
+import UserGrowthBarChart from './components/UserGrowthBarChart';
 import ActivityChart from './components/ActivityChart';
 import TopPerformers from './components/TopPerformers';
 import RecentRegistrations from './components/RecentRegistrations';
@@ -21,7 +21,7 @@ const AdminDashboard = () => {
 
       {/* Analytics Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <UserGrowthChart />
+        <UserGrowthBarChart />
         <ActivityChart />
       </div>
 
