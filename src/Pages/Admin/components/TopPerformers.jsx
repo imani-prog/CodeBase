@@ -12,7 +12,7 @@ const TopPerformers = () => {
   return (
     <div className="bg-white shadow-sm border border-gray-100">
       <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Top Performing CHWs</h3>
+        <h3 className="text-lg font-semibold">Top Performing CHWs</h3>
       </div>
       <div className="p-6">
         <div className="space-y-4">
@@ -23,16 +23,16 @@ const TopPerformers = () => {
             >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 flex items-center justify-center">
-                  <span className="text-sm font-medium text-indigo-700">#{index + 1}</span>
+                  <span className="text-blue-700">#{index + 1}</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{performer.name}</p>
+                  <p className="">{performer.name}</p>
                   <p className="text-xs text-gray-500">{performer.patients} patients</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="flex items-center">
-                  <span className="text-xs text-yellow-500">★</span>
+                  <span className="text-xs text-blue-500">★</span>
                   <span className="text-sm font-medium text-gray-700 ml-1">{performer.rating}</span>
                 </div>
               </div>

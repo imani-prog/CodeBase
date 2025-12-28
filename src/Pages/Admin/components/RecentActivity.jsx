@@ -31,20 +31,20 @@ const RecentActivity = () => {
       <div className="bg-white shadow-sm border border-gray-100">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+            <h2 className="text-lg font-semibold">Recent Activity</h2>
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search activities..."
-                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <select 
-                className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 value={selectedTimeframe}
                 onChange={(e) => setSelectedTimeframe(e.target.value)}
               >
@@ -66,7 +66,7 @@ const RecentActivity = () => {
                 <div className="flex items-center space-x-4">
                   {getStatusIcon(activity.status)}
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{activity.user}</p>
+                    <p className="">{activity.user}</p>
                     <p className="text-sm text-gray-500">{activity.action}</p>
                   </div>
                 </div>

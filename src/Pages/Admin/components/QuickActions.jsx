@@ -58,7 +58,7 @@ const QuickActions = () => {
 
   return (
     <div className="bg-white p-6 mb-8">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <h2 className="text-lg font-semibold  mb-4">Quick Actions</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
         {actions.map((action, index) => {
           const Icon = action.icon;
@@ -71,7 +71,7 @@ const QuickActions = () => {
               <div className={`w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-all duration-200`}>
                 <Icon className={`w-10 h-10 text-blue-600`} />
               </div>
-              <span className="text-sm font-medium text-gray-700 mt-2 text-center group-hover:text-blue-600 transition-colors">
+              <span className="text-sm mt-2 text-center group-hover:text-blue-600 transition-colors">
                 {action.label}
               </span>
             </button>

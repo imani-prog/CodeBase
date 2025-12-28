@@ -101,10 +101,10 @@ const StatsCards = () => {
               </div>
 
               {/* Title */}
-              <p className="text-xs font-medium text-gray-600 mb-1">{stat.title}</p>
+              <p className="text-sm font-bold  mb-1">{stat.title}</p>
 
               {/* Value */}
-              <p className="text-2xl font-bold text-gray-900 mb-2">{stat.value}</p>
+              <p className="text-2xl font-bold  mb-2">{stat.value}</p>
 
               {/* Trend */}
               <div className="flex items-center">

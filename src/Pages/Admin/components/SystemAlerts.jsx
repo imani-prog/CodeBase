@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, Info, XCircle, CheckCircle } from 'lucide-react';
 
 const SystemAlerts = () => {
   const systemAlerts = [
@@ -8,18 +9,20 @@ const SystemAlerts = () => {
     { id: 4, type: 'success', message: 'Security update completed', time: '6 hours ago' }
   ];
 
-  const getAlertColor = (type) => {
+  const getAlertIcon = (type) => {
+    const iconClass = "w-5 h-5";
     switch (type) {
       case 'error':
-        return 'bg-red-500';
+        return <XCircle className={`${iconClass} text-red-500`} />;
       case 'warning':
-        return 'bg-yellow-500';
+        return <AlertTriangle className={`${iconClass} text-yellow-500`} />;
       case 'success':
-        return 'bg-green-500';
+        return <CheckCircle className={`${iconClass} text-green-500`} />;
       case 'info':
-        return 'bg-blue-500';
+        return <Info className={`${iconClass} text-blue-500`} />;
       default:
-        return 'bg-gray-500';
+        return <Info className={`${iconClass} text-gray-500`} />;
+
     }
   };
 
@@ -35,9 +38,11 @@ const SystemAlerts = () => {
               key={alert.id} 
               className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <div className={`w-2 h-2 rounded-full mt-2 ${getAlertColor(alert.type)}`}></div>
+              <div className="flex-shrink-0 mt-0.5">
+                {getAlertIcon(alert.type)}
+              </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-900">{alert.message}</p>
+                <p className="text-sm ">{alert.message}</p>
                 <p className="text-xs text-gray-500 mt-1">{alert.time}</p>
               </div>
             </div>

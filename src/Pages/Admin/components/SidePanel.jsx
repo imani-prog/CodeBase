@@ -4,9 +4,9 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 const SidePanel = () => {
   const data = [
     { name: 'New Registrations', value: 23, color: '#3b82f6' },
-    { name: 'Active Sessions', value: 156, color: '#10b981' },
-    { name: 'Completed Tasks', value: 89, color: '#8b5cf6' },
-    { name: 'System Alerts', value: 10, color: '#f59e0b' }
+    { name: 'Active Sessions', value: 46, color: '#7dd3fc' },
+    { name: 'Completed Tasks', value: 89, color: '#1e40af' },
+    { name: 'System Alerts', value: 20, color: '#f59e0b' }
   ];
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -61,21 +61,21 @@ const SidePanel = () => {
 
       {/* Today's Overview with Pie Chart */}
       <div className="bg-white shadow-sm p-4 border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Today's Overview</h3>
+        <h3 className="text-lg font-semibold mb-2">Today's Overview</h3>
         
         {/* Pie Chart */}
-        <div className="h-48 mb-4">
+        <div className="h-64 mb-1 -mx-4">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
                 label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                outerRadius={70}
+                outerRadius={95}
                 fill="#8884d8"
                 dataKey="value"
+                labelLine={{ stroke: '#9ca3af', strokeWidth: 1 }}
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -87,17 +87,15 @@ const SidePanel = () => {
         </div>
 
         {/* Legend with values */}
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-3">
           {data.map((item, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div
-                  className="w-2 h-2 rounded-full mr-2"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-sm text-gray-600">{item.name}</span>
-              </div>
-              <span className="text-sm font-semibold text-gray-900">
+            <div key={index} className="flex items-center gap-1">
+              <div
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="text-xs text-gray-600 whitespace-nowrap">{item.name}</span>
+              <span className="text-sm font-semibold text-gray-900 ml-1">
                 {item.value}
               </span>
             </div>
@@ -105,7 +103,7 @@ const SidePanel = () => {
         </div>
 
         {/* Total */}
-        <div className="mt-2 pt-2 border-t border-gray-200">
+        <div className="mt-3 pt-3 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Total Activity</span>
             <span className="text-base font-bold text-gray-900">{total}</span>

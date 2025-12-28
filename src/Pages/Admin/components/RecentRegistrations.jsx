@@ -25,7 +25,7 @@ const RecentRegistrations = () => {
   return (
     <div className="bg-white shadow-sm border border-gray-100">
       <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Recent Registrations</h3>
+        <h3 className="text-lg font-semibold ">Recent Registrations</h3>
       </div>
       <div className="p-6">
         <div className="space-y-4">
@@ -35,7 +35,7 @@ const RecentRegistrations = () => {
               className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div>
-                <p className="text-sm font-medium text-gray-900">{reg.name}</p>
+                <p className="">{reg.name}</p>
                 <p className="text-xs text-gray-500">{reg.type} • {reg.date}</p>
               </div>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(reg.status)}`}>
