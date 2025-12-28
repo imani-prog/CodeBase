@@ -64,7 +64,7 @@ const AnalyticsModal = ({ isOpen, onClose, action }) => {
               <select
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="users">User Analytics</option>
                 <option value="patients">Patient Activity</option>
@@ -79,7 +79,7 @@ const AnalyticsModal = ({ isOpen, onClose, action }) => {
                   type="date"
                   value={dateRange.start}
                   onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 />
               </div>
               <div>
@@ -88,20 +88,20 @@ const AnalyticsModal = ({ isOpen, onClose, action }) => {
                   type="date"
                   value={dateRange.end}
                   onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 />
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="ml-40 flex gap-3">
               <button
                 onClick={() => handleExport('pdf')}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Export PDF
               </button>
               <button
                 onClick={() => handleExport('csv')}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-500 transition-colors"
               >
                 Export CSV
               </button>
@@ -147,7 +147,7 @@ const AnalyticsModal = ({ isOpen, onClose, action }) => {
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity flex items-center justify-center z-50 p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div 

@@ -39,10 +39,10 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
                 { type: 'success', msg: 'System update completed successfully', time: '2 hours ago' }
               ].map((alert, idx) => (
                 <div key={idx} className={`p-3 rounded-lg border ${
-                  alert.type === 'error' ? 'bg-red-50 border-red-200' :
-                  alert.type === 'warning' ? 'bg-yellow-50 border-yellow-200' :
-                  alert.type === 'success' ? 'bg-green-50 border-green-200' :
-                  'bg-blue-50 border-blue-200'
+                  alert.type === 'error' ? ' border-blue-200' :
+                  alert.type === 'warning' ? ' border-blue-200' :
+                  alert.type === 'success' ? ' border-blue-200' :
+                  ' border-blue-200'
                 }`}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -71,7 +71,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
                 type="text"
                 value={message.title}
                 onChange={(e) => setMessage({...message, title: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 placeholder="Announcement title..."
                 required
               />
@@ -81,7 +81,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
               <textarea
                 value={message.content}
                 onChange={(e) => setMessage({...message, content: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-32"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent h-32"
                 placeholder="Type your announcement..."
                 required
               />
@@ -91,7 +91,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
               <select
                 value={message.priority}
                 onChange={(e) => setMessage({...message, priority: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="low">Low</option>
                 <option value="normal">Normal</option>
@@ -101,7 +101,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
             </div>
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+              className="ml-30 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
             >
               <Send className="w-4 h-4 mr-2" />
               Send Announcement
@@ -117,7 +117,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
               <select
                 value={recipients}
                 onChange={(e) => setRecipients(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="all">All Users</option>
                 <option value="patients">Patients Only</option>
@@ -128,7 +128,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Message Type</label>
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
                 <option>Email</option>
                 <option>SMS</option>
                 <option>Push Notification</option>
@@ -140,7 +140,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
               <textarea
                 value={message.content}
                 onChange={(e) => setMessage({...message, content: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-32"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent h-32"
                 placeholder="Type your message..."
                 required
               />
@@ -152,7 +152,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
             </div>
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+              className="ml-30 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
             >
               <Users className="w-4 h-4 mr-2" />
               Send to {recipients === 'all' ? 'All Users' : recipients}
@@ -173,7 +173,7 @@ const CommunicationsModal = ({ isOpen, onClose, action }) => {
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity flex items-center justify-center z-50 p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div 

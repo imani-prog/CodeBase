@@ -51,7 +51,7 @@ const SystemConfigModal = ({ isOpen, onClose, action }) => {
                 type="text"
                 value={config.siteName}
                 onChange={(e) => setConfig({...config, siteName: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -68,7 +68,7 @@ const SystemConfigModal = ({ isOpen, onClose, action }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
                 <option>UTC</option>
                 <option>EST</option>
                 <option>PST</option>
@@ -77,7 +77,7 @@ const SystemConfigModal = ({ isOpen, onClose, action }) => {
             </div>
             <button
               onClick={handleSave}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+              className="ml-30 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
             >
               <Save className="w-4 h-4 mr-2" />
               Save Configuration
@@ -114,7 +114,7 @@ const SystemConfigModal = ({ isOpen, onClose, action }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Notification Frequency</label>
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
                 <option>Instant</option>
                 <option>Hourly Digest</option>
                 <option>Daily Digest</option>
@@ -122,7 +122,7 @@ const SystemConfigModal = ({ isOpen, onClose, action }) => {
             </div>
             <button
               onClick={handleSave}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="ml-30 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Save Preferences
             </button>
@@ -137,7 +137,7 @@ const SystemConfigModal = ({ isOpen, onClose, action }) => {
               <select
                 value={config.backupFrequency}
                 onChange={(e) => setConfig({...config, backupFrequency: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="hourly">Hourly</option>
                 <option value="daily">Daily</option>
@@ -152,14 +152,14 @@ const SystemConfigModal = ({ isOpen, onClose, action }) => {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={handleBackup}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+                className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Backup Now
               </button>
               <button
                 onClick={handleRestore}
-                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center"
+                className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Restore
@@ -181,7 +181,7 @@ const SystemConfigModal = ({ isOpen, onClose, action }) => {
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity flex items-center justify-center z-50 p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div 

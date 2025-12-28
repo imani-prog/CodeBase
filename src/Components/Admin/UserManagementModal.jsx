@@ -40,7 +40,7 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 required
               />
             </div>
@@ -50,7 +50,7 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 required
               />
             </div>
@@ -60,7 +60,7 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 required
               />
             </div>
@@ -69,7 +69,7 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({...formData, role: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
@@ -79,7 +79,7 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
             </div>
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="ml-30 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Create User
             </button>
@@ -96,20 +96,36 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {['John Doe', 'Jane Smith', 'Bob Johnson'].map((user, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <span className="text-sm font-medium">{user}</span>
-                  <select className="px-3 py-1 border border-gray-300 rounded text-sm">
-                    <option>User</option>
+                  <select className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Admin</option>
+                    <option>User</option>
                     <option>CHW</option>
+                    <option>Doctor</option>
+                    <option>Patient</option>
                   </select>
                 </div>
               ))}
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         );
@@ -121,7 +137,7 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
               <label className="block text-sm font-medium text-gray-700 mb-2">User Email</label>
               <input
                 type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 placeholder="user@example.com"
                 required
               />
@@ -130,13 +146,13 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
               <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
               <input
                 type="password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="ml-30 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Reset Password
             </button>
@@ -156,7 +172,7 @@ const UserManagementModal = ({ isOpen, onClose, action }) => {
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity flex items-center justify-center z-50 p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div 
