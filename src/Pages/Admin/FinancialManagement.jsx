@@ -37,6 +37,9 @@ import {
 import {
   AreaChart,
   Area,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -101,7 +104,14 @@ const FinancialManagement = () => {
       transactions: 890,
       avgPerTransaction: 472
     },
-  
+    { 
+      source: 'Medical Equipment Rental', 
+      amount: 380000, 
+      percentage: 15.5, 
+      trend: 'down',
+      transactions: 156,
+      avgPerTransaction: 2436
+    },
     { 
       source: 'Telemedicine Services', 
       amount: 150000, 
@@ -110,6 +120,15 @@ const FinancialManagement = () => {
       transactions: 445,
       avgPerTransaction: 337
     }
+  ];
+
+  // Revenue distribution data for pie chart
+  const revenueDistribution = [
+    { name: 'Ambulance Services', value: 850000, color: '#1e3a8a' },
+    { name: 'Consultation Fees', value: 650000, color: '#4ade80' },
+    { name: 'Online Payments', value: 420000, color: '#2563eb' },
+    { name: 'Equipment Rental', value: 380000, color: '#93c5fd' },
+    { name: 'Telemedicine', value: 150000, color: '#fb923c' }
   ];
 
   const expenses = [
@@ -611,9 +630,9 @@ const FinancialManagement = () => {
 
   const renderRevenue = () => (
     <div className="space-y-6">
-      <div className="shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Revenue Streams Analysis</h3>
+          <h3 className="text-lg font-semibold">Revenue Streams Analysis</h3>
           <div className="flex items-center space-x-3">
             <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
               <option>This Month</option>
@@ -627,58 +646,115 @@ const FinancialManagement = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            {revenueStreams.map((stream, index) => (
-              <div key={index} className="border border-gray-200 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium text-gray-900">{stream.source}</h4>
-                  <div className="flex items-center">
-                    {stream.trend === 'up' ? (
-                      <ArrowUpRight className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <ArrowDownRight className="w-4 h-4 text-red-500" />
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Total Revenue</p>
-                    <p className="text-lg font-semibold text-gray-900">{formatCurrency(stream.amount)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Share of Total</p>
-                    <p className="text-lg font-semibold text-gray-900">{stream.percentage}%</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Transactions</p>
-                    <p className="text-lg font-semibold text-gray-900">{stream.transactions}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Avg per Transaction</p>
-                    <p className="text-lg font-semibold text-gray-900">{formatCurrency(stream.avgPerTransaction)}</p>
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full" 
-                      style={{ width: `${stream.percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <div className="border border-gray-200 overflow-hidden flex flex-col">
+            <div className="overflow-x-auto flex-1">
+              <table className="min-w-full divide-y divide-gray-200 h-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                      Source
+                    </th>
+                    <th className="px-3 py-3 text-right text-xs font-semibold uppercase tracking-wider">
+                      Revenue
+                    </th>
+                    <th className="px-3 py-3 text-right text-xs font-semibold uppercase tracking-wider">
+                      Share
+                    </th>
+                    <th className="px-3 py-3 text-right text-xs font-semibold uppercase tracking-wider">
+                      Trans.
+                    </th>
+                    <th className="px-3 py-3 text-right text-xs font-semibold uppercase tracking-wider">
+                      Avg/Trans
+                    </th>
+                    <th className="px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider">
+                      Trend
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {revenueStreams.map((stream, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">{stream.source}</span>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap text-right">
+                        <span className="text-sm font-semibold text-gray-900">{formatCurrency(stream.amount)}</span>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap text-right">
+                        <span className="text-sm font-semibold text-blue-600">{stream.percentage}%</span>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap text-right">
+                        <span className="text-sm text-gray-900">{stream.transactions}</span>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap text-right">
+                        <span className="text-sm text-gray-900">{formatCurrency(stream.avgPerTransaction)}</span>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap text-center">
+                        {stream.trend === 'up' ? (
+                          <ArrowUpRight className="w-4 h-4 text-green-500 inline-block" />
+                        ) : (
+                          <ArrowDownRight className="w-4 h-4 text-red-500 inline-block" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <div className="bg-gray-50 p-6">
-            <h4 className="font-medium text-gray-900 mb-4">Revenue Distribution</h4>
-            <div className="h-64 flex items-center justify-center">
-              <div className="text-center">
-                <PieChart className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">Pie chart visualization</p>
-                <p className="text-sm text-gray-500">Would show revenue distribution</p>
-              </div>
+          <div className="bg-white border border-gray-200 p-6">
+            <h4 className="font-bold mb-4">Revenue Distribution</h4>
+            <ResponsiveContainer width="100%" height={480}>
+              <RechartsPieChart>
+                <Pie
+                  data={revenueDistribution}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={180}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {revenueDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  formatter={(value) => [
+                    new Intl.NumberFormat('en-KE', {
+                      style: 'currency',
+                      currency: 'KES',
+                      minimumFractionDigits: 0
+                    }).format(value),
+                    ''
+                  ]}
+                />
+              </RechartsPieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-2">
+              {revenueDistribution.map((item, index) => {
+                const total = revenueDistribution.reduce((sum, i) => sum + i.value, 0);
+                const percentage = ((item.value / total) * 100).toFixed(1);
+                return (
+                  <div key={index} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center">
+                      <div 
+                        className="w-3 h-3 rounded-full mr-2" 
+                        style={{ backgroundColor: item.color }}
+                      ></div>
+                      <span className="text-gray-600">{item.name}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="font-semibold text-blue-600">{percentage}%</span>
+                      <span className="font-medium text-gray-900">
+                        {formatCurrency(item.value)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
