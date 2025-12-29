@@ -81,7 +81,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
   if (!ambulance) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
       <div className="bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="p-6">

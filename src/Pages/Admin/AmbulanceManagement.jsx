@@ -62,7 +62,7 @@ const AmbulanceManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
-  const [activeTab, setActiveTab] = useState('ambulances'); // 'ambulances', 'drivers', 'dispatches', 'dispatch', 'tracking'
+  const [activeTab, setActiveTab] = useState('ambulances'); 
   const [_selectedItems, _setSelectedItems] = useState([]);
   const [showDispatchModal, setShowDispatchModal] = useState(false);
   const [selectedAmbulance, setSelectedAmbulance] = useState(null);
@@ -574,6 +574,20 @@ const AmbulanceManagement = () => {
       estimatedResponse: '12 minutes',
       nearestAmbulances: ['AMB-002-NB', 'AMB-004-NB'],
       status: 'pending'
+    },
+    {
+      id: 'EMG-003',
+      priority: 'medium',
+      patientName: 'Lucy Wambui',
+      condition: 'Fall Injury - Possible Fracture',
+      location: 'Karen Shopping Center, Near Entrance B',
+      coordinates: { lat: -1.3521, lng: 36.7073 },
+      callerName: 'Shop Owner',
+      callerPhone: '+254 711 654 321',
+      callTime: new Date(Date.now() - 15 * 60000),
+      estimatedResponse: '10 minutes',
+      nearestAmbulances: ['AMB-005-NB', 'AMB-006-NB'],
+      status: 'pending'
     }
   ]);
 
@@ -802,11 +816,7 @@ const AmbulanceManagement = () => {
     // TODO: Implement API call to update ambulance
     console.log('Saving updated ambulance:', updatedAmbulance);
     
-    // Update local state (replace with actual API call)
-    // const _updatedAmbulances = ambulances.map(a => 
-    //   a.vehicleNumber === updatedAmbulance.vehicleNumber ? updatedAmbulance : a
-    // );
-    
+  
     // Close modal
     setShowEditModal(false);
     setCurrentAmbulance(null);
@@ -878,40 +888,89 @@ const AmbulanceManagement = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <div className="mb-8">
-        <div className="p-8">
-          <div className="flex items-center justify-between">
+      <div className="mb-6">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-bold mb-2">Ambulance Management</h1>
-              <p className="text-lg">
+              <h1 className="text-3xl font-bold mb-1">Ambulance Management</h1>
+              <p className="text-gray-600">
                 Manage ambulance fleet, drivers, dispatch operations, and emergency response
               </p>
-              <div className="mt-4 flex items-center space-x-6">
-                <div className="flex items-center">
-                  <Truck className="w-5 h-5 mr-2" />
-                  <span className="">
-                    {ambulances.length} Fleet Vehicles
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="w-5 h-5 mr-2" />
-                      <span className="">
-                        {drivers.filter(d => d.status === 'on_duty').length} Drivers On Duty
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <Activity className="w-5 h-5 mr-2" />
-                      <span className="">
-                        {dispatches.filter(d => d.status === 'in_progress').length} Active Dispatches
-                      </span>
-                    </div>
-                  </div>
+            </div>
+          </div>
 
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Total Fleet</p>
+                  <p className="text-2xl font-bold text-gray-900">{ambulances.length}</p>
                 </div>
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <Truck className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-green-600 flex items-center">
+                <CheckCircle className="w-3 h-3 mr-1" />
+                {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').length} Available
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Active Drivers</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {drivers.filter(d => d.status === 'on_duty').length}
+                  </p>
+                </div>
+                <div className="p-3 bg-green-50 rounded-lg">
+                  <Users className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-gray-600">
+                of {drivers.length} total drivers
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Emergency Calls</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {emergencyCalls.filter(c => c.status === 'pending').length}
+                  </p>
+                </div>
+                <div className="p-3 bg-red-50 rounded-lg">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-gray-600">
+                {emergencyCalls.length} total calls
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Active Tracking</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {Object.keys(trackingData).length}
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-50 rounded-lg">
+                  <Navigation className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-purple-600 flex items-center">
+                <div className="w-2 h-2 bg-purple-600 rounded-full mr-1 animate-pulse"></div>
+                Live monitoring
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
 
           {/* Tabs */}
@@ -961,21 +1020,12 @@ const AmbulanceManagement = () => {
                 <Target className="w-4 h-4 inline mr-2" />
                 Live Tracking ({Object.keys(trackingData).length})
               </button>
-              <button
-                onClick={() => setActiveTab('dispatches')}
-                className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'dispatches'
-                    ? 'border-blue-500 text-blue-600 bg-blue-50'
-                    : 'border-transparent hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <Navigation className="w-4 h-4 inline mr-2" />
-                History ({dispatches.length})
-              </button>
-            </div>
+            
+            </div> 
+          </div>
 
-            {/* Controls */}
-            <div className="p-6">
+          {/* Controls */}
+          <div className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex flex-col sm:flex-row gap-4 flex-1">
                   <div className="relative flex-1 max-w-md">
@@ -983,7 +1033,7 @@ const AmbulanceManagement = () => {
                     <input
                       type="text"
                       placeholder={`Search ${activeTab}...`}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -994,7 +1044,7 @@ const AmbulanceManagement = () => {
                       <select
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none "
                       >
                         {statusOptions.map(option => (
                           <option key={option.value} value={option.value}>{option.label}</option>
@@ -1003,7 +1053,7 @@ const AmbulanceManagement = () => {
                       <select
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
-                        className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         {typeOptions.map(option => (
                           <option key={option.value} value={option.value}>{option.label}</option>
@@ -1013,8 +1063,8 @@ const AmbulanceManagement = () => {
                   )}
                 </div>
 
-                <div className="flex items-center space-x-3">
-                  <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <div className="flex  space-x-3">
+                  <button className="flex items-center px-4 py-2 border border-gray-300  text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Refresh
                   </button>
@@ -1022,144 +1072,143 @@ const AmbulanceManagement = () => {
                     <Download className="w-4 h-4 mr-2" />
                     Export
                   </button>
-                  <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add {activeTab.slice(0, -1)}
+                  <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+                    <Plus className="w-5 h-5 mr-2" />
+                    Add {activeTab === 'dispatch' ? 'dispatch' : activeTab === 'dispatches' ? 'dispatch' : activeTab === 'tracking' ? 'unit' : activeTab.slice(0, -1)}
                   </button>
                 </div>
               </div>
             </div>
-          </div>
 
           {/* Ambulances Tab */}
-          {activeTab === 'ambulances' && (
-           <div className="bg-white shadow overflow-x-auto">
-  <table className="min-w-full text-sm">
-    <thead className="bg-gray-100 uppercase text-xs font-semibold">
-      <tr>
-        <th className="px-4 py-3 text-left">Ambulance</th>
-        <th className="px-4 py-3 text-left">Type</th>
-        <th className="px-4 py-3 text-left">Status</th>
-        <th className="px-4 py-3 text-left">Driver / Medic</th>
-        <th className="px-4 py-3 text-center">Trips</th>
-        <th className="px-4 py-3 text-center">Avg Response</th>
-        <th className="px-4 py-3 text-center">Fuel Level</th>
-        <th className="px-4 py-3 text-center">Insurance</th>
-        <th className="px-4 py-3 text-center">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {filteredAmbulances.map((a) => (
-        <tr key={a.id} className="border-b hover:bg-gray-50 transition-colors">
-          {/* Ambulance Column */}
-          <td className="px-4 py-3">
-            <div className="flex items-center space-x-2">
-              {/* {getTypeIcon(a.type)} */}
-              <div>
-                <p className="font-medium text-gray-900">{a.vehiclePlate}</p>
-                <p className="text-xs text-gray-500">
-                  Reg: {a.registrationNumber} ({a.year})
-                </p>
-              </div>
+              {activeTab === 'ambulances' && (
+              <div className="bg-white shadow overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-100 uppercase text-xs font-semibold">
+              <tr>
+                <th className="px-4 py-3 text-left">Ambulance</th>
+                <th className="px-4 py-3 text-left">Type</th>
+                <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">Driver / Medic</th>
+                <th className="px-4 py-3 text-center">Trips</th>
+                <th className="px-4 py-3 text-center">Avg Response</th>
+                {/* <th className="px-4 py-3 text-center">Fuel Level</th> */}
+                <th className="px-4 py-3 text-center">Insurance</th>
+                <th className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAmbulances.map((a) => (
+                <tr key={a.id} className="border-b hover:bg-gray-50 transition-colors">
+                  {/* Ambulance Column */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center space-x-2">
+                      {/* {getTypeIcon(a.type)} */}
+                      <div>
+                        <p className="font-medium text-gray-900">{a.vehiclePlate}</p>
+                        <p className="text-xs text-gray-500">
+                          Reg: {a.registrationNumber} ({a.year})
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Type */}
+                  <td className="px-4 py-3 capitalize">
+                    {a.type.replace("_", " ")}
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                        a.status
+                      )}`}
+                    >
+                      {a.status.replace("_", " ").toUpperCase()}
+                    </span>
+                  </td>
+
+                  {/* Driver + Medic */}
+                  <td className="px-4 py-3">
+                    <p className="text-sm font-medium">{a.driverName}</p>
+                    <p className="text-xs text-gray-500">{a.medicName}</p>
+                  </td>
+
+                  {/* Total Trips */}
+                  <td className="px-4 py-3 text-center">{a.totalDispatches}</td>
+
+                  {/* Avg Response */}
+                  <td className="px-4 py-3 text-center">{a.averageResponseTime}</td>
+
+                  {/* Fuel */}
+                  {/* <td className="px-4 py-3 text-center">
+                    <div className="flex flex-col items-center">
+                      <div className="w-24 bg-gray-200 h-2 rounded-full mb-1">
+                        <div
+                          className={`h-2 rounded-full ${
+                            a.fuelLevel > 50
+                              ? "bg-green-500"
+                              : a.fuelLevel > 25
+                              ? "bg-yellow-500"
+                              : "bg-red-500"
+                          }`}
+                          style={{ width: `${a.fuelLevel}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs">{a.fuelLevel}%</span>
+                    </div>
+                  </td> */}
+
+                  {/* Insurance */}
+                  <td className="px-4 py-3 text-xs text-center">
+                    <p className="font-medium">{a.insuranceProvider}</p>
+                    <p className="text-gray-500">{a.insurancePolicyNumber}</p>
+                  </td>
+
+                  {/* Actions */}
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center space-x-3">
+                      <button 
+                        className="text-blue-600"
+                        onClick={() => {
+                          setCurrentAmbulance(a);
+                          setShowViewModal(true);
+                        }}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button 
+                        className="text-blue-600"
+                        onClick={() => {
+                          setCurrentAmbulance(a);
+                          setShowEditModal(true);
+                        }}
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        className=""
+                        onClick={() => {
+                          setCurrentAmbulance(a);
+                          setShowMoreModal(true);
+                        }}
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {filteredAmbulances.length === 0 && (
+            <div className="text-center py-8 text-gray-500 text-sm">
+              No ambulances found.
             </div>
-          </td>
-
-          {/* Type */}
-          <td className="px-4 py-3 capitalize">
-            {a.type.replace("_", " ")}
-          </td>
-
-          {/* Status */}
-          <td className="px-4 py-3">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                a.status
-              )}`}
-            >
-              {a.status.replace("_", " ").toUpperCase()}
-            </span>
-          </td>
-
-          {/* Driver + Medic */}
-          <td className="px-4 py-3">
-            <p className="text-sm font-medium">{a.driverName}</p>
-            <p className="text-xs text-gray-500">{a.medicName}</p>
-          </td>
-
-          {/* Total Trips */}
-          <td className="px-4 py-3 text-center">{a.totalDispatches}</td>
-
-          {/* Avg Response */}
-          <td className="px-4 py-3 text-center">{a.averageResponseTime}</td>
-
-          {/* Fuel */}
-          <td className="px-4 py-3 text-center">
-            <div className="flex flex-col items-center">
-              <div className="w-24 bg-gray-200 h-2 rounded-full mb-1">
-                <div
-                  className={`h-2 rounded-full ${
-                    a.fuelLevel > 50
-                      ? "bg-green-500"
-                      : a.fuelLevel > 25
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  }`}
-                  style={{ width: `${a.fuelLevel}%` }}
-                ></div>
-              </div>
-              <span className="text-xs">{a.fuelLevel}%</span>
-            </div>
-          </td>
-
-          {/* Insurance */}
-          <td className="px-4 py-3 text-xs text-center">
-            <p className="font-medium">{a.insuranceProvider}</p>
-            <p className="text-gray-500">{a.insurancePolicyNumber}</p>
-          </td>
-
-          {/* Actions */}
-          <td className="px-4 py-3 text-center">
-            <div className="flex items-center justify-center space-x-3">
-              <button 
-                className="text-blue-600"
-                onClick={() => {
-                  setCurrentAmbulance(a);
-                  setShowViewModal(true);
-                }}
-              >
-                <Eye className="w-4 h-4" />
-              </button>
-              <button 
-                className="text-blue-600"
-                onClick={() => {
-                  setCurrentAmbulance(a);
-                  setShowEditModal(true);
-                }}
-              >
-                <Edit3 className="w-4 h-4" />
-              </button>
-              <button 
-                className=""
-                onClick={() => {
-                  setCurrentAmbulance(a);
-                  setShowMoreModal(true);
-                }}
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-
-  {filteredAmbulances.length === 0 && (
-    <div className="text-center py-8 text-gray-500 text-sm">
-      No ambulances found.
-    </div>
-  )}
-</div>
+          )}
+        </div>
 
           )}
 
@@ -1174,7 +1223,7 @@ const AmbulanceManagement = () => {
                       <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Status</th>
                       <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Vehicle</th>
                       <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Experience</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Rating</th>
+                      {/* <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Rating</th> */}
                       <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Total Trips</th>
                       <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Actions</th>
                     </tr>
@@ -1220,12 +1269,12 @@ const AmbulanceManagement = () => {
                             {driver.certifications.slice(0, 2).join(', ')}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        {/* <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <Star className="w-4 h-4 text-yellow-400 mr-1" />
                             <span className="text-sm font-medium text-gray-900">{driver.rating}</span>
                           </div>
-                        </td>
+                        </td> */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{driver.totalTrips}</div>
                         </td>
@@ -1250,361 +1299,171 @@ const AmbulanceManagement = () => {
             </div>
           )}
 
-          {/* Dispatches/History Tab */}
-          {activeTab === 'dispatches' && (
-            <div className="space-y-4">
-              {filteredDispatches.map((dispatch) => (
-                <div key={dispatch.id} className="border border-gray-200 p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">
-                        {dispatch.incidentId}
-                      </h3>
-                      <p className="text-sm text-gray-500 mb-2">Legacy Call ID: {dispatch.callId}</p>
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center">
-                          {getStatusIcon(dispatch.priority)}
-                          <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(dispatch.priority)}`}>
-                            {dispatch.priority} PRIORITY
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          {getStatusIcon(dispatch.status)}
-                          <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(dispatch.status)}`}>
-                            {dispatch.status.replace('_', ' ')}
-                          </span>
-                        </div>
-                        <div className="px-3 py-1 text-purple-800 rounded-full text-xs font-medium border border-purple-200">
-                          {dispatch.incidentType.replace('_', ' ')}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-gray-900">{dispatch.vehiclePlate}</div>
-                      <div className="text-xs text-gray-500">Unit: {dispatch.ambulanceUnitId}</div>
-                      <div className="text-sm text-gray-500 mt-1">
-                        Driver: {dispatch.driverName}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Medic: {dispatch.medicName}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                        <Users className="w-4 h-4 mr-1" />
-                        Patient Information
-                      </h4>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div><strong>Name:</strong> {dispatch.patientName}</div>
-                        <div><strong>Age:</strong> {dispatch.patientAge} years</div>
-                        <div><strong>Patient ID:</strong> {dispatch.patientId}</div>
-                        <div><strong>Condition:</strong> {dispatch.condition}</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        Pickup Location
-                      </h4>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div>{dispatch.pickupAddressLine1}</div>
-                        {dispatch.pickupAddressLine2 && <div>{dispatch.pickupAddressLine2}</div>}
-                        <div>{dispatch.pickupCity}, {dispatch.pickupState}</div>
-                        <div>{dispatch.pickupPostalCode}, {dispatch.pickupCountry}</div>
-                        <div className="text-xs text-gray-500">
-                           {dispatch.pickupLatitude}, {dispatch.pickupLongitude}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                        <Navigation className="w-4 h-4 mr-1" />
-                        Destination
-                      </h4>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div><strong>Hospital ID:</strong> {dispatch.hospitalId}</div>
-                        <div>{dispatch.dropoffAddressLine1}</div>
-                        {dispatch.dropoffAddressLine2 && <div>{dispatch.dropoffAddressLine2}</div>}
-                        <div>{dispatch.dropoffCity}, {dispatch.dropoffState}</div>
-                        <div>{dispatch.dropoffPostalCode}, {dispatch.dropoffCountry}</div>
-                        <div className="text-xs text-gray-500">
-                           {dispatch.dropoffLatitude}, {dispatch.dropoffLongitude}
-                        </div>
-                        <div><strong>Distance:</strong> {dispatch.distance}</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        Timeline
-                      </h4>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div><strong>Request:</strong> {new Date(dispatch.requestTime).toLocaleTimeString()}</div>
-                        <div><strong>Dispatch:</strong> {new Date(dispatch.dispatchTime).toLocaleTimeString()}</div>
-                        {dispatch.enRouteTime && (
-                          <div><strong>En Route:</strong> {new Date(dispatch.enRouteTime).toLocaleTimeString()}</div>
-                        )}
-                        {dispatch.onSceneTime && (
-                          <div><strong>On Scene:</strong> {new Date(dispatch.onSceneTime).toLocaleTimeString()}</div>
-                        )}
-                        {dispatch.departSceneTime && (
-                          <div><strong>Left Scene:</strong> {new Date(dispatch.departSceneTime).toLocaleTimeString()}</div>
-                        )}
-                        {dispatch.arrivalAtHospitalTime && (
-                          <div><strong>At Hospital:</strong> {new Date(dispatch.arrivalAtHospitalTime).toLocaleTimeString()}</div>
-                        )}
-                        {dispatch.completionTime && (
-                          <div><strong>Completed:</strong> {new Date(dispatch.completionTime).toLocaleTimeString()}</div>
-                        )}
-                        {dispatch.actualTime && (
-                          <div className="text-green-600"><strong>Response Time:</strong> {dispatch.actualTime}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Caller Information */}
-                  <div className="border-t border-gray-100 pt-4 mb-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                      <Phone className="w-4 h-4 mr-1" />
-                      Caller Information
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                      <div>
-                        <strong>Name:</strong> {dispatch.callerName} | <strong>Phone:</strong> {dispatch.callerPhone}
-                      </div>
-                      {dispatch.callerNotes && (
-                        <div className="col-span-2 p-3 rounded-lg border-l-4 border-blue-400">
-                          <strong>Caller Notes:</strong> {dispatch.callerNotes}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Clinical Notes */}
-                  {dispatch.notes && (
-                    <div className="border-t border-gray-100 pt-4 mb-4">
-                      <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                        <Activity className="w-4 h-4 mr-1" />
-                        Clinical/Operational Notes
-                      </h4>
-                      <div className="p-3 rounded-lg border-l-4 border-green-400 text-sm text-gray-700">
-                        {dispatch.notes}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="text-xs text-gray-500">
-                      Estimated Time: {dispatch.estimatedTime}
-                      {dispatch.actualTime && ` | Actual: ${dispatch.actualTime}`}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900 transition-colors flex items-center text-sm">
-                        <Eye className="w-4 h-4 mr-1" />
-                        Full Details
-                      </button>
-                      <button className="text-green-600 hover:text-green-900 transition-colors">
-                        <Download className="w-4 h-4" />
-                      </button>
-                      <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Emergency Dispatch Tab */}
           {activeTab === 'dispatch' && (
-            <div className="space-y-6">
-              {/* Emergency Calls Queue */}
-              <div className="shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Emergency Calls Queue</h3>
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-3 h-3 bg-red-500 rounded-full mr-2 animate-pulse"></div>
-                        Live Feed
-                      </div>
-                      <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center">
-                        <Plus className="w-4 h-4 mr-2" />
-                        New Emergency Call
-                      </button>
-                    </div>
-                  </div>
+            <div className="bg-white shadow overflow-x-auto">
+              {emergencyCalls.length === 0 ? (
+                <div className="p-12 text-center">
+                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Emergency Calls</h3>
+                  <p className="text-gray-500">All emergency calls have been handled. Great work!</p>
                 </div>
+              ) : (
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-100 uppercase text-xs font-semibold">
+                    <tr>
+                      <th className="px-4 py-3 text-left">Call ID</th>
+                      <th className="px-4 py-3 text-left">Priority</th>
+                      <th className="px-4 py-3 text-left">Status</th>
+                      <th className="px-4 py-3 text-left">Patient Info</th>
+                      <th className="px-4 py-3 text-left">Location</th>
+                      <th className="px-4 py-3 text-left">Caller Details</th>
+                      <th className="px-4 py-3 text-left">Time Info</th>
+                      <th className="px-4 py-3 text-left">Nearest Units</th>
+                      <th className="px-4 py-3 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {emergencyCalls.map((call) => (
+                      <tr key={call.id} className="border-b hover:bg-gray-50 transition-colors">
+                        {/* Call ID */}
+                        <td className="px-4 py-4">
+                          <div className="font-semibold text-gray-900">{call.id}</div>
+                        </td>
 
-                <div className="divide-y divide-gray-200">
-                  {emergencyCalls.map((call) => (
-                    <div key={call.id} className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-4 mb-2">
-                            <h4 className="text-lg font-semibold text-gray-900">{call.id}</h4>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              call.priority === 'critical' ? 'text-red-800 border border-red-200' :
-                              call.priority === 'high' ? ' text-orange-800 border border-orange-200' :
-                              'text-yellow-800 border border-yellow-200'
-                            }`}>
-                              {call.priority.toUpperCase()} PRIORITY
-                            </span>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(call.status)}`}>
-                              {call.status.toUpperCase()}
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="text-gray-600"><strong>Patient:</strong> {call.patientName}</p>
-                              <p className="text-gray-600"><strong>Condition:</strong> {call.condition}</p>
-                              <p className="text-gray-600"><strong>Call Time:</strong> {call.callTime.toLocaleTimeString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-gray-600"><strong>Location:</strong> {call.location}</p>
-                              <p className="text-gray-600"><strong>Caller:</strong> {call.callerName}</p>
-                              <p className="text-gray-600"><strong>Phone:</strong> {call.callerPhone}</p>
-                            </div>
-                            <div>
-                              <p className="text-gray-600"><strong>Est. Response:</strong> {call.estimatedResponse}</p>
-                              <p className="text-gray-600"><strong>Nearest Units:</strong> {call.nearestAmbulances.join(', ')}</p>
-                              <p className="text-gray-600"><strong>Time Elapsed:</strong> {Math.floor((Date.now() - call.callTime.getTime()) / 60000)} min</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2 ml-4">
-                          {call.status === 'pending' && (
-                            <>
-                              <button
-                                onClick={() => handleQuickDispatch(call)}
-                                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center"
-                              >
-                                <Zap className="w-4 h-4 mr-2" />
-                                Quick Dispatch
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSelectedAmbulance(null);
-                                  setDispatchForm({
-                                    ...dispatchForm,
-                                    patientName: call.patientName,
-                                    condition: call.condition,
-                                    pickupLocation: call.location,
-                                    callerName: call.callerName,
-                                    callerPhone: call.callerPhone,
-                                    priority: call.priority
-                                  });
-                                  setShowDispatchModal(true);
-                                }}
-                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-                              >
-                                <Send className="w-4 h-4 mr-2" />
-                                Manual Dispatch
-                              </button>
-                            </>
-                          )}
-                          <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                            <MoreHorizontal className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
+                        {/* Priority */}
+                        <td className="px-4 py-4">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${
+                            call.priority === 'critical' ? 'text-red-800 bg-red-50 border-red-200' :
+                            call.priority === 'high' ? 'text-orange-800 bg-orange-50 border-orange-200' :
+                            'text-yellow-800 bg-yellow-50 border-yellow-200'
+                          }`}>
+                            {call.priority.toUpperCase()}
+                          </span>
+                        </td>
 
-                      {/* Available Ambulances for this call */}
-                      {call.status === 'pending' && (
-                        <div className="mt-4 pt-4 border-t border-gray-100">
-                          <h5 className="text-sm font-medium text-gray-900 mb-2">Available Ambulances:</h5>
-                          <div className="flex space-x-2">
-                            {call.nearestAmbulances.map((ambulanceId) => {
+                        {/* Status */}
+                        <td className="px-4 py-4">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(call.status)}`}>
+                            {call.status.toUpperCase()}
+                          </span>
+                        </td>
+
+                        {/* Patient Info */}
+                        <td className="px-4 py-4">
+                          <div className="space-y-1">
+                            <div className="font-medium text-gray-900">{call.patientName}</div>
+                            <div className="text-xs text-gray-600">{call.condition}</div>
+                          </div>
+                        </td>
+
+                        {/* Location */}
+                        <td className="px-4 py-4">
+                          <div className="flex items-start max-w-xs">
+                            <MapPin className="w-4 h-4 mr-1 mt-0.5 text-gray-400 flex-shrink-0" />
+                            <span className="text-gray-700">{call.location}</span>
+                          </div>
+                        </td>
+
+                        {/* Caller Details */}
+                        <td className="px-4 py-4">
+                          <div className="space-y-1">
+                            <div className="text-gray-900">{call.callerName}</div>
+                            <div className="flex items-center text-xs text-gray-600">
+                              <Phone className="w-3 h-3 mr-1" />
+                              {call.callerPhone}
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Time Info */}
+                        <td className="px-4 py-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center text-xs text-gray-600">
+                              <Clock className="w-3 h-3 mr-1" />
+                              {call.callTime.toLocaleTimeString()}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              Est: {call.estimatedResponse}
+                            </div>
+                            <div className="text-xs font-medium text-red-600">
+                              Elapsed: {Math.floor((Date.now() - call.callTime.getTime()) / 60000)} min
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Nearest Units */}
+                        <td className="px-4 py-4">
+                          <div className="space-y-1">
+                            {call.nearestAmbulances.slice(0, 2).map((ambulanceId) => {
                               const ambulance = ambulances.find(a => a.vehicleNumber === ambulanceId);
-                              if (!ambulance || ambulance.status !== 'available') return null;
+                              const isAvailable = ambulance?.status === 'available';
                               
                               return (
-                                <button
-                                  key={ambulanceId}
-                                  onClick={() => handleDispatch(ambulanceId, call.id)}
-                                  className="flex items-center px-3 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors text-sm"
-                                >
-                                  <Truck className="w-4 h-4 mr-2" />
-                                  {ambulanceId}
-                                </button>
+                                <div key={ambulanceId} className="flex items-center text-xs">
+                                  <div className={`w-2 h-2 rounded-full mr-1 ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                                  <span className={isAvailable ? 'text-green-700 font-medium' : 'text-gray-500'}>
+                                    {ambulanceId}
+                                  </span>
+                                </div>
                               );
                             })}
+                            {call.nearestAmbulances.length > 2 && (
+                              <div className="text-xs text-gray-500">+{call.nearestAmbulances.length - 2} more</div>
+                            )}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        </td>
 
-                  {emergencyCalls.length === 0 && (
-                    <div className="p-12 text-center">
-                      <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Emergency Calls</h3>
-                      <p className="text-gray-500">All emergency calls have been handled. Great work!</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Fleet Status Overview */}
-              {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Available Units</p>
-                      <p className="text-2xl font-bold text-green-600">
-                        {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').length}
-                      </p>
-                    </div>
-                    <CheckCircle className="w-8 h-8 text-green-500" />
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">In Transit</p>
-                      <p className="text-2xl font-bold text-blue-600">
-                        {ambulances.filter(a => a.status === 'BUSY' || a.status === 'in_transit').length}
-                      </p>
-                    </div>
-                    <Navigation className="w-8 h-8 text-blue-500" />
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Maintenance</p>
-                      <p className="text-2xl font-bold text-yellow-600">
-                        {ambulances.filter(a => a.status === 'MAINTENANCE' || a.status === 'maintenance').length}
-                      </p>
-                    </div>
-                    <Settings className="w-8 h-8 text-yellow-500" />
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Pending Calls</p>
-                      <p className="text-2xl font-bold text-red-600">
-                        {emergencyCalls.filter(c => c.status === 'pending').length}
-                      </p>
-                    </div>
-                    <AlertTriangle className="w-8 h-8 text-red-500" />
-                  </div>
-                </div>
-              </div> */}
-
+                        {/* Actions */}
+                        <td className="px-4 py-4">
+                          <div className="flex items-center justify-center space-x-2">
+                            {call.status === 'pending' ? (
+                              <>
+                                <button
+                                  onClick={() => handleQuickDispatch(call)}
+                                  className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center text-xs whitespace-nowrap"
+                                  title="Quick Dispatch"
+                                >
+                                  <Zap className="w-3 h-3 mr-1" />
+                                  Quick
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setSelectedAmbulance(null);
+                                    setDispatchForm({
+                                      ...dispatchForm,
+                                      patientName: call.patientName,
+                                      condition: call.condition,
+                                      pickupLocation: call.location,
+                                      callerName: call.callerName,
+                                      callerPhone: call.callerPhone,
+                                      priority: call.priority
+                                    });
+                                    setShowDispatchModal(true);
+                                  }}
+                                  className="bg-gray-600 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors flex items-center text-xs whitespace-nowrap"
+                                  title="Manual Dispatch"
+                                >
+                                  <Send className="w-3 h-3 mr-1" />
+                                  Manual
+                                </button>
+                                <button 
+                                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                                  title="More Options"
+                                >
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </button>
+                              </>
+                            ) : (
+                              <span className="text-xs text-gray-500">Dispatched</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           )}
 
@@ -1612,40 +1471,40 @@ const AmbulanceManagement = () => {
           {activeTab === 'tracking' && (
             <div className="space-y-6">
               {/* Map Container */}
-              <div className="border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
+              <div className="border border-gray-200 bg-white">
+                <div className="p-4 border-b border-gray-200">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Live Ambulance Tracking</h3>
                     <div className="flex items-center space-x-3">
-                      <div className="flex items-center text-sm">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                      <h3 className="text-base font-semibold">Live Ambulance Tracking</h3>
+                      <div className="flex items-center text-xs">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></div>
                         Real-time Updates
                       </div>
-                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        Refresh Map
-                      </button>
                     </div>
+                    <button className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center text-sm">
+                      <RefreshCw className="w-3 h-3 mr-1.5" />
+                      Refresh Map
+                    </button>
                   </div>
                 </div>
 
                 {/* Map Placeholder */}
-                <div className="h-96 flex items-center justify-center">
+                <div className="h-64 flex items-center justify-center bg-gray-50">
                   <div className="text-center">
-                    <Map className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Interactive Map View</h3>
-                    <p className="">Integration with Google Maps/Mapbox for live tracking</p>
-                    <div className="mt-4 flex justify-center space-x-4">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                    <Map className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <h3 className="text-base font-medium mb-1">Interactive Map View</h3>
+                    <p className="text-sm text-gray-600">Integration with Google Maps/Mapbox for live tracking</p>
+                    <div className="mt-3 flex justify-center space-x-4">
+                      <div className="flex items-center text-xs text-gray-600">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
                         Available
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                      <div className="flex items-center text-xs text-gray-600">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
                         In Transit
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                      <div className="flex items-center text-xs text-gray-600">
+                        <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
                         Emergency
                       </div>
                     </div>
@@ -1653,147 +1512,169 @@ const AmbulanceManagement = () => {
                 </div>
               </div>
 
-              {/* Live Tracking Cards */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {Object.entries(trackingData).map(([vehicleId, data]) => {
-                  const ambulance = ambulances.find(a => a.vehicleNumber === vehicleId);
-                  if (!ambulance) return null;
+              {/* Live Tracking Table */}
+              <div className="bg-white shadow overflow-x-auto">
+                {Object.keys(trackingData).length === 0 ? (
+                  <div className="p-12 text-center">
+                    <Navigation className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Tracking</h3>
+                    <p className="text-gray-500">No ambulances are currently being tracked</p>
+                  </div>
+                ) : (
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-gray-100 uppercase text-xs font-semibold">
+                      <tr>
+                        <th className="px-4 py-3 text-left">Vehicle ID</th>
+                        <th className="px-4 py-3 text-left">Driver</th>
+                        <th className="px-4 py-3 text-left">Status</th>
+                        <th className="px-4 py-3 text-left">Current Location</th>
+                        <th className="px-4 py-3 text-left">Speed & Heading</th>
+                        <th className="px-4 py-3 text-center">Signal</th>
+                        <th className="px-4 py-3 text-left">Last Update</th>
+                        <th className="px-4 py-3 text-left">Recent Route</th>
+                        <th className="px-4 py-3 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(trackingData).map(([vehicleId, data]) => {
+                        const ambulance = ambulances.find(a => a.vehicleNumber === vehicleId);
+                        if (!ambulance) return null;
 
-                  return (
-                    <div key={vehicleId} className="border border-gray-200 overflow-hidden">
-                      <div className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h4 className="text-lg font-semibold text-gray-900">{vehicleId}</h4>
-                            <p className="text-sm text-gray-600">{ambulance.currentDriver}</p>
-                            <div className="flex items-center mt-1">
-                              {getStatusIcon(ambulance.status)}
-                              <span className={`ml-2 px-2 py-1 rounded text-xs font-medium ${getStatusColor(ambulance.status)}`}>
-                                {ambulance.status.replace('_', ' ').toUpperCase()}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-sm text-gray-500">Last Update</div>
-                            <div className="text-sm font-medium">{data.lastUpdate.toLocaleTimeString()}</div>
-                          </div>
-                        </div>
+                        return (
+                          <tr key={vehicleId} className="border-b hover:bg-gray-50 transition-colors">
+                            {/* Vehicle ID */}
+                            <td className="px-4 py-4">
+                              <div className="font-semibold text-gray-900">{vehicleId}</div>
+                              <div className="text-xs text-gray-500">{ambulance.vehiclePlate}</div>
+                            </td>
 
-                        {/* Location & Navigation Info */}
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                              <div>
-                                <div className="font-medium">Location</div>
-                                <div className="text-xs">{data.latitude.toFixed(4)}, {data.longitude.toFixed(4)}</div>
+                            {/* Driver */}
+                            <td className="px-4 py-4">
+                              <div className="flex items-center">
+                                <UserCheck className="w-4 h-4 mr-1.5 text-gray-400" />
+                                <span className="text-gray-700">{ambulance.currentDriver}</span>
                               </div>
-                            </div>
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Compass className="w-4 h-4 mr-2 text-gray-400" />
-                              <div>
-                                <div className="font-medium">Heading</div>
-                                <div className="text-xs">{data.heading.toFixed(0)}°</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Zap className="w-4 h-4 mr-2 text-gray-400" />
-                              <div>
-                                <div className="font-medium">Speed</div>
-                                <div className="text-xs">{data.speed.toFixed(0)} km/h</div>
-                              </div>
-                            </div>
+                            </td>
 
-                            {/* <div className="flex items-center text-sm text-gray-600">
-                              <Battery className="w-4 h-4 mr-2 text-gray-400" />
-                              <div>
-                                <div className="font-medium">Battery</div>
-                                <div className="text-xs">{data.batteryLevel}%</div>
+                            {/* Status */}
+                            <td className="px-4 py-4">
+                              <div className="flex items-center">
+                                {getStatusIcon(ambulance.status)}
+                                <span className={`ml-1.5 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(ambulance.status)}`}>
+                                  {ambulance.status.replace('_', ' ').toUpperCase()}
+                                </span>
                               </div>
-                            </div> */}
+                            </td>
 
-                          </div>
-                        </div>
+                            {/* Current Location */}
+                            <td className="px-4 py-4">
+                              <div className="flex items-start">
+                                <MapPin className="w-4 h-4 mr-1.5 mt-0.5 text-gray-400 flex-shrink-0" />
+                                <div>
+                                  <div className="text-xs text-gray-700 font-medium">
+                                    {data.latitude.toFixed(4)}, {data.longitude.toFixed(4)}
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-0.5">
+                                    {ambulance.location}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
 
-                        {/* Status Indicators */}
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-4">
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center text-sm">
-                              <Signal className="w-4 h-4 mr-1 text-gray-500" />
-                              <div className="flex space-x-1">
-                                {[1,2,3,4].map(bar => (
-                                  <div 
-                                    key={bar}
-                                    className={`w-1 h-3 rounded ${bar <= data.signalStrength ? 'bg-green-500' : 'bg-gray-300'}`}
-                                  ></div>
+                            {/* Speed & Heading */}
+                            <td className="px-4 py-4">
+                              <div className="space-y-1">
+                                <div className="flex items-center text-xs">
+                                  <Zap className="w-3 h-3 mr-1 text-blue-500" />
+                                  <span className="font-medium text-gray-900">{data.speed.toFixed(0)} km/h</span>
+                                </div>
+                                <div className="flex items-center text-xs text-gray-600">
+                                  <Compass className="w-3 h-3 mr-1 text-gray-400" />
+                                  <span>{data.heading.toFixed(0)}°</span>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Signal Strength */}
+                            <td className="px-4 py-4">
+                              <div className="flex flex-col items-center space-y-1">
+                                <div className="flex items-center space-x-0.5">
+                                  {[1,2,3,4].map(bar => (
+                                    <div 
+                                      key={bar}
+                                      className={`w-1 h-3 rounded ${bar <= data.signalStrength ? 'bg-green-500' : 'bg-gray-300'}`}
+                                    ></div>
+                                  ))}
+                                </div>
+                                <div className="flex items-center text-xs text-gray-600">
+                                  <Wifi className="w-3 h-3 mr-1" />
+                                  Connected
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Last Update */}
+                            <td className="px-4 py-4">
+                              <div className="flex items-center text-xs text-gray-600">
+                                <Clock className="w-3 h-3 mr-1" />
+                                <span>{data.lastUpdate.toLocaleTimeString()}</span>
+                              </div>
+                            </td>
+
+                            {/* Recent Route */}
+                            <td className="px-4 py-4">
+                              <div className="space-y-1 max-w-xs">
+                                {data.route.slice(-3).map((point, index) => (
+                                  <div key={index} className="flex items-center text-xs text-gray-600">
+                                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1.5 flex-shrink-0"></div>
+                                    <span className="truncate">{point.timestamp} - {point.lat.toFixed(4)}, {point.lng.toFixed(4)}</span>
+                                  </div>
                                 ))}
                               </div>
-                            </div>
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Wifi className="w-4 h-4 mr-1" />
-                              Connected
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <button className="text-blue-600 hover:text-blue-800 transition-colors">
-                              <PhoneCall className="w-4 h-4" />
-                            </button>
-                            <button className="text-green-600 hover:text-green-800 transition-colors">
-                              <MessageSquare className="w-4 h-4" />
-                            </button>
-                            <button className="text-purple-600 hover:text-purple-800 transition-colors">
-                              <Navigation2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
+                            </td>
 
-                        {/* Recent Route */}
-                        <div className="border-t border-gray-100 pt-4">
-                          <h5 className="text-sm font-medium text-gray-900 mb-2">Recent Route</h5>
-                          <div className="space-y-1 max-h-20 overflow-y-auto">
-                            {data.route.slice(-3).map((point, index) => (
-                              <div key={index} className="flex items-center text-xs text-gray-600">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                                <span>{point.timestamp}</span>
-                                <span className="mx-2">-</span>
-                                <span>{point.lat.toFixed(4)}, {point.lng.toFixed(4)}</span>
+                            {/* Actions */}
+                            <td className="px-4 py-4">
+                              <div className="flex items-center justify-center space-x-2">
+                                <button 
+                                  className="text-blue-600 hover:text-blue-800 transition-colors"
+                                  title="Call Driver"
+                                >
+                                  <PhoneCall className="w-4 h-4" />
+                                </button>
+                                <button 
+                                  className="text-green-600 hover:text-green-800 transition-colors"
+                                  title="Send Message"
+                                >
+                                  <MessageSquare className="w-4 h-4" />
+                                </button>
+                                <button 
+                                  className="text-purple-600 hover:text-purple-800 transition-colors"
+                                  title="View Route"
+                                >
+                                  <Navigation2 className="w-4 h-4" />
+                                </button>
+                                <button 
+                                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                                  title="More Options"
+                                >
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </button>
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
               </div>
-
-              {/* Tracking Controls */}
-              {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Tracking Controls</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <button className="flex items-center justify-center px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                    <Play className="w-5 h-5 mr-2" />
-                    Start All Tracking
-                  </button>
-                  <button className="flex items-center justify-center px-4 py-3 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors">
-                    <Pause className="w-5 h-5 mr-2" />
-                    Pause Tracking
-                  </button>
-                  <button className="flex items-center justify-center px-4 py-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
-                    <Square className="w-5 h-5 mr-2" />
-                    Emergency Stop
-                  </button>
-                </div>
-              </div> */}
-
             </div>
           )}
 
       {/* Dispatch Modal */}
       {showDispatchModal && (
-        <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 flex items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
           <div className="bg-white shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">

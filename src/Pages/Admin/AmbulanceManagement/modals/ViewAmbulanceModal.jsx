@@ -21,7 +21,7 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
   if (!ambulance) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
       <div className="bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="p-6">
@@ -216,7 +216,7 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
           </div>
 
           {/* Fuel Level */}
-          <div className="mt-6 border border-gray-200  p-4">
+          {/* <div className="mt-6 border border-gray-200  p-4">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
               <Fuel className="w-5 h-5 mr-2 text-blue-600" />
               Fuel Level
@@ -239,7 +239,7 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
                 ></div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Equipment List */}
           <div className="mt-6 border border-gray-200  p-4">
