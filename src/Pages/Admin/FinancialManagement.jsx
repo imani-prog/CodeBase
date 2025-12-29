@@ -34,6 +34,16 @@ import {
   Hospital,
   Activity
 } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 const FinancialManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -49,6 +59,22 @@ const FinancialManagement = () => {
     monthlyGrowth: 12.5,
     pendingPayments: 125000
   };
+
+  // Monthly financial trend data for 12 months
+  const monthlyTrendData = [
+    { month: 'Jan', revenue: 1200000, expenses: 1400000, profit: 800000 },
+    { month: 'Feb', revenue: 1800000, expenses: 1550000, profit: 250000 },
+    { month: 'Mar', revenue: 1500000, expenses: 1600000, profit: 100000 },
+    { month: 'Apr', revenue: 2400000, expenses: 1300000, profit: 700000 },
+    { month: 'May', revenue: 2000000, expenses: 1650000, profit: 350000 },
+    { month: 'Jun', revenue: 2700000, expenses: 1200000, profit: 900000 },
+    { month: 'Jul', revenue: 2300000, expenses: 1750000, profit: 550000 },
+    { month: 'Aug', revenue: 2900000, expenses: 1900000, profit: 1000000 },
+    { month: 'Sep', revenue: 2100000, expenses: 1850000, profit: 250000 },
+    { month: 'Oct', revenue: 3000000, expenses: 2000000, profit: 1000000 },
+    { month: 'Nov', revenue: 2600000, expenses: 1950000, profit: 650000 },
+    { month: 'Dec', revenue: 3200000, expenses: 2100000, profit: 1100000 }
+  ];
 
   const revenueStreams = [
     { 
@@ -75,14 +101,7 @@ const FinancialManagement = () => {
       transactions: 890,
       avgPerTransaction: 472
     },
-    { 
-      source: 'Medical Equipment Rental', 
-      amount: 380000, 
-      percentage: 15.5, 
-      trend: 'down',
-      transactions: 156,
-      avgPerTransaction: 2436
-    },
+  
     { 
       source: 'Telemedicine Services', 
       amount: 150000, 
@@ -299,8 +318,8 @@ const FinancialManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm mb-1">Total Revenue</p>
+              <p className="text-2xl font-bold ">
                 {formatCurrency(financialOverview.totalRevenue)}
               </p>
               <div className="flex items-center mt-2">
@@ -317,8 +336,8 @@ const FinancialManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Expenses</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm mb-1">Total Expenses</p>
+              <p className="text-2xl font-bold ">
                 {formatCurrency(financialOverview.totalExpenses)}
               </p>
               <div className="flex items-center mt-2">
@@ -335,8 +354,8 @@ const FinancialManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Net Profit</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm mb-1">Net Profit</p>
+              <p className="text-2xl font-bold ">
                 {formatCurrency(financialOverview.netProfit)}
               </p>
               <div className="flex items-center mt-2">
@@ -353,8 +372,8 @@ const FinancialManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Pending Payments</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm mb-1">Pending Payments</p>
+              <p className="text-2xl font-bold ">
                 {formatCurrency(financialOverview.pendingPayments)}
               </p>
               <div className="flex items-center mt-2">
@@ -369,46 +388,22 @@ const FinancialManagement = () => {
         </div>
       </div>
 
-      {/* Revenue vs Expenses Chart */}
-      <div className="  shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Monthly Financial Trend</h3>
-          <select
-            value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
-          >
-            <option value="this-month">This Month</option>
-            <option value="last-3-months">Last 3 Months</option>
-            <option value="last-6-months">Last 6 Months</option>
-            <option value="this-year">This Year</option>
-          </select>
-        </div>
-        <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-          <div className="text-center">
-            <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-600">Financial trend chart would be displayed here</p>
-            <p className="text-sm text-gray-500">Integration with charting library needed</p>
-          </div>
-        </div>
-      </div>
-
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="shadow-sm border border-gray-200 p-6">
           <h4 className="font-semibold text-gray-900 mb-4">Quick Actions</h4>
           <div className="space-y-3">
-            <button className="w-full flex items-center px-4 py-2 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-blue-100 rounded-lg transition-colors">
               <Plus className="w-4 h-4 text-blue-600 mr-3" />
               <span className="text-blue-700">Add New Transaction</span>
             </button>
-            <button className="w-full flex items-center px-4 py-2 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
-              <Download className="w-4 h-4 text-green-600 mr-3" />
-              <span className="text-green-700">Export Financial Report</span>
+            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-blue-100 rounded-lg transition-colors">
+              <Download className="w-4 h-4 text-blue-600 mr-3" />
+              <span className="text-blue-700">Export Financial Report</span>
             </button>
-            <button className="w-full flex items-center px-4 py-2 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
-              <Users className="w-4 h-4 text-purple-600 mr-3" />
-              <span className="text-purple-700">Process CHW Payments</span>
+            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-blue-100 rounded-lg transition-colors">
+              <Users className="w-4 h-4 text-blue-600 mr-3" />
+              <span className="text-blue-700">Process CHW Payments</span>
             </button>
           </div>
         </div>
@@ -466,7 +461,151 @@ const FinancialManagement = () => {
             </div>
           </div>
         </div>
+      </div> */}
+
+      {/* Revenue vs Expenses Chart */}
+      <div className="shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">Monthly Financial Trend</h3>
+          <select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent text-sm"
+          >
+            <option value="this-month">This Month</option>
+            <option value="last-3-months">Last 3 Months</option>
+            <option value="last-6-months">Last 6 Months</option>
+            <option value="this-year">This Year</option>
+          </select>
+        </div>
+        
+        <ResponsiveContainer width="100%" height={400}>
+          <AreaChart 
+            data={monthlyTrendData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
+            <defs>
+            {/* Revenue – darkest blue */}
+            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#1e40af" stopOpacity={0.45} /> {/* blue-800 */}
+              <stop offset="100%" stopColor="#1e40af" stopOpacity={0.05} />
+            </linearGradient>
+
+            {/* Expenses – mid blue */}
+            <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} /> {/* blue-500 */}
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.05} />
+            </linearGradient>
+
+            {/* Profit – green (clearly distinct) */}
+            <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#16a34a" stopOpacity={0.4} /> {/* green-600 */}
+              <stop offset="100%" stopColor="#16a34a" stopOpacity={0.05} />
+            </linearGradient>
+          </defs>
+
+
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+            <XAxis 
+              dataKey="month" 
+              stroke="#9ca3af"
+              tick={{ fill: '#6b7280', fontSize: 12 }}
+              axisLine={{ stroke: '#e5e7eb' }}
+            />
+            <YAxis 
+              stroke="#9ca3af"
+              tick={{ fill: '#6b7280', fontSize: 12 }}
+              axisLine={{ stroke: '#e5e7eb' }}
+              tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+              domain={[0, 'dataMax + 200000']}
+              allowDataOverflow={false}
+            />
+            <Tooltip 
+              contentStyle={{
+                backgroundColor: '#fff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                padding: '12px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+              formatter={(value, name) => {
+                const formattedValue = new Intl.NumberFormat('en-KE', {
+                  style: 'currency',
+                  currency: 'KES',
+                  minimumFractionDigits: 0
+                }).format(value);
+                const label = name.charAt(0).toUpperCase() + name.slice(1);
+                return [formattedValue, label];
+              }}
+            />
+            <Legend 
+              wrapperStyle={{ paddingTop: '20px' }}
+              iconType="line"
+            />
+            <Area
+              type="monotone"
+              dataKey="revenue"
+              stroke="#1e3a8a"
+              strokeWidth={2.5}
+              fill="url(#colorRevenue)"
+              baseValue={0}
+              name="Revenue"
+            />
+
+            <Area
+              type="monotone"
+              dataKey="expenses"
+              stroke="#3b82f6"
+              strokeWidth={2.5}
+              fill="url(#colorExpenses)"
+              baseValue={0}
+              name="Expenses"
+            />
+
+            <Area
+              type="monotone"
+              dataKey="profit"
+              stroke="#16a34a"
+              strokeWidth={2.5}
+              fill="url(#colorProfit)"
+              baseValue={0}
+              name="Profit"
+            />
+
+          </AreaChart>
+        </ResponsiveContainer>
+        
+        <div className="mt-6 grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-3 h-3 rounded bg-blue-800 mr-2"></div>
+              <span className="text-sm text-gray-600">Latest Month Total</span>
+            </div>
+            <p className="text-sm text-gray-500">
+              Revenue: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].revenue)}</span>
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-3 h-3 rounded bg-blue-500  mr-2"></div>
+              <span className="text-sm text-gray-600">Expenses</span>
+            </div>
+            <p className="text-sm text-gray-500">
+              Total: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].expenses)}</span>
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-3 h-3 rounded bg-green-600 mr-2"></div>
+              <span className="text-sm text-gray-600">Net Profit</span>
+            </div>
+            <p className="text-sm text-gray-500">
+              Amount: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].profit)}</span>
+            </p>
+          </div>
+        </div>
       </div>
+
     </div>
   );
 
@@ -1021,44 +1160,19 @@ const FinancialManagement = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 p-6">
       
       <div className="">
         <div className="">
           {/* Header Section */}
           <div className="mb-8">
-            <div className="p-8 shadow-lg">
-              <div className="flex items-center justify-between">
+            <div className="">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h1 className="text-4xl font-bold mb-2">Financial Management</h1>
+                  <h1 className="text-3xl font-bold">Financial Management</h1>
                   <p className="text-lg">
                     Comprehensive financial oversight for MediLink healthcare operations
                   </p>
-                  <div className="mt-4 flex items-center space-x-6">
-                    <div className="flex items-center">
-                      <TrendingUp className="w-5 h-5 mr-2 text-green-300" />
-                      <span className="">
-                        Revenue: {formatCurrency(financialOverview.totalRevenue)}
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <CircleDollarSign className="w-5 h-5 mr-2 text-yellow-300" />
-                      <span className="">
-                        Profit: {formatCurrency(financialOverview.netProfit)}
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <Target className="w-5 h-5 mr-2 text-blue-300" />
-                      <span className="">
-                        Margin: {financialOverview.profitMargin}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="hidden md:block">
-                  <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-16 h-16" />
-                  </div>
                 </div>
               </div>
             </div>
