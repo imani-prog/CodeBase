@@ -184,17 +184,6 @@ const ApproveRequests = () => {
     }
   };
 
-  // const getTypeColor = (type) => {
-  //   switch (type) {
-  //     case 'chw_application': return 'bg-blue-50 border-blue-200';
-  //     case 'patient_registration': return 'bg-green-50 border-green-200';
-  //     case 'system_access': return 'bg-purple-50 border-purple-200';
-  //     case 'clinic_partnership': return 'bg-indigo-50 border-indigo-200';
-  //     case 'training_enrollment': return 'bg-orange-50 border-orange-200';
-  //     case 'equipment_request': return 'bg-teal-50 border-teal-200';
-  //     default: return 'bg-gray-50 border-gray-200';
-  //   }
-  // };
 
   const handleApprove = (id) => console.log('Approving request:', id);
   const handleReject = (id) => console.log('Rejecting request:', id);
@@ -216,16 +205,16 @@ const ApproveRequests = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
-      <div className="mb-8 p-8">
-        <div className="flex items-center justify-between">
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Approve Requests</h1>
-            <p className="text-lg">
+            <h1 className="text-3xl font-bold">Approve Requests</h1>
+            <p className="mt-1">
               Review and manage all pending requests in the MediLink system
             </p>
-            <div className="mt-4 flex items-center space-x-6">
+            {/* <div className="mt-4 flex items-center space-x-6">
               <div className="flex items-center">
                 <Clock className="w-5 h-5 mr-2" />
                 <span className="">{filteredRequests.length} Pending Requests</span>
@@ -236,18 +225,14 @@ const ApproveRequests = () => {
                   {requests.filter(r => r.priority === 'urgent' || r.priority === 'high').length} High Priority
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
-          <div className="hidden md:block">
-            <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-              <FileText className="w-16 h-16" />
-            </div>
-          </div>
+          
         </div>
       </div>
 
       {/* Controls */}
-      <div className="border border-gray-200 p-6 mb-6">
+      <div className="p-4 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex flex-col sm:flex-row gap-4 flex-1">
             {/* Search */}
@@ -325,157 +310,221 @@ const ApproveRequests = () => {
       </div>
 
       {/* Requests Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredRequests.map(request => (
-          <div
-            key={request.id}
-            className={`shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200`}
-          >
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
+      <div className="bg-white shadow overflow-x-auto">
+        {filteredRequests.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No requests found</h3>
+            <p className="text-gray-600">
+              {searchTerm || selectedFilter !== 'all'
+                ? 'Try adjusting your search or filter criteria'
+                : 'There are no pending requests at the moment'}
+            </p>
+          </div>
+        ) : (
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-100 uppercase text-xs font-semibold">
+              <tr>
+                <th className="px-4 py-3 text-left">
                   <input
                     type="checkbox"
-                    checked={selectedRequests.includes(request.id)}
-                    onChange={() => toggleSelectRequest(request.id)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedRequests(filteredRequests.map(r => r.id));
+                      } else {
+                        setSelectedRequests([]);
+                      }
+                    }}
+                    checked={selectedRequests.length === filteredRequests.length && filteredRequests.length > 0}
                   />
-                  <div className="p-4 w-4 h-4">{getTypeIcon(request.type)}</div>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(request.priority)}`}>
-                  {request.priority.toUpperCase()}
-                </span>
-              </div>
+                </th>
+                <th className="px-4 py-3 text-left">Type</th>
+                <th className="px-4 py-3 text-left">Request Title</th>
+                <th className="px-4 py-3 text-left">Priority</th>
+                <th className="px-4 py-3 text-left">Applicant</th>
+                <th className="px-4 py-3 text-left">Contact Info</th>
+                <th className="px-4 py-3 text-left">Submitted Date</th>
+                <th className="px-4 py-3 text-left">Details</th>
+                <th className="px-4 py-3 text-left">Documents</th>
+                <th className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRequests.map(request => (
+                <tr key={request.id} className="border-b hover:bg-gray-50 transition-colors">
+                  {/* Checkbox */}
+                  <td className="px-4 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedRequests.includes(request.id)}
+                      onChange={() => toggleSelectRequest(request.id)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                  </td>
 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{request.title}</h3>
-              <p className="text-gray-600 text-sm line-clamp-2">{request.description}</p>
-            </div>
+                  {/* Type Icon */}
+                  <td className="px-4 py-4">
+                    <div className="flex items-center justify-center">
+                      {getTypeIcon(request.type)}
+                    </div>
+                  </td>
 
-            {/* Applicant Info */}
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center space-x-3 mb-4">
-                <img
-                  src={request.applicant.avatar}
-                  alt={request.applicant.name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                  onError={(e) => {
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(request.applicant.name)}&background=3B82F6&color=fff&size=48`;
-                  }}
-                />
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">{request.applicant.name}</h4>
-                  <div className="flex items-center text-sm text-gray-500 mt-1">
-                    <MapPin className="w-3 h-3 mr-1" />
-                    {request.applicant.location}
-                  </div>
-                </div>
-              </div>
+                  {/* Request Title & Description */}
+                  <td className="px-4 py-4">
+                    <div className="max-w-xs">
+                      <div className="font-semibold text-gray-900 mb-1">{request.title}</div>
+                      <div className="text-xs text-gray-600 line-clamp-2">{request.description}</div>
+                    </div>
+                  </td>
 
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center text-gray-600">
-                  <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                  {request.applicant.email}
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                  {request.applicant.phone}
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                  Submitted: {new Date(request.submittedDate).toLocaleDateString()}
-                </div>
-              </div>
-            </div>
-
-            {/* Additional Details */}
-            <div className="p-6 border-b border-gray-100 space-y-3">
-              {request.experience && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Experience:</span>
-                  <span className="font-medium text-gray-900">{request.experience}</span>
-                </div>
-              )}
-              {request.medicalCondition && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Condition:</span>
-                  <span className="font-medium text-gray-900">{request.medicalCondition}</span>
-                </div>
-              )}
-              {request.department && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Department:</span>
-                  <span className="font-medium text-gray-900">{request.department}</span>
-                </div>
-              )}
-              {request.course && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Course:</span>
-                  <span className="font-medium text-gray-900">{request.course}</span>
-                </div>
-              )}
-              {request.equipmentType && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Equipment:</span>
-                  <span className="font-medium text-gray-900">{request.equipmentType}</span>
-                </div>
-              )}
-
-              <div className="pt-2">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">Documents:</span>
-                  <span className="text-sm font-medium text-blue-600">{request.documents.length} files</span>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {request.documents.slice(0, 2).map((doc, i) => (
-                    <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                      {doc}
+                  {/* Priority */}
+                  <td className="px-4 py-4">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${getPriorityColor(request.priority)}`}>
+                      {request.priority.toUpperCase()}
                     </span>
-                  ))}
-                  {request.documents.length > 2 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                      +{request.documents.length - 2} more
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
+                  </td>
 
-            {/* Actions */}
-            <div className="p-6 flex items-center space-x-3">
-              <button
-                onClick={() => handleApprove(request.id)}
-                className="ml-10 mr-10 flex-1 flex items-center justify-center py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                <Check className="w-4 h-4 mr-2" /> Approve
-              </button>
-              <button
-                onClick={() => handleReject(request.id)}
-                className="ml-10 mr-10 flex-1 flex items-center justify-center py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                <X className="w-4 h-4 mr-2" /> Reject
-              </button>
-              <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-                <Eye className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        ))}
+                  {/* Applicant Info */}
+                  <td className="px-4 py-4">
+                    <div className="flex items-center space-x-2">
+                      <img
+                        src={request.applicant.avatar}
+                        alt={request.applicant.name}
+                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                        onError={(e) => {
+                          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(request.applicant.name)}&background=3B82F6&color=fff&size=32`;
+                        }}
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900">{request.applicant.name}</div>
+                        <div className="flex items-center text-xs text-gray-500">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {request.applicant.location}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Contact Info */}
+                  <td className="px-4 py-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Mail className="w-3 h-3 mr-1 text-gray-400" />
+                        <span className="truncate max-w-[150px]">{request.applicant.email}</span>
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Phone className="w-3 h-3 mr-1 text-gray-400" />
+                        {request.applicant.phone}
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Submitted Date */}
+                  <td className="px-4 py-4">
+                    <div className="flex items-center text-xs text-gray-600">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      {new Date(request.submittedDate).toLocaleDateString()}
+                    </div>
+                  </td>
+
+                  {/* Additional Details */}
+                  <td className="px-4 py-4">
+                    <div className="space-y-1 text-xs">
+                      {request.experience && (
+                        <div className="text-gray-600">
+                          <span className="font-medium">Exp:</span> {request.experience}
+                        </div>
+                      )}
+                      {request.medicalCondition && (
+                        <div className="text-gray-600">
+                          <span className="font-medium">Condition:</span> {request.medicalCondition}
+                        </div>
+                      )}
+                      {request.department && (
+                        <div className="text-gray-600">
+                          <span className="font-medium">Dept:</span> {request.department}
+                        </div>
+                      )}
+                      {request.course && (
+                        <div className="text-gray-600">
+                          <span className="font-medium">Course:</span> {request.course}
+                        </div>
+                      )}
+                      {request.equipmentType && (
+                        <div className="text-gray-600">
+                          <span className="font-medium">Equipment:</span> {request.equipmentType}
+                        </div>
+                      )}
+                      {request.referredBy && (
+                        <div className="text-gray-600">
+                          <span className="font-medium">Referred:</span> {request.referredBy}
+                        </div>
+                      )}
+                      {request.accessLevel && (
+                        <div className="text-gray-600">
+                          <span className="font-medium">Access:</span> {request.accessLevel}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* Documents */}
+                  <td className="px-4 py-4">
+                    <div className="space-y-1">
+                      <div className="text-xs font-medium text-blue-600 mb-1">
+                        {request.documents.length} files
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {request.documents.slice(0, 2).map((doc, i) => (
+                          <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                            {doc}
+                          </span>
+                        ))}
+                        {request.documents.length > 2 && (
+                          <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                            +{request.documents.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Actions */}
+                  <td className="px-4 py-4">
+                    <div className="flex items-center justify-center space-x-2">
+                      <button
+                        onClick={() => handleApprove(request.id)}
+                        className="flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs whitespace-nowrap"
+                        title="Approve Request"
+                      >
+                        <Check className="w-3 h-3 mr-1" />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleReject(request.id)}
+                        className="flex items-center px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-xs whitespace-nowrap"
+                        title="Reject Request"
+                      >
+                        <X className="w-3 h-3 mr-1" />
+                        Reject
+                      </button>
+                      <button 
+                        className="p-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
-
-      {/* Empty State */}
-      {filteredRequests.length === 0 && (
-        <div className="text-center py-12">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FileText className="w-12 h-12 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No requests found</h3>
-          <p className="text-gray-600">
-            {searchTerm || selectedFilter !== 'all'
-              ? 'Try adjusting your search or filter criteria'
-              : 'There are no pending requests at the moment'}
-          </p>
-        </div>
-      )}
     </div>
   );
 };
