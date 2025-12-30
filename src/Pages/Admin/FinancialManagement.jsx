@@ -882,22 +882,22 @@ const FinancialManagement = () => {
 
   const renderAmbulanceFinances = () => (
     <div className="space-y-6">
-      <div className="border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Ambulance Financial Performance</h3>
-          <div className="flex items-center space-x-3">
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
-              <option>All Ambulances</option>
-              <option>Active Only</option>
-              <option>Maintenance</option>
-            </select>
-            <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Download className="w-4 h-4 mr-2" />
-              Export Report
-            </button>
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold ">Ambulance Financial Performance</h3>
+        <div className="flex items-center space-x-3">
+          <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
+            <option>All Ambulances</option>
+            <option>Active Only</option>
+            <option>Maintenance</option>
+          </select>
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <Download className="w-4 h-4 mr-2" />
+            Export Report
+          </button>
         </div>
+      </div>
 
+      <div className="border border-gray-200 p-6">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -917,13 +917,13 @@ const FinancialManagement = () => {
                 <tr key={ambulance.id} className="border-b border-gray-100">
                   <td className="py-4 px-4">
                     <div>
-                      <p className="font-medium text-gray-900">{ambulance.registration}</p>
+                      <p className="font-semibold ">{ambulance.registration}</p>
                       <p className="text-sm text-gray-600">{ambulance.location}</p>
                     </div>
                   </td>
                   <td className="py-4 px-4">
                     <div>
-                      <p className="font-medium text-gray-900">{formatCurrency(ambulance.monthlyRevenue)}</p>
+                      <p className="font-semibold">{formatCurrency(ambulance.monthlyRevenue)}</p>
                       <p className="text-sm text-gray-600">{formatCurrency(ambulance.avgRevenuePerTrip)}/trip</p>
                     </div>
                   </td>
@@ -937,7 +937,7 @@ const FinancialManagement = () => {
                     <p className="text-gray-900">{formatCurrency(ambulance.driverPayments)}</p>
                   </td>
                   <td className="py-4 px-4">
-                    <p className={`font-medium ${ambulance.netProfit > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <p className={`font-semibold ${ambulance.netProfit > 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {formatCurrency(ambulance.netProfit)}
                     </p>
                   </td>
@@ -945,7 +945,7 @@ const FinancialManagement = () => {
                     <p className="text-gray-900">{ambulance.trips}</p>
                   </td>
                   <td className="py-4 px-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ambulance.status)}`}>
+                    <span className={`px-2 py-1 rounded-full font-medium ${getStatusColor(ambulance.status)}`}>
                       {ambulance.status}
                     </span>
                   </td>
@@ -960,52 +960,52 @@ const FinancialManagement = () => {
 
   const renderCHWPayments = () => (
     <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold ">Community Health Worker Payments</h3>
+        <div className="flex items-center space-x-3">
+          <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
+            <option>All CHWs</option>
+            <option>Paid</option>
+            <option>Pending</option>
+          </select>
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Process Payments
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10 max-w-4xl mx-auto">
+        <div className="border border-gray-100 shadow-md p-4">
+          <div className="flex items-center">
+            <Users className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="text-sm text-blue-600">Total CHWs</p>
+              <p className="text-2xl font-bold ">45</p>
+            </div>
+          </div>
+        </div>
+        <div className="border border-gray-100 shadow-md p-4">
+          <div className="flex items-center">
+            <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="text-sm text-blue-600">Payments Processed</p>
+              <p className="text-2xl font-bold ">{formatCurrency(480000)}</p>
+            </div>
+          </div>
+        </div>
+        <div className="border border-gray-100 shadow-md p-4">
+          <div className="flex items-center">
+            <Clock className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="text-sm text-blue-600">Pending Payments</p>
+              <p className="text-2xl font-bold ">{formatCurrency(54000)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Community Health Worker Payments</h3>
-          <div className="flex items-center space-x-3">
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100focus:border-transparent">
-              <option>All CHWs</option>
-              <option>Paid</option>
-              <option>Pending</option>
-            </select>
-            <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Process Payments
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="border border-gray-100 shadow-md p-4">
-            <div className="flex items-center">
-              <Users className="w-8 h-8 text-blue-600 mr-3" />
-              <div>
-                <p className="text-sm text-blue-600">Total CHWs</p>
-                <p className="text-2xl font-bold text-blue-900">45</p>
-              </div>
-            </div>
-          </div>
-          <div className="border border-gray-100 shadow-md p-4">
-            <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
-              <div>
-                <p className="text-sm text-green-600">Payments Processed</p>
-                <p className="text-2xl font-bold text-green-900">{formatCurrency(480000)}</p>
-              </div>
-            </div>
-          </div>
-          <div className="border border-gray-100 shadow-md p-4">
-            <div className="flex items-center">
-              <Clock className="w-8 h-8 text-yellow-600 mr-3" />
-              <div>
-                <p className="text-sm text-yellow-600">Pending Payments</p>
-                <p className="text-2xl font-bold text-yellow-900">{formatCurrency(54000)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -1025,7 +1025,7 @@ const FinancialManagement = () => {
                 <tr key={chw.id} className="border-b border-gray-100">
                   <td className="py-4 px-4">
                     <div>
-                      <p className="font-medium text-gray-900">{chw.name}</p>
+                      <p className="font-semibold">{chw.name}</p>
                       <p className="text-sm text-gray-600">{chw.location}</p>
                     </div>
                   </td>
@@ -1042,7 +1042,7 @@ const FinancialManagement = () => {
                     </div>
                   </td>
                   <td className="py-4 px-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(chw.paymentStatus)}`}>
+                    <span className={`px-2 py-1 rounded-full ${getStatusColor(chw.paymentStatus)}`}>
                       {chw.paymentStatus}
                     </span>
                   </td>
