@@ -478,7 +478,7 @@ const InsuranceManagement = () => {
   // Render Insurance Providers Tab
   const renderProviders = () => (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold">Insurance Providers</h3>
         <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
           <Plus className="w-4 h-4 mr-2" />
@@ -486,66 +486,136 @@ const InsuranceManagement = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {insuranceProviders.map((provider) => (
-          <div key={provider.id} className="bg-white border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <span className="text-3xl mr-3">{provider.logo}</span>
-                <div>
-                  <h4 className="font-semibold text-gray-900">{provider.name}</h4>
-                  <p className="text-sm text-gray-500">{provider.type}</p>
-                </div>
-              </div>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(provider.status)}`}>
-                {provider.status}
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Covered Patients:</span>
-                <span className="text-sm font-medium">{provider.patients.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Claims Processed:</span>
-                <span className="text-sm font-medium">{provider.claimsProcessed}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Total Amount:</span>
-                <span className="text-sm font-medium">{formatCurrency(provider.totalAmount)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Coverage:</span>
-                <span className="text-sm font-medium">{provider.coveragePercentage}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Ambulance Cover:</span>
-                <span className={`text-sm font-medium ${provider.ambulanceCover ? 'text-green-600' : 'text-red-600'}`}>
-                  {provider.ambulanceCover ? 'Yes' : 'No'}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <div className="text-sm text-gray-600 mb-2">Contact Person:</div>
-              <div className="text-sm font-medium text-gray-900">{provider.contactPerson}</div>
-              <div className="text-sm text-gray-500">{provider.phone}</div>
-              <div className="text-sm text-gray-500">{provider.email}</div>
-            </div>
-
-            <div className="mt-4 flex justify-between">
-              <button className="text-blue-600 hover:text-blue-700 flex items-center text-sm">
-                <Eye className="w-4 h-4 mr-1" />
-                View Details
-              </button>
-              <button className="text-gray-600 hover:text-gray-700 flex items-center text-sm">
-                <Edit className="w-4 h-4 mr-1" />
-                Edit
-              </button>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <Shield className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Total Providers</p>
+              <p className="text-2xl font-bold">{insuranceProviders.length}</p>
             </div>
           </div>
-        ))}
+        </div>
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <Users className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Covered Patients</p>
+              <p className="text-2xl font-bold">
+                {insuranceProviders.reduce((sum, p) => sum + p.patients, 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <FileText className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Total Claims</p>
+              <p className="text-2xl font-bold">
+                {insuranceProviders.reduce((sum, p) => sum + p.claimsProcessed, 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Total Amount</p>
+              <p className="text-2xl font-bold">
+                {formatCurrency(insuranceProviders.reduce((sum, p) => sum + p.totalAmount, 0))}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 uppercase text-xs">
+            <tr>
+              <th className="px-4 py-3 text-left">Provider Name</th>
+              <th className="px-4 py-3 text-center">Type</th>
+              <th className="px-4 py-3 text-center">Patients</th>
+              <th className="px-4 py-3 text-center">Claims</th>
+              <th className="px-4 py-3 text-right">Total Amount</th>
+              <th className="px-4 py-3 text-center">Coverage</th>
+              <th className="px-4 py-3 text-center">Ambulance</th>
+              <th className="px-4 py-3 text-left">Contact Person</th>
+              <th className="px-4 py-3 text-center">Status</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {insuranceProviders.map((provider) => (
+              <tr key={provider.id} className="hover:bg-gray-50">
+                <td className="px-4 py-4">
+                  <div>
+                    <p className="font-semibold">{provider.name}</p>
+                    <p className="text-xs text-gray-500">{provider.coverage}</p>
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${
+                    provider.type === 'Government' ? ' text-blue-800' : ' text-blue-800'
+                  }`}>
+                    {provider.type}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-semibold">{provider.patients.toLocaleString()}</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-semibold">{provider.claimsProcessed}</span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <span className="font-semibold">{formatCurrency(provider.totalAmount)}</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <div className="flex flex-col items-center">
+                    <span className="text-sm font-medium mb-1">{provider.coveragePercentage}%</span>
+                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-500 h-2 rounded-full" 
+                        style={{ width: `${provider.coveragePercentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className={`px-2 py-1 font-medium rounded-full border ${
+                    provider.ambulanceCover ? ' text-green-800' : ' text-red-800'
+                  }`}>
+                    {provider.ambulanceCover ? 'Yes' : 'No'}
+                  </span>
+                </td>
+                <td className="px-4 py-4">
+                  <div>
+                    <p className="text-sm font-medium">{provider.contactPerson}</p>
+                    <p className="text-xs text-gray-500">{provider.phone}</p>
+                    <p className="text-xs text-gray-500">{provider.email}</p>
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="px-2 py-1 font-medium text-green-800">
+                    {provider.status}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <div className="flex items-center justify-end space-x-2">
+                    <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -554,7 +624,7 @@ const InsuranceManagement = () => {
   const renderPatientCoverage = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Patient Insurance Coverage</h3>
+        <h3 className="text-lg font-semibold">Patient Insurance Coverage</h3>
         <div className="flex items-center space-x-4">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
