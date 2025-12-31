@@ -811,11 +811,11 @@ const TrainingManagement = () => {
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(trainingOverview.totalRevenue)}</p>
+              <p className="text-sm  mb-1">Total Revenue</p>
+              <p className="text-2xl font-bold">{formatCurrency(trainingOverview.totalRevenue)}</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-green-600" />
+              <DollarSign className="w-10 h-10 text-blue-600" />
             </div>
           </div>
         </div>
@@ -823,13 +823,13 @@ const TrainingManagement = () => {
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Avg Revenue per Course</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm  mb-1">Avg Revenue per Course</p>
+              <p className="text-2xl font-bold">
                 {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalCourses)}
               </p>
             </div>
             <div className="w-12 h-12  flex items-center justify-center">
-              <Target className="w-6 h-6 text-blue-600" />
+              <Target className="w-10 h-10 text-blue-600" />
             </div>
           </div>
         </div>
@@ -837,13 +837,13 @@ const TrainingManagement = () => {
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Avg Revenue per Student</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm  mb-1">Avg Revenue per Student</p>
+              <p className="text-2xl font-bold">
                 {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalStudents)}
               </p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <Users className="w-6 h-6 text-purple-600" />
+              <Users className="w-10 h-10 text-blue-600" />
             </div>
           </div>
         </div>
@@ -851,54 +851,66 @@ const TrainingManagement = () => {
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Monthly Growth</p>
-              <p className="text-2xl font-bold text-gray-900">{trainingOverview.monthlyGrowth}%</p>
+              <p className="text-sm mb-1">Monthly Growth</p>
+              <p className="text-2xl font-bold">{trainingOverview.monthlyGrowth}%</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-yellow-600" />
+              <TrendingUp className="w-10 h-10 text-blue-600" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Revenue by Category</h3>
-        <div className="space-y-4">
-          {revenueByCategory.map((category, index) => (
-            <div key={index} className="border border-gray-200 p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-medium text-gray-900">{category.category}</h4>
-                <div className="text-right">
-                  <p className="font-semibold text-gray-900">{formatCurrency(category.revenue)}</p>
-                  <p className="text-sm text-gray-600">{category.students} students</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-600">Courses</p>
-                  <p className="font-medium text-gray-900">{category.courses}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Avg per Student</p>
-                  <p className="font-medium text-gray-900">{formatCurrency(category.revenue / category.students)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">% of Total</p>
-                  <p className="font-medium text-gray-900">
-                    {((category.revenue / trainingOverview.totalRevenue) * 100).toFixed(1)}%
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3">
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full" 
-                    style={{ width: `${(category.revenue / trainingOverview.totalRevenue) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          ))}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Revenue by Category</h3>
+        <div className="bg-white border border-gray-200 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 uppercase text-xs">
+              <tr>
+                <th className="px-4 py-3 text-left">Category</th>
+                <th className="px-4 py-3 text-center">Courses</th>
+                <th className="px-4 py-3 text-center">Students</th>
+                <th className="px-4 py-3 text-right">Total Revenue</th>
+                <th className="px-4 py-3 text-right">Avg per Student</th>
+                <th className="px-4 py-3 text-center">% of Total</th>
+                <th className="px-4 py-3 text-left">Progress</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {revenueByCategory.map((category, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="px-4 py-4">
+                    <span className="font-semibold">{category.category}</span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="font-medium">{category.courses}</span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="font-semibold">{category.students}</span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <span className="font-semibold">{formatCurrency(category.revenue)}</span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <span className="font-semibold">{formatCurrency(category.revenue / category.students)}</span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="font-semibold">
+                      {((category.revenue / trainingOverview.totalRevenue) * 100).toFixed(1)}%
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full" 
+                        style={{ width: `${(category.revenue / trainingOverview.totalRevenue) * 100}%` }}
+                      ></div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
