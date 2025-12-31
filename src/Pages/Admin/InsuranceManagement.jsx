@@ -1007,33 +1007,136 @@ const InsuranceManagement = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Coverage Distribution</h4>
-          <div className="space-y-4">
-            {insuranceProviders.map((provider) => (
-              <div key={provider.id} className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <span className="text-lg mr-2">{provider.logo}</span>
-                  <span className="text-sm font-medium">{provider.name}</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full" 
-                      style={{ width: `${(provider.patients / insuranceOverview.activePatients) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-gray-600">{provider.patients}</span>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                <tr>
+                  <th className="px-3 py-2 text-left">Provider</th>
+                  <th className="px-3 py-2 text-center">Patients</th>
+                  <th className="px-3 py-2 text-center">% Share</th>
+                  <th className="px-3 py-2 text-right">Claims</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {insuranceProviders.map((provider) => {
+                  const sharePercentage = ((provider.patients / insuranceOverview.activePatients) * 100).toFixed(1);
+                  return (
+                    <tr key={provider.id} className="hover:bg-gray-50">
+                      <td className="px-3 py-3">
+                        <p className="font-medium text-gray-900 text-xs">{provider.name}</p>
+                      </td>
+                      <td className="px-3 py-3 text-center">
+                        <span className="font-semibold text-gray-900">{provider.patients}</span>
+                      </td>
+                      <td className="px-3 py-3">
+                        <div className="flex flex-col items-center">
+                          <span className="text-xs font-medium text-gray-900 mb-1">{sharePercentage}%</span>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div 
+                              className="bg-blue-500 h-1.5 rounded-full" 
+                              style={{ width: `${sharePercentage}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-right">
+                        <span className="font-medium text-gray-900">{provider.claimsProcessed}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Monthly Trends</h4>
-          <div className="text-center py-12 text-gray-500">
-            <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <p>Analytics chart placeholder</p>
-            <p className="text-sm">Integration with chart library needed</p>
+          <div className="space-y-2">
+            {/* Chart Legend */}
+            <div className="flex justify-end space-x-4 text-xs mb-4">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-500 rounded mr-1"></div>
+                <span className="text-gray-600">Claims</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded mr-1"></div>
+                <span className="text-gray-600">Premiums</span>
+              </div>
+            </div>
+
+            {/* Chart Area with Y-axis */}
+            <div className="flex">
+              {/* Y-axis Labels */}
+              <div className="flex flex-col-reverse justify-between text-xs text-gray-500 pr-2 h-56">
+                <span>0</span>
+                <span>100</span>
+                <span>200</span>
+                <span>300+</span>
+              </div>
+
+              {/* Chart Container */}
+              <div className="flex-1">
+                {/* Bar Chart */}
+                <div className="h-56 border-b-2 border-l-2 border-gray-300 flex items-end justify-around px-2 relative">
+                  {[
+                    { month: 'Jun', claims: 180, premiums: 85 },
+                    { month: 'Jul', claims: 220, premiums: 90 },
+                    { month: 'Aug', claims: 280, premiums: 88 },
+                    { month: 'Sep', claims: 310, premiums: 92 },
+                    { month: 'Oct', claims: 289, premiums: 87 },
+                    { month: 'Nov', claims: 320, premiums: 95 }
+                  ].map((data, index) => {
+                    const maxValue = 350;
+                    const chartHeight = 220; // Fixed height in pixels
+                    const claimsHeight = (data.claims / maxValue) * chartHeight;
+                    const premiumsHeight = (data.premiums / maxValue) * chartHeight;
+                    
+                    return (
+                      <div key={index} className="flex items-end space-x-1 pb-2">
+                        {/* Claims Bar */}
+                        <div className="relative group">
+                          <div 
+                            className="bg-blue-900 hover:bg-blue-600 transition-all rounded-t-sm w-6 cursor-pointer"
+                            style={{ height: `${claimsHeight}px` }}
+                          >
+                            <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-white border-2 border-gray-200 px-6 py-2 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                              <div className="font-semibold text-center border-b border-gray-200 pb-1 mb-1 text-gray-800">{data.month}</div>
+                              <div className="text-blue-900 font-medium">Claims: {data.claims}</div>
+                              <div className="text-blue-500 font-medium">Premiums: {data.premiums}%</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Premiums Bar */}
+                        <div className="relative group">
+                          <div 
+                            className="bg-blue-500 hover:bg-blue-600 transition-all rounded-t-sm w-6 cursor-pointer"
+                            style={{ height: `${premiumsHeight}px` }}
+                          >
+                            <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-white border-2 border-gray-200 px-6 py-2 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                              <div className="font-semibold text-center border-b border-gray-200 pb-1 mb-1 text-gray-800">{data.month}</div>
+                              <div className="text-blue-900 font-medium">Claims: {data.claims}</div>
+                              <div className="text-blue-500 font-medium">Premiums: {data.premiums}%</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* X-axis Labels (Months) */}
+                <div className="flex justify-around text-xs text-gray-600 font-medium mt-2 px-2">
+                  <span>Jun</span>
+                  <span>Jul</span>
+                  <span>Aug</span>
+                  <span>Sep</span>
+                  <span>Oct</span>
+                  <span>Nov</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
