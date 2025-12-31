@@ -338,8 +338,8 @@ const InsuranceManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Providers</p>
-              <p className="text-3xl font-bold text-gray-900">{insuranceOverview.totalProviders}</p>
+              <p className="mb-1">Total Providers</p>
+              <p className="text-3xl font-bold">{insuranceOverview.totalProviders}</p>
               <p className="text-sm text-green-600 mt-1">+2 this month</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
@@ -351,12 +351,12 @@ const InsuranceManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Covered Patients</p>
-              <p className="text-3xl font-bold text-gray-900">{insuranceOverview.activePatients.toLocaleString()}</p>
+              <p className=" mb-1">Covered Patients</p>
+              <p className="text-3xl font-bold">{insuranceOverview.activePatients.toLocaleString()}</p>
               <p className="text-sm text-green-600 mt-1">+156 this month</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <Users className="w-6 h-6 text-green-600" />
+              <Users className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -364,12 +364,12 @@ const InsuranceManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Coverage</p>
-              <p className="text-3xl font-bold text-gray-900">{formatCurrency(insuranceOverview.totalCoverage)}</p>
+              <p className=" mb-1">Total Coverage</p>
+              <p className="text-3xl font-bold">{formatCurrency(insuranceOverview.totalCoverage)}</p>
               <p className="text-sm text-green-600 mt-1">+8.5% growth</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <Shield className="w-6 h-6 text-purple-600" />
+              <Shield className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -377,12 +377,12 @@ const InsuranceManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Claims Processed</p>
-              <p className="text-3xl font-bold text-gray-900">{insuranceOverview.claimsProcessed}</p>
+              <p className=" mb-1">Claims Processed</p>
+              <p className="text-3xl font-bold">{insuranceOverview.claimsProcessed}</p>
               <p className="text-sm text-yellow-600 mt-1">{insuranceOverview.pendingClaims} pending</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <FileText className="w-6 h-6 text-yellow-600" />
+              <FileText className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -396,15 +396,15 @@ const InsuranceManagement = () => {
             {insuranceProviders.slice(0, 4).map((provider) => (
               <div key={provider.id} className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <span className="text-2xl mr-3">{provider.logo}</span>
+                  {/* <span className="text-2xl mr-3">{provider.logo}</span> */}
                   <div>
-                    <p className="font-medium">{provider.name}</p>
-                    <p className="text-sm text-gray-500">{provider.claimsProcessed} claims</p>
+                    <p className="font-semibold">{provider.name}</p>
+                    <p className="text-sm">{provider.claimsProcessed} claims</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-gray-900">{formatCurrency(provider.totalAmount)}</p>
-                  <p className="text-sm text-gray-500">{provider.coveragePercentage}% coverage</p>
+                  <p className="font-semibold">{formatCurrency(provider.totalAmount)}</p>
+                  <p className="text-sm">{provider.coveragePercentage}% coverage</p>
                 </div>
               </div>
             ))}
@@ -412,22 +412,22 @@ const InsuranceManagement = () => {
         </div>
 
         <div className="shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
             <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               <Plus className="w-5 h-5 text-blue-600 mr-2" />
               Add Provider
             </button>
             <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <FileText className="w-5 h-5 text-green-600 mr-2" />
+              <FileText className="w-5 h-5 text-blue-600 mr-2" />
               Process Claims
             </button>
             <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <Download className="w-5 h-5 text-purple-600 mr-2" />
+              <Download className="w-5 h-5 text-blue-600 mr-2" />
               Export Report
             </button>
             <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <Settings className="w-5 h-5 text-gray-600 mr-2" />
+              <Settings className="w-5 h-5 text-blue-600 mr-2" />
               Settings
             </button>
           </div>
@@ -436,13 +436,13 @@ const InsuranceManagement = () => {
 
       {/* Recent Activity */}
       <div className="shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Insurance Activity</h3>
+        <h3 className="text-lg font-semibold mb-4">Recent Insurance Activity</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 ">
             <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
+              <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
               <div>
-                <p className="font-medium text-gray-900">Claim Approved - CLM-2024-045</p>
+                <p className="font-medium ">Claim Approved - CLM-2024-045</p>
                 <p className="text-sm text-gray-500">SHA - Sarah Wanjiku - KES 13,950</p>
               </div>
             </div>
@@ -453,7 +453,7 @@ const InsuranceManagement = () => {
             <div className="flex items-center">
               <UserCheck className="w-8 h-8 text-blue-600 mr-3" />
               <div>
-                <p className="font-medium text-gray-900">New Patient Enrolled</p>
+                <p className="font-medium ">New Patient Enrolled</p>
                 <p className="text-sm text-gray-500">NHIF - David Kiprotich - UHC Basic</p>
               </div>
             </div>
@@ -462,9 +462,9 @@ const InsuranceManagement = () => {
 
           <div className="flex items-center justify-between p-4 ">
             <div className="flex items-center">
-              <AlertCircle className="w-8 h-8 text-yellow-600 mr-3" />
+              <AlertCircle className="w-8 h-8 text-blue-600 mr-3" />
               <div>
-                <p className="font-medium text-gray-900">Policy Renewal Required</p>
+                <p className="font-medium">Policy Renewal Required</p>
                 <p className="text-sm text-gray-500">Ambulance KCC 003C - Expires Oct 25</p>
               </div>
             </div>
