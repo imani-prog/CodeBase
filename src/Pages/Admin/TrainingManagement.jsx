@@ -1293,6 +1293,205 @@ const TrainingManagement = () => {
     </div>
   );
 
+  const renderReports = () => {
+    const reports = [
+      {
+        id: 1,
+        reportName: 'Monthly Course Enrollment Report',
+        category: 'Enrollment',
+        period: 'October 2025',
+        generatedDate: '2025-10-31',
+        totalStudents: 310,
+        totalRevenue: 4980000,
+        completionRate: 82,
+        status: 'Completed'
+      },
+      {
+        id: 2,
+        reportName: 'Instructor Performance Report',
+        category: 'Performance',
+        period: 'Q3 2025',
+        generatedDate: '2025-09-30',
+        totalStudents: 870,
+        totalRevenue: 14250000,
+        completionRate: 85,
+        status: 'Completed'
+      },
+      {
+        id: 3,
+        reportName: 'Certificate Issuance Report',
+        category: 'Certifications',
+        period: 'September 2025',
+        generatedDate: '2025-09-30',
+        totalStudents: 245,
+        totalRevenue: 122500,
+        completionRate: 94,
+        status: 'Completed'
+      },
+      {
+        id: 4,
+        reportName: 'Course Revenue Analysis',
+        category: 'Revenue',
+        period: 'August 2025',
+        generatedDate: '2025-08-31',
+        totalStudents: 280,
+        totalRevenue: 4320000,
+        completionRate: 78,
+        status: 'Completed'
+      },
+      {
+        id: 5,
+        reportName: 'Student Progress Report',
+        category: 'Progress',
+        period: 'July 2025',
+        generatedDate: '2025-07-31',
+        totalStudents: 220,
+        totalRevenue: 3640000,
+        completionRate: 88,
+        status: 'Completed'
+      },
+      {
+        id: 6,
+        reportName: 'Training Quality Assessment',
+        category: 'Quality',
+        period: 'Q2 2025',
+        generatedDate: '2025-06-30',
+        totalStudents: 650,
+        totalRevenue: 10850000,
+        completionRate: 86,
+        status: 'Completed'
+      }
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold">Training Reports</h3>
+          <div className="flex items-center space-x-3">
+            <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+              <Filter className="w-4 h-4 mr-2" />
+              Filter Reports
+            </button>
+            <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <Plus className="w-4 h-4 mr-2" />
+              Generate Report
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="shadow-md border border-gray-200 p-6">
+            <div className="flex items-center">
+              <FileText className="w-8 h-8 text-blue-600 mr-3" />
+              <div>
+                <p className="">Total Reports</p>
+                <p className="text-2xl font-bold">{reports.length}</p>
+              </div>
+            </div>
+          </div>
+          <div className="shadow-md border border-gray-200 p-6">
+            <div className="flex items-center">
+              <Users className="w-8 h-8 text-blue-600 mr-3" />
+              <div>
+                <p className="">Students Tracked</p>
+                <p className="text-2xl font-bold">
+                  {reports.reduce((sum, report) => sum + report.totalStudents, 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="shadow-md border border-gray-200 p-6">
+            <div className="flex items-center">
+              <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
+              <div>
+                <p className="">Total Revenue</p>
+                <p className="text-2xl font-bold">
+                  {formatCurrency(reports.reduce((sum, report) => sum + report.totalRevenue, 0))}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="shadow-md border border-gray-200 p-6">
+            <div className="flex items-center">
+              <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
+              <div>
+                <p className="">Avg Completion</p>
+                <p className="text-2xl font-bold">
+                  {(reports.reduce((sum, report) => sum + report.completionRate, 0) / reports.length).toFixed(1)}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 uppercase text-xs">
+              <tr>
+                <th className="px-4 py-3 text-left">Report Name</th>
+                <th className="px-4 py-3 text-center">Category</th>
+                <th className="px-4 py-3 text-center">Period</th>
+                <th className="px-4 py-3 text-center">Generated Date</th>
+                <th className="px-4 py-3 text-center">Students</th>
+                <th className="px-4 py-3 text-right">Revenue</th>
+                <th className="px-4 py-3 text-center">Completion</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {reports.map((report) => (
+                <tr key={report.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-4">
+                    <span className="font-semibold ">{report.reportName}</span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="px-2 py-1 text-xs font-medium rounded-full border text-blue-800">
+                      {report.category}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="text-gray-700">{report.period}</span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="text-gray-700">{report.generatedDate}</span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="font-semibold text-gray-900">{report.totalStudents}</span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <span className="font-semibold text-gray-900">{formatCurrency(report.totalRevenue)}</span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="font-semibold text-gray-900">{report.completionRate}%</span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="px-2 py-1 text-xs font-medium rounded-full border text-green-800">
+                      {report.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <div className="flex items-center justify-end space-x-2">
+                      <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                        <Download className="w-4 h-4" />
+                      </button>
+                      <button className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="">
@@ -1342,21 +1541,7 @@ const TrainingManagement = () => {
             {activeTab === 'revenue' && renderRevenue()}
             {activeTab === 'certificates' && renderCertificates()}
             {activeTab === 'instructors' && renderInstructors()}
-            
-            {/* Placeholder for other tabs */}
-            {['reports'].includes(activeTab) && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <BookOpen className="w-12 h-12 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {tabs.find(tab => tab.id === activeTab)?.label}
-                </h3>
-                <p className="text-gray-600">
-                  This section is under development. Advanced {activeTab.replace('-', ' ')} features will be available soon.
-                </p>
-              </div>
-            )}
+            {activeTab === 'reports' && renderReports()}
           </div>
         </div>
       </div>
