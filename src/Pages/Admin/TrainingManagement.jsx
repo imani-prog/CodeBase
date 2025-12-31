@@ -324,6 +324,138 @@ const TrainingManagement = () => {
     { category: 'Mental Health', revenue: 1440000, courses: 1, students: 180 }
   ];
 
+  // Instructors data
+  const instructors = [
+    {
+      id: 1,
+      name: 'Dr. Grace Achieng',
+      specialization: 'Community Health',
+      qualification: 'PhD in Public Health',
+      experience: '12 years',
+      coursesTeaching: 2,
+      totalStudents: 430,
+      avgRating: 4.8,
+      email: 'grace.achieng@medilink.com',
+      phone: '+254 712 345 678',
+      status: 'Active',
+      joinDate: '2020-03-15',
+      completedCourses: 24,
+      salary: 250000
+    },
+    {
+      id: 2,
+      name: 'Dr. James Kimani',
+      specialization: 'Digital Health Technology',
+      qualification: 'MSc in Health Informatics',
+      experience: '8 years',
+      coursesTeaching: 1,
+      totalStudents: 180,
+      avgRating: 4.7,
+      email: 'james.kimani@medilink.com',
+      phone: '+254 723 456 789',
+      status: 'Active',
+      joinDate: '2021-06-20',
+      completedCourses: 12,
+      salary: 180000
+    },
+    {
+      id: 3,
+      name: 'Dr. Mary Wanjiru',
+      specialization: 'Healthcare Administration',
+      qualification: 'MBA Healthcare Management',
+      experience: '15 years',
+      coursesTeaching: 1,
+      totalStudents: 95,
+      avgRating: 4.5,
+      email: 'mary.wanjiru@medilink.com',
+      phone: '+254 734 567 890',
+      status: 'Active',
+      joinDate: '2019-09-10',
+      completedCourses: 18,
+      salary: 220000
+    },
+    {
+      id: 4,
+      name: 'Dr. David Omondi',
+      specialization: 'Clinical Skills',
+      qualification: 'MD, MMED (Internal Medicine)',
+      experience: '18 years',
+      coursesTeaching: 1,
+      totalStudents: 160,
+      avgRating: 4.9,
+      email: 'david.omondi@medilink.com',
+      phone: '+254 745 678 901',
+      status: 'Active',
+      joinDate: '2018-01-05',
+      completedCourses: 32,
+      salary: 280000
+    },
+    {
+      id: 5,
+      name: 'Dr. Peter Njoroge',
+      specialization: 'Data Analytics',
+      qualification: 'PhD in Biostatistics',
+      experience: '10 years',
+      coursesTeaching: 1,
+      totalStudents: 85,
+      avgRating: 4.6,
+      email: 'peter.njoroge@medilink.com',
+      phone: '+254 756 789 012',
+      status: 'Active',
+      joinDate: '2020-11-12',
+      completedCourses: 8,
+      salary: 200000
+    },
+    {
+      id: 6,
+      name: 'Dr. Esther Nyambura',
+      specialization: 'Maternal & Child Health',
+      qualification: 'MD, MMED (Obstetrics)',
+      experience: '14 years',
+      coursesTeaching: 1,
+      totalStudents: 120,
+      avgRating: 4.9,
+      email: 'esther.nyambura@medilink.com',
+      phone: '+254 767 890 123',
+      status: 'Active',
+      joinDate: '2019-04-22',
+      completedCourses: 22,
+      salary: 240000
+    },
+    {
+      id: 7,
+      name: 'Dr. Joseph Otieno',
+      specialization: 'Quality Management',
+      qualification: 'MPH, Six Sigma Black Belt',
+      experience: '11 years',
+      coursesTeaching: 1,
+      totalStudents: 95,
+      avgRating: 4.6,
+      email: 'joseph.otieno@medilink.com',
+      phone: '+254 778 901 234',
+      status: 'Active',
+      joinDate: '2020-08-17',
+      completedCourses: 15,
+      salary: 190000
+    },
+    {
+      id: 8,
+      name: 'Dr. Susan Mwangi',
+      specialization: 'Mental Health',
+      qualification: 'MD, Psychiatry',
+      experience: '16 years',
+      coursesTeaching: 1,
+      totalStudents: 180,
+      avgRating: 4.8,
+      email: 'susan.mwangi@medilink.com',
+      phone: '+254 789 012 345',
+      status: 'Active',
+      joinDate: '2018-05-30',
+      completedCourses: 28,
+      salary: 260000
+    }
+  ];
+
   const enrollmentTrends = [
     { month: 'Jun', enrollments: 180, revenue: 2850000 },
     { month: 'Jul', enrollments: 220, revenue: 3640000 },
@@ -435,7 +567,7 @@ const TrainingManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Total Courses</p>
+              <p className="mb-1">Total Courses</p>
               <p className="text-3xl font-bold">{trainingOverview.totalCourses}</p>
               <div className="flex items-center mt-2">
                 <BookOpen className="w-4 h-4 text-blue-500 mr-1" />
@@ -451,7 +583,7 @@ const TrainingManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1">Total Students</p>
+              <p className="mb-1">Total Students</p>
               <p className="text-3xl font-bold">{trainingOverview.totalStudents}</p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="w-4 h-4 text-blue-500 mr-1" />
@@ -467,7 +599,7 @@ const TrainingManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Total Revenue</p>
+              <p className="mb-1">Total Revenue</p>
               <p className="text-3xl font-bold">{formatCurrency(trainingOverview.totalRevenue)}</p>
               <div className="flex items-center mt-2">
                 <DollarSign className="w-4 h-4 text-blue-500 mr-1" />
@@ -483,7 +615,7 @@ const TrainingManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1">Certificates Issued</p>
+              <p className="mb-1">Certificates Issued</p>
               <p className="text-3xl font-bold">{trainingOverview.certificatesIssued}</p>
               <div className="flex items-center mt-2">
                 <Award className="w-4 h-4 text-blue-500 mr-1" />
@@ -702,7 +834,7 @@ const TrainingManagement = () => {
           <div className="flex items-center">
             <Users className="w-8 h-8 text-blue-600 mr-3" />
             <div>
-              <p className="text-sm ">Total Students</p>
+              <p className="">Total Students</p>
               <p className="text-2xl font-bold ">{trainingOverview.totalStudents}</p>
             </div>
           </div>
@@ -711,7 +843,7 @@ const TrainingManagement = () => {
           <div className="flex items-center">
             <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
             <div>
-              <p className="text-sm ">Active Enrollments</p>
+              <p className="">Active Enrollments</p>
               <p className="text-2xl font-bold ">1,245</p>
             </div>
           </div>
@@ -720,7 +852,7 @@ const TrainingManagement = () => {
           <div className="flex items-center">
             <Award className="w-8 h-8 text-blue-600 mr-3" />
             <div>
-              <p className="text-sm ">Completed Courses</p>
+              <p className="">Completed Courses</p>
               <p className="text-2xl font-bold ">856</p>
             </div>
           </div>
@@ -811,7 +943,7 @@ const TrainingManagement = () => {
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1">Total Revenue</p>
+              <p className="mb-1">Total Revenue</p>
               <p className="text-2xl font-bold">{formatCurrency(trainingOverview.totalRevenue)}</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
@@ -823,7 +955,7 @@ const TrainingManagement = () => {
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1">Avg Revenue per Course</p>
+              <p className="mb-1">Avg Revenue per Course</p>
               <p className="text-2xl font-bold">
                 {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalCourses)}
               </p>
@@ -837,7 +969,7 @@ const TrainingManagement = () => {
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1">Avg Revenue per Student</p>
+              <p className="mb-1">Avg Revenue per Student</p>
               <p className="text-2xl font-bold">
                 {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalStudents)}
               </p>
@@ -851,7 +983,7 @@ const TrainingManagement = () => {
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Monthly Growth</p>
+              <p className="mb-1">Monthly Growth</p>
               <p className="text-2xl font-bold">{trainingOverview.monthlyGrowth}%</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
@@ -918,105 +1050,245 @@ const TrainingManagement = () => {
 
   const renderCertificates = () => (
     <div className="space-y-6">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold ">Certificate Management</h3>
-          <div className="flex items-center space-x-3">
-            <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-              <Award className="w-4 h-4 mr-2" />
-              Issue Certificates
-            </button>
-            <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Download className="w-4 h-4 mr-2" />
-              Download Templates
-            </button>
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold">Certificate Management</h3>
+        <div className="flex items-center space-x-3">
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <Award className="w-4 h-4 mr-2" />
+            Issue Certificates
+          </button>
+          <button className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+            <Download className="w-4 h-4 mr-2" />
+            Download Templates
+          </button>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="shadow-md border border-gray-200 p-6">
-            <div className="flex items-center">
-              <Award className="w-8 h-8 text-purple-600 mr-3" />
-              <div>
-                <p className="text-sm text-purple-600">Certificates Issued</p>
-                <p className="text-2xl font-bold text-purple-900">{trainingOverview.certificatesIssued}</p>
-              </div>
-            </div>
-          </div>
-          <div className="shadow-md border border-gray-200 p-6">
-            <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
-              <div>
-                <p className="text-sm text-green-600">Pass Rate</p>
-                <p className="text-2xl font-bold text-green-900">
-                  {(trainingCourses.reduce((sum, course) => sum + course.passRate, 0) / trainingCourses.length).toFixed(1)}%
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="shadow-md border border-gray-200 p-6">
-            <div className="flex items-center">
-              <Star className="w-8 h-8 text-blue-600 mr-3" />
-              <div>
-                <p className="text-sm text-blue-600">Avg Rating</p>
-                <p className="text-2xl font-bold text-blue-900">{trainingOverview.avgRating.toFixed(1)}</p>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <Award className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Certificates Issued</p>
+              <p className="text-2xl font-bold">{trainingOverview.certificatesIssued}</p>
             </div>
           </div>
         </div>
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Pass Rate</p>
+              <p className="text-2xl font-bold">
+                {(trainingCourses.reduce((sum, course) => sum + course.passRate, 0) / trainingCourses.length).toFixed(1)}%
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <Star className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Avg Rating</p>
+              <p className="text-2xl font-bold">{trainingOverview.avgRating.toFixed(1)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div className="space-y-4">
-          {trainingCourses.map((course) => (
-            <div key={course.id} className="border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h4 className="font-medium text-gray-900">{course.title}</h4>
-                  <p className="text-sm text-gray-600">Certification: {course.certification}</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">Completed Students</p>
-                    <p className="font-semibold text-gray-900">
-                      {Math.floor(course.enrolledStudents * (course.completionRate / 100))}
-                    </p>
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 uppercase text-xs">
+            <tr>
+              <th className="px-4 py-3 text-left">Certification</th>
+              <th className="px-4 py-3 text-center">Completed Students</th>
+              <th className="px-4 py-3 text-center">Pass Rate</th>
+              <th className="px-4 py-3 text-center">Eligible</th>
+              <th className="px-4 py-3 text-center">Issued</th>
+              <th className="px-4 py-3 text-center">Pending</th>
+              <th className="px-4 py-3 text-right">Certificate Fee</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {trainingCourses.map((course) => (
+              <tr key={course.id} className="hover:bg-gray-50">
+                <td className="px-4 py-4">
+                  <div>
+                    <p className="font-semibold">{course.title}</p>
+                    <p className="text-xs text-gray-600">Certification: {course.certification}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">Pass Rate</p>
-                    <p className="font-semibold text-gray-900">{course.passRate}%</p>
-                  </div>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-semibold">
+                    {Math.floor(course.enrolledStudents * (course.completionRate / 100))}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-semibold">{course.passRate}%</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-medium">
+                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100))}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-medium">
+                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100) * 0.95)}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-medium">
+                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100) * 0.05)}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <span className="font-semibold">{formatCurrency(500)}</span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <button className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     Issue Certificates
                   </button>
-                </div>
-              </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <p className="text-xs text-gray-500">Eligible for Certification</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100))}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Certificates Issued</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100) * 0.95)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Pending Certificates</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100) * 0.05)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Certificate Fee</p>
-                  <p className="text-sm font-medium text-gray-900">{formatCurrency(500)}</p>
-                </div>
-              </div>
-            </div>
-          ))}
+  const renderInstructors = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold">Instructor Management</h3>
+        <div className="flex items-center space-x-3">
+          <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            <Download className="w-4 h-4 mr-2" />
+            Export Report
+          </button>
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <UserPlus className="w-4 h-4 mr-2" />
+            Add Instructor
+          </button>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <Users className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Total Instructors</p>
+              <p className="text-2xl font-bold ">{instructors.length}</p>
+            </div>
+          </div>
+        </div>
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <BookOpen className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Total Courses</p>
+              <p className="text-2xl font-bold ">
+                {instructors.reduce((sum, instructor) => sum + instructor.coursesTeaching, 0)}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <Star className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Avg Rating</p>
+              <p className="text-2xl font-bold ">
+                {(instructors.reduce((sum, instructor) => sum + instructor.avgRating, 0) / instructors.length).toFixed(1)}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p className="">Total Monthly Salaries</p>
+              <p className="text-2xl font-bold ">
+                {formatCurrency(instructors.reduce((sum, instructor) => sum + instructor.salary, 0))}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 uppercase text-xs">
+            <tr>
+              <th className="px-4 py-3 text-left">Instructor</th>
+              <th className="px-4 py-3 text-left">Specialization</th>
+              <th className="px-4 py-3 text-center">Experience</th>
+              <th className="px-4 py-3 text-center">Courses</th>
+              <th className="px-4 py-3 text-center">Students</th>
+              <th className="px-4 py-3 text-center">Rating</th>
+              <th className="px-4 py-3 text-right">Monthly Salary</th>
+              <th className="px-4 py-3 text-center">Status</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {instructors.map((instructor) => (
+              <tr key={instructor.id} className="hover:bg-gray-50">
+                <td className="px-4 py-4">
+                  <div>
+                    <p className="font-semibold text-gray-900">{instructor.name}</p>
+                    <p className="text-xs text-gray-600">{instructor.qualification}</p>
+                  </div>
+                </td>
+                <td className="px-4 py-4">
+                  <span className="font-semibold">{instructor.specialization}</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-medium text-gray-900">{instructor.experience}</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <div>
+                    <p className="font-semibold text-gray-900">{instructor.coursesTeaching}</p>
+                    <p className="text-xs text-gray-500">{instructor.completedCourses} completed</p>
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-semibold text-gray-900">{instructor.totalStudents}</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <div className="flex items-center justify-center">
+                    <Star className="w-4 h-4 text-blue-500 mr-1" />
+                    <span className="font-medium text-gray-900">{instructor.avgRating}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <span className="font-semibold text-gray-900">{formatCurrency(instructor.salary)}</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="px-2 py-1 text-xs font-medium  text-green-600">
+                    {instructor.status}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <div className="flex items-center justify-end space-x-2">
+                    <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -1069,9 +1341,10 @@ const TrainingManagement = () => {
             {activeTab === 'students' && renderStudents()}
             {activeTab === 'revenue' && renderRevenue()}
             {activeTab === 'certificates' && renderCertificates()}
+            {activeTab === 'instructors' && renderInstructors()}
             
             {/* Placeholder for other tabs */}
-            {['instructors', 'reports'].includes(activeTab) && (
+            {['reports'].includes(activeTab) && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
                 <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <BookOpen className="w-12 h-12 text-gray-400" />
