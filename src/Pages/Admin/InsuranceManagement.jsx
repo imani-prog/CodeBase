@@ -37,7 +37,9 @@ import {
   Mail,
   MapPin,
   Star,
-  Zap
+  Trash,
+  Zap,
+  Trash2
 } from 'lucide-react';
 
 const InsuranceManagement = () => {
@@ -320,13 +322,13 @@ const InsuranceManagement = () => {
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case 'active': return 'text-green-600 bg-green-50';
-      case 'processing': return 'text-yellow-600 bg-yellow-50';
-      case 'approved': return 'text-green-600 bg-green-50';
-      case 'rejected': return 'text-red-600 bg-red-50';
-      case 'pending': return 'text-yellow-600 bg-yellow-50';
-      case 'expiring soon': return 'text-orange-600 bg-orange-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'active': return 'text-green-600';
+      case 'processing': return 'text-yellow-600';
+      case 'approved': return 'text-green-600';
+      case 'rejected': return 'text-red-600';
+      case 'pending': return 'text-yellow-600';
+      case 'expiring soon': return 'text-orange-600';
+      default: return 'text-gray-600';
     }
   };
 
@@ -631,13 +633,13 @@ const InsuranceManagement = () => {
             <input
               type="text"
               placeholder="Search patients..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <select 
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={selectedProvider}
             onChange={(e) => setSelectedProvider(e.target.value)}
           >
@@ -650,17 +652,17 @@ const InsuranceManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Insurance Provider</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Policy Details</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coverage</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Patient</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Insurance Provider</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Policy Details</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Coverage</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -668,33 +670,33 @@ const InsuranceManagement = () => {
                 <tr key={patient.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{patient.patientName}</div>
-                      <div className="text-sm text-gray-500">ID: {patient.patientId}</div>
+                      <div className="text-sm font-semibold">{patient.patientName}</div>
+                      <div className="text-sm ">ID: {patient.patientId}</div>
                       <div className="text-sm text-gray-500">{patient.dependents} dependents</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{patient.insuranceProvider}</div>
-                    <div className="text-sm text-gray-500">{patient.policyType}</div>
+                    <div className="text-sm font-semibold">{patient.insuranceProvider}</div>
+                    <div className="text-sm ">{patient.policyType}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.policyNumber}</div>
-                    <div className="text-sm text-gray-500">Expires: {patient.renewalDate}</div>
+                    <div className="text-sm font-semibold">{patient.policyNumber}</div>
+                    <div className="text-sm ">Expires: {patient.renewalDate}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      <div>{formatCurrency(patient.coverageAmount)} Total</div>
-                      <div className="text-green-600">{formatCurrency(patient.remainingAmount)} Remaining</div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                    <div className="text-sm">
+                      <div className="font-semibold mb-2">{formatCurrency(patient.coverageAmount)} Total</div>
+                      <div className="">{formatCurrency(patient.remainingAmount)} Remaining</div>
+                      {/* <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                         <div 
-                          className="bg-green-500 h-2 rounded-full" 
+                          className="bg-blue-500 h-2 rounded-full" 
                           style={{ width: `${(patient.remainingAmount / patient.coverageAmount) * 100}%` }}
                         ></div>
-                      </div>
+                      </div> */}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(patient.status)}`}>
+                    <span className={`px-2 py-1 inline-flex leading-5 ${getStatusColor(patient.status)}`}>
                       {patient.status}
                     </span>
                   </td>
@@ -706,7 +708,7 @@ const InsuranceManagement = () => {
                       <button className="text-green-600 hover:text-green-900">
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button className="text-purple-600 hover:text-purple-900">
+                      <button className="text-blue-800 hover:text-blue-900">
                         <Receipt className="w-4 h-4" />
                       </button>
                     </div>
@@ -724,13 +726,13 @@ const InsuranceManagement = () => {
   const renderClaims = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Claims Management</h3>
+        <h3 className="text-lg font-semibold">Claims Management</h3>
         <div className="flex items-center space-x-4">
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
             <Plus className="w-4 h-4 mr-2" />
             New Claim
           </button>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+          <button className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center">
             <Upload className="w-4 h-4 mr-2" />
             Bulk Upload
           </button>
@@ -739,67 +741,67 @@ const InsuranceManagement = () => {
 
       {/* Claims Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white  shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12  flex items-center justify-center mr-4">
+              <CheckCircle className="w-10 h-10 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Approved Claims</p>
-              <p className="text-2xl font-bold text-gray-900">{insuranceOverview.claimsProcessed}</p>
+              <p className="">Approved Claims</p>
+              <p className="text-2xl font-bold">{insuranceOverview.claimsProcessed}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
-              <Clock className="w-6 h-6 text-yellow-600" />
+            <div className="w-12 h-12  flex items-center justify-center mr-4">
+              <Clock className="w-10 h-10 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Pending Claims</p>
-              <p className="text-2xl font-bold text-gray-900">{insuranceOverview.pendingClaims}</p>
+              <p className="">Pending Claims</p>
+              <p className="text-2xl font-bold">{insuranceOverview.pendingClaims}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
-              <XCircle className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12  flex items-center justify-center mr-4">
+              <XCircle className="w-10 h-10 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Rejected Claims</p>
-              <p className="text-2xl font-bold text-gray-900">{insuranceOverview.rejectedClaims}</p>
+              <p className="">Rejected Claims</p>
+              <p className="text-2xl font-bold">{insuranceOverview.rejectedClaims}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-              <DollarSign className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12  flex items-center justify-center mr-4">
+              <DollarSign className="w-10 h-10 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Average Claim</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(insuranceOverview.averageClaimAmount)}</p>
+              <p className="">Average Claim</p>
+              <p className="text-2xl font-bold">{formatCurrency(insuranceOverview.averageClaimAmount)}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Claims Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claim Details</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Claim Details</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Patient</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Provider</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -807,35 +809,35 @@ const InsuranceManagement = () => {
                 <tr key={claim.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{claim.claimNumber}</div>
-                      <div className="text-sm text-gray-500">{claim.claimType}</div>
+                      <div className="text-sm font-semibold">{claim.claimNumber}</div>
+                      <div className="text-sm">{claim.claimType}</div>
                       <div className="text-sm text-gray-500">Submitted: {claim.submissionDate}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{claim.patientName}</div>
-                      <div className="text-sm text-gray-500">ID: {claim.patientId}</div>
+                      <div className="text-sm font-semibold">{claim.patientName}</div>
+                      <div className="text-sm">ID: {claim.patientId}</div>
                       <div className="text-sm text-gray-500">{claim.diagnosis}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{claim.insuranceProvider}</div>
-                      <div className="text-sm text-gray-500">{claim.hospital}</div>
+                      <div className="text-sm font-semibold">{claim.insuranceProvider}</div>
+                      <div className="text-sm">{claim.hospital}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{formatCurrency(claim.claimAmount)}</div>
-                      <div className="text-sm text-green-600">Approved: {formatCurrency(claim.approvedAmount)}</div>
+                      <div className="text-sm font-semibold">{formatCurrency(claim.claimAmount)}</div>
+                      <div className="text-sm">Approved: {formatCurrency(claim.approvedAmount)}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(claim.status)}`}>
+                    <span className={`px-2 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusColor(claim.status)}`}>
                       {claim.status}
                     </span>
-                    <div className="text-xs text-gray-500 mt-1">{claim.processingTime}</div>
+                    <div className="text-xs mt-1">{claim.processingTime}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
@@ -846,7 +848,7 @@ const InsuranceManagement = () => {
                         <CheckCircle className="w-4 h-4" />
                       </button>
                       <button className="text-red-600 hover:text-red-900">
-                        <XCircle className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -862,8 +864,8 @@ const InsuranceManagement = () => {
   // Render Ambulance Insurance Tab
   const renderAmbulanceInsurance = () => (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Ambulance Insurance Management</h3>
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg font-semibold">Ambulance Insurance Management</h3>
         <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
           <Plus className="w-4 h-4 mr-2" />
           Add Policy
@@ -871,33 +873,33 @@ const InsuranceManagement = () => {
       </div>
 
       {/* Ambulance Insurance Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center">
             <Truck className="w-8 h-8 text-blue-600 mr-3" />
             <div>
-              <p className="text-sm text-blue-600">Total Vehicles</p>
-              <p className="text-2xl font-bold text-blue-900">{ambulanceInsurance.length}</p>
+              <p className="">Total Vehicles</p>
+              <p className="text-2xl font-bold">{ambulanceInsurance.length}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center">
-            <Shield className="w-8 h-8 text-green-600 mr-3" />
+            <Shield className="w-8 h-8 text-blue-600 mr-3" />
             <div>
-              <p className="text-sm text-green-600">Coverage Rate</p>
-              <p className="text-2xl font-bold text-green-900">{insuranceOverview.ambulanceCoverage}%</p>
+              <p className="text-sm">Coverage Rate</p>
+              <p className="text-2xl font-bold">{insuranceOverview.ambulanceCoverage}%</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center">
-            <DollarSign className="w-8 h-8 text-purple-600 mr-3" />
+            <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
             <div>
-              <p className="text-sm text-purple-600">Total Premiums</p>
-              <p className="text-2xl font-bold text-purple-900">
+              <p className="text-sm">Total Premiums</p>
+              <p className="text-2xl font-bold">
                 {formatCurrency(ambulanceInsurance.reduce((sum, ambulance) => sum + ambulance.premium, 0))}
               </p>
             </div>
@@ -905,74 +907,94 @@ const InsuranceManagement = () => {
         </div>
       </div>
 
-      {/* Ambulance Insurance Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {ambulanceInsurance.map((ambulance) => (
-          <div key={ambulance.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <Truck className="w-8 h-8 text-blue-600 mr-3" />
-                <div>
-                  <h4 className="font-semibold text-gray-900">{ambulance.vehicleNumber}</h4>
-                  <p className="text-sm text-gray-500">{ambulance.policyType}</p>
-                </div>
-              </div>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ambulance.status)}`}>
-                {ambulance.status}
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Insurance Provider:</span>
-                <span className="text-sm font-medium">{ambulance.insuranceProvider}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Policy Number:</span>
-                <span className="text-sm font-medium">{ambulance.policyNumber}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Coverage Amount:</span>
-                <span className="text-sm font-medium">{formatCurrency(ambulance.coverageAmount)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Premium:</span>
-                <span className="text-sm font-medium">{formatCurrency(ambulance.premium)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Deductible:</span>
-                <span className="text-sm font-medium">{formatCurrency(ambulance.deductible)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Expiry Date:</span>
-                <span className="text-sm font-medium">{ambulance.expiryDate}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Drivers Covered:</span>
-                <span className="text-sm font-medium">{ambulance.driversCovered}</span>
-              </div>
-            </div>
-
-            {ambulance.lastClaim && (
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="text-sm text-gray-600 mb-1">Last Claim:</div>
-                <div className="text-sm font-medium text-gray-900">{ambulance.lastClaim}</div>
-                <div className="text-sm text-gray-500">{formatCurrency(ambulance.claimAmount)}</div>
-              </div>
-            )}
-
-            <div className="mt-4 flex justify-between">
-              <button className="text-blue-600 hover:text-blue-700 flex items-center text-sm">
-                <Eye className="w-4 h-4 mr-1" />
-                View Policy
-              </button>
-              <button className="text-green-600 hover:text-green-700 flex items-center text-sm">
-                <RefreshCw className="w-4 h-4 mr-1" />
-                Renew
-              </button>
-            </div>
-          </div>
-        ))}
+      {/* Ambulance Insurance Table */}
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 uppercase text-xs">
+            <tr>
+              <th className="px-4 py-3 text-left">Vehicle</th>
+              <th className="px-4 py-3 text-left">Insurance Provider</th>
+              <th className="px-4 py-3 text-center">Policy Type</th>
+              <th className="px-4 py-3 text-right">Coverage Amount</th>
+              <th className="px-4 py-3 text-right">Premium</th>
+              <th className="px-4 py-3 text-right">Deductible</th>
+              <th className="px-4 py-3 text-center">Expiry Date</th>
+              <th className="px-4 py-3 text-center">Drivers</th>
+              <th className="px-4 py-3 text-left">Last Claim</th>
+              <th className="px-4 py-3 text-center">Status</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {ambulanceInsurance.map((ambulance) => (
+              <tr key={ambulance.id} className="hover:bg-gray-50">
+                <td className="px-4 py-4">
+                  <div className="flex items-center">
+                    <span className="font-semibold">{ambulance.vehicleNumber}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-4">
+                  <div>
+                    <p className="font-semibold">{ambulance.insuranceProvider}</p>
+                    <p className="text-sm">{ambulance.policyNumber}</p>
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="px-2 py-1 text-xs font-medium rounded-full border text-blue-800">
+                    {ambulance.policyType}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <span className="font-semibold">{formatCurrency(ambulance.coverageAmount)}</span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <span className="font-semibold">{formatCurrency(ambulance.premium)}</span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <span className="font-medium">{formatCurrency(ambulance.deductible)}</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="">{ambulance.expiryDate}</span>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className="font-semibold">{ambulance.driversCovered}</span>
+                </td>
+                <td className="px-4 py-4">
+                  {ambulance.lastClaim ? (
+                    <div>
+                      <p className="text-sm font-medium">{ambulance.lastClaim}</p>
+                      <p className="text-xs">{formatCurrency(ambulance.claimAmount)}</p>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400">No claims</span>
+                  )}
+                </td>
+                <td className="px-4 py-4 text-center">
+                  <span className={`px-2 py-1 text-sm font-medium ${
+                    ambulance.status === 'Active' ? ' text-green-800' :
+                    ambulance.status === 'Expiring Soon' ? ' text-yellow-800' :
+                    ' text-red-800'
+                  }`}>
+                    {ambulance.status}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-right">
+                  <div className="flex items-center justify-end space-x-2">
+                    <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors">
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                    <button className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
