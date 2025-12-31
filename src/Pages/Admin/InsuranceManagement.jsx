@@ -39,7 +39,10 @@ import {
   Star,
   Trash,
   Zap,
-  Trash2
+  Trash2,
+  Save,
+  Bell,
+  MessageSquare
 } from 'lucide-react';
 
 const InsuranceManagement = () => {
@@ -47,6 +50,7 @@ const InsuranceManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('all');
   const [selectedPeriod, setSelectedPeriod] = useState('this-month');
+  const [hasChanges, setHasChanges] = useState(false);
 
   // Sample data for Kenyan insurance context
   const insuranceOverview = {
@@ -1002,14 +1006,14 @@ const InsuranceManagement = () => {
   // Render Analytics Tab (placeholder)
   const renderAnalytics = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">Insurance Analytics & Reports</h3>
+      <h3 className="text-lg font-semibold">Insurance Analytics & Reports</h3>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">Coverage Distribution</h4>
+        <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <h4 className="text-lg font-semibold mb-4">Coverage Distribution</h4>
           <div className="overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+              <thead className="bg-gray-50 uppercase text-xs">
                 <tr>
                   <th className="px-3 py-2 text-left">Provider</th>
                   <th className="px-3 py-2 text-center">Patients</th>
@@ -1023,14 +1027,14 @@ const InsuranceManagement = () => {
                   return (
                     <tr key={provider.id} className="hover:bg-gray-50">
                       <td className="px-3 py-3">
-                        <p className="font-medium text-gray-900 text-xs">{provider.name}</p>
+                        <p className="font-medium text-sm">{provider.name}</p>
                       </td>
                       <td className="px-3 py-3 text-center">
-                        <span className="font-semibold text-gray-900">{provider.patients}</span>
+                        <span className="font-semibold">{provider.patients}</span>
                       </td>
                       <td className="px-3 py-3">
                         <div className="flex flex-col items-center">
-                          <span className="text-xs font-medium text-gray-900 mb-1">{sharePercentage}%</span>
+                          <span className="text-xs font-medium mb-1">{sharePercentage}%</span>
                           <div className="w-full bg-gray-200 rounded-full h-1.5">
                             <div 
                               className="bg-blue-500 h-1.5 rounded-full" 
@@ -1050,17 +1054,17 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">Monthly Trends</h4>
+        <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <h4 className="text-lg font-semibold mb-4">Monthly Trends</h4>
           <div className="space-y-2">
             {/* Chart Legend */}
             <div className="flex justify-end space-x-4 text-xs mb-4">
               <div className="flex items-center">
-                <div className="w-3 h-3 bg-blue-500 rounded mr-1"></div>
+                <div className="w-3 h-3 bg-blue-900 rounded mr-1"></div>
                 <span className="text-gray-600">Claims</span>
               </div>
               <div className="flex items-center">
-                <div className="w-3 h-3 bg-green-500 rounded mr-1"></div>
+                <div className="w-3 h-3 bg-blue-500 rounded mr-1"></div>
                 <span className="text-gray-600">Premiums</span>
               </div>
             </div>
@@ -1143,134 +1147,599 @@ const InsuranceManagement = () => {
     </div>
   );
 
-  // Render Policy Management Tab (placeholder)
-  const renderPolicies = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Policy Management Dashboard</h3>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Policy Template
-        </button>
-      </div>
+  // Render Policy Management Tab
+  const renderPolicies = () => {
+    const policies = [
+      { id: 'POL-001', policyNumber: 'NHIF-2024-001', policyHolder: 'John Kamau', category: 'Individual', type: 'Comprehensive', provider: 'Jubilee Insurance', premium: 45000, coverage: 1500000, startDate: '2024-01-15', expiryDate: '2025-01-15', status: 'Active', beneficiaries: 1, claims: 3 },
+      { id: 'POL-002', policyNumber: 'AAR-2024-089', policyHolder: 'Mary Njeri', category: 'Family', type: 'Premium', provider: 'AAR Healthcare', premium: 85000, coverage: 3000000, startDate: '2024-02-20', expiryDate: '2025-02-20', status: 'Active', beneficiaries: 4, claims: 5 },
+      { id: 'POL-003', policyNumber: 'MED-2024-045', policyHolder: 'Peter Omondi', category: 'Individual', type: 'Basic', provider: 'Madison Insurance', premium: 28000, coverage: 800000, startDate: '2024-03-10', expiryDate: '2025-03-10', status: 'Active', beneficiaries: 1, claims: 2 },
+      { id: 'POL-004', policyNumber: 'CIC-2024-123', policyHolder: 'Tech Solutions Ltd', category: 'Corporate', type: 'Group', provider: 'CIC Insurance', premium: 450000, coverage: 10000000, startDate: '2024-01-01', expiryDate: '2025-01-01', status: 'Active', beneficiaries: 25, claims: 18 },
+      { id: 'POL-005', policyNumber: 'BRI-2024-067', policyHolder: 'Grace Muthoni', category: 'Family', type: 'Standard', provider: 'Britam Insurance', premium: 62000, coverage: 2000000, startDate: '2024-04-15', expiryDate: '2024-02-10', status: 'Expiring', beneficiaries: 3, claims: 4 },
+      { id: 'POL-006', policyNumber: 'JUB-2024-234', policyHolder: 'Samuel Kipchoge', category: 'Individual', type: 'Premium', provider: 'Jubilee Insurance', premium: 55000, coverage: 2500000, startDate: '2024-05-01', expiryDate: '2025-05-01', status: 'Active', beneficiaries: 1, claims: 1 },
+      { id: 'POL-007', policyNumber: 'AAR-2024-156', policyHolder: 'Jane Wambui', category: 'Family', type: 'Comprehensive', provider: 'AAR Healthcare', premium: 95000, coverage: 3500000, startDate: '2024-03-20', expiryDate: '2024-02-05', status: 'Expiring', beneficiaries: 5, claims: 7 },
+      { id: 'POL-008', policyNumber: 'EMG-2024-012', policyHolder: 'Dr. David Mutua', category: 'Emergency', type: 'Critical Care', provider: 'Resolution Health', premium: 120000, coverage: 5000000, startDate: '2024-06-01', expiryDate: '2025-06-01', status: 'Active', beneficiaries: 1, claims: 2 },
+      { id: 'POL-009', policyNumber: 'MED-2024-078', policyHolder: 'Sarah Achieng', category: 'Individual', type: 'Basic', provider: 'Madison Insurance', premium: 32000, coverage: 1000000, startDate: '2024-07-10', expiryDate: '2025-07-10', status: 'Active', beneficiaries: 1, claims: 0 },
+      { id: 'POL-010', policyNumber: 'CIC-2024-189', policyHolder: 'Green Valley School', category: 'Corporate', type: 'Group', provider: 'CIC Insurance', premium: 380000, coverage: 8000000, startDate: '2024-02-01', expiryDate: '2025-02-01', status: 'Active', beneficiaries: 42, claims: 12 }
+    ];
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <Receipt className="w-8 h-8 text-blue-600 mb-3" />
-          <h4 className="font-semibold text-gray-900 mb-2">Active Policies</h4>
-          <p className="text-3xl font-bold text-gray-900">127</p>
-          <p className="text-sm text-green-600 mt-1">+12 this month</p>
+    const stats = [
+      { label: 'Total Policies', value: '127', change: '+12 this month', icon: Receipt, color: 'blue' },
+      { label: 'Expiring Soon', value: '8', change: 'Next 30 days', icon: AlertCircle, color: 'blue' },
+      { label: 'Premium Value', value: formatCurrency(2890000), change: '+5.2% growth', icon: Calculator, color: 'blue' },
+      { label: 'Active Claims', value: '54', change: '18 pending', icon: FileText, color: 'blue' }
+    ];
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-semibold">Policy Management</h3>
+            
+          </div>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Policy
+          </button>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <AlertCircle className="w-8 h-8 text-yellow-600 mb-3" />
-          <h4 className="font-semibold text-gray-900 mb-2">Expiring Soon</h4>
-          <p className="text-3xl font-bold text-gray-900">8</p>
-          <p className="text-sm text-yellow-600 mt-1">Next 30 days</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <Calculator className="w-8 h-8 text-purple-600 mb-3" />
-          <h4 className="font-semibold text-gray-900 mb-2">Premium Value</h4>
-          <p className="text-3xl font-bold text-gray-900">{formatCurrency(insuranceOverview.monthlyPremiums)}</p>
-          <p className="text-sm text-green-600 mt-1">+5.2% growth</p>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">Policy Categories</h4>
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 bg-blue-50 rounded-lg">
-            <h5 className="font-medium text-blue-900">Individual Policies</h5>
-            <p className="text-2xl font-bold text-blue-600">45</p>
-            <p className="text-sm text-blue-500">Personal coverage</p>
-          </div>
-          <div className="p-4 bg-green-50 rounded-lg">
-            <h5 className="font-medium text-green-900">Family Policies</h5>
-            <p className="text-2xl font-bold text-green-600">67</p>
-            <p className="text-sm text-green-500">Household coverage</p>
-          </div>
-          <div className="p-4 bg-purple-50 rounded-lg">
-            <h5 className="font-medium text-purple-900">Corporate Policies</h5>
-            <p className="text-2xl font-bold text-purple-600">12</p>
-            <p className="text-sm text-purple-500">Business coverage</p>
-          </div>
-          <div className="p-4 bg-orange-50 rounded-lg">
-            <h5 className="font-medium text-orange-900">Emergency Policies</h5>
-            <p className="text-2xl font-bold text-orange-600">3</p>
-            <p className="text-sm text-orange-500">Critical care coverage</p>
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            const colors = {
+              blue: 'text-blue-600',
+              
+            };
+            
+            return (
+              <div key={index} className="bg-white shadow-sm border border-gray-200 p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="mb-1">{stat.label}</p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                    <p className="text-sm mt-1">{stat.change}</p>
+                  </div>
+                  <div className={`p-2 rounded-lg ${colors[stat.color]}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Header with Actions */}
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-lg font-semibold">All Policies</h4>
+          <div className="flex items-center space-x-2">
+            <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center">
+              <Download className="w-4 h-4 mr-1" />
+              Export
+            </button>
+            <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center">
+              <RefreshCw className="w-4 h-4 mr-1" />
+              Refresh
+            </button>
           </div>
         </div>
+
+        {/* Search and Filter */}
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="ml-50 w-1/2 flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search by policy number, holder name..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="">All Categories</option>
+            <option value="individual">Individual</option>
+            <option value="family">Family</option>
+            <option value="corporate">Corporate</option>
+            <option value="emergency">Emergency</option>
+          </select>
+          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="expiring">Expiring</option>
+            <option value="expired">Expired</option>
+          </select>
+        </div>
+
+        {/* Policies Table */}
+        <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Policy Details</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Provider</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Coverage</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Premium</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Beneficiaries</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Expiry Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Claims</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {policies.map((policy) => (
+                  <tr key={policy.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div>
+                        <div className="text-sm font-semibold">{policy.policyHolder}</div>
+                        <div className="text-sm ">{policy.policyNumber}</div>
+                        <div className="text-xs text-gray-600">{policy.type}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${
+                        policy.category === 'Individual' ? ' text-blue-700' :
+                        policy.category === 'Family' ? ' text-green-700' :
+                        policy.category === 'Corporate' ? ' text-blue-950' :
+                        ' text-orange-700'
+                      }`}>
+                        {policy.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold ">{policy.provider}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{formatCurrency(policy.coverage)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ">{formatCurrency(policy.premium)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Users className="w-4 h-4  mr-1" />
+                        <span className="text-sm ">{policy.beneficiaries}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm ">{policy.expiryDate}</div>
+                      <div className="text-xs ">{policy.startDate}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium  text-blue-700">
+                        <FileText className="w-3 h-3 mr-1" />
+                        {policy.claims}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
+                        policy.status === 'Active' ? ' text-green-800' :
+                        policy.status === 'Expiring' ? ' text-yellow-800' :
+                        ' text-red-800'
+                      }`}>
+                        {policy.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center space-x-2">
+                        <button className="text-blue-600 hover:text-blue-800 transition-colors">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button className="text-gray-600 hover:text-gray-800 transition-colors">
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button className="text-green-600 hover:text-green-800 transition-colors">
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Pagination */}
+          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-500">
+              Showing <span className="font-medium">1-10</span> of <span className="font-medium">127</span> policies
+            </div>
+            <div className="flex items-center space-x-2">
+              <button className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                Previous
+              </button>
+              <button className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                1
+              </button>
+              <button className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                2
+              </button>
+              <button className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                3
+              </button>
+              <button className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                Next
+              </button>
+            </div>
+          </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-  // Render Settings Tab (placeholder)
-  const renderSettings = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">Insurance Management Settings</h3>
+  // Render Settings Tab
+  const renderSettings = () => {
+    return (
+      <div className="space-y-6">
+        {/* Header with Actions */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold ">Insurance Management Settings</h3>
+            
+          </div>
+          <div className="flex items-center space-x-3">
+            <button className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center text-gray-700">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Reset to Default
+            </button>
+            <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm">
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </button>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">General Settings</h4>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Default Currency</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option value="KES">Kenyan Shilling (KES)</option>
-                <option value="USD">US Dollar (USD)</option>
-                <option value="EUR">Euro (EUR)</option>
-              </select>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* General Settings */}
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center mb-6">
+              <div className="p-2  mr-3">
+                <Settings className="w-8 h-8 text-blue-600" />
+              </div>
+              <div>
+                <h4 className="font-semibold ">General Settings</h4>
+                <p className="text-sm">Insurance Management configuration options</p>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Claim Processing Time</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option value="3">3 days</option>
-                <option value="5">5 days</option>
-                <option value="7">7 days</option>
-                <option value="10">10 days</option>
-              </select>
+            
+            <div className="space-y-5">
+              <div>
+                <label className="block font-semibold mb-2">Default Currency</label>
+                <select 
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  onChange={() => setHasChanges(true)}
+                >
+                  <option value="KES">Kenyan Shilling (KES)</option>
+                  <option value="USD">US Dollar (USD)</option>
+                  <option value="EUR">Euro (EUR)</option>
+                  <option value="GBP">British Pound (GBP)</option>
+                </select>
+                <p className="text-sm mt-1">Default currency for all financial transactions</p>
+              </div>
+              
+              <div>
+                <label className="block font-semibold mb-2">Claim Processing Time</label>
+                <select 
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  onChange={() => setHasChanges(true)}
+                >
+                  <option value="1">1 day (Express)</option>
+                  <option value="3">3 days (Standard)</option>
+                  <option value="5">5 days</option>
+                  <option value="7">7 days</option>
+                  <option value="10">10 days</option>
+                  <option value="14">14 days</option>
+                </select>
+                <p className="text-sm mt-1">Standard time to process insurance claims</p>
+              </div>
+              
+              <div>
+                <label className="block font-semibold mb-2">Auto-approval Limit</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900 w-4 h-4" />
+                  <input
+                    type="number"
+                    placeholder="50000"
+                    defaultValue="50000"
+                    className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    onChange={() => setHasChanges(true)}
+                  />
+                </div>
+                <p className="text-sm  mt-1">Claims below this amount are auto-approved (KES)</p>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">Maximum Coverage Amount</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900 w-4 h-4" />
+                  <input
+                    type="number"
+                    placeholder="10000000"
+                    defaultValue="10000000"
+                    className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    onChange={() => setHasChanges(true)}
+                  />
+                </div>
+                <p className="text-sm mt-1">Maximum insurance coverage per policy (KES)</p>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">Policy Expiry Warning Period</label>
+                <select 
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  onChange={() => setHasChanges(true)}
+                >
+                  <option value="7">7 days before</option>
+                  <option value="14">14 days before</option>
+                  <option value="30">30 days before</option>
+                  <option value="60">60 days before</option>
+                  <option value="90">90 days before</option>
+                </select>
+                <p className="text-sm mt-1">When to send policy renewal reminders</p>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Auto-approval Limit</label>
-              <input
-                type="number"
-                placeholder="Amount in KES"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+          </div>
+
+          {/* Notification Settings */}
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center mb-6">
+              <div className="p-2 mr-3">
+                <Bell className="w-8 h-8 text-blue-600" />
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold ">Notification Settings</h4>
+                <p className="text-sm">Manage alerts and communication preferences</p>
+              </div>
+            </div>
+            
+            <div className="space-y-5">
+              {/* Email Notifications */}
+              <div className="flex items-start justify-between pb-4 border-b border-gray-100">
+                <div className="flex items-start space-x-3">
+                  <Mail className="w-5 h-5 text-blue-600  mt-0.5" />
+                  <div>
+                    <p className="font-semibold">Email Notifications</p>
+                    <p className="text-sm  mt-0.5">Send email updates for claims and policies</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              {/* SMS Notifications */}
+              <div className="flex items-start justify-between pb-4 border-b border-gray-100">
+                <div className="flex items-start space-x-3">
+                  <MessageSquare className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-semibold">SMS Notifications</p>
+                    <p className="text-sm mt-0.5">Send SMS updates for urgent claims</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              {/* Policy Renewal Alerts */}
+              <div className="flex items-start justify-between pb-4 border-b border-gray-100">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-semibold">Policy Renewal Alerts</p>
+                    <p className="text-sm mt-0.5">Alert before policy expiration</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              {/* Claim Status Updates */}
+              <div className="flex items-start justify-between pb-4 border-b border-gray-100">
+                <div className="flex items-start space-x-3">
+                  <FileText className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-semibold">Claim Status Updates</p>
+                    <p className="text-sm mt-0.5">Notify on claim approval/rejection</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              {/* Payment Reminders */}
+              <div className="flex items-start justify-between pb-4 border-b border-gray-100">
+                <div className="flex items-start space-x-3">
+                  <DollarSign className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-semibold">Payment Reminders</p>
+                    <p className="text-sm mt-0.5">Remind users about pending premiums</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              {/* System Maintenance Alerts */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-start space-x-3">
+                  <Settings className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-semibold">System Maintenance Alerts</p>
+                    <p className="text-sm mt-0.5">Notify about scheduled maintenance</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Security & Access Settings */}
+          {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center mb-6">
+              <div className="p-2 bg-green-50 rounded-lg mr-3">
+                <Shield className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900">Security & Access</h4>
+                <p className="text-xs text-gray-500">Data protection and user access controls</p>
+              </div>
+            </div>
+            
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Data Retention Period</label>
+                <select 
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  onChange={() => setHasChanges(true)}
+                >
+                  <option value="1">1 year</option>
+                  <option value="2">2 years</option>
+                  <option value="3">3 years</option>
+                  <option value="5">5 years</option>
+                  <option value="7">7 years (Recommended)</option>
+                  <option value="10">10 years</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">How long to keep insurance records</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Session Timeout</label>
+                <select 
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  onChange={() => setHasChanges(true)}
+                >
+                  <option value="15">15 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="60">1 hour</option>
+                  <option value="120">2 hours</option>
+                  <option value="240">4 hours</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Auto-logout after inactivity period</p>
+              </div>
+
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-medium text-gray-900">Two-Factor Authentication</p>
+                  <p className="text-sm text-gray-500">Require 2FA for sensitive operations</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-medium text-gray-900">Audit Logging</p>
+                  <p className="text-sm text-gray-500">Track all system changes and access</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            </div>
+          </div> */}
+
+          {/* Integration & API Settings */}
+          <div className="bg-white shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center mb-6">
+              <div className="p-2 mr-3">
+                <Truck className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold">Integration & API</h4>
+                <p className="text-sm ">Third-party integrations and API settings</p>
+              </div>
+            </div>
+            
+            <div className="space-y-5">
+              <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                <div>
+                  <p className="font-semibold">Provider API Integration</p>
+                  <p className="text-sm">Connect to insurance provider systems</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                <div>
+                  <p className="font-semibold">Payment Gateway</p>
+                  <p className="text-sm">Enable online premium payments</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" defaultChecked onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-semibold">Automated Claim Verification</p>
+                  <p className="text-sm">Auto-verify claims through provider APIs</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" onChange={() => setHasChanges(true)} />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2">API Rate Limit</label>
+                <select 
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  onChange={() => setHasChanges(true)}
+                >
+                  <option value="100">100 requests/hour</option>
+                  <option value="500">500 requests/hour</option>
+                  <option value="1000">1000 requests/hour</option>
+                  <option value="5000">5000 requests/hour</option>
+                  <option value="unlimited">Unlimited</option>
+                </select>
+                <p className="text-xs mt-1">Maximum API calls per hour</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">Notification Settings</h4>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900">Email Notifications</p>
-                <p className="text-sm text-gray-500">Send email updates for claims</p>
-              </div>
-              <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300" />
+        {/* Save Banner */}
+        {hasChanges && (
+          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-2xl border border-gray-200 p-4 flex items-center space-x-4 z-50">
+            <AlertCircle className="w-8 h-8 text-yellow-500" />
+            <div>
+              <p className="font-semibold">You have unsaved changes</p>
+              <p className="text-sm ">Save your changes to apply the new settings</p>
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900">SMS Notifications</p>
-                <p className="text-sm text-gray-500">Send SMS updates for urgent claims</p>
-              </div>
-              <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300" />
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900">Policy Renewal Alerts</p>
-                <p className="text-sm text-gray-500">Alert before policy expiration</p>
-              </div>
-              <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300" defaultChecked />
+            <div className="flex items-center space-x-2 ml-8">
+              <button 
+                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => setHasChanges(false)}
+              >
+                Discard
+              </button>
+              <button 
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                onClick={() => setHasChanges(false)}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
