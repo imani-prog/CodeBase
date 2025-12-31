@@ -976,27 +976,27 @@ const FinancialManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10 max-w-4xl mx-auto">
-        <div className="border border-gray-100 shadow-md p-4">
+        <div className="border border-gray-100 shadow-md p-8">
           <div className="flex items-center">
-            <Users className="w-8 h-8 text-blue-600 mr-3" />
+            <Users className="w-10 h-10 text-blue-600 mr-3" />
             <div>
               <p className="text-sm text-blue-600">Total CHWs</p>
               <p className="text-2xl font-bold ">45</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md p-4">
+        <div className="border border-gray-100 shadow-md p-8">
           <div className="flex items-center">
-            <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
+            <CheckCircle className="w-10 h-10 text-blue-600 mr-3" />
             <div>
               <p className="text-sm text-blue-600">Payments Processed</p>
               <p className="text-2xl font-bold ">{formatCurrency(480000)}</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md p-4">
+        <div className="border border-gray-100 shadow-md p-8">
           <div className="flex items-center">
-            <Clock className="w-8 h-8 text-blue-600 mr-3" />
+            <Clock className="w-10 h-10 text-blue-600 mr-3" />
             <div>
               <p className="text-sm text-blue-600">Pending Payments</p>
               <p className="text-2xl font-bold ">{formatCurrency(54000)}</p>
@@ -1067,68 +1067,68 @@ const FinancialManagement = () => {
 
   const renderPatientPayments = () => (
     <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold">Patient Payment Transactions</h3>
+        <div className="flex items-center space-x-3">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search transactions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+            />
+          </div>
+          <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
+            <option>All Payments</option>
+            <option>Completed</option>
+            <option>Pending</option>
+            <option>Failed</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 max-w-6xl mx-auto">
+        <div className="border border-gray-100 shadow-md p-6">
+          <div className="flex items-center">
+            <Smartphone className="w-10 h-10 text-blue-600 mr-3" />
+            <div>
+              <p className="text-base text-blue-600 mb-1">M-Pesa</p>
+              <p className="text-2xl font-bold">{formatCurrency(650000)}</p>
+            </div>
+          </div>
+        </div>
+        <div className="border border-gray-100 shadow-md p-6">
+          <div className="flex items-center">
+            <CreditCard className="w-10 h-10 text-blue-600 mr-3" />
+            <div>
+              <p className="text-base text-blue-600 mb-1">Card Payments</p>
+              <p className="text-2xl font-bold">{formatCurrency(420000)}</p>
+            </div>
+          </div>
+        </div>
+        <div className="border border-gray-100 shadow-md p-6">
+          <div className="flex items-center">
+            <Banknote className="w-10 h-10 text-blue-600 mr-3" />
+            <div>
+              <p className="text-base text-blue-600 mb-1">Cash</p>
+              <p className="text-2xl font-bold">{formatCurrency(280000)}</p>
+            </div>
+          </div>
+        </div>
+        <div className="border border-gray-100 shadow-md p-6">
+          <div className="flex items-center">
+            <Receipt className="w-10 h-10 text-blue-600 mr-3" />
+            <div>
+              <p className="text-base text-blue-600 mb-1">Insurance</p>
+              <p className="text-2xl font-bold">{formatCurrency(180000)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Patient Payment Transactions</h3>
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search transactions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
-              />
-            </div>
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
-              <option>All Payments</option>
-              <option>Completed</option>
-              <option>Pending</option>
-              <option>Failed</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="border border-gray-100 shadow-md p-4">
-            <div className="flex items-center">
-              <Smartphone className="w-6 h-6 mr-2" />
-              <div>
-                <p className="text-sm opacity-90">M-Pesa</p>
-                <p className="text-xl font-bold">{formatCurrency(650000)}</p>
-              </div>
-            </div>
-          </div>
-          <div className="border border-gray-100 shadow-md p-4">
-            <div className="flex items-center">
-              <CreditCard className="w-6 h-6 mr-2" />
-              <div>
-                <p className="text-sm opacity-90">Card Payments</p>
-                <p className="text-xl font-bold">{formatCurrency(420000)}</p>
-              </div>
-            </div>
-          </div>
-          <div className="border border-gray-100 shadow-md p-4">
-            <div className="flex items-center">
-              <Banknote className="w-6 h-6 mr-2" />
-              <div>
-                <p className="text-sm opacity-90">Cash</p>
-                <p className="text-xl font-bold">{formatCurrency(280000)}</p>
-              </div>
-            </div>
-          </div>
-          <div className="border border-gray-100 shadow-md p-4">
-            <div className="flex items-center">
-              <Receipt className="w-6 h-6 mr-2" />
-              <div>
-                <p className="text-sm opacity-90">Insurance</p>
-                <p className="text-xl font-bold">{formatCurrency(180000)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -1156,14 +1156,14 @@ const FinancialManagement = () => {
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex items-center">
-                      {payment.paymentMethod === 'M-Pesa' && <Smartphone className="w-4 h-4 text-green-600 mr-2" />}
+                      {payment.paymentMethod === 'M-Pesa' && <Smartphone className="w-4 h-4 text-blue-600 mr-2" />}
                       {payment.paymentMethod === 'Credit Card' && <CreditCard className="w-4 h-4 text-blue-600 mr-2" />}
-                      {payment.paymentMethod === 'Cash' && <Banknote className="w-4 h-4 text-yellow-600 mr-2" />}
+                      {payment.paymentMethod === 'Cash' && <Banknote className="w-4 h-4 text-blue-600 mr-2" />}
                       <span className="text-gray-900">{payment.paymentMethod}</span>
                     </div>
                   </td>
                   <td className="py-4 px-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
+                    <span className={`px-2 py-1 rounded-full font-medium ${getStatusColor(payment.status)}`}>
                       {payment.status}
                     </span>
                   </td>
@@ -1176,7 +1176,7 @@ const FinancialManagement = () => {
                         <Eye className="w-4 h-4" />
                       </button>
                       <button className="text-green-600 hover:text-green-800">
-                        <Receipt className="w-4 h-4" />
+                        <Edit className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
