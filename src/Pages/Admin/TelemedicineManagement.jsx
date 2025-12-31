@@ -43,16 +43,31 @@ import {
   Target,
   Award,
   Settings,
-  RefreshCw
+  RefreshCw,
+  ChevronDown
 } from 'lucide-react';
-import AdminNavbar from '../../Components/AdminNavbar';
-import AdminSidebar from '../../Components/AdminSidebar';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
+
 
 const TelemedicineManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedPeriod, setSelectedPeriod] = useState('today');
   const [searchTerm, setSearchTerm] = useState('');
   const [sessionFilter, setSessionFilter] = useState('all');
+  const [expandedRow, setExpandedRow] = useState(null);
+
+  const toggleRow = (id) => {
+    setExpandedRow(expandedRow === id ? null : id);
+  };
 
   // Sample telemedicine data
   const platformOverview = {
@@ -251,7 +266,6 @@ const TelemedicineManagement = () => {
     { id: 'doctors', label: 'Online Doctors', icon: UserCheck },
     { id: 'session-history', label: 'Session History', icon: Calendar },
     { id: 'revenue', label: 'Revenue Analytics', icon: DollarSign },
-    { id: 'platform-stats', label: 'Platform Statistics', icon: BarChart3 },
     { id: 'settings', label: 'Platform Settings', icon: Settings }
   ];
 
@@ -323,20 +337,42 @@ const TelemedicineManagement = () => {
 
   const renderOverview = () => (
     <div className="space-y-6">
+      {/* Header with Quick Actions */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-gray-900">Telemedicine Overview</h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleScheduleSession}
+            className="flex items-center px-3 py-1.5 text-sm bg-blue-500 border border-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            Schedule Session
+          </button>
+          <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            <Download className="w-4 h-4 mr-1.5" />
+            Export Reports
+          </button>
+          <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            <Settings className="w-4 h-4 mr-1.5" />
+            Settings
+          </button>
+        </div>
+      </div>
+
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Active Sessions</p>
+              <p className="text-sm font-semibold  mb-1">Active Sessions</p>
               <p className="text-3xl font-bold text-gray-900">{platformOverview.activeSessions}</p>
               <div className="flex items-center mt-2">
-                <Activity className="w-4 h-4 text-green-500 mr-1" />
-                <span className="text-sm text-green-600">Live now</span>
+                <Activity className="w-4 h-4 text-blue-500 mr-1" />
+                <span className="text-sm text-blue-600">Live now</span>
               </div>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <Video className="w-6 h-6 text-green-600" />
+              <Video className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -344,7 +380,7 @@ const TelemedicineManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Online Doctors</p>
+              <p className="text-sm font-semibold mb-1">Online Doctors</p>
               <p className="text-3xl font-bold text-gray-900">{platformOverview.onlineDoctors}</p>
               <div className="flex items-center mt-2">
                 <UserCheck className="w-4 h-4 text-blue-500 mr-1" />
@@ -360,15 +396,15 @@ const TelemedicineManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Today's Revenue</p>
+              <p className="text-sm font-semibold mb-1">Today's Revenue</p>
               <p className="text-3xl font-bold text-gray-900">{formatCurrency(revenueData.daily)}</p>
               <div className="flex items-center mt-2">
-                <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
-                <span className="text-sm text-green-600">+{platformOverview.monthlyGrowth}%</span>
+                <TrendingUp className="w-4 h-4 text-blue-500 mr-1" />
+                <span className="text-sm text-blue-600">+{platformOverview.monthlyGrowth}%</span>
               </div>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-yellow-600" />
+              <DollarSign className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -376,15 +412,15 @@ const TelemedicineManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Avg Session Time</p>
+              <p className="text-sm font-semibold mb-1">Avg Session Time</p>
               <p className="text-3xl font-bold text-gray-900">{formatDuration(platformOverview.avgSessionDuration)}</p>
               <div className="flex items-center mt-2">
-                <Clock className="w-4 h-4 text-purple-500 mr-1" />
-                <span className="text-sm text-purple-600">Per session</span>
+                <Clock className="w-4 h-4 text-blue-500 mr-1" />
+                <span className="text-sm text-blue-600">Per session</span>
               </div>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <Timer className="w-6 h-6 text-purple-600" />
+              <Timer className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -393,7 +429,7 @@ const TelemedicineManagement = () => {
       {/* Platform Usage Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Usage Distribution</h3>
+          <h3 className="text-lg font-semibold mb-4">Platform Usage Distribution</h3>
           <div className="space-y-4">
             {Object.entries(platformStats).map(([platform, stats]) => (
               <div key={platform} className="flex items-center justify-between">
@@ -418,13 +454,13 @@ const TelemedicineManagement = () => {
         </div>
 
         <div className="shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3">
               <div className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                <CheckCircle className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Session Completed</p>
+                  <p className="text-sm font-medium ">Session Completed</p>
                   <p className="text-xs text-gray-600">Dr. Sarah Mitchell - Mary Wanjiku</p>
                 </div>
               </div>
@@ -434,7 +470,7 @@ const TelemedicineManagement = () => {
               <div className="flex items-center">
                 <UserCheck className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Doctor Joined</p>
+                  <p className="text-sm font-medium ">Doctor Joined</p>
                   <p className="text-xs text-gray-600">Dr. James Mwangi is now online</p>
                 </div>
               </div>
@@ -442,9 +478,9 @@ const TelemedicineManagement = () => {
             </div>
             <div className="flex items-center justify-between p-3">
               <div className="flex items-center">
-                <Calendar className="w-5 h-5 text-yellow-600 mr-3" />
+                <Calendar className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Session Scheduled</p>
+                  <p className="text-sm font-medium ">Session Scheduled</p>
                   <p className="text-xs text-gray-600">New appointment for 2:30 PM</p>
                 </div>
               </div>
@@ -453,281 +489,345 @@ const TelemedicineManagement = () => {
           </div>
         </div>
       </div>
-
-      {/* Quick Actions */}
-      <div className="border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-20">
-          <button
-            onClick={handleScheduleSession}
-            className="flex items-center justify-center px-1 ml-50 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Schedule New Session
-          </button>
-          <button className="flex items-center justify-center ml-30 mr-30 p1-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-            <Download className="w-5 h-5 mr-2" />
-            Export Reports
-          </button>
-          <button className="flex items-center justify-center mr-50 px-1 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-            <Settings className="w-5 h-5 mr-2" />
-            Platform Settings
-          </button>
-        </div>
-      </div>
     </div>
   );
 
   const renderActiveSessions = () => (
     <div className="space-y-6">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Active Telemedicine Sessions</h3>
-          <div className="flex items-center space-x-3">
-            <select
-              value={sessionFilter}
-              onChange={(e) => setSessionFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
-            >
-              <option value="all">All Sessions</option>
-              <option value="video">Video Calls</option>
-              <option value="audio">Audio Calls</option>
-              <option value="high-priority">High Priority</option>
-            </select>
-            <button
-              onClick={handleScheduleSession}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              New Session
-            </button>
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold">Active Telemedicine Sessions</h3>
+        <div className="flex items-center space-x-3">
+          <select
+            value={sessionFilter}
+            onChange={(e) => setSessionFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+          >
+            <option value="all">All Sessions</option>
+            <option value="video">Video Calls</option>
+            <option value="audio">Audio Calls</option>
+            <option value="high-priority">High Priority</option>
+          </select>
+          <button
+            onClick={handleScheduleSession}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Session
+          </button>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {activeSessions.map((session) => (
-            <div key={session.id} className="border border-gray-200 p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                  <span className="text-sm font-medium text-green-600">LIVE</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(session.priority)}`}>
-                    {session.priority}
-                  </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(session.status)}`}>
-                    {session.status}
-                  </span>
-                </div>
-              </div>
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 uppercase text-xs">
+            <tr>
+              <th className="px-4 py-3 text-left font-semibold">Patient</th>
+              <th className="px-4 py-3 text-left font-semibold">Doctor</th>
+              <th className="px-4 py-3 font-semibold">Platform</th>
+              <th className="px-4 py-3 font-semibold">Priority</th>
+              <th className="px-4 py-3 font-semibold">Status</th>
+              <th className="px-4 py-3 font-semibold">Duration</th>
+              <th className="px-4 py-3 font-semibold">Cost</th>
+              <th className="px-4 py-3 font-semibold text-right">Actions</th>
+            </tr>
+          </thead>
 
-              <div className="space-y-3">
-                <div>
-                  <p className="font-medium text-gray-900">{session.patient}</p>
-                  <p className="text-sm text-gray-600">Patient ID: {session.patientId}</p>
-                </div>
+          <tbody>
+            {activeSessions.map((session, index) => (
+              <React.Fragment key={session.id}>
+                {/* MAIN ROW */}
+                <tr
+                  className={`hover:bg-gray-50 cursor-pointer ${index !== 0 ? 'border-t border-gray-200' : ''}`}
+                  onClick={() => toggleRow(session.id)}
+                >
+                  <td className="px-4 py-3 font-semibold">
+                    {session.patient}
+                    <div className="text-xs text-gray-500">
+                      ID: {session.patientId}
+                    </div>
+                  </td>
 
-                <div>
-                  <p className="font-medium text-gray-900">{session.doctor}</p>
-                  <p className="text-sm text-gray-600">{session.specialty}</p>
-                </div>
+                  <td className="px-4 py-3 font-semibold">
+                    {session.doctor}
+                    <div className="text-xs text-gray-500">
+                      {session.specialty}
+                    </div>
+                  </td>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
+                  <td className="px-4 py-3 text-center">
                     {session.platform === 'Video Call' ? (
-                      <Video className="w-4 h-4 text-blue-600 mr-2" />
+                      <Video className="w-4 h-4 inline text-blue-600" />
                     ) : (
-                      <Phone className="w-4 h-4 text-green-600 mr-2" />
+                      <Phone className="w-4 h-4 inline text-blue-600" />
                     )}
-                    <span className="text-sm text-gray-600">{session.platform}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="w-4 h-4 text-gray-400 mr-1" />
-                    <span className="text-sm text-gray-600">{formatDuration(session.duration)}</span>
-                  </div>
-                </div>
+                  </td>
 
-                <div>
-                  <p className="text-sm text-gray-600">Symptoms:</p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {session.symptoms.map((symptom, index) => (
-                      <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                        {symptom}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`px-2 py-1  ${getPriorityColor(session.priority)}`}>
+                      {session.priority}
+                    </span>
+                  </td>
 
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-900">{formatCurrency(session.cost)}</span>
-                  <span className="text-sm text-gray-600">{session.sessionType}</span>
-                </div>
-              </div>
+                  <td className="px-4 py-3 text-center">
+                    <span className="px-2 py-1 text-green-700">
+                      Live
+                    </span>
+                  </td>
 
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors">
-                    <Pause className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleTerminateSession(session.id)}
-                    className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                  >
-                    End Session
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSession(session.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                  <td className="px-4 py-3 text-center">
+                    {formatDuration(session.duration)}
+                  </td>
+
+                  <td className="px-4 py-3 text-center font-semibold">
+                    {formatCurrency(session.cost)}
+                  </td>
+
+                  <td className="px-4 py-3 text-right">
+                    <ChevronDown
+                      className={`w-4 h-4 inline transition-transform ${
+                        expandedRow === session.id ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </td>
+                </tr>
+
+                {/* EXPANDED ROW */}
+                {expandedRow === session.id && (
+                  <tr className="bg-gray-50">
+                    <td colSpan="8" className="px-6 py-4 border-b border-gray-200">
+                      <div className="grid grid-cols-3 gap-6 text-sm">
+                        {/* Symptoms */}
+                        <div>
+                          <p className="font-medium text-gray-700 mb-2">Symptoms</p>
+                          <div className="flex flex-wrap gap-1">
+                            {session.symptoms.map((symptom, i) => (
+                              <span
+                                key={i}
+                                className="px-2 py-1 bg-white border rounded text-xs"
+                              >
+                                {symptom}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Session Info */}
+                        <div>
+                          <p className="font-medium text-gray-700 mb-2">Session Info</p>
+                          <p className="text-gray-600">Type: {session.sessionType}</p>
+                          <p className="text-gray-600">Platform: {session.platform}</p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-start justify-end gap-3">
+                          <button className="p-2 text-blue-600 hover:bg-blue-50 rounded">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button className="p-2 text-yellow-600 hover:bg-yellow-50 rounded">
+                            <Pause className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleTerminateSession(session.id)}
+                            className="text-sm text-red-600 hover:underline"
+                          >
+                            End Session
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 
   const renderOnlineDoctors = () => (
     <div className="space-y-6">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Online Doctors</h3>
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search doctors..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
-              />
-            </div>
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
-              <option>All Specialties</option>
-              <option>General Medicine</option>
-              <option>Cardiology</option>
-              <option>Pediatrics</option>
-              <option>Dermatology</option>
-            </select>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold">Online Doctors</h3>
+        <div className="flex items-center space-x-3">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search doctors..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+            />
           </div>
+          <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
+            <option>All Specialties</option>
+            <option>General Medicine</option>
+            <option>Cardiology</option>
+            <option>Pediatrics</option>
+            <option>Dermatology</option>
+          </select>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {onlineDoctors.map((doctor) => (
-            <div key={doctor.id} className="border border-gray-200 p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center">
-                  <div className="relative">
-                    <img
-                      src={doctor.photo}
-                      alt={doctor.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white ${
-                      doctor.currentStatus === 'available' ? 'bg-green-500' :
-                      doctor.currentStatus === 'busy' ? 'bg-yellow-500' : 'bg-red-500'
-                    }`}></div>
-                  </div>
-                  <div className="ml-4">
-                    <h4 className="font-bold ">{doctor.name}</h4>
-                    <p className="text-sm ">{doctor.specialty}</p>
-                    <div className="flex items-center mt-1">
-                      <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                      <span className="text-sm text-gray-600">{doctor.rating} ({doctor.totalSessions} sessions)</span>
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 uppercase text-xs">
+            <tr>
+              <th className="px-4 py-3 text-left font-semibold">Doctor</th>
+              <th className="px-4 py-3 font-semibold">Status</th>
+              <th className="px-4 py-3 font-semibold">Rating</th>
+              <th className="px-4 py-3 font-semibold">Experience</th>
+              <th className="px-4 py-3 font-semibold">Sessions Today</th>
+              <th className="px-4 py-3 font-semibold">Avg Duration</th>
+              <th className="px-4 py-3 font-semibold">Earnings</th>
+              <th className="px-4 py-3 font-semibold text-right">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {onlineDoctors.map((doctor, index) => (
+              <React.Fragment key={doctor.id}>
+                {/* MAIN ROW */}
+                <tr
+                  className={`hover:bg-gray-50 cursor-pointer ${index !== 0 ? 'border-t border-gray-200' : ''}`}
+                  onClick={() => toggleRow(doctor.id)}
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center">
+                      <div className="relative">
+                        <img
+                          src={doctor.photo}
+                          alt={doctor.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                          doctor.currentStatus === 'available' ? 'bg-green-500' :
+                          doctor.currentStatus === 'busy' ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}></div>
+                      </div>
+                      <div className="ml-3">
+                        <p className="font-semibold">{doctor.name}</p>
+                        <p className="text-xs">{doctor.specialty}</p>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(doctor.currentStatus)}`}>
-                  {doctor.currentStatus}
-                </span>
-              </div>
+                  </td>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <p className="text-sm text-gray-600">Experience</p>
-                  <p className="font-medium text-gray-900">{doctor.experience} years</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Today's Sessions</p>
-                  <p className="font-medium text-gray-900">{doctor.sessionsToday}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Avg Duration</p>
-                  <p className="font-medium text-gray-900">{formatDuration(doctor.avgSessionDuration)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Earnings</p>
-                  <p className="font-medium text-gray-900">{formatCurrency(doctor.earnings)}</p>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <p className="text-sm text-gray-600 mb-2">Languages</p>
-                <div className="flex flex-wrap gap-1">
-                  {doctor.languages.map((language, index) => (
-                    <span key={index} className="px-2 py-1 text-blue-700 text-xs rounded">
-                      {language}
+                  <td className="px-4 py-3 text-center">
+                    <span className={`px-2 py-1 ${getStatusColor(doctor.currentStatus)}`}>
+                      {doctor.currentStatus}
                     </span>
-                  ))}
-                </div>
-              </div>
+                  </td>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <MapPin className="w-4 h-4 text-gray-400 mr-1" />
-                  <span className="text-sm text-gray-600">{doctor.location}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                    <MessageSquare className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
-                    <Edit className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center">
+                      <Star className="w-4 h-4 text-blue-500 mr-1" />
+                      <span className="font-medium">{doctor.rating}</span>
+                    </div>
+                    <div className="text-xs text-gray-500">{doctor.totalSessions} sessions</div>
+                  </td>
+
+                  <td className="px-4 py-3 text-center font-medium">
+                    {doctor.experience} years
+                  </td>
+
+                  <td className="px-4 py-3 text-center font-medium">
+                    {doctor.sessionsToday}
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    {formatDuration(doctor.avgSessionDuration)}
+                  </td>
+
+                  <td className="px-4 py-3 text-center font-semibold">
+                    {formatCurrency(doctor.earnings)}
+                  </td>
+
+                  <td className="px-4 py-3 text-right">
+                    <ChevronDown
+                      className={`w-4 h-4 inline transition-transform ${
+                        expandedRow === doctor.id ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </td>
+                </tr>
+
+                {/* EXPANDED ROW */}
+                {expandedRow === doctor.id && (
+                  <tr className="bg-gray-50">
+                    <td colSpan="8" className="px-6 py-4 border-b border-gray-200">
+                      <div className="grid grid-cols-3 gap-6 text-sm">
+                        {/* Languages */}
+                        <div>
+                          <p className="font-medium text-gray-700 mb-2">Languages</p>
+                          <div className="flex flex-wrap gap-1">
+                            {doctor.languages.map((language, i) => (
+                              <span
+                                key={i}
+                                className="px-2 py-1 bg-white border rounded text-xs text-blue-700"
+                              >
+                                {language}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Location Info */}
+                        <div>
+                          <p className="font-medium text-gray-700 mb-2">Location</p>
+                          <div className="flex items-center text-gray-600">
+                            <MapPin className="w-4 h-4 mr-2" />
+                            <span>{doctor.location}</span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-start justify-end gap-3">
+                          <button className="p-2 text-blue-600 hover:bg-blue-50 rounded">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button className="p-2 text-green-600 hover:bg-green-50 rounded">
+                            <MessageSquare className="w-4 h-4" />
+                          </button>
+                          <button className="p-2 text-purple-600 hover:bg-purple-50 rounded">
+                            <Edit className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 
   const renderSessionHistory = () => (
     <div className="space-y-6">
-      <div className="border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold ">Session History</h3>
-          <div className="flex items-center space-x-3">
-            <select
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
-            >
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="all">All Time</option>
-            </select>
-            <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </button>
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold">Session History</h3>
+        <div className="flex items-center space-x-3">
+          <select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+          >
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="all">All Time</option>
+          </select>
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </button>
         </div>
+      </div>
+
+      <div className="border border-gray-200 p-6">
 
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -788,7 +888,7 @@ const TelemedicineManagement = () => {
                         <FileText className="w-4 h-4" />
                       </button>
                       {session.status === 'completed' && (
-                        <button className="text-purple-600 hover:text-purple-800">
+                        <button className="text-blue-600 hover:text-blue-800">
                           <Download className="w-4 h-4" />
                         </button>
                       )}
@@ -809,11 +909,11 @@ const TelemedicineManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Daily Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(revenueData.daily)}</p>
+              <p className="text-sm mb-1">Daily Revenue</p>
+              <p className="text-2xl font-bold ">{formatCurrency(revenueData.daily)}</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-green-600" />
+              <DollarSign className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -821,8 +921,8 @@ const TelemedicineManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Weekly Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(revenueData.weekly)}</p>
+              <p className="text-sm  mb-1">Weekly Revenue</p>
+              <p className="text-2xl font-bold">{formatCurrency(revenueData.weekly)}</p>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-blue-600" />
@@ -833,120 +933,87 @@ const TelemedicineManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Monthly Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(revenueData.monthly)}</p>
+              <p className="text-sm mb-1">Monthly Revenue</p>
+              <p className="text-2xl font-bold ">{formatCurrency(revenueData.monthly)}</p>
             </div>
             <div className="w-12 h-12  flex items-center justify-center">
-              <Target className="w-6 h-6 text-purple-600" />
+              <Target className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Revenue by Specialty</h3>
-        <div className="space-y-4">
-          {revenueData.bySpecialty.map((specialty, index) => (
-            <div key={index} className="border border-gray-200 p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-medium text-gray-900">{specialty.specialty}</h4>
-                <div className="text-right">
-                  <p className="font-semibold text-gray-900">{formatCurrency(specialty.revenue)}</p>
-                  <p className="text-sm text-gray-600">{specialty.sessions} sessions</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-600">Sessions</p>
-                  <p className="font-medium text-gray-900">{specialty.sessions}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Avg Cost</p>
-                  <p className="font-medium text-gray-900">{formatCurrency(specialty.avgCost)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">% of Total</p>
-                  <p className="font-medium text-gray-900">
-                    {((specialty.revenue / revenueData.monthly) * 100).toFixed(1)}%
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderPlatformStats = () => (
-    <div className="space-y-6">
-      <div className="border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Platform Performance Statistics</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="text-center">
-            <div className="w-16 h-16  flex items-center justify-center mx-auto mb-3">
-              <Video className="w-8 h-8 text-blue-600" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{platformStats.videoCall.sessions}</p>
-            <p className="text-sm text-gray-600">Video Calls</p>
-            <p className="text-xs text-gray-500">{platformStats.videoCall.percentage}% of total</p>
+      <div className="p-6">
+        <h3 className="text-lg font-semibold  mb-6">Revenue by Specialty</h3>
+        <div className="grid grid-cols-2 gap-6">
+          {/* Table on the left */}
+          <div className="bg-white border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50  uppercase text-xs">
+                <tr>
+                  <th className="px-4 py-3 text-left font-semibold">Specialty</th>
+                  <th className="px-4 py-3 text-center font-semibold">Sessions</th>
+                  <th className="px-4 py-3 text-center font-semibold">Avg Cost</th>
+                  <th className="px-4 py-3 text-right font-semibold">Revenue</th>
+                  <th className="px-4 py-3 text-right font-semibold">% Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {revenueData.bySpecialty.map((specialty, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-semibold">{specialty.specialty}</td>
+                    <td className="px-4 py-3 text-center ">{specialty.sessions}</td>
+                    <td className="px-4 py-3 text-center ">{formatCurrency(specialty.avgCost)}</td>
+                    <td className="px-4 py-3 text-right font-semibold ">{formatCurrency(specialty.revenue)}</td>
+                    <td className="px-4 py-3 text-right font-semibold ">
+                      {((specialty.revenue / revenueData.monthly) * 100).toFixed(1)}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          <div className="text-center">
-            <div className="w-16 h-16  flex items-center justify-center mx-auto mb-3">
-              <Phone className="w-8 h-8 text-green-600" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{platformStats.audioCall.sessions}</p>
-            <p className="text-sm text-gray-600">Audio Calls</p>
-            <p className="text-xs text-gray-500">{platformStats.audioCall.percentage}% of total</p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-16 h-16  flex items-center justify-center mx-auto mb-3">
-              <MessageSquare className="w-8 h-8 text-purple-600" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{platformStats.messaging.sessions}</p>
-            <p className="text-sm text-gray-600">Messages</p>
-            <p className="text-xs text-gray-500">{platformStats.messaging.percentage}% of total</p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-16 h-16  flex items-center justify-center mx-auto mb-3">
-              <Star className="w-8 h-8 text-yellow-600" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{platformOverview.patientSatisfaction}</p>
-            <p className="text-sm text-gray-600">Satisfaction</p>
-            <p className="text-xs text-gray-500">Out of 5 stars</p>
-          </div>
-        </div>
-
-        <div className="bg-gray-50 rounded-lg p-6">
-          <h4 className="font-medium text-gray-900 mb-4">Platform Health Metrics</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">System Uptime</span>
-                <span className="text-sm font-medium text-green-600">99.9%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: '99.9%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">Connection Quality</span>
-                <span className="text-sm font-medium text-blue-600">Excellent</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '95%' }}></div>
-              </div>
-            </div>
+          {/* Bar Chart on the right */}
+          <div className="bg-white border border-gray-200 p-6">
+            <h4 className="font-semibold mb-4">Revenue Analytics</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={revenueData.bySpecialty}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="specialty" 
+                  tick={{ fill: '#000000', fontSize: 12, fontWeight: 600 }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis 
+                  tick={{ fill: '#000000', fontSize: 12, fontWeight: 600 }}
+                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                />
+                <Tooltip 
+                  formatter={(value) => formatCurrency(value)}
+                  contentStyle={{
+                    backgroundColor: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    padding: '8px'
+                  }}
+                />
+                <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                <Bar dataKey="revenue" fill="#3b82f6" name="Revenue" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
     </div>
   );
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -954,38 +1021,13 @@ const TelemedicineManagement = () => {
         <div className="">
           {/* Header Section */}
           <div className="mb-8">
-            <div className="p-8 shadow-lg">
+            <div className="">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl font-bold mb-2">Telemedicine Management</h1>
                   <p className=" text-lg">
                     Comprehensive oversight of telemedicine services and virtual healthcare delivery
                   </p>
-                  <div className="mt-4 flex items-center space-x-6">
-                    <div className="flex items-center">
-                      <Video className="w-5 h-5 mr-2 text-green-300" />
-                      <span className="">
-                        {platformOverview.activeSessions} Active Sessions
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <UserCheck className="w-5 h-5 mr-2 text-blue-300" />
-                      <span className="">
-                        {platformOverview.onlineDoctors}/{platformOverview.totalDoctors} Doctors Online
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <DollarSign className="w-5 h-5 mr-2 text-yellow-300" />
-                      <span className="">
-                        {formatCurrency(revenueData.daily)} Today
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="hidden md:block">
-                  <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                    <Monitor className="w-16 h-16" />
-                  </div>
                 </div>
               </div>
             </div>
@@ -1021,7 +1063,7 @@ const TelemedicineManagement = () => {
             {activeTab === 'doctors' && renderOnlineDoctors()}
             {activeTab === 'session-history' && renderSessionHistory()}
             {activeTab === 'revenue' && renderRevenue()}
-            {activeTab === 'platform-stats' && renderPlatformStats()}
+            
             
             {/* Placeholder for settings tab */}
             {activeTab === 'settings' && (
