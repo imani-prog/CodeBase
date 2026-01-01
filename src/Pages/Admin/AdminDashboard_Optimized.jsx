@@ -9,15 +9,23 @@ import SystemAlerts from './components/SystemAlerts';
 import RecentActivity from './components/RecentActivity';
 import SidePanel from './components/SidePanel';
 import AdminFeatures from './components/AdminFeatures';
+import OverallOperations from '../../Components/Admin/OverallOperations';
 
 const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Stats Cards */}
-      <StatsCards />
 
       {/* Quick Actions */}
       <QuickActions />
+
+
+      {/* Stats Cards */}
+      <StatsCards />
+
+      {/* Overall Operations */}
+      <OverallOperations />
+
+      
 
       {/* Analytics Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
