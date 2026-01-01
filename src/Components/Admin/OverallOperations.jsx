@@ -144,8 +144,8 @@ const OverallOperations = () => {
     switch (trend) {
       case 'up': return <ArrowUp className="w-4 h-4 text-green-600" />;
       case 'down': return <ArrowDown className="w-4 h-4 text-red-600" />;
-      case 'stable': return <Minus className="w-4 h-4 text-gray-600" />;
-      default: return <Minus className="w-4 h-4 text-gray-600" />;
+      case 'stable': return <Minus className="w-4 h-4 text-gray-900" />;
+      default: return <Minus className="w-4 h-4 text-gray-900" />;
     }
   };
 
