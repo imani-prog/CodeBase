@@ -19,6 +19,7 @@ import NotificationManagement from '../Pages/Admin/NotificationManagement';
 import ReportsAnalytics from '../Pages/Admin/ReportsAnalytics';
 import HospitalManagement from '../Pages/Admin/HospitalManagement';
 import CHWAssignments from '../Pages/Admin/CHWAssignments';
+import AdminAppointments from '../Pages/Admin/AdminAppointments';
 import { Outlet } from 'react-router-dom';
 
 export const adminRoutes = [
@@ -34,6 +35,7 @@ export const adminRoutes = [
       { path: 'add-chw', element: <AddCHW /> },
       { path: 'ambulance-management', element: <AmbulanceManagement /> },
       { path: 'approve-requests', element: <ApproveRequests /> },
+      { path: 'appointments', element: <AdminAppointments /> },
       { path: 'system-logs', element: <SystemLogs /> },
       { path: 'user-management', element: <UserManagement /> },
       { path: 'system-settings', element: <SystemSettings /> },
