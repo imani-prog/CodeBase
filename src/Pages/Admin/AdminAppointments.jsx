@@ -182,9 +182,9 @@ const AdminAppointments = () => {
     { label: 'Scheduled Today', value: appointments.all.filter(a => 
       new Date(a.scheduledStart).toDateString() === new Date().toDateString() && 
       ['SCHEDULED', 'CONFIRMED'].includes(a.status)
-    ).length, color: 'green', icon: CheckCircle },
-    { label: 'In Progress', value: appointments.all.filter(a => a.status === 'IN_PROGRESS').length, color: 'yellow', icon: Clock },
-    { label: 'Pending Approval', value: appointments.all.filter(a => a.status === 'SCHEDULED').length, color: 'orange', icon: AlertCircle }
+    ).length, color: 'blue', icon: CheckCircle },
+    { label: 'In Progress', value: appointments.all.filter(a => a.status === 'IN_PROGRESS').length, color: 'blue', icon: Clock },
+    { label: 'Pending Approval', value: appointments.all.filter(a => a.status === 'SCHEDULED').length, color: 'blue', icon: AlertCircle }
   ];
 
   const tabs = [
@@ -200,16 +200,16 @@ const AdminAppointments = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      SCHEDULED: 'bg-blue-100 text-blue-800',
-      CONFIRMED: 'bg-green-100 text-green-800',
-      CHECKED_IN: 'bg-purple-100 text-purple-800',
-      IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
-      COMPLETED: 'bg-green-100 text-green-800',
-      CANCELED: 'bg-red-100 text-red-800',
-      NO_SHOW: 'bg-gray-100 text-gray-800',
-      RESCHEDULED: 'bg-orange-100 text-orange-800'
+      SCHEDULED: 'text-blue-800',
+      CONFIRMED: 'text-green-800',
+      CHECKED_IN: 'text-blue-800',
+      IN_PROGRESS: 'text-yellow-800',
+      COMPLETED: 'text-green-800',
+      CANCELED: 'text-red-800',
+      NO_SHOW: 'text-gray-800',
+      RESCHEDULED: 'text-orange-800'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'text-gray-800';
   };
 
   const getTypeIcon = (type) => {
@@ -268,10 +268,10 @@ const AdminAppointments = () => {
   };
 
   const DetailsModal = () => (
-    <div className="fixed inset-0  bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Appointment Details</h2>
+          <h2 className="text-2xl font-bold">Appointment Details</h2>
           <button
             onClick={() => setShowDetailsModal(false)}
             className="text-gray-400 hover:text-gray-600 transition"
@@ -282,9 +282,9 @@ const AdminAppointments = () => {
 
         <div className="p-6 space-y-6">
           {/* Appointment Code */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-700 font-medium">Appointment Code</p>
-            <p className="text-xl font-bold text-blue-900">{selectedAppointment?.appointmentCode}</p>
+          <div className="p-4">
+            <p className="text-sm font-medium">Appointment Code</p>
+            <p className="text-xl font-bold">{selectedAppointment?.appointmentCode}</p>
           </div>
 
           {/* Status & Type */}
@@ -299,14 +299,14 @@ const AdminAppointments = () => {
               <p className="text-sm font-medium text-gray-700 mb-2">Type</p>
               <div className="flex items-center gap-2">
                 {getTypeIcon(selectedAppointment?.type)}
-                <span className="text-sm font-medium text-gray-900">{selectedAppointment?.type}</span>
+                <span className="text-sm font-medium">{selectedAppointment?.type}</span>
               </div>
             </div>
           </div>
 
           {/* Patient Information */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <div className="border border-gray-100 shadow-md p-4">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <User className="w-5 h-5 text-blue-600" />
               Patient Information
             </h3>
@@ -341,42 +341,42 @@ const AdminAppointments = () => {
           </div>
 
           {/* Provider Information */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <div className="p-4">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <Users className="w-5 h-5 text-blue-600" />
               Provider Information
             </h3>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Provider:</span>
-                <span className="text-sm font-medium text-gray-900">{selectedAppointment?.providerName}</span>
+                <span className="text-sm font-medium">{selectedAppointment?.providerName}</span>
               </div>
             </div>
           </div>
 
           {/* Schedule Information */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <div className="p-4">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-600" />
               Schedule Information
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Start Time</p>
-                <p className="text-sm font-medium text-gray-900">{formatDateTime(selectedAppointment?.scheduledStart).date}</p>
+                <p className="text-sm font-medium">{formatDateTime(selectedAppointment?.scheduledStart).date}</p>
                 <p className="text-sm font-medium text-blue-600">{formatDateTime(selectedAppointment?.scheduledStart).time}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">End Time</p>
-                <p className="text-sm font-medium text-gray-900">{formatDateTime(selectedAppointment?.scheduledEnd).date}</p>
+                <p className="text-sm font-medium">{formatDateTime(selectedAppointment?.scheduledEnd).date}</p>
                 <p className="text-sm font-medium text-blue-600">{formatDateTime(selectedAppointment?.scheduledEnd).time}</p>
               </div>
             </div>
           </div>
 
           {/* Location Information */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <div className="p-4">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-blue-600" />
               Location Information
             </h3>
@@ -408,10 +408,10 @@ const AdminAppointments = () => {
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
+          <div className="flex gap-6 pt-4 border-t border-gray-200">
             <button
               onClick={() => handleAssignProvider(selectedAppointment)}
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+              className="flex-1 w-1/2 ml-20 bg-blue-600 text-white px-1 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
             >
               <Edit className="w-4 h-4" />
               Assign/Update
@@ -419,7 +419,7 @@ const AdminAppointments = () => {
             {['SCHEDULED', 'CONFIRMED'].includes(selectedAppointment?.status) && (
               <button
                 onClick={() => handleCancelAppointment(selectedAppointment)}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2"
+                className="flex-1 mr-20 bg-red-600 text-white px-1 py-2 rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2"
               >
                 <XCircle className="w-4 h-4" />
                 Cancel
@@ -764,7 +764,7 @@ const AdminAppointments = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Appointments Management</h1>
+        <h1 className="text-3xl font-bold mb-2">Appointments Management</h1>
         <p className="text-gray-600">Manage, approve, and assign all patient appointments</p>
       </div>
 
@@ -773,19 +773,19 @@ const AdminAppointments = () => {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div key={index} className="bg-white shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                <Icon className={`w-5 h-5 text-${stat.color}-600`} />
+                <p className="text-sm font-semibold">{stat.label}</p>
+                <Icon className={`w-8 h-8 text-${stat.color}-600`} />
               </div>
-              <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+              <p className="text-3xl font-bold">{stat.value}</p>
             </div>
           );
         })}
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="bg-white p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -794,14 +794,14 @@ const AdminAppointments = () => {
               placeholder="Search appointments..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">All Statuses</option>
             {statusTypes.filter(s => s !== 'all').map(status => (
@@ -812,7 +812,7 @@ const AdminAppointments = () => {
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">All Types</option>
             {appointmentTypes.filter(t => t !== 'all').map(type => (
@@ -822,13 +822,13 @@ const AdminAppointments = () => {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
+            className="bg-blue-600 text-white ml-25 px-1 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
           >
             <Plus className="w-5 h-5" />
             New Appointment
           </button>
 
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+          <button className="bg-gray-600 ml-20 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center justify-center gap-2">
             <Download className="w-5 h-5" />
             Export
           </button>
@@ -836,7 +836,7 @@ const AdminAppointments = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+      <div className="bg-white shadow-sm border border-gray-200 mb-6">
         <div className="flex overflow-x-auto">
           {tabs.map((tab) => (
             <button
@@ -858,19 +858,19 @@ const AdminAppointments = () => {
       </div>
 
       {/* Appointments Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Code</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Patient</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Provider</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Date & Time</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
-                <th className="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Code</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Patient</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Provider</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Date & Time</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Location</th>
+                <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -888,20 +888,20 @@ const AdminAppointments = () => {
                   return (
                     <tr key={appointment.id} className="hover:bg-gray-50 transition">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <p className="text-sm font-medium text-blue-600">{appointment.appointmentCode}</p>
+                        <p className="text-sm font-semibold">{appointment.appointmentCode}</p>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{appointment.patientName}</p>
+                          <p className="text-sm font-semibold">{appointment.patientName}</p>
                           <p className="text-xs text-gray-500">{appointment.patientId}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <p className="text-sm text-gray-900">{appointment.providerName}</p>
+                        <p className="text-sm font-semibold">{appointment.providerName}</p>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <p className="text-sm text-gray-900 flex items-center gap-1">
+                          <p className="text-sm font-semibold flex items-center gap-1">
                             <Calendar className="w-4 h-4 text-gray-400" />
                             {date}
                           </p>
@@ -914,17 +914,17 @@ const AdminAppointments = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           {getTypeIcon(appointment.type)}
-                          <span className="text-sm text-gray-900">{appointment.type}</span>
+                          <span className="text-sm">{appointment.type}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(appointment.status)}`}>
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium border rounded-full ${getStatusColor(appointment.status)}`}>
                           {appointment.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <p className="text-sm text-gray-900">{appointment.hospital}</p>
+                          <p className="text-sm font-medium">{appointment.hospital}</p>
                           <p className="text-xs text-gray-500">{appointment.location}</p>
                         </div>
                       </td>
