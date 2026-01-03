@@ -776,7 +776,7 @@ const SystemSettings = () => {
               type="checkbox"
               checked={settings.monitoringEnabled}
               onChange={(e) => handleSettingChange('monitoringEnabled', e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-gray-100"
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <label className="ml-2 text-sm text-gray-700">Enable System Monitoring</label>
           </div>
@@ -785,7 +785,7 @@ const SystemSettings = () => {
               type="checkbox"
               checked={settings.performanceTracking}
               onChange={(e) => handleSettingChange('performanceTracking', e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-gray-100"
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <label className="ml-2 text-sm text-gray-700">Enable Performance Tracking</label>
           </div>
