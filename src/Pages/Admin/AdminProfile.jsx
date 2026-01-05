@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 
 const AdminProfile = () => {
-  const [activeTab, setActiveTab] = useState("personal");
   const [profile, setProfile] = useState({
     name: "Dr. Timothy Imani",
     email: "timothy.imani@medilink.com",
@@ -55,51 +54,46 @@ const AdminProfile = () => {
     { module: "Audit Logs", access: "Full Access", active: true }
   ];
 
-  const tabs = [
-    { id: "personal", label: "Personal Info", icon: User },
-    { id: "security", label: "Security", icon: Shield },
-    { id: "preferences", label: "Preferences", icon: Settings },
-    { id: "activity", label: "Activity", icon: Activity },
-    { id: "permissions", label: "Permissions", icon: Key }
-  ];
-
   const handleSave = () => {
     setEditMode(false);
     // Add save logic here
   };
 
   const renderPersonalInfo = () => (
-    <div className="space-y-6">
+    <div className="bg-white shadow-md p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+        <User className="w-6 h-6 mr-2 text-blue-600" />
+        Personal Information
+      </h2>
+      
       {/* Profile Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-6">
-            <div className="relative">
-              <img
-                src="https://ui-avatars.com/api/?name=Sarah+Mitchell&background=3B82F6&color=fff&size=120"
-                alt="Profile"
-                className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
-              />
-              <button className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
-                <Camera className="w-4 h-4" />
-              </button>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{profile.name}</h2>
-              <p className="text-lg text-blue-600 font-medium">{profile.role}</p>
-              <p className="text-gray-600">{profile.department}</p>
-              <div className="flex items-center mt-2">
-                <div className="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
-                <span className="text-sm text-gray-600">{profile.status}</span>
-              </div>
+      <div className="flex items-start justify-between border-b pb-6">
+        <div className="flex items-center space-x-6">
+          <div className="relative">
+            <img
+              src="https://ui-avatars.com/api/?name=Sarah+Mitchell&background=3B82F6&color=fff&size=120"
+              alt="Profile"
+              className="w-24 h-24 rounded-full border-2 border-blue-200 shadow-lg"
+            />
+            <button className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
+              <Camera className="w-4 h-4" />
+            </button>
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900">{profile.name}</h3>
+            <p className="text-lg text-blue-600 font-medium">{profile.role}</p>
+            <p className="text-gray-600">{profile.department}</p>
+            <div className="flex items-center mt-2">
+              <div className="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+              <span className="text-sm text-gray-600">{profile.status}</span>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Employee ID</p>
-            <p className="font-mono text-sm font-medium">{profile.employeeId}</p>
-            <p className="text-sm text-gray-500 mt-2">Joined</p>
-            <p className="text-sm font-medium">{profile.joinDate}</p>
-          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-gray-500">Employee ID</p>
+          <p className="font-mono text-sm font-medium">{profile.employeeId}</p>
+          <p className="text-sm text-gray-500 mt-2">Joined</p>
+          <p className="text-sm font-medium">{profile.joinDate}</p>
         </div>
       </div>
 
@@ -116,7 +110,7 @@ const AdminProfile = () => {
                 type="text"
                 value={profile.name}
                 onChange={(e) => setProfile({...profile, name: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border rounded-md border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white"
               />
             ) : (
               <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.name}</p>
@@ -133,7 +127,7 @@ const AdminProfile = () => {
                 type="email"
                 value={profile.email}
                 onChange={(e) => setProfile({...profile, email: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border rounded-md border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white"
               />
             ) : (
               <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.email}</p>
@@ -150,7 +144,7 @@ const AdminProfile = () => {
                 type="tel"
                 value={profile.phone}
                 onChange={(e) => setProfile({...profile, phone: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border rounded-md border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white"
               />
             ) : (
               <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.phone}</p>
@@ -188,9 +182,14 @@ const AdminProfile = () => {
   );
 
   const renderSecurity = () => (
-    <div className="space-y-6">
+    <div className="bg-white shadow-md p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+        <Shield className="w-6 h-6 mr-2 text-blue-600" />
+        Security Settings
+      </h2>
+      
       {/* Password Section */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Password & Authentication</h3>
         <div className="space-y-4">
           <div>
@@ -199,7 +198,7 @@ const AdminProfile = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter current password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white"
               />
               <button
                 onClick={() => setShowPassword(!showPassword)}
@@ -215,7 +214,7 @@ const AdminProfile = () => {
               <input
                 type="password"
                 placeholder="Enter new password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white"
               />
             </div>
             <div>
@@ -223,7 +222,7 @@ const AdminProfile = () => {
               <input
                 type="password"
                 placeholder="Confirm new password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white"
               />
             </div>
           </div>
@@ -234,7 +233,7 @@ const AdminProfile = () => {
       </div>
 
       {/* Two-Factor Authentication */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Two-Factor Authentication</h3>
           <div className="flex items-center">
@@ -259,7 +258,7 @@ const AdminProfile = () => {
       </div>
 
       {/* Active Sessions */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Active Sessions</h3>
         <div className="space-y-3">
           {loginSessions.map((session, index) => (
@@ -285,9 +284,14 @@ const AdminProfile = () => {
   );
 
   const renderPreferences = () => (
-    <div className="space-y-6">
+    <div className="bg-white shadow-md p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+        <Settings className="w-6 h-6 mr-2 text-blue-600" />
+        Preferences
+      </h2>
+      
       {/* Theme Settings */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Appearance</h3>
         <div className="flex items-center justify-between">
           <div>
@@ -308,7 +312,7 @@ const AdminProfile = () => {
       </div>
 
       {/* Notification Settings */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Notifications</h3>
         <div className="space-y-4">
           {Object.entries(notifications).map(([key, value]) => (
@@ -332,12 +336,12 @@ const AdminProfile = () => {
       </div>
 
       {/* Language & Region */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Language & Region</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white">
               <option>English</option>
               <option>Swahili</option>
               <option>French</option>
@@ -345,7 +349,7 @@ const AdminProfile = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white">
               <option>EAT (UTC+3)</option>
               <option>GMT (UTC+0)</option>
               <option>EST (UTC-5)</option>
@@ -357,9 +361,14 @@ const AdminProfile = () => {
   );
 
   const renderActivity = () => (
-    <div className="space-y-6">
+    <div className="bg-white shadow-md p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+        <Activity className="w-6 h-6 mr-2 text-blue-600" />
+        Activity & History
+      </h2>
+      
       {/* Recent Activity */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Recent Activity</h3>
           <button className="flex items-center text-blue-600 hover:text-blue-800">
@@ -386,7 +395,7 @@ const AdminProfile = () => {
       </div>
 
       {/* Login History */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Login History</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -421,8 +430,13 @@ const AdminProfile = () => {
   );
 
   const renderPermissions = () => (
-    <div className="space-y-6">
-      <div className="bg-white border rounded-xl p-6">
+    <div className="bg-white shadow-md p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+        <Key className="w-6 h-6 mr-2 text-blue-600" />
+        Permissions & Access
+      </h2>
+      
+      <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Access Control</h3>
         <div className="space-y-3">
           {permissions.map((permission, index) => (
@@ -445,7 +459,7 @@ const AdminProfile = () => {
       </div>
 
       {/* API Keys */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="border-t pt-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">API Keys</h3>
           <button className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700">
@@ -464,14 +478,14 @@ const AdminProfile = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="">
         {/* Header */}
-        <div className="mb-8">
+        <div className="bg-white shadow-md p-8 mb-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Admin Profile</h1>
               <p className="text-gray-600">Manage your account settings and preferences</p>
             </div>
             <div className="flex items-center space-x-3">
-              {editMode && activeTab === "personal" ? (
+              {editMode ? (
                 <>
                   <button
                     onClick={() => setEditMode(false)}
@@ -488,7 +502,7 @@ const AdminProfile = () => {
                     Save Changes
                   </button>
                 </>
-              ) : activeTab === "personal" ? (
+              ) : (
                 <button
                   onClick={() => setEditMode(true)}
                   className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -496,7 +510,7 @@ const AdminProfile = () => {
                   <Edit3 className="w-4 h-4 mr-2" />
                   Edit Profile
                 </button>
-              ) : null}
+              )}
               <button className="flex items-center text-red-600 hover:text-red-800 px-4 py-2 border border-red-300 rounded-lg hover:bg-red-50">
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -505,36 +519,13 @@ const AdminProfile = () => {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="mb-8">
-          <nav className="flex space-x-1">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Tab Content */}
-        <div>
-          {activeTab === "personal" && renderPersonalInfo()}
-          {activeTab === "security" && renderSecurity()}
-          {activeTab === "preferences" && renderPreferences()}
-          {activeTab === "activity" && renderActivity()}
-          {activeTab === "permissions" && renderPermissions()}
+        {/* All Sections on One Page */}
+        <div className="space-y-6">
+          {renderPersonalInfo()}
+          {renderSecurity()}
+          {renderPreferences()}
+          {renderActivity()}
+          {renderPermissions()}
         </div>
       </div>
     </div>
