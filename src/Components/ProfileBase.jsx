@@ -47,7 +47,6 @@ const InputField = ({ label, value, field, type = 'text', icon: Icon, disabled =
 
 const ProfileBase = ({ userType, profileData, tabs, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState(tabs[0]?.id || 'personal');
   const [editedData, setEditedData] = useState(profileData);
 
   const handleEdit = () => {
@@ -139,38 +138,17 @@ const ProfileBase = ({ userType, profileData, tabs, onSave }) => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="bg-white shadow-md">
-        <div className="border-b border-gray-200">
-          <div className="flex space-x-8 px-6 overflow-x-auto">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap flex items-center space-x-2 ${
-                    activeTab === tab.id
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="p-6">
-          {tabs.map((tab) => {
-            if (activeTab !== tab.id) return null;
-            
-            return (
-              <div key={tab.id} className="space-y-6">
-                <h2 className="text-2xl font-bold text-gray-900">{tab.label}</h2>
+      {/* All Sections on One Page */}
+      <div className="space-y-6">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <div key={tab.id} className="bg-white shadow-md p-8">
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <Icon className="w-6 h-6 mr-2 text-blue-600" />
+                  {tab.label}
+                </h2>
                 {tab.description && (
                   <p className="text-gray-600">{tab.description}</p>
                 )}
@@ -212,9 +190,9 @@ const ProfileBase = ({ userType, profileData, tabs, onSave }) => {
                   </div>
                 )}
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Account Information Card */}

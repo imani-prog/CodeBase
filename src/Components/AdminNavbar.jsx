@@ -7,18 +7,11 @@ import {
   User, 
   LogOut, 
   Shield, 
-  Activity, 
   Moon, 
   Sun, 
   ChevronDown,
   Menu,
   X,
-  Home,
-  Users,
-  FileText,
-  BarChart3,
-  Calendar,
-  MessageSquare,
   HelpCircle
 } from 'lucide-react';
 
@@ -44,15 +37,6 @@ const AdminNavbar = () => {
   ];
 
   const unreadCount = notifications.filter(n => n.unread).length;
-
-  const navLinks = [
-    { name: 'Dashboard', path: '/admin/dashboard', icon: Home },
-    { name: 'Active Patients', path: '/admin/active-patients', icon: Users },
-    { name: 'Active CHWs', path: '/admin/active-chw', icon: Users },
-    { name: 'Hospital Management', path: '/admin/hospital-management', icon: FileText },
-    { name: 'Appointments', path: '/admin/appointments', icon: Calendar },
-    { name: 'Reports', path: '/admin/reports', icon: BarChart3 },
-  ];
 
   const profileMenuItems = [
     { name: 'My Profile', icon: User, path: '/admin/profile' },
@@ -81,30 +65,7 @@ const AdminNavbar = () => {
     // fixed top navbar that starts after the sidebar (left-64) so it doesn't touch the left edge
     <nav className={`fixed top-0 left-64 right-0 z-40 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'} border-b border-gray-200 h-16`}> 
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-      
-
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center space-x-1">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                    darkMode 
-                      ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {link.name}
-                </Link>
-              );
-            })}
-          </div>
-
+        <div className="flex items-center justify-end h-16">
           {/* Right side controls */}
           <div className="flex items-center space-x-4">
             {/* Search Bar */}
@@ -301,26 +262,6 @@ const AdminNavbar = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className={`lg:hidden border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} py-4`}>
-            <div className="space-y-2">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                      darkMode 
-                        ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 mr-3" />
-                    {link.name}
-                  </Link>
-                );
-              })}
-            </div>
-            
             {/* Mobile Search */}
             <div className="mt-4 px-4">
               <div className="relative">
