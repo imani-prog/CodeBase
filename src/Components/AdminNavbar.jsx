@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Bell, 
   Search, 
@@ -22,10 +23,18 @@ import {
 } from 'lucide-react';
 
 const AdminNavbar = () => {
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleSignOut = () => {
+    // Clear auth data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/');
+  };
 
   const notifications = [
     { id: 1, type: 'user', message: 'New user registration pending approval', time: '5 min ago', unread: true },
@@ -37,16 +46,19 @@ const AdminNavbar = () => {
   const unreadCount = notifications.filter(n => n.unread).length;
 
   const navLinks = [
-    
-    { name: 'Messages', path: '/admin/messages', icon: MessageSquare },
-    
+    { name: 'Dashboard', path: '/admin/dashboard', icon: Home },
+    { name: 'Active Patients', path: '/admin/active-patients', icon: Users },
+    { name: 'Active CHWs', path: '/admin/active-chw', icon: Users },
+    { name: 'Hospital Management', path: '/admin/hospital-management', icon: FileText },
+    { name: 'Appointments', path: '/admin/appointments', icon: Calendar },
+    { name: 'Reports', path: '/admin/reports', icon: BarChart3 },
   ];
 
   const profileMenuItems = [
     { name: 'My Profile', icon: User, path: '/admin/profile' },
-    { name: 'Account Settings', icon: Settings, path: '/admin/settings' },
-    { name: 'Security', icon: Shield, path: '/admin/security' },
-    { name: 'Help Center', icon: HelpCircle, path: '/admin/help' },
+    { name: 'System Settings', icon: Settings, path: '/admin/system-settings' },
+    { name: 'User Management', icon: Shield, path: '/admin/user-management' },
+    { name: 'System Logs', icon: HelpCircle, path: '/admin/system-logs' },
     { name: 'Sign Out', icon: LogOut, path: '/', isDanger: true }
   ];
 
@@ -77,9 +89,9 @@ const AdminNavbar = () => {
             {navLinks.map((link) => {
               const Icon = link.icon;
               return (
-                <a
+                <Link
                   key={link.name}
-                  href={link.path}
+                  to={link.path}
                   className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 ${
                     darkMode 
                       ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
@@ -88,7 +100,7 @@ const AdminNavbar = () => {
                 >
                   <Icon className="w-4 h-4 mr-2" />
                   {link.name}
-                </a>
+                </Link>
               );
             })}
           </div>
@@ -240,21 +252,31 @@ const AdminNavbar = () => {
                   <div className="py-2">
                     {profileMenuItems.map((item) => {
                       const Icon = item.icon;
+                      if (item.isDanger) {
+                        return (
+                          <button
+                            key={item.name}
+                            onClick={handleSignOut}
+                            className={`flex items-center w-full px-4 py-3 text-sm transition-colors text-red-600 hover:text-red-700 hover:bg-red-50`}
+                          >
+                            <Icon className="w-4 h-4 mr-3" />
+                            {item.name}
+                          </button>
+                        );
+                      }
                       return (
-                        <a
+                        <Link
                           key={item.name}
-                          href={item.path}
+                          to={item.path}
                           className={`flex items-center px-4 py-3 text-sm transition-colors ${
-                            item.isDanger
-                              ? 'text-red-600 hover:text-red-700 hover:bg-red-50'
-                              : darkMode
+                            darkMode
                               ? 'text-gray-300 hover:text-white hover:bg-gray-700'
                               : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                           }`}
                         >
                           <Icon className="w-4 h-4 mr-3" />
                           {item.name}
-                        </a>
+                        </Link>
                       );
                     })}
                   </div>
@@ -283,9 +305,9 @@ const AdminNavbar = () => {
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 return (
-                  <a
+                  <Link
                     key={link.name}
-                    href={link.path}
+                    to={link.path}
                     className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                       darkMode 
                         ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
@@ -294,7 +316,7 @@ const AdminNavbar = () => {
                   >
                     <Icon className="w-4 h-4 mr-3" />
                     {link.name}
-                  </a>
+                  </Link>
                 );
               })}
             </div>
