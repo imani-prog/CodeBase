@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientDetailsModal from '../../Components/Admin/PatientDetailsModal';
 import EditPatientModal from '../../Components/Admin/EditPatientModal';
+import AddPatientModal from '../../Components/Admin/AddPatientModal';
 
 const dummyPatients = [
   { 
@@ -83,6 +84,7 @@ const ActivePatients = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [patients, setPatients] = useState(dummyPatients);
 
   // Filter and sort patients
@@ -147,7 +149,7 @@ const ActivePatients = () => {
 
   // Button handlers
   const handleAddPatient = () => {
-    navigate('/admin/add-patient');
+    setShowAddModal(true);
   };
 
   const handleExport = () => {
@@ -191,6 +193,7 @@ const ActivePatients = () => {
 
   const handleAddNewPatient = (newPatient) => {
     setPatients(prev => [...prev, newPatient]);
+    setShowAddModal(false);
   };
 
   return (
@@ -300,7 +303,7 @@ const ActivePatients = () => {
                   placeholder="Search patients by name, email, or condition..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border rounded-lg border-gray-300  focus:ring-1 focus:border"
+                  className="pl-10 pr-4 py-2 w-full border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 />
               </div>
             </div>
@@ -308,7 +311,7 @@ const ActivePatients = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -477,6 +480,12 @@ const ActivePatients = () => {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSave={handleSavePatient}
+      />
+
+      <AddPatientModal 
+        showModal={showAddModal}
+        setShowModal={setShowAddModal}
+        onSavePatient={handleAddNewPatient}
       />
     </div>
   );

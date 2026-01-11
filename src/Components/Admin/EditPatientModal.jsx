@@ -26,8 +26,8 @@ const InputField = ({
           value={value}
           onChange={onChange}
           className={`w-full ${Icon ? 'pl-10' : 'px-4'} py-3 border ${
-            error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
-          } rounded-lg focus:ring-2 focus:border-transparent transition-all appearance-none bg-white`}
+            error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-700'
+          } rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all appearance-none bg-white`}
         >
           <option value="">Select {label.toLowerCase()}</option>
           {options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -42,8 +42,8 @@ const InputField = ({
           min={min}
           max={max}
           className={`w-full ${Icon ? 'pl-10' : 'px-4'} pr-4 py-3 border ${
-            error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
-          } rounded-lg focus:ring-2 focus:border-transparent transition-all`}
+            error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-700'
+          } rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
         />
       )}
 
