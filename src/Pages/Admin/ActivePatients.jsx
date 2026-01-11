@@ -412,9 +412,9 @@ const ActivePatients = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                        {/* <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
                           <span className="text-sm font-medium text-blue-800">{patient.avatar}</span>
-                        </div>
+                        </div> */}
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{patient.name}</div>
