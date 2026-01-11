@@ -8,65 +8,95 @@ import AddPatientModal from '../../Components/Admin/AddPatientModal';
 const dummyPatients = [
   { 
     id: 1, 
-    name: 'John Doe', 
+    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     email: 'john@example.com', 
     phone: '+254-712-345-678',
-    status: 'Active', 
+    nationalId: '28456123',
+    bloodType: 'O_POS',
+    city: 'Nairobi',
+    status: 'ACTIVE', 
     lastVisit: '2025-08-20',
     age: 45,
-    gender: 'Male',
+    gender: 'MALE',
+    chronicConditions: 'Hypertension',
     condition: 'Hypertension',
     nextAppointment: '2025-09-25',
     avatar: 'JD'
   },
   { 
     id: 2, 
-    name: 'Mary Wambui', 
+    name: 'Mary Wambui',
+    firstName: 'Mary',
+    lastName: 'Wambui',
     email: 'maryw@example.com', 
     phone: '+254-723-456-789',
-    status: 'Active', 
+    nationalId: '31245678',
+    bloodType: 'A_POS',
+    city: 'Kisumu',
+    status: 'ACTIVE', 
     lastVisit: '2025-08-21',
     age: 32,
-    gender: 'Female',
+    gender: 'FEMALE',
+    chronicConditions: 'Diabetes',
     condition: 'Diabetes',
     nextAppointment: '2025-09-26',
     avatar: 'MW'
   },
   { 
     id: 3, 
-    name: 'Ali Hassan', 
+    name: 'Ali Hassan',
+    firstName: 'Ali',
+    lastName: 'Hassan',
     email: 'alih@example.com', 
     phone: '+254-734-567-890',
-    status: 'Active', 
+    nationalId: '25789456',
+    bloodType: 'B_POS',
+    city: 'Mombasa',
+    status: 'ACTIVE', 
     lastVisit: '2025-08-19',
     age: 28,
-    gender: 'Male',
+    gender: 'MALE',
+    chronicConditions: 'Asthma',
     condition: 'Asthma',
     nextAppointment: '2025-09-24',
     avatar: 'AH'
   },
   { 
     id: 4, 
-    name: 'Grace Achieng', 
+    name: 'Grace Achieng',
+    firstName: 'Grace',
+    lastName: 'Achieng',
     email: 'grace@example.com', 
     phone: '+254-745-678-901',
-    status: 'Critical', 
+    nationalId: '29856743',
+    bloodType: 'AB_POS',
+    city: 'Nairobi',
+    status: 'INACTIVE', 
     lastVisit: '2025-08-22',
     age: 67,
-    gender: 'Female',
+    gender: 'FEMALE',
+    chronicConditions: 'Heart Disease',
     condition: 'Heart Disease',
     nextAppointment: '2025-09-25',
     avatar: 'GA'
   },
   { 
     id: 5, 
-    name: 'Peter Njoroge', 
+    name: 'Peter Njoroge',
+    firstName: 'Peter',
+    lastName: 'Njoroge',
     email: 'peter@example.com', 
     phone: '+254-756-789-012',
-    status: 'Recovering', 
+    nationalId: '32147896',
+    bloodType: 'O_NEG',
+    city: 'Nakuru',
+    status: 'ACTIVE', 
     lastVisit: '2025-08-18',
     age: 39,
-    gender: 'Male',
+    gender: 'MALE',
+    chronicConditions: 'Surgery Recovery',
     condition: 'Surgery Recovery',
     nextAppointment: '2025-09-27',
     avatar: 'PN'
@@ -133,10 +163,14 @@ const ActivePatients = () => {
   const getStatusBadge = (status) => {
     const statusStyles = {
       Active: 'text-green-800 border-green-200',
+      ACTIVE: 'text-green-800 border-green-200',
       Critical: 'text-red-800 border-red-200',
+      INACTIVE: 'text-gray-800 border-gray-200',
+      Inactive: 'text-gray-800 border-gray-200',
       Recovering: 'text-yellow-800 border-yellow-200',
+      DECEASED: 'text-red-900 border-red-300 bg-red-50',
     };
-    return statusStyles[status] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return statusStyles[status] || 'text-gray-800 border-gray-200';
   };
 
   const formatDate = (dateString) => {
@@ -145,6 +179,11 @@ const ActivePatients = () => {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const formatBloodType = (bloodType) => {
+    if (!bloodType) return 'N/A';
+    return bloodType.replace('_POS', '+').replace('_NEG', '-');
   };
 
   // Button handlers
@@ -197,7 +236,7 @@ const ActivePatients = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-2 bg-gray-50 min-h-screen">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
@@ -241,7 +280,7 @@ const ActivePatients = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Active</p>
-                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'Active').length}</p>
+                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'ACTIVE' || p.status === 'Active').length}</p>
               </div>
             </div>
           </div>
@@ -254,23 +293,23 @@ const ActivePatients = () => {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Critical</p>
-                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'Critical').length}</p>
+                <p className="text-sm font-medium text-gray-600">Critical/Inactive</p>
+                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'INACTIVE' || p.status === 'Critical').length}</p>
               </div>
             </div>
           </div>
 
 
-          <div className="p-4 shadow-sm border border-gray-100">
+          <div className="p-2 shadow-sm border border-gray-100">
             <div className="flex items-center">
               <div className="p-2">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Recovering</p>
-                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'Recovering').length}</p>
+                <p className="text-sm font-medium text-gray-600">Total Patients</p>
+                <p className="text-2xl font-bold text-gray-900">{patients.length}</p>
               </div>
             </div>
           </div>
@@ -367,6 +406,8 @@ const ActivePatients = () => {
                     )}
                   </div>
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">National ID</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Blood Type</th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('condition')}>
                   <div className="flex items-center space-x-1">
@@ -378,7 +419,7 @@ const ActivePatients = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Email</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">City</th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Phone</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('status')}>
@@ -411,11 +452,11 @@ const ActivePatients = () => {
                 <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        {/* <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                      {/* <div className="flex-shrink-0 h-10 w-10">
+                        <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
                           <span className="text-sm font-medium text-blue-800">{patient.avatar}</span>
-                        </div> */}
-                      </div>
+                        </div>
+                      </div> */}
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{patient.name}</div>
                       </div>
@@ -425,20 +466,28 @@ const ActivePatients = () => {
                     <div className="text-sm text-gray-900">{patient.age} years</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.gender}</div>
+                    <div className="text-sm text-gray-900">{patient.gender === 'MALE' ? 'Male' : patient.gender === 'FEMALE' ? 'Female' : patient.gender === 'OTHER' ? 'Other' : patient.gender}</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.condition}</div>
+                    <div className="text-sm text-gray-600 font-mono">{patient.nationalId || 'N/A'}</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.email}</div>
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-700">
+                      {patient.bloodType ? patient.bloodType.replace('_POS', '+').replace('_NEG', '-') : 'N/A'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{patient.condition || patient.chronicConditions || 'N/A'}</div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{patient.city || 'N/A'}</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">{patient.phone}</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getStatusBadge(patient.status)}`}>
-                      {patient.status}
+                      {patient.status === 'ACTIVE' ? 'Active' : patient.status === 'INACTIVE' ? 'Inactive' : patient.status}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">

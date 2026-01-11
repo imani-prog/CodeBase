@@ -4,7 +4,6 @@ import AdminDashboard from '../Pages/Admin/AdminDashboard_Optimized';
 import AdminProfile from '../Pages/Admin/AdminProfile';
 import ActivePatients from '../Pages/Admin/ActivePatients';
 import ActiveCHW from '../Pages/Admin/ActiveCHW';
-import AddPatient from '../Pages/Admin/AddPatient';
 import AddCHW from '../Pages/Admin/AddCHW';
 import ApproveRequests from '../Pages/Admin/ApproveRequests';
 import SystemLogs from '../Pages/Admin/SystemLogs';
@@ -31,7 +30,6 @@ export const adminRoutes = [
       { path: 'profile', element: <AdminProfile /> },
       { path: 'active-patients', element: <ActivePatients /> },
       { path: 'active-chw', element: <ActiveCHW /> },
-      { path: 'add-patient', element: <AddPatient /> },
       { path: 'add-chw', element: <AddCHW /> },
       { path: 'ambulance-management', element: <AmbulanceManagement /> },
       { path: 'approve-requests', element: <ApproveRequests /> },
