@@ -712,7 +712,8 @@ const FinancialManagement = () => {
                   data={revenueDistribution}
                   cx="50%"
                   cy="50%"
-                  labelLine={false}
+                  label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
+                  labelLine={{ stroke: '#6b7280', strokeWidth: 1 }}
                   outerRadius={180}
                   innerRadius={90}
                   fill="#8884d8"
@@ -723,14 +724,34 @@ const FinancialManagement = () => {
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value) => [
-                    new Intl.NumberFormat('en-KE', {
-                      style: 'currency',
-                      currency: 'KES',
-                      minimumFractionDigits: 0
-                    }).format(value),
-                    ''
-                  ]}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0];
+                      const total = revenueDistribution.reduce((sum, item) => sum + item.value, 0);
+                      const percentage = ((data.value / total) * 100).toFixed(1);
+                      
+                      return (
+                        <div className="bg-white px-4 py-3 border-2 border-gray-300 rounded-lg shadow-lg">
+                          <p className="font-bold text-gray-900 text-base mb-2">{data.name}</p>
+                          <p className="text-sm text-gray-700 mb-1">
+                            <span className="font-semibold">Revenue:</span>{' '}
+                            <span className="font-bold text-green-600">
+                              {new Intl.NumberFormat('en-KE', {
+                                style: 'currency',
+                                currency: 'KES',
+                                minimumFractionDigits: 0
+                              }).format(data.value)}
+                            </span>
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Share:</span>{' '}
+                            <span className="font-bold text-blue-600">{percentage}%</span> of total revenue
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
               </RechartsPieChart>
             </ResponsiveContainer>
