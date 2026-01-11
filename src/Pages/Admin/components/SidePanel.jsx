@@ -73,6 +73,7 @@ const SidePanel = () => {
                 cy="50%"
                 label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                 outerRadius={95}
+                innerRadius={60}
                 fill="#8884d8"
                 dataKey="value"
                 labelLine={{ stroke: '#9ca3af', strokeWidth: 1 }}

@@ -714,6 +714,7 @@ const FinancialManagement = () => {
                   cy="50%"
                   labelLine={false}
                   outerRadius={180}
+                  innerRadius={90}
                   fill="#8884d8"
                   dataKey="value"
                 >
