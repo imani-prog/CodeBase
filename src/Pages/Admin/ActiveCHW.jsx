@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CHWDetailsModal from '../../Components/Admin/CHWDetailsModal';
 import EditCHWModal from '../../Components/Admin/EditCHWModal';
+import Pagination from '../../Components/Admin/Pagination';
 
 const dummyCHWs = [
   { 
@@ -571,6 +572,17 @@ const ActiveCHW = () => {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {filteredAndSortedCHWs.length > 0 && (
+        <Pagination 
+          currentPage={currentPage}
+          totalItems={filteredAndSortedCHWs.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          itemName="CHWs"
+        />
+      )}
 
       {/* Empty State */}
       {filteredAndSortedCHWs.length === 0 && (

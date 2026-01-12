@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import PatientDetailsModal from '../../Components/Admin/PatientDetailsModal';
 import EditPatientModal from '../../Components/Admin/EditPatientModal';
 import AddPatientModal from '../../Components/Admin/AddPatientModal';
+import Pagination from '../../Components/Admin/Pagination';
 
 const dummyPatients = [
   { 
@@ -571,6 +572,17 @@ const ActivePatients = () => {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {filteredAndSortedPatients.length > 0 && (
+        <Pagination 
+          currentPage={currentPage}
+          totalItems={filteredAndSortedPatients.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          itemName="patients"
+        />
+      )}
 
       {/* Empty State */}
       {filteredAndSortedPatients.length === 0 && (
