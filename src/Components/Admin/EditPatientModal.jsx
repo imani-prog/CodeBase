@@ -199,7 +199,7 @@ const EditPatientModal = ({ patient, isOpen, onClose, onSave }) => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="relative bg-white shadow-2xl transform transition-all max-w-5xl w-full overflow-hidden max-h-[90vh] flex flex-col">
           {/* Header */}
-          <div className="relative px-8 py-5 bg-blue-700 text-white">
+          <div className="relative px-8 py-5 bg-blue-950 text-white">
             <button
               onClick={onClose}
               className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
