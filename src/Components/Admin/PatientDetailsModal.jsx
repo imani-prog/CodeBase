@@ -96,7 +96,7 @@ const PatientDetailsModal = ({ patient, isOpen, onClose }) => {
         <div className="relative bg-white shadow-2xl transform transition-all max-w-6xl w-full overflow-hidden max-h-[90vh] flex flex-col">
           
           {/* Header */}
-          <div className="relative px-8 py-6 border-b border-gray-200">
+          <div className="relative px-8 py-5 bg-blue-700 text-white">
             <button
               onClick={onClose}
               className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
