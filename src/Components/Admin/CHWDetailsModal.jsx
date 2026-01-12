@@ -74,41 +74,53 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="relative bg-white shadow-2xl max-w-5xl w-full overflow-hidden transform transition-all">
           {/* Header */}
-          <div className="relative px-8 py-8">
-            <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-all duration-200 hover:rotate-90">
+          <div className="relative px-8 py-6 bg-blue-950 text-white">
+            <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200">
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="h-20 w-20 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
+                <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
                   <span className="text-3xl font-bold">{chw.avatar}</span>
                 </div>
-                {chw.status === 'AVAILABLE' && (
-                  <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-green-400 border-4 border-white animate-pulse" />
+                {(chw.status === 'AVAILABLE' || chw.status === 'Active') && (
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-green-400 border-4 border-blue-950 animate-pulse" />
                 )}
               </div>
 
             <div className="flex-1">
               <div className="flex items-center space-x-3 mb-2">
                 <h2 className="text-2xl font-bold">{chw.name}</h2>
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full border border-blue-300">
+                <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full border border-white/30">
                   {chw.code}
                 </span>
-                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                <span className="px-2 py-1 bg-white/10 text-white/80 text-xs rounded">
                   ID: {chw.id}
                 </span>
               </div>
-              <div className="text-sm text-gray-600 mb-2">
+              <div className="text-sm text-white/90 mb-2">
                 {chw.firstName} {chw.middleName && chw.middleName + ' '}{chw.lastName}
               </div>
-              <div className="flex items-center space-x-4 text-sm text-gray-700">
+              <div className="flex items-center space-x-4 text-sm text-white/80">
                 <span className="flex items-center"><MapPin className="w-4 h-4 mr-1" />{chw.city}, {chw.state}</span>
                 <span className="flex items-center"><Users className="w-4 h-4 mr-1" />{chw.patients} Patients</span>
               </div>
             </div>
 
-            <div className="hidden md:block"><StatusBadge status={chw.status} /></div>
+            <div className="hidden md:block">
+              <span className={`inline-flex px-4 py-2 text-sm font-semibold rounded-full ${
+                chw.status === 'AVAILABLE' || chw.status === 'Active'
+                  ? 'bg-green-500 text-white'
+                  : chw.status === 'BUSY'
+                  ? 'bg-blue-500 text-white'
+                  : chw.status === 'OFFLINE' || chw.status === 'On Leave'
+                  ? 'bg-yellow-500 text-white'
+                  : 'bg-red-500 text-white'
+              }`}>
+                {getStatusDisplay(chw.status)}
+              </span>
+            </div>
             </div>
           </div>
 
@@ -124,8 +136,30 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
               </div>
             </div>
 
+            {/* Work Statistics - Full Width */}
+            <div className="mb-6 bg-white shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Activity className="w-6 h-6 text-blue-600 mr-3" /> Work Statistics
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  { v: chw.patients, l: 'Assigned Patients', icon: Users },
+                  { v: chw.monthlyVisits, l: 'Monthly Visits', icon: Calendar },
+                  { v: Math.round(chw.monthlyVisits / 30), l: 'Daily Average', icon: TrendingUp },
+                ].map((s, i) => (
+                  <div key={i} className="p-6 border border-gray-200 hover:shadow-md transition-shadow text-center">
+                    <div className="p-3 mb-3 mx-auto">
+                      <s.icon className="w-6 h-6 text-blue-600 mx-auto" />
+                    </div>
+                    <div className="text-3xl font-bold text-gray-900">{s.v}</div>
+                    <div className="text-sm font-medium text-gray-600 mt-2">{s.l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Column */}
               <div className="space-y-4">
               {/* Personal Information */}
@@ -174,6 +208,45 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
                 </div>
               </div>
 
+              {/* Hospital Affiliation & Specialization */}
+              {(chw.hospitalId || chw.specialization) && (
+                <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
+                  {chw.hospitalId && (
+                    <>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center">
+                        <Building2 className="w-6 h-6 text-blue-600 mr-3" /> Hospital Affiliation
+                      </h3>
+                      <div className="space-y-3 mb-4">
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital Name</label>
+                          <p className="mt-1 text-sm font-medium text-gray-900">{chw.hospitalName}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital ID</label>
+                          <p className="mt-1 text-xs font-mono text-gray-600">{chw.hospitalId}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {chw.hospitalId && chw.specialization && <div className="border-t border-gray-200 my-4"></div>}
+                  {chw.specialization && (
+                    <>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center">
+                        <Award className="w-6 h-6 text-blue-600 mr-3" /> Specialization
+                      </h3>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Area of Expertise</label>
+                        <p className="mt-1 text-sm font-medium text-gray-900">{chw.specialization}</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-4">
+
               {/* Status */}
               <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -190,61 +263,6 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
                 </div>
                 <p className="text-xs text-gray-500 mt-3">Last updated: {chw.lastStatusUpdate}</p>
               </div>
-
-              {/* Work Stats */}
-              <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Activity className="w-6 h-6 text-blue-600 mr-3" /> Work Statistics
-                </h3>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  {[
-                    { v: chw.patients, l: 'Assigned Patients' },
-                    { v: chw.monthlyVisits, l: 'Monthly Visits' },
-                    { v: Math.round(chw.monthlyVisits / 30), l: 'Daily Average' },
-                  ].map((s, i) => (
-                    <div key={i} className="p-4 border border-gray-200">
-                      <div className="text-2xl font-bold">{s.v}</div>
-                      <div className="text-xs mt-1">{s.l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Hospital Affiliation */}
-              {chw.hospitalId && (
-                <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Building2 className="w-6 h-6 text-blue-600 mr-3" /> Hospital Affiliation
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital Name</label>
-                      <p className="mt-1 text-sm font-medium text-gray-900">{chw.hospitalName}</p>
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital ID</label>
-                      <p className="mt-1 text-xs font-mono text-gray-600">{chw.hospitalId}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Specialization */}
-              {chw.specialization && (
-                <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Award className="w-6 h-6 text-blue-600 mr-3" /> Specialization
-                  </h3>
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Area of Expertise</label>
-                    <p className="mt-1 text-sm font-medium text-gray-900">{chw.specialization}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-4">
 
               {/* Full Address */}
               <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
@@ -306,37 +324,6 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Hospital Affiliation */}
-              {chw.hospitalId && (
-                <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Building2 className="w-6 h-6 text-blue-600 mr-3" /> Hospital Affiliation
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital Name</label>
-                      <p className="mt-1 text-sm font-medium text-gray-900">{chw.hospitalName}</p>
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital ID</label>
-                      <p className="mt-1 text-xs font-mono text-gray-600">{chw.hospitalId}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Specialization */}
-              {chw.specialization && (
-                <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Award className="w-6 h-6 text-blue-600 mr-3" /> Specialization
-                  </h3>
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Area of Expertise</label>
-                    <p className="mt-1 text-sm font-medium text-gray-900">{chw.specialization}</p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
