@@ -319,7 +319,7 @@ const ActiveCHW = () => {
   const uniqueRegions = [...new Set(chws.map(chw => chw.region))];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className=" bg-gray-50 min-h-screen">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
@@ -330,7 +330,7 @@ const ActiveCHW = () => {
           <div className="flex space-x-3">
             <button 
               onClick={handleAddCHW}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -339,7 +339,7 @@ const ActiveCHW = () => {
             </button>
             <button 
               onClick={handleExport}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
