@@ -188,9 +188,9 @@ const AddPatientModal = ({ showModal, setShowModal, onSavePatient }) => {
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="font-bold hover:text-red-600 hover:bg-red-300 rounded-full transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-8 h-8" />
           </button>
         </div>
 
