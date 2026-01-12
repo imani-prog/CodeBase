@@ -101,6 +101,25 @@ const dummyPatients = [
     nextAppointment: '2025-09-27',
     avatar: 'PN'
   },
+  {
+    id: 6,
+    name: 'Lilian Otieno',
+    firstName: 'Lilian',
+    lastName: 'Otieno',
+    email: 'lilian@example.com',
+    phone: '+254-767-890-123',
+    nationalId: '33456789',
+    bloodType: 'A_NEG',
+    city: 'Eldoret',
+    status: 'Critical',
+    lastVisit: '2025-08-17',
+    age: 52,
+    gender: 'FEMALE',
+    chronicConditions: 'Kidney Disease',
+    condition: 'Kidney Disease',
+    nextAppointment: '2025-09-28',
+    avatar: 'LO'
+  }
 ];
 
 const ActivePatients = () => {
