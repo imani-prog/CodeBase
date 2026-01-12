@@ -174,11 +174,11 @@ const AddPatientModal = ({ showModal, setShowModal, onSavePatient }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col">
+      <div className="bg-white shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+            <div className="h-12 w-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg">
               <UserPlus className="w-6 h-6 text-white" />
             </div>
             <div>
