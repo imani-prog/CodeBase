@@ -113,9 +113,21 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
           </div>
 
           {/* Body */}
-          <div className="p-8 bg-gray-50 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column */}
-            <div className="space-y-4">
+          <div className="p-8 bg-gray-50 max-h-[calc(100vh-250px)] overflow-y-auto">
+            {/* Performance Metrics - Full Width */}
+            <div className="mb-6 bg-white shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <TrendingUp className="w-6 h-6 text-blue-600 mr-3" /> Performance Metrics
+              </h3>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {metrics.map((m, i) => <MetricCard key={i} {...m} />)}
+              </div>
+            </div>
+
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column */}
+              <div className="space-y-4">
               {/* Personal Information */}
               <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -161,6 +173,78 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
                   <InfoRow icon={Phone} label="Phone" value={chw.phone} link={`tel:${chw.phone}`} />
                 </div>
               </div>
+
+              {/* Status */}
+              <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
+                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                  <Activity className="w-6 h-6 text-blue-600 mr-3" /> Current Status
+                </h3>
+                <div className="flex items-center justify-between">
+                  <StatusBadge status={chw.status} />
+                  {(chw.status === 'AVAILABLE' || chw.status === 'Active') && (
+                    <div className="flex items-center space-x-2 px-4 py-2 bg-green-100 rounded-lg">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      <span className="text-sm font-medium text-green-700">Online Now</span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-3">Last updated: {chw.lastStatusUpdate}</p>
+              </div>
+
+              {/* Work Stats */}
+              <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
+                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                  <Activity className="w-6 h-6 text-blue-600 mr-3" /> Work Statistics
+                </h3>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  {[
+                    { v: chw.patients, l: 'Assigned Patients' },
+                    { v: chw.monthlyVisits, l: 'Monthly Visits' },
+                    { v: Math.round(chw.monthlyVisits / 30), l: 'Daily Average' },
+                  ].map((s, i) => (
+                    <div key={i} className="p-4 border border-gray-200">
+                      <div className="text-2xl font-bold">{s.v}</div>
+                      <div className="text-xs mt-1">{s.l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hospital Affiliation */}
+              {chw.hospitalId && (
+                <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Building2 className="w-6 h-6 text-blue-600 mr-3" /> Hospital Affiliation
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital Name</label>
+                      <p className="mt-1 text-sm font-medium text-gray-900">{chw.hospitalName}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital ID</label>
+                      <p className="mt-1 text-xs font-mono text-gray-600">{chw.hospitalId}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Specialization */}
+              {chw.specialization && (
+                <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Award className="w-6 h-6 text-blue-600 mr-3" /> Specialization
+                  </h3>
+                  <div>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Area of Expertise</label>
+                    <p className="mt-1 text-sm font-medium text-gray-900">{chw.specialization}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-4">
 
               {/* Full Address */}
               <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
@@ -253,118 +337,6 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
                   </div>
                 </div>
               )}
-
-              {/* Audit Trail & Timestamps */}
-              <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Calendar className="w-6 h-6 text-blue-600 mr-3" /> Audit Trail
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Record Created</label>
-                    <p className="mt-1 text-sm text-gray-900">
-                      {new Date(chw.createdAt).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</label>
-                    <p className="mt-1 text-sm text-gray-900">
-                      {new Date(chw.updatedAt).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</label>
-                    <p className="mt-1 text-sm text-gray-900">{chw.startDate}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</label>
-                    <p className="mt-1 text-sm text-gray-900">{chw.lastActivity}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Status Last Updated</label>
-                    <p className="mt-1 text-sm text-gray-900">{chw.lastStatusUpdate}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
-                <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-                <div className="space-y-2">
-                  <button className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
-                    <Video className="w-4 h-4 mr-2" /> Start Video Call
-                  </button>
-                  <button className="w-full flex items-center justify-center px-4 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                    <MessageSquare className="w-4 h-4 mr-2" /> Send Message
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Metrics */}
-              <div className="p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <TrendingUp className="w-8 h-8 text-blue-600 mr-3" /> Performance Metrics
-                </h3>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  {metrics.map((m, i) => <MetricCard key={i} {...m} />)}
-                </div>
-              </div>
-
-              {/* Status */}
-              <div className="shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Activity className="w-8 h-8 text-blue-600 mr-3" /> Current Status
-                </h3>
-                <div className="p-6 bg-gradient-to-r from-gray-50 to-gray-100/50 flex justify-between items-center">
-                  <div className="flex items-center space-x-4">
-                    <StatusBadge status={chw.status} />
-                    <div>
-                      <p className="text-sm font-semibold">Status: {getStatusDisplay(chw.status)}</p>
-                      <p className="text-xs text-gray-500 mt-1">Last updated: {chw.lastStatusUpdate}</p>
-                    </div>
-                  </div>
-                  {(chw.status === 'AVAILABLE' || chw.status === 'Active') && (
-                    <div className="flex items-center space-x-2 px-4 py-2 bg-green-100 rounded-lg">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-sm font-medium text-green-700">Online Now</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Work Stats */}
-              <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Activity className="w-6 h-6 text-blue-600 mr-3" /> Work Statistics
-                </h3>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  {[
-                    { v: chw.patients, l: 'Assigned Patients' },
-                    { v: chw.monthlyVisits, l: 'Monthly Visits' },
-                    { v: Math.round(chw.monthlyVisits / 30), l: 'Daily Average' },
-                  ].map((s, i) => (
-                    <div key={i} className="p-4 border border-gray-200">
-                      <div className="text-2xl font-bold">{s.v}</div>
-                      <div className="text-xs mt-1">{s.l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
 
@@ -394,6 +366,7 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

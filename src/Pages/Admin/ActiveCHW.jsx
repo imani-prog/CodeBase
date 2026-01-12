@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CHWDetailsModal from '../../Components/Admin/CHWDetailsModal';
 import EditCHWModal from '../../Components/Admin/EditCHWModal';
+import AddCHWModal from '../../Components/Admin/AddCHWModal';
 import Pagination from '../../Components/Admin/Pagination';
 
 const dummyCHWs = [
@@ -190,6 +191,7 @@ const ActiveCHW = () => {
   const [selectedCHW, setSelectedCHW] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [chws, setCHWs] = useState(dummyCHWs);
 
   // Filter and sort CHWs
@@ -269,7 +271,7 @@ const ActiveCHW = () => {
 
   // Button handlers
   const handleAddCHW = () => {
-    navigate('/admin/add-chw');
+    setShowAddModal(true);
   };
 
   const handleExport = () => {
@@ -313,6 +315,7 @@ const ActiveCHW = () => {
 
   const handleAddNewCHW = (newCHW) => {
     setCHWs(prev => [...prev, newCHW]);
+    setShowAddModal(false);
   };
 
   // Get unique regions for filter
@@ -621,6 +624,12 @@ const ActiveCHW = () => {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSave={handleSaveCHW}
+      />
+
+      <AddCHWModal 
+        showModal={showAddModal}
+        setShowModal={setShowAddModal}
+        onSaveCHW={handleAddNewCHW}
       />
     </div>
   );
