@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import logo from '../assets/mediLink.png';
+import logo from '../../assets/mediLink.png';
 
 const sidebarLinks = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: (
