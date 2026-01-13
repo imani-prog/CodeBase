@@ -468,10 +468,10 @@ const ActiveCHW = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('code')}>
                   <div className="flex items-center space-x-1">
-                    <span>CHW Number</span>
+                    <span>Code</span>
                     {sortField === 'code' && (
                       <svg className={`w-4 h-4 ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -479,13 +479,46 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">CHW Details</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Contact</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Location</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Hospital</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('patients')}>
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('name')}>
                   <div className="flex items-center space-x-1">
+                    <span>Name</span>
+                    {sortField === 'name' && (
+                      <svg className={`w-4 h-4 ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    )}
+                  </div>
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Specialization</th>
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Email</th>
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Phone</th>
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('city')}>
+                  <div className="flex items-center space-x-1">
+                    <span>City</span>
+                    {sortField === 'city' && (
+                      <svg className={`w-4 h-4 ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    )}
+                  </div>
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('region')}>
+                  <div className="flex items-center space-x-1">
+                    <span>Region</span>
+                    {sortField === 'region' && (
+                      <svg className={`w-4 h-4 ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    )}
+                  </div>
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Hospital</th>
+                <th className="px-3 py-3 text-center text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('patients')}>
+                  <div className="flex items-center justify-center space-x-1">
                     <span>Patients</span>
                     {sortField === 'patients' && (
                       <svg className={`w-4 h-4 ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,7 +527,7 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                <th className="px-3 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('status')}>
                   <div className="flex items-center space-x-1">
                     <span>Status</span>
@@ -505,46 +538,46 @@ const ActiveCHW = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Actions</th>
+                <th className="px-3 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedCHWs.map((chw) => (
                 <tr key={chw.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="text-sm font-bold">{chw.code}</div>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="text-xs font-bold text-gray-900">{chw.code}</span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center">
-                      
-                      <div className="ml-3">
-                        <div className="text-sm font-medium text-gray-900">{chw.name}</div>
-                        <div className="text-xs text-gray-500">{chw.specialization}</div>
-                      </div>
-                    </div>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="text-xs font-medium text-gray-900">{chw.name}</span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="text-xs text-gray-900">{chw.email}</div>
-                    <div className="text-xs text-gray-500">{chw.phone}</div>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="text-xs text-gray-600">{chw.specialization}</span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="text-xs text-gray-900">{chw.city}, {chw.state}</div>
-                    <div className="text-xs text-gray-500">{chw.region}</div>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="text-xs text-gray-900">{chw.email}</span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="text-xs text-gray-900">{chw.hospitalName}</div>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="text-xs text-gray-600">{chw.phone}</span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-center">
-                    <div className="text-sm font-semibold text-gray-900">{chw.patients}</div>
-                    <div className="text-xs text-gray-500">assigned</div>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="text-xs text-gray-900">{chw.city}</span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="text-xs text-gray-600">{chw.region}</span>
+                  </td>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="text-xs text-gray-900">{chw.hospitalName}</span>
+                  </td>
+                  <td className="px-3 py-3 whitespace-nowrap text-center">
+                    <span className="text-xs font-semibold text-gray-900">{chw.patients}</span>
+                  </td>
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(chw.status)}`}>
                       {getDisplayStatus(chw.status)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <div className="flex justify-center space-x-2">
                       <button 
                         onClick={() => handleViewCHW(chw)}
                         className="text-green-600 hover:text-green-900 transition-colors"
