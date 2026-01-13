@@ -27,7 +27,7 @@ const InputField = ({
           value={value}
           onChange={onChange}
           className={`w-full ${Icon ? 'pl-10' : 'px-4'} py-3 border ${
-            error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 '
+            error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent'
           } rounded-lg transition-all appearance-none bg-white`}
         >
           {options?.map(opt => (
@@ -47,7 +47,7 @@ const InputField = ({
           max={max}
           step={step}
           className={`w-full ${Icon ? 'pl-10' : 'px-4'} pr-4 py-3 border ${
-            error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 '
+            error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent'
           } rounded-lg  transition-all`}
         />
       )}
@@ -538,7 +538,7 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                       value={newService}
                       onChange={(e) => setNewService(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddService())}
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                       placeholder="Enter service name and press Enter"
                     />
                     <button
@@ -618,7 +618,7 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                       value={newInsurance}
                       onChange={(e) => setNewInsurance(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddInsurance())}
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                       placeholder="Enter insurance provider and press Enter"
                     />
                     <button

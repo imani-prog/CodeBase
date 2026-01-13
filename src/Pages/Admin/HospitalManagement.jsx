@@ -546,7 +546,7 @@ const HospitalManagement = () => {
             </div>
             <button 
               onClick={() => setShowAddModal(true)}
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
+              className="px-4 py-3 bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
             >
               <Plus className="w-5 h-5" />
               <span className="font-medium">Add Hospital</span>
@@ -681,25 +681,37 @@ const HospitalManagement = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
-                    Hospital
+                  <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                    Code
                   </th>
-                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                    Hospital Name
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">
                     Type
                   </th>
-                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
-                    Location
+                  <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                    City
                   </th>
-                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
-                    Capacity
+                  <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                    State
                   </th>
-                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
-                    Contact
+                  <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">
+                    Beds
                   </th>
-                  <th className="px-6 py-3 text-left font-bold  uppercase tracking-wider">
+                  <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">
+                    Ambulances
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                    Phone
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-right font-bold  uppercase tracking-wider">
+                  <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -707,84 +719,64 @@ const HospitalManagement = () => {
               <tbody className="divide-y divide-gray-200">
                 {filteredHospitals.map((hospital) => (
                   <tr key={hospital.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-3">
-                        {/* <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                          <Building2 className="w-6 h-6 text-white" />
-                        </div> */}
-                        <div>
-                          <p className="font-semibold ">{hospital.name}</p>
-                          <p className="text-sm text-gray-500">{hospital.code}</p>
-                        </div>
-                      </div>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className="text-xs font-bold text-gray-900">{hospital.code}</span>
                     </td>
-                    <td className="px-6 py-3">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(hospital.type)}`}>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className="text-xs font-medium text-gray-900">{hospital.name}</span>
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(hospital.type)}`}>
                         {hospital.type.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-start space-x-2">
-                        <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{hospital.city}</p>
-                          <p className="text-xs text-gray-500">{hospital.state}</p>
-                        </div>
-                      </div>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className="text-xs text-gray-900">{hospital.city}</span>
                     </td>
-                    <td className="px-6 py-3">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <Bed className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-900">{hospital.numberOfBeds} beds</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Truck className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-900">{hospital.numberOfAmbulances} ambulances</span>
-                        </div>
-                      </div>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className="text-xs text-gray-600">{hospital.state}</span>
                     </td>
-                    <td className="px-6 py-3">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <Phone className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-900">{hospital.phone}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Mail className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-900">{hospital.email}</span>
-                        </div>
-                      </div>
+                    <td className="px-3 py-3 whitespace-nowrap text-center">
+                      <span className="text-xs font-semibold text-gray-900">{hospital.numberOfBeds}</span>
                     </td>
-                    <td className="px-6 py-3">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(hospital.status)}`}>
+                    <td className="px-3 py-3 whitespace-nowrap text-center">
+                      <span className="text-xs font-semibold text-gray-900">{hospital.numberOfAmbulances}</span>
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className="text-xs text-gray-900">{hospital.phone}</span>
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className="text-xs text-gray-900">{hospital.email}</span>
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(hospital.status)}`}>
                         {hospital.status === 'ACTIVE' && <CheckCircle className="w-3 h-3 mr-1" />}
                         {hospital.status === 'INACTIVE' && <XCircle className="w-3 h-3 mr-1" />}
                         {hospital.status === 'SUSPENDED' && <AlertCircle className="w-3 h-3 mr-1" />}
                         {hospital.status}
                       </span>
                     </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center justify-end space-x-2">
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <div className="flex items-center justify-center space-x-2">
                         <button 
                           onClick={() => handleViewHospital(hospital)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="text-blue-600 hover:text-blue-900 transition-colors"
                           title="View Details"
                         >
-                          <Eye className="w-5 h-5" />
+                          <Eye className="w-4 h-4" />
                         </button>
                         <button 
                           onClick={() => handleEditHospital(hospital)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="text-blue-600 hover:text-blue-900 transition-colors"
                           title="Edit"
                         >
-                          <Edit className="w-5 h-5" />
+                          <Edit className="w-4 h-4" />
                         </button>
                         <button 
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="text-red-600 hover:text-red-900 transition-colors"
                           title="Delete"
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
