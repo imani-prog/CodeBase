@@ -566,7 +566,7 @@ const ActiveCHW = () => {
                       </button>
                       <button 
                         onClick={() => handleContactCHW(chw)}
-                        className="text-purple-600 hover:text-purple-900 transition-colors"
+                        className="text-blue-600 hover:text-blue-900 transition-colors"
                         title="Contact CHW"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
