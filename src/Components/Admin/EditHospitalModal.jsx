@@ -65,10 +65,11 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
   const [formData, setFormData] = useState({
     name: '',
     code: '',
-    type: 'PUBLIC',
+    type: 'GENERAL',
     registrationNumber: '',
     taxId: '',
-    phone: '',
+    mainPhone: '',
+    altPhone: '',
     email: '',
     website: '',
     fax: '',
@@ -80,18 +81,25 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
     country: 'Kenya',
     latitude: '',
     longitude: '',
+    adminContactName: '',
+    adminContactEmail: '',
+    adminContactPhone: '',
     numberOfBeds: '',
-    numberOfICUBeds: '',
+    numberOfIcuBeds: '',
     numberOfAmbulances: '',
     servicesOffered: [],
+    departments: [],
+    operatingHours: '',
     facilities: [],
-    insuranceProvidersAccepted: [],
+    acceptedInsurance: [],
+    notes: '',
     status: 'ACTIVE'
   });
 
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [newService, setNewService] = useState('');
+  const [newDepartment, setNewDepartment] = useState('');
   const [newInsurance, setNewInsurance] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -102,10 +110,11 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
       setFormData({
         name: hospital.name || '',
         code: hospital.code || '',
-        type: hospital.type || 'PUBLIC',
+        type: hospital.type || 'GENERAL',
         registrationNumber: hospital.registrationNumber || '',
         taxId: hospital.taxId || '',
-        phone: hospital.phone || '',
+        mainPhone: hospital.mainPhone || '',
+        altPhone: hospital.altPhone || '',
         email: hospital.email || '',
         website: hospital.website || '',
         fax: hospital.fax || '',
@@ -117,12 +126,18 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
         country: hospital.country || 'Kenya',
         latitude: hospital.latitude || '',
         longitude: hospital.longitude || '',
+        adminContactName: hospital.adminContactName || '',
+        adminContactEmail: hospital.adminContactEmail || '',
+        adminContactPhone: hospital.adminContactPhone || '',
         numberOfBeds: hospital.numberOfBeds || '',
-        numberOfICUBeds: hospital.numberOfICUBeds || '',
+        numberOfIcuBeds: hospital.numberOfIcuBeds || '',
         numberOfAmbulances: hospital.numberOfAmbulances || '',
-        servicesOffered: hospital.servicesOffered || [],
-        facilities: hospital.facilities || [],
-        insuranceProvidersAccepted: hospital.insuranceProvidersAccepted || [],
+        servicesOffered: hospital.servicesOffered ? hospital.servicesOffered.split(',').map(s => s.trim()) : [],
+        departments: hospital.departments ? hospital.departments.split(',').map(s => s.trim()) : [],
+        operatingHours: hospital.operatingHours || '',
+        facilities: hospital.facilities ? hospital.facilities.split(',').map(s => s.trim()) : [],
+        acceptedInsurance: hospital.acceptedInsurance ? hospital.acceptedInsurance.split(',').map(s => s.trim()) : [],
+        notes: hospital.notes || '',
         status: hospital.status || 'ACTIVE'
       });
     }
@@ -160,11 +175,28 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
     }));
   };
 
-  const handleAddInsurance = () => {
-    if (newInsurance.trim() && !formData.insuranceProvidersAccepted.includes(newInsurance.trim())) {
+  const handleAddDepartment = () => {
+    if (newDepartment.trim() && !formData.departments.includes(newDepartment.trim())) {
       setFormData(prev => ({
         ...prev,
-        insuranceProvidersAccepted: [...prev.insuranceProvidersAccepted, newInsurance.trim()]
+        departments: [...prev.departments, newDepartment.trim()]
+      }));
+      setNewDepartment('');
+    }
+  };
+
+  const handleRemoveDepartment = (department) => {
+    setFormData(prev => ({
+      ...prev,
+      departments: prev.departments.filter(d => d !== department)
+    }));
+  };
+
+  const handleAddInsurance = () => {
+    if (newInsurance.trim() && !formData.acceptedInsurance.includes(newInsurance.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        acceptedInsurance: [...prev.acceptedInsurance, newInsurance.trim()]
       }));
       setNewInsurance('');
     }
@@ -173,12 +205,12 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
   const handleRemoveInsurance = (insurance) => {
     setFormData(prev => ({
       ...prev,
-      insuranceProvidersAccepted: prev.insuranceProvidersAccepted.filter(i => i !== insurance)
+      acceptedInsurance: prev.acceptedInsurance.filter(i => i !== insurance)
     }));
   };
 
   const validateForm = () => {
-    const requiredFields = ['name', 'phone', 'email'];
+    const requiredFields = ['name', 'mainPhone', 'email'];
     const newErrors = {};
     
     requiredFields.forEach(field => {
@@ -208,7 +240,17 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
         console.warn('HospitalFormModal: onSave prop is not a function or missing', onSave);
       } else {
         try {
-          await onSave({ ...hospital, ...formData });
+          // Transform arrays to comma-separated strings for backend
+          const backendData = {
+            ...hospital,
+            ...formData,
+            servicesOffered: formData.servicesOffered.join(', '),
+            departments: formData.departments.join(', '),
+            facilities: formData.facilities.join(', '),
+            acceptedInsurance: formData.acceptedInsurance.join(', ')
+          };
+
+          await onSave(backendData);
           
           setShowSuccess(true);
           
@@ -311,10 +353,14 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                     value={formData.type}
                     onChange={handleChange}
                     options={[
-                      { value: 'PUBLIC', label: 'Public' },
-                      { value: 'PRIVATE', label: 'Private' },
-                      { value: 'FAITH_BASED', label: 'Faith-Based' },
-                      { value: 'NGO', label: 'NGO' }
+                      { value: 'GENERAL', label: 'General' },
+                      { value: 'CLINIC', label: 'Clinic' },
+                      { value: 'SPECIALTY', label: 'Specialty' },
+                      { value: 'TEACHING', label: 'Teaching' },
+                      { value: 'REHABILITATION', label: 'Rehabilitation' },
+                      { value: 'EMERGENCY_CENTER', label: 'Emergency Center' },
+                      { value: 'REFERRAL', label: 'Referral' },
+                      { value: 'MISSION', label: 'Mission' }
                     ]}
                   />
                   <InputField
@@ -326,7 +372,8 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                     options={[
                       { value: 'ACTIVE', label: 'Active' },
                       { value: 'INACTIVE', label: 'Inactive' },
-                      { value: 'SUSPENDED', label: 'Suspended' }
+                      { value: 'UNDER_MAINTENANCE', label: 'Under Maintenance' },
+                      { value: 'CLOSED', label: 'Closed' }
                     ]}
                   />
                   <InputField
@@ -357,15 +404,24 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InputField
-                    label="Phone Number"
-                    name="phone"
+                    label="Main Phone Number"
+                    name="mainPhone"
                     type="tel"
                     required
                     icon={Phone}
-                    value={formData.phone}
+                    value={formData.mainPhone}
                     onChange={handleChange}
-                    error={errors.phone}
+                    error={errors.mainPhone}
                     placeholder="+254-20-2726300"
+                  />
+                  <InputField
+                    label="Alternative Phone"
+                    name="altPhone"
+                    type="tel"
+                    icon={Phone}
+                    value={formData.altPhone}
+                    onChange={handleChange}
+                    placeholder="+254-20-2726301"
                   />
                   <InputField
                     label="Email Address"
@@ -393,6 +449,44 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                     value={formData.fax}
                     onChange={handleChange}
                     placeholder="+254-20-2725272"
+                  />
+                </div>
+              </div>
+
+              {/* Admin Contact Section */}
+              <div className="shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 flex items-center justify-center mr-3">
+                    <Shield className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Administrative Contact</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <InputField
+                    label="Contact Name"
+                    name="adminContactName"
+                    value={formData.adminContactName}
+                    onChange={handleChange}
+                    placeholder="e.g., Dr. John Doe"
+                  />
+                  <InputField
+                    label="Contact Email"
+                    name="adminContactEmail"
+                    type="email"
+                    icon={Mail}
+                    value={formData.adminContactEmail}
+                    onChange={handleChange}
+                    placeholder="admin@hospital.com"
+                  />
+                  <InputField
+                    label="Contact Phone"
+                    name="adminContactPhone"
+                    type="tel"
+                    icon={Phone}
+                    value={formData.adminContactPhone}
+                    onChange={handleChange}
+                    placeholder="+254-20-2726302"
                   />
                 </div>
               </div>
@@ -498,10 +592,10 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                   <div>
                     <InputField
                       label="ICU Beds"
-                      name="numberOfICUBeds"
+                      name="numberOfIcuBeds"
                       type="number"
                       icon={Heart}
-                      value={formData.numberOfICUBeds}
+                      value={formData.numberOfIcuBeds}
                       onChange={handleChange}
                       placeholder="0"
                       min="0"
@@ -519,6 +613,16 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                       min="0"
                     />
                   </div>
+                </div>
+
+                <div className="mt-6">
+                  <InputField
+                    label="Operating Hours"
+                    name="operatingHours"
+                    value={formData.operatingHours}
+                    onChange={handleChange}
+                    placeholder="e.g., Mon-Fri 8AM-6PM, Sat 9AM-2PM, 24/7 Emergency"
+                  />
                 </div>
               </div>
 
@@ -574,6 +678,58 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                 </div>
               </div>
 
+              {/* Departments Section */}
+              <div className="shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 flex items-center justify-center mr-3">
+                    <Building2 className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Hospital Departments</h3>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={newDepartment}
+                      onChange={(e) => setNewDepartment(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDepartment())}
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                      placeholder="Enter department name and press Enter"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddDepartment}
+                      className="px-4 py-3 bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add</span>
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 min-h-[60px]">
+                    {formData.departments.map((department, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-2 bg-blue-50 border border-blue-200 text-blue-800 font-medium flex items-center space-x-2"
+                      >
+                        <span>{department}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDepartment(department)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </button>
+                      </span>
+                    ))}
+                    {formData.departments.length === 0 && (
+                      <p className="text-sm text-gray-500 py-4">No departments added yet. Add departments above.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Facilities Section */}
               <div className="shadow-sm border border-gray-200 p-6 mb-6">
                 <div className="flex items-center mb-4">
@@ -603,7 +759,7 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
               </div>
 
               {/* Insurance Section */}
-              <div className="shadow-sm border border-gray-200 p-6">
+              <div className="shadow-sm border border-gray-200 p-6 mb-6">
                 <div className="flex items-center mb-4">
                   <div className="w-8 h-8 flex items-center justify-center mr-3">
                     <Shield className="w-6 h-6 text-blue-600" />
@@ -632,7 +788,7 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                   </div>
 
                   <div className="flex flex-wrap gap-2 min-h-[60px]">
-                    {formData.insuranceProvidersAccepted.map((insurance, index) => (
+                    {formData.acceptedInsurance.map((insurance, index) => (
                       <span
                         key={index}
                         className="px-3 py-2 bg-blue-50 border border-blue-200 text-blue-800 font-medium flex items-center space-x-2"
@@ -648,11 +804,29 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
                         </button>
                       </span>
                     ))}
-                    {formData.insuranceProvidersAccepted.length === 0 && (
+                    {formData.acceptedInsurance.length === 0 && (
                       <p className="text-sm text-gray-500 py-4">No insurance providers added yet. Add providers above.</p>
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Notes Section */}
+              <div className="shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 flex items-center justify-center mr-3">
+                    <AlertCircle className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Additional Notes</h3>
+                </div>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent resize-none"
+                  placeholder="Add any additional information or remarks about the hospital..."
+                />
               </div>
             </div>
 

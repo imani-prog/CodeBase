@@ -33,10 +33,12 @@ import {
   Pill,
   TestTube,
   Microscope,
+  User,
   Syringe,
   Ambulance
 } from 'lucide-react';
 import HospitalFormModal from '../../Components/Admin/EditHospitalModal';
+import Pagination from '../../Components/Admin/Pagination';
 
 const HospitalManagement = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -47,6 +49,8 @@ const HospitalManagement = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedHospital, setSelectedHospital] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   // Hospital types matching backend enum
   const hospitalTypes = ['PUBLIC', 'PRIVATE', 'FAITH_BASED', 'NGO'];
@@ -72,10 +76,11 @@ const HospitalManagement = () => {
       id: 1,
       code: 'HS001',
       name: 'Kenyatta National Hospital',
-      type: 'PUBLIC',
+      type: 'GENERAL',
       registrationNumber: 'KNH-REG-2001',
       taxId: 'TAX-KNH-001',
-      phone: '+254-20-2726300',
+      mainPhone: '+254-20-2726300',
+      altPhone: '+254-20-2726301',
       email: 'info@knh.or.ke',
       website: 'www.knh.or.ke',
       fax: '+254-20-2725272',
@@ -87,40 +92,18 @@ const HospitalManagement = () => {
       country: 'Kenya',
       latitude: -1.3018,
       longitude: 36.8073,
+      adminContactName: 'Dr. Sarah Kamau',
+      adminContactEmail: 'admin@knh.or.ke',
+      adminContactPhone: '+254-20-2726302',
       numberOfBeds: 1800,
-      numberOfICUBeds: 80,
+      numberOfIcuBeds: 80,
       numberOfAmbulances: 15,
-      servicesOffered: [
-        'Emergency Care',
-        'Surgery',
-        'Maternity',
-        'Pediatrics',
-        'Oncology',
-        'Cardiology',
-        'Neurology',
-        'Orthopedics'
-      ],
-      facilities: [
-        'LABORATORY',
-        'PHARMACY',
-        'RADIOLOGY',
-        'ICU',
-        'EMERGENCY',
-        'MATERNITY',
-        'SURGERY',
-        'PEDIATRICS',
-        'OUTPATIENT',
-        'INPATIENT'
-      ],
-      insuranceProvidersAccepted: [
-        'NHIF',
-        'SHA',
-        'AAR',
-        'Jubilee',
-        'Britam',
-        'Madison',
-        'CIC'
-      ],
+      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, Oncology, Cardiology, Neurology, Orthopedics',
+      departments: 'Cardiology, Oncology, Neurology, Orthopedics, Pediatrics, Maternity',
+      operatingHours: '24/7 Emergency, Mon-Fri 8AM-5PM Outpatient',
+      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
+      acceptedInsurance: 'NHIF, SHA, AAR, Jubilee, Britam, Madison, CIC',
+      notes: 'National referral and teaching hospital',
       status: 'ACTIVE',
       createdAt: '2020-01-15T08:00:00',
       updatedAt: '2025-12-15T10:30:00'
@@ -129,10 +112,11 @@ const HospitalManagement = () => {
       id: 2,
       code: 'HS002',
       name: 'Aga Khan University Hospital',
-      type: 'PRIVATE',
+      type: 'SPECIALTY',
       registrationNumber: 'AKUH-REG-1998',
       taxId: 'TAX-AKUH-002',
-      phone: '+254-20-3662000',
+      mainPhone: '+254-20-3662000',
+      altPhone: '+254-20-3662001',
       email: 'info@aku.edu',
       website: 'www.aku.edu/nairobi',
       fax: '+254-20-3740917',
@@ -144,38 +128,18 @@ const HospitalManagement = () => {
       country: 'Kenya',
       latitude: -1.2626,
       longitude: 36.8070,
+      adminContactName: 'Dr. James Orwa',
+      adminContactEmail: 'j.orwa@aku.edu',
+      adminContactPhone: '+254-20-3662002',
       numberOfBeds: 254,
-      numberOfICUBeds: 24,
+      numberOfIcuBeds: 24,
       numberOfAmbulances: 8,
-      servicesOffered: [
-        'Emergency Care',
-        'Surgery',
-        'Maternity',
-        'Cardiology',
-        'Oncology',
-        'Diagnostics',
-        'Wellness Center'
-      ],
-      facilities: [
-        'LABORATORY',
-        'PHARMACY',
-        'RADIOLOGY',
-        'ICU',
-        'EMERGENCY',
-        'MATERNITY',
-        'SURGERY',
-        'OUTPATIENT',
-        'INPATIENT'
-      ],
-      insuranceProvidersAccepted: [
-        'NHIF',
-        'AAR',
-        'Jubilee',
-        'Britam',
-        'Madison',
-        'CIC',
-        'Resolution'
-      ],
+      servicesOffered: 'Emergency Care, Surgery, Maternity, Cardiology, Oncology, Diagnostics, Wellness Center',
+      departments: 'Cardiology, Oncology, Surgery, Maternity, Diagnostics, Emergency Medicine',
+      operatingHours: '24/7 Emergency and Critical Care, Mon-Sat 8AM-8PM Outpatient',
+      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
+      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison, CIC, Resolution',
+      notes: 'Leading private teaching hospital with international accreditation',
       status: 'ACTIVE',
       createdAt: '2019-05-10T09:00:00',
       updatedAt: '2025-12-18T14:20:00'
@@ -184,10 +148,11 @@ const HospitalManagement = () => {
       id: 3,
       code: 'HS003',
       name: 'Mombasa General Hospital',
-      type: 'PUBLIC',
+      type: 'GENERAL',
       registrationNumber: 'MGH-REG-2003',
       taxId: 'TAX-MGH-003',
-      phone: '+254-41-2314201',
+      mainPhone: '+254-41-2314201',
+      altPhone: '+254-41-2314202',
       email: 'info@mombasahospital.go.ke',
       website: 'www.mombasahospital.go.ke',
       fax: '+254-41-2225792',
@@ -199,34 +164,18 @@ const HospitalManagement = () => {
       country: 'Kenya',
       latitude: -4.0435,
       longitude: 39.6682,
+      adminContactName: 'Dr. Fatuma Hassan',
+      adminContactEmail: 'f.hassan@mombasahospital.go.ke',
+      adminContactPhone: '+254-41-2314203',
       numberOfBeds: 650,
-      numberOfICUBeds: 30,
+      numberOfIcuBeds: 30,
       numberOfAmbulances: 6,
-      servicesOffered: [
-        'Emergency Care',
-        'Surgery',
-        'Maternity',
-        'Pediatrics',
-        'General Medicine'
-      ],
-      facilities: [
-        'LABORATORY',
-        'PHARMACY',
-        'RADIOLOGY',
-        'ICU',
-        'EMERGENCY',
-        'MATERNITY',
-        'SURGERY',
-        'PEDIATRICS',
-        'OUTPATIENT',
-        'INPATIENT'
-      ],
-      insuranceProvidersAccepted: [
-        'NHIF',
-        'SHA',
-        'AAR',
-        'Jubilee'
-      ],
+      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, General Medicine, Orthopedics',
+      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Internal Medicine, Orthopedics',
+      operatingHours: '24/7 Emergency Services, Mon-Fri 8AM-6PM Outpatient',
+      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
+      acceptedInsurance: 'NHIF, SHA, AAR, Jubilee',
+      notes: 'Main referral hospital for Coast region',
       status: 'ACTIVE',
       createdAt: '2020-03-20T10:00:00',
       updatedAt: '2025-12-10T09:15:00'
@@ -235,10 +184,11 @@ const HospitalManagement = () => {
       id: 4,
       code: 'HS004',
       name: 'Kisumu County Hospital',
-      type: 'PUBLIC',
+      type: 'GENERAL',
       registrationNumber: 'KCH-REG-2005',
       taxId: 'TAX-KCH-004',
-      phone: '+254-57-2020333',
+      mainPhone: '+254-57-2020333',
+      altPhone: '+254-57-2020334',
       email: 'info@kisumuhospital.go.ke',
       website: null,
       fax: null,
@@ -250,30 +200,18 @@ const HospitalManagement = () => {
       country: 'Kenya',
       latitude: -0.0917,
       longitude: 34.7680,
+      adminContactName: 'Dr. Peter Odhiambo',
+      adminContactEmail: 'p.odhiambo@kisumuhospital.go.ke',
+      adminContactPhone: '+254-57-2020335',
       numberOfBeds: 420,
-      numberOfICUBeds: 18,
+      numberOfIcuBeds: 18,
       numberOfAmbulances: 4,
-      servicesOffered: [
-        'Emergency Care',
-        'Surgery',
-        'Maternity',
-        'Pediatrics',
-        'HIV/AIDS Care'
-      ],
-      facilities: [
-        'LABORATORY',
-        'PHARMACY',
-        'RADIOLOGY',
-        'ICU',
-        'EMERGENCY',
-        'MATERNITY',
-        'OUTPATIENT',
-        'INPATIENT'
-      ],
-      insuranceProvidersAccepted: [
-        'NHIF',
-        'SHA'
-      ],
+      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, HIV/AIDS Care, TB Treatment',
+      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Infectious Diseases',
+      operatingHours: '24/7 Emergency, Mon-Fri 8AM-5PM Outpatient',
+      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, OUTPATIENT, INPATIENT',
+      acceptedInsurance: 'NHIF, SHA',
+      notes: 'County referral hospital serving Nyanza region',
       status: 'ACTIVE',
       createdAt: '2020-06-12T11:30:00',
       updatedAt: '2025-12-05T16:45:00'
@@ -282,10 +220,11 @@ const HospitalManagement = () => {
       id: 5,
       code: 'HS005',
       name: "St. Mary's Mission Hospital",
-      type: 'FAITH_BASED',
+      type: 'CLINIC',
       registrationNumber: 'STMH-REG-1995',
       taxId: 'TAX-STMH-005',
-      phone: '+254-45-31234',
+      mainPhone: '+254-45-31234',
+      altPhone: '+254-45-31236',
       email: 'info@stmarysmission.org',
       website: 'www.stmarysmission.org',
       fax: '+254-45-31235',
@@ -297,28 +236,18 @@ const HospitalManagement = () => {
       country: 'Kenya',
       latitude: 0.3348,
       longitude: 34.4877,
+      adminContactName: 'Sr. Mary Wanjiru',
+      adminContactEmail: 'm.wanjiru@stmarysmission.org',
+      adminContactPhone: '+254-45-31237',
       numberOfBeds: 180,
-      numberOfICUBeds: 8,
+      numberOfIcuBeds: 8,
       numberOfAmbulances: 2,
-      servicesOffered: [
-        'General Medicine',
-        'Maternity',
-        'Surgery',
-        'HIV/AIDS Care',
-        'TB Treatment'
-      ],
-      facilities: [
-        'LABORATORY',
-        'PHARMACY',
-        'MATERNITY',
-        'SURGERY',
-        'OUTPATIENT',
-        'INPATIENT'
-      ],
-      insuranceProvidersAccepted: [
-        'NHIF',
-        'SHA'
-      ],
+      servicesOffered: 'General Medicine, Maternity, Surgery, HIV/AIDS Care, TB Treatment, Community Health',
+      departments: 'General Medicine, Maternity, Surgery, Infectious Diseases, Outpatient Services',
+      operatingHours: '24/7 Emergency and Maternity, Mon-Sat 8AM-5PM Outpatient',
+      facilities: 'LABORATORY, PHARMACY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
+      acceptedInsurance: 'NHIF, SHA',
+      notes: 'Faith-based mission hospital serving rural community',
       status: 'ACTIVE',
       createdAt: '2019-11-08T08:00:00',
       updatedAt: '2025-12-12T13:00:00'
@@ -327,10 +256,11 @@ const HospitalManagement = () => {
       id: 6,
       code: 'HS006',
       name: 'Nairobi Women\'s Hospital',
-      type: 'PRIVATE',
+      type: 'SPECIALTY',
       registrationNumber: 'NWH-REG-2001',
       taxId: 'TAX-NWH-006',
-      phone: '+254-20-7202000',
+      mainPhone: '+254-20-7202000',
+      altPhone: '+254-20-7202001',
       email: 'info@nwch.co.ke',
       website: 'www.nwch.co.ke',
       fax: '+254-20-3870219',
@@ -342,35 +272,18 @@ const HospitalManagement = () => {
       country: 'Kenya',
       latitude: -1.3027,
       longitude: 36.7693,
+      adminContactName: 'Dr. Lucy Mwangi',
+      adminContactEmail: 'l.mwangi@nwch.co.ke',
+      adminContactPhone: '+254-20-7202002',
       numberOfBeds: 120,
-      numberOfICUBeds: 12,
+      numberOfIcuBeds: 12,
       numberOfAmbulances: 5,
-      servicesOffered: [
-        'Maternity',
-        'Gynecology',
-        'Pediatrics',
-        'Fertility Clinic',
-        'Well Woman Clinic'
-      ],
-      facilities: [
-        'LABORATORY',
-        'PHARMACY',
-        'RADIOLOGY',
-        'ICU',
-        'MATERNITY',
-        'SURGERY',
-        'PEDIATRICS',
-        'OUTPATIENT'
-      ],
-      insuranceProvidersAccepted: [
-        'NHIF',
-        'AAR',
-        'Jubilee',
-        'Britam',
-        'Madison',
-        'CIC',
-        'APA'
-      ],
+      servicesOffered: 'Maternity, Gynecology, Pediatrics, Fertility Clinic, Well Woman Clinic, Neonatal Care',
+      departments: 'Maternity, Gynecology, Pediatrics, Fertility, Neonatal ICU',
+      operatingHours: '24/7 Emergency Maternity Services, Mon-Sat 8AM-8PM Outpatient',
+      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT',
+      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison, CIC, APA',
+      notes: 'Specialized women and children healthcare facility',
       status: 'ACTIVE',
       createdAt: '2019-08-22T10:00:00',
       updatedAt: '2025-12-19T11:30:00'
@@ -379,10 +292,11 @@ const HospitalManagement = () => {
       id: 7,
       code: 'HS007',
       name: 'Gertrude\'s Children Hospital',
-      type: 'NGO',
+      type: 'SPECIALTY',
       registrationNumber: 'GCH-REG-1999',
       taxId: 'TAX-GCH-007',
-      phone: '+254-20-7206000',
+      mainPhone: '+254-20-7206000',
+      altPhone: '+254-20-7206001',
       email: 'info@gerties.org',
       website: 'www.gerties.org',
       fax: '+254-20-2721175',
@@ -394,34 +308,18 @@ const HospitalManagement = () => {
       country: 'Kenya',
       latitude: -1.2571,
       longitude: 36.8267,
+      adminContactName: 'Dr. Robert Nyarango',
+      adminContactEmail: 'r.nyarango@gerties.org',
+      adminContactPhone: '+254-20-7206002',
       numberOfBeds: 85,
-      numberOfICUBeds: 15,
+      numberOfIcuBeds: 15,
       numberOfAmbulances: 3,
-      servicesOffered: [
-        'Pediatrics',
-        'Neonatal Care',
-        'Pediatric Surgery',
-        'Child Vaccination',
-        'Child Nutrition'
-      ],
-      facilities: [
-        'LABORATORY',
-        'PHARMACY',
-        'RADIOLOGY',
-        'ICU',
-        'EMERGENCY',
-        'SURGERY',
-        'PEDIATRICS',
-        'OUTPATIENT',
-        'INPATIENT'
-      ],
-      insuranceProvidersAccepted: [
-        'NHIF',
-        'AAR',
-        'Jubilee',
-        'Britam',
-        'Madison'
-      ],
+      servicesOffered: 'Pediatrics, Neonatal Care, Pediatric Surgery, Child Vaccination, Child Nutrition, Child Development',
+      departments: 'Pediatrics, Neonatology, Pediatric Surgery, Pediatric ICU, Immunization',
+      operatingHours: '24/7 Emergency Pediatric Care, Mon-Sun 8AM-8PM Outpatient',
+      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
+      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison',
+      notes: 'Leading pediatric specialty hospital',
       status: 'ACTIVE',
       createdAt: '2019-04-18T09:00:00',
       updatedAt: '2025-12-17T15:20:00'
@@ -430,10 +328,11 @@ const HospitalManagement = () => {
       id: 8,
       code: 'HS008',
       name: 'Nakuru Level 5 Hospital',
-      type: 'PUBLIC',
+      type: 'GENERAL',
       registrationNumber: 'NKR-REG-2004',
       taxId: 'TAX-NKR-008',
-      phone: '+254-51-2212995',
+      mainPhone: '+254-51-2212995',
+      altPhone: '+254-51-2212996',
       email: 'info@nakuruhospital.go.ke',
       website: null,
       fax: null,
@@ -445,32 +344,18 @@ const HospitalManagement = () => {
       country: 'Kenya',
       latitude: -0.2827,
       longitude: 36.0667,
+      adminContactName: 'Dr. Jane Kiplagat',
+      adminContactEmail: 'j.kiplagat@nakuruhospital.go.ke',
+      adminContactPhone: '+254-51-2212997',
       numberOfBeds: 380,
-      numberOfICUBeds: 16,
+      numberOfIcuBeds: 16,
       numberOfAmbulances: 5,
-      servicesOffered: [
-        'Emergency Care',
-        'Surgery',
-        'Maternity',
-        'Pediatrics',
-        'General Medicine'
-      ],
-      facilities: [
-        'LABORATORY',
-        'PHARMACY',
-        'RADIOLOGY',
-        'ICU',
-        'EMERGENCY',
-        'MATERNITY',
-        'SURGERY',
-        'OUTPATIENT',
-        'INPATIENT'
-      ],
-      insuranceProvidersAccepted: [
-        'NHIF',
-        'SHA',
-        'AAR'
-      ],
+      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, General Medicine, Orthopedics',
+      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Internal Medicine, Orthopedics',
+      operatingHours: '24/7 Emergency Services, Mon-Fri 8AM-5PM Outpatient',
+      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
+      acceptedInsurance: 'NHIF, SHA, AAR',
+      notes: 'County referral hospital for Rift Valley region',
       status: 'ACTIVE',
       createdAt: '2020-02-10T10:30:00',
       updatedAt: '2025-12-14T12:00:00'
@@ -489,6 +374,16 @@ const HospitalManagement = () => {
     
     return matchesSearch && matchesType && matchesStatus;
   });
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentHospitals = filteredHospitals.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedType, selectedStatus]);
 
   // Calculate statistics
   const stats = {
@@ -717,7 +612,7 @@ const HospitalManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredHospitals.map((hospital) => (
+                {currentHospitals.map((hospital) => (
                   <tr key={hospital.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-3 py-3 whitespace-nowrap">
                       <span className="text-xs font-bold text-gray-900">{hospital.code}</span>
@@ -743,7 +638,7 @@ const HospitalManagement = () => {
                       <span className="text-xs font-semibold text-gray-900">{hospital.numberOfAmbulances}</span>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
-                      <span className="text-xs text-gray-900">{hospital.phone}</span>
+                      <span className="text-xs text-gray-900">{hospital.mainPhone}</span>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
                       <span className="text-xs text-gray-900">{hospital.email}</span>
@@ -787,7 +682,16 @@ const HospitalManagement = () => {
           </div>
         </div>
 
-        {/* View Modal */}
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalItems={filteredHospitals.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          itemName="hospitals"
+        />
+
+        {/* /* View Modal */ }
         {showViewModal && selectedHospital && (
           <div className="flex items-center justify-center z-50 p-4 fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity">
             <div className="relative bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -847,10 +751,19 @@ const HospitalManagement = () => {
                     <div className="flex items-center space-x-3">
                       <Phone className="w-5 h-5 " />
                       <div>
-                        <p className="font-bold">Phone</p>
-                        <p className="text-sm font-medium mt-1">{selectedHospital.phone}</p>
+                        <p className="font-bold">Main Phone</p>
+                        <p className="text-sm font-medium mt-1">{selectedHospital.mainPhone}</p>
                       </div>
                     </div>
+                    {selectedHospital.altPhone && (
+                      <div className="flex items-center space-x-3">
+                        <Phone className="w-5 h-5 " />
+                        <div>
+                          <p className="font-bold">Alternative Phone</p>
+                          <p className="text-sm font-medium mt-1">{selectedHospital.altPhone}</p>
+                        </div>
+                      </div>
+                    )}
                     <div className="flex items-center space-x-3">
                       <Mail className="w-5 h-5 " />
                       <div>
@@ -878,6 +791,42 @@ const HospitalManagement = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Administrative Contact */}
+                {(selectedHospital.adminContactName || selectedHospital.adminContactEmail || selectedHospital.adminContactPhone) && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Administrative Contact</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedHospital.adminContactName && (
+                        <div className="flex items-center space-x-3">
+                          <User className="w-5 h-5 " />
+                          <div>
+                            <p className="font-bold">Contact Name</p>
+                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactName}</p>
+                          </div>
+                        </div>
+                      )}
+                      {selectedHospital.adminContactEmail && (
+                        <div className="flex items-center space-x-3">
+                          <Mail className="w-5 h-5 " />
+                          <div>
+                            <p className="font-bold">Contact Email</p>
+                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactEmail}</p>
+                          </div>
+                        </div>
+                      )}
+                      {selectedHospital.adminContactPhone && (
+                        <div className="flex items-center space-x-3">
+                          <Phone className="w-5 h-5 " />
+                          <div>
+                            <p className="font-bold">Contact Phone</p>
+                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactPhone}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Address */}
                 <div>
@@ -911,7 +860,7 @@ const HospitalManagement = () => {
                     </div>
                     <div className="border border-gray-200 shadow-md p-4">
                       <Heart className="w-8 h-8 text-blue-600 mb-2" />
-                      <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfICUBeds}</p>
+                      <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfIcuBeds}</p>
                       <p className="text-sm text-gray-600">ICU Beds</p>
                     </div>
                     <div className="border border-gray-200 shadow-md p-4">
@@ -920,13 +869,33 @@ const HospitalManagement = () => {
                       <p className="text-sm text-gray-600">Ambulances</p>
                     </div>
                   </div>
+                  {selectedHospital.operatingHours && (
+                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="font-bold text-gray-900 mb-1">Operating Hours</p>
+                      <p className="text-sm text-gray-700">{selectedHospital.operatingHours}</p>
+                    </div>
+                  )}
                 </div>
+
+                {/* Departments */}
+                {selectedHospital.departments && selectedHospital.departments.trim() && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Hospital Departments</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedHospital.departments.split(', ').map((department, index) => (
+                        <span key={index} className="px-3 py-1 bg-purple-50 border border-purple-200 text-purple-800 rounded-full font-medium">
+                          {department}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Services Offered */}
                 <div>
                   <h3 className="text-lg font-semibold  mb-4">Services Offered</h3>
                   <div className="flex flex-wrap gap-2">
-                    {selectedHospital.servicesOffered.map((service, index) => (
+                    {selectedHospital.servicesOffered.split(', ').map((service, index) => (
                       <span key={index} className="px-3 py-1  border border-blue-200 text-blue-800 rounded-full font-medium">
                         {service}
                       </span>
@@ -938,7 +907,7 @@ const HospitalManagement = () => {
                 <div>
                   <h3 className="text-lg font-semibold  mb-4">Facilities Available</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {selectedHospital.facilities.map((facility, index) => (
+                    {selectedHospital.facilities.split(', ').map((facility, index) => (
                       <div key={index} className="flex items-center space-x-2 text-sm text-gray-700">
                         <CheckCircle className="w-4 h-4 text-blue-600" />
                         <span>{facility}</span>
@@ -951,7 +920,7 @@ const HospitalManagement = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Insurance Providers Accepted</h3>
                   <div className="flex flex-wrap gap-2">
-                    {selectedHospital.insuranceProvidersAccepted.map((provider, index) => (
+                    {selectedHospital.acceptedInsurance.split(', ').map((provider, index) => (
                       <span key={index} className="px-3 py-1 border border-blue-200 text-blue-800 rounded-full font-medium flex items-center space-x-1">
                         <Shield className="w-3 h-3" />
                         <span>{provider}</span>
@@ -959,6 +928,16 @@ const HospitalManagement = () => {
                     ))}
                   </div>
                 </div>
+
+                {/* Notes */}
+                {selectedHospital.notes && selectedHospital.notes.trim() && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Notes</h3>
+                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedHospital.notes}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
