@@ -293,23 +293,25 @@ const HospitalFormModal = ({ hospital, isOpen, onClose, onSave, facilityTypes })
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="relative bg-white shadow-2xl transform transition-all max-w-5xl w-full overflow-hidden">
           {/* Header */}
-          <div className="relative px-8 py-6">
+          <div className="relative px-8 py-6 bg-blue-950 text-white">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-all duration-200 hover:rotate-90"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center space-x-4">
-              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
-                {isEdit ? <Edit3 className="w-8 h-8" /> : <Plus className="w-8 h-8" />}
+              <div className="relative">
+                <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
+                  {isEdit ? <Edit3 className="w-8 h-8 text-white" /> : <Plus className="w-8 h-8 text-white" />}
+                </div>
               </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold mb-1">
                   {isEdit ? 'Edit Hospital' : 'Add New Hospital'}
                 </h2>
-                <p className="text-sm">
+                <p className="text-sm text-white/80">
                   {isEdit ? 'Update hospital information and details' : 'Fill in the details to add a new hospital'}
                 </p>
               </div>

@@ -529,7 +529,7 @@ const HospitalManagement = () => {
                 placeholder="Search by hospital name, code, or city..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-blue-600 focus:ring-2 focus:border-transparent"
               />
             </div>
 
@@ -539,7 +539,7 @@ const HospitalManagement = () => {
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-blue-600 focus:ring-2 focus:border-transparent"
                 >
                   <option value="all">All Types</option>
                   {hospitalTypes.map(type => (
@@ -551,7 +551,7 @@ const HospitalManagement = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2  focus:border-transparent"
+                className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-blue-600 focus:ring-2 focus:border-transparent"
               >
                 <option value="all">All Status</option>
                 {hospitalStatuses.map(status => (
@@ -696,23 +696,29 @@ const HospitalManagement = () => {
           <div className="flex items-center justify-center z-50 p-4 fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity">
             <div className="relative bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    {/* <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                      <Building2 className="w-7 h-7 text-white" />
-                    </div> */}
-                    <div>
-                      <h2 className="text-2xl font-bold">{selectedHospital.name}</h2>
-                      <p className="text-sm mt-1">{selectedHospital.code}</p>
+              <div className="relative px-8 py-6 bg-blue-950 text-white">
+                <button 
+                  onClick={() => setShowViewModal(false)}
+                  className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
+                      <Building2 className="w-8 h-8 text-white" />
                     </div>
                   </div>
-                  <button 
-                    onClick={() => setShowViewModal(false)}
-                    className="font-bold hover:text-red-600 cursor-pointer transition-colors "
-                  >
-                    <XCircle className="w-8 h-8" />
-                  </button>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h2 className="text-2xl font-bold">{selectedHospital.name}</h2>
+                      <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full border border-white/30">
+                        {selectedHospital.code}
+                      </span>
+                    </div>
+                    <p className="text-sm text-white/80">{selectedHospital.type.replace('_', ' ')} • {selectedHospital.city}</p>
+                  </div>
                 </div>
               </div>
 
