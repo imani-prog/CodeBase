@@ -56,6 +56,7 @@ import {
 // Import modal components
 import ViewAmbulanceModal from './AmbulanceManagement/modals/ViewAmbulanceModal';
 import EditAmbulanceModal from './AmbulanceManagement/modals/EditAmbulanceModal';
+import AddAmbulanceModal from './AmbulanceManagement/modals/AddAmbulanceModal';
 import MoreOptionsModal from './AmbulanceManagement/modals/MoreOptionsModal';
 
 const AmbulanceManagement = () => {
@@ -70,6 +71,7 @@ const AmbulanceManagement = () => {
   // Modal states
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [currentAmbulance, setCurrentAmbulance] = useState(null);
   const [_liveTracking, _setLiveTracking] = useState({});
@@ -825,6 +827,17 @@ const AmbulanceManagement = () => {
     alert('Ambulance updated successfully!');
   };
 
+  const handleAddSave = (newAmbulance) => {
+    // TODO: Implement API call to add new ambulance
+    console.log('Adding new ambulance:', newAmbulance);
+    
+    // Close modal
+    setShowAddModal(false);
+    
+    // Show success message
+    alert('Ambulance added successfully!');
+  };
+
   const handleMoreAction = (action, ambulance) => {
     console.log(`Action: ${action} for ambulance:`, ambulance);
     
@@ -907,11 +920,11 @@ const AmbulanceManagement = () => {
                   <p className="text-sm text-gray-600 mb-1">Total Fleet</p>
                   <p className="text-2xl font-bold text-gray-900">{ambulances.length}</p>
                 </div>
-                <div className="p-3 bg-blue-50 rounded-lg">
+                <div className="p-3 rounded-lg">
                   <Truck className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
-              <div className="mt-2 text-xs text-green-600 flex items-center">
+              <div className="mt-2 text-xs text-blue-600 flex items-center">
                 <CheckCircle className="w-3 h-3 mr-1" />
                 {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').length} Available
               </div>
@@ -925,11 +938,11 @@ const AmbulanceManagement = () => {
                     {drivers.filter(d => d.status === 'on_duty').length}
                   </p>
                 </div>
-                <div className="p-3 bg-green-50 rounded-lg">
-                  <Users className="w-6 h-6 text-green-600" />
+                <div className="p-3 rounded-lg">
+                  <Users className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
-              <div className="mt-2 text-xs text-gray-600">
+              <div className="mt-2 text-xs text-blue-600">
                 of {drivers.length} total drivers
               </div>
             </div>
@@ -942,11 +955,11 @@ const AmbulanceManagement = () => {
                     {emergencyCalls.filter(c => c.status === 'pending').length}
                   </p>
                 </div>
-                <div className="p-3 bg-red-50 rounded-lg">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="p-3 rounded-lg">
+                  <AlertTriangle className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
-              <div className="mt-2 text-xs text-gray-600">
+              <div className="mt-2 text-xs text-blue-600">
                 {emergencyCalls.length} total calls
               </div>
             </div>
@@ -959,12 +972,12 @@ const AmbulanceManagement = () => {
                     {Object.keys(trackingData).length}
                   </p>
                 </div>
-                <div className="p-3 bg-purple-50 rounded-lg">
-                  <Navigation className="w-6 h-6 text-purple-600" />
+                <div className="p-3 rounded-lg">
+                  <Navigation className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
-              <div className="mt-2 text-xs text-purple-600 flex items-center">
-                <div className="w-2 h-2 bg-purple-600 rounded-full mr-1 animate-pulse"></div>
+              <div className="mt-2 text-xs text-blue-600 flex items-center">
+                <div className="w-2 h-2 bg-blue-600 rounded-full mr-1 animate-pulse"></div>
                 Live monitoring
               </div>
             </div>
@@ -1072,7 +1085,14 @@ const AmbulanceManagement = () => {
                     <Download className="w-4 h-4 mr-2" />
                     Export
                   </button>
-                  <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+                  <button 
+                    onClick={() => {
+                      if (activeTab === 'ambulances') {
+                        setShowAddModal(true);
+                      }
+                    }}
+                    className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+                  >
                     <Plus className="w-5 h-5 mr-2" />
                     Add {activeTab === 'dispatch' ? 'dispatch' : activeTab === 'dispatches' ? 'dispatch' : activeTab === 'tracking' ? 'unit' : activeTab.slice(0, -1)}
                   </button>
@@ -1086,40 +1106,49 @@ const AmbulanceManagement = () => {
           <table className="min-w-full text-sm">
             <thead className="bg-gray-100 uppercase text-xs font-semibold">
               <tr>
-                <th className="px-4 py-3 text-left">Ambulance</th>
-                <th className="px-4 py-3 text-left">Type</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Driver / Medic</th>
-                <th className="px-4 py-3 text-center">Trips</th>
-                <th className="px-4 py-3 text-center">Avg Response</th>
-                {/* <th className="px-4 py-3 text-center">Fuel Level</th> */}
-                <th className="px-4 py-3 text-center">Insurance</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-3 py-3 text-left">Vehicle Plate</th>
+                <th className="px-3 py-3 text-left">Registration</th>
+                <th className="px-3 py-3 text-left">Year</th>
+                <th className="px-3 py-3 text-left">Type</th>
+                <th className="px-3 py-3 text-left">Status</th>
+                <th className="px-3 py-3 text-left">Driver</th>
+                <th className="px-3 py-3 text-left">Medic</th>
+                <th className="px-3 py-3 text-center">Trips</th>
+                <th className="px-3 py-3 text-center">Avg Response</th>
+                <th className="px-3 py-3 text-left">Insurance Provider</th>
+                <th className="px-3 py-3 text-left">Policy Number</th>
+                <th className="px-3 py-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredAmbulances.map((a) => (
-                <tr key={a.id} className="border-b hover:bg-gray-50 transition-colors">
-                  {/* Ambulance Column */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center space-x-2">
-                      {/* {getTypeIcon(a.type)} */}
-                      <div>
-                        <p className="font-medium text-gray-900">{a.vehiclePlate}</p>
-                        <p className="text-xs text-gray-500">
-                          Reg: {a.registrationNumber} ({a.year})
-                        </p>
-                      </div>
-                    </div>
+                <tr key={a.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                  {/* Vehicle Plate */}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-sm font-medium text-gray-900">{a.vehiclePlate}</p>
+                  </td>
+
+                  {/* Registration Number */}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-sm text-gray-700">{a.registrationNumber}</p>
+                  </td>
+
+                  {/* Year */}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-sm text-gray-700">{a.year}</p>
+                  </td>
+                  {/* Year */}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-sm text-gray-700">{a.year}</p>
                   </td>
 
                   {/* Type */}
-                  <td className="px-4 py-3 capitalize">
-                    {a.type.replace("_", " ")}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-sm text-gray-700 capitalize">{a.type.replace("_", " ")}</p>
                   </td>
 
                   {/* Status */}
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
                         a.status
@@ -1129,70 +1158,66 @@ const AmbulanceManagement = () => {
                     </span>
                   </td>
 
-                  {/* Driver + Medic */}
-                  <td className="px-4 py-3">
-                    <p className="text-sm font-medium">{a.driverName}</p>
-                    <p className="text-xs text-gray-500">{a.medicName}</p>
+                  {/* Driver */}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-sm font-medium text-gray-900">{a.driverName}</p>
+                  </td>
+
+                  {/* Medic */}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-sm text-gray-700">{a.medicName}</p>
                   </td>
 
                   {/* Total Trips */}
-                  <td className="px-4 py-3 text-center">{a.totalDispatches}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">
+                    <p className="text-sm font-semibold text-gray-900">{a.totalDispatches}</p>
+                  </td>
 
                   {/* Avg Response */}
-                  <td className="px-4 py-3 text-center">{a.averageResponseTime}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">
+                    <p className="text-sm text-gray-700">{a.averageResponseTime}</p>
+                  </td>
 
-                  {/* Fuel */}
-                  {/* <td className="px-4 py-3 text-center">
-                    <div className="flex flex-col items-center">
-                      <div className="w-24 bg-gray-200 h-2 rounded-full mb-1">
-                        <div
-                          className={`h-2 rounded-full ${
-                            a.fuelLevel > 50
-                              ? "bg-green-500"
-                              : a.fuelLevel > 25
-                              ? "bg-yellow-500"
-                              : "bg-red-500"
-                          }`}
-                          style={{ width: `${a.fuelLevel}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-xs">{a.fuelLevel}%</span>
-                    </div>
-                  </td> */}
+                  {/* Insurance Provider */}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-sm font-medium text-gray-900">{a.insuranceProvider}</p>
+                  </td>
 
-                  {/* Insurance */}
-                  <td className="px-4 py-3 text-xs text-center">
-                    <p className="font-medium">{a.insuranceProvider}</p>
-                    <p className="text-gray-500">{a.insurancePolicyNumber}</p>
+                  {/* Policy Number */}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <p className="text-xs text-gray-600">{a.insurancePolicyNumber}</p>
                   </td>
 
                   {/* Actions */}
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex items-center justify-center space-x-3">
+                  <td className="px-3 py-3 text-center whitespace-nowrap">
+                    <div className="flex items-center justify-center space-x-2">
                       <button 
-                        className="text-blue-600"
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         onClick={() => {
                           setCurrentAmbulance(a);
                           setShowViewModal(true);
                         }}
+                        title="View Details"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button 
-                        className="text-blue-600"
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         onClick={() => {
                           setCurrentAmbulance(a);
                           setShowEditModal(true);
                         }}
+                        title="Edit"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button 
-                        className=""
+                        className="p-1.5 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
                         onClick={() => {
                           setCurrentAmbulance(a);
                           setShowMoreModal(true);
                         }}
+                        title="More Options"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
@@ -2144,6 +2169,13 @@ const AmbulanceManagement = () => {
             setCurrentAmbulance(null);
           }}
           onAction={handleMoreAction}
+        />
+      )}
+
+      {showAddModal && (
+        <AddAmbulanceModal
+          onClose={() => setShowAddModal(false)}
+          onSave={handleAddSave}
         />
       )}
     </div>

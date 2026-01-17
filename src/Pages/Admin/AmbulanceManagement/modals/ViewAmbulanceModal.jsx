@@ -24,24 +24,24 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
     <div className="fixed inset-0 flex items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
       <div className="bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 flex items-center justify-center">
-                <Truck className="w-8 h-8" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">{ambulance.vehiclePlate}</h2>
-                <p className="">Registration: {ambulance.registrationNumber}</p>
-                <p className="text-sm">{ambulance.model} ({ambulance.year})</p>
+        <div className="relative px-8 py-6 bg-blue-950 text-white">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
+                <Truck className="w-8 h-8 text-white" />
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="hover:bg-white/20 rounded-lg p-2 transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold mb-1">{ambulance.vehiclePlate}</h2>
+              <p className="text-sm text-white/80">Registration: {ambulance.registrationNumber} • {ambulance.model} ({ambulance.year})</p>
+            </div>
           </div>
         </div>
 

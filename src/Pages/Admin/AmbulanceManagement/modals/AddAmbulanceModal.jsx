@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Save,
@@ -9,21 +9,22 @@ import {
   Fuel,
   Users,
   Calendar,
-  FileText
+  FileText,
+  Plus
 } from 'lucide-react';
 
-const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
+const AddAmbulanceModal = ({ onClose, onSave }) => {
   const [formData, setFormData] = useState({
     vehiclePlate: '',
     registrationNumber: '',
     model: '',
     year: '',
-    type: '',
-    status: '',
-    fuelType: '',
+    type: 'basic_life_support',
+    status: 'AVAILABLE',
+    fuelType: 'DIESEL',
     capacity: '',
     equippedForICU: false,
-    gpsEnabled: false,
+    gpsEnabled: true,
     location: '',
     driverName: '',
     driverPhone: '',
@@ -33,37 +34,11 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
     lastMaintenance: '',
     nextMaintenance: '',
     mileage: '',
-    fuelLevel: '',
+    fuelLevel: '100',
     notes: ''
   });
 
-  useEffect(() => {
-    if (ambulance) {
-      setFormData({
-        vehiclePlate: ambulance.vehiclePlate || '',
-        registrationNumber: ambulance.registrationNumber || '',
-        model: ambulance.model || '',
-        year: ambulance.year || '',
-        type: ambulance.type || '',
-        status: ambulance.status || '',
-        fuelType: ambulance.fuelType || '',
-        capacity: ambulance.capacity || '',
-        equippedForICU: ambulance.equippedForICU || false,
-        gpsEnabled: ambulance.gpsEnabled || false,
-        location: ambulance.location || '',
-        driverName: ambulance.driverName || '',
-        driverPhone: ambulance.driverPhone || '',
-        medicName: ambulance.medicName || '',
-        insurancePolicyNumber: ambulance.insurancePolicyNumber || '',
-        insuranceProvider: ambulance.insuranceProvider || '',
-        lastMaintenance: ambulance.lastMaintenance || '',
-        nextMaintenance: ambulance.nextMaintenance || '',
-        mileage: ambulance.mileage || '',
-        fuelLevel: ambulance.fuelLevel || '',
-        notes: ambulance.notes || ''
-      });
-    }
-  }, [ambulance]);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -71,14 +46,45 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    // Clear error for this field if it exists
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!formData.vehiclePlate.trim()) newErrors.vehiclePlate = 'Vehicle plate is required';
+    if (!formData.registrationNumber.trim()) newErrors.registrationNumber = 'Registration number is required';
+    if (!formData.model.trim()) newErrors.model = 'Model is required';
+    if (!formData.year) newErrors.year = 'Year is required';
+    if (!formData.capacity) newErrors.capacity = 'Capacity is required';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ ...ambulance, ...formData });
-  };
+    
+    if (!validate()) {
+      return;
+    }
 
-  if (!ambulance) return null;
+    // Generate new ambulance object
+    const newAmbulance = {
+      id: Date.now(),
+      ...formData,
+      totalTrips: 0,
+      avgResponseTime: '0 min',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    onSave(newAmbulance);
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
@@ -95,12 +101,12 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
           <div className="flex items-center space-x-4">
             <div className="relative">
               <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
-                <Truck className="w-8 h-8 text-white" />
+                <Plus className="w-8 h-8 text-white" />
               </div>
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold mb-1">Edit Ambulance</h2>
-              <p className="text-sm text-white/80">{ambulance.vehiclePlate}</p>
+              <h2 className="text-2xl font-bold mb-1">Add New Ambulance</h2>
+              <p className="text-sm text-white/80">Register a new ambulance to the fleet</p>
             </div>
           </div>
         </div>
@@ -110,14 +116,14 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Vehicle Information Section */}
             <div className="col-span-2">
-              <h3 className="text-lg font-semibold mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
                 <Truck className="w-5 h-5 mr-2 text-blue-600" />
                 Vehicle Information
               </h3>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Vehicle Plate *
               </label>
               <input
@@ -125,13 +131,14 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="vehiclePlate"
                 value={formData.vehiclePlate}
                 onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                placeholder="e.g., AMB-001-NB"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
+              {errors.vehiclePlate && <p className="text-red-500 text-xs mt-1">{errors.vehiclePlate}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Registration Number *
               </label>
               <input
@@ -139,13 +146,14 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="registrationNumber"
                 value={formData.registrationNumber}
                 onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                placeholder="e.g., KCB 123A"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
+              {errors.registrationNumber && <p className="text-red-500 text-xs mt-1">{errors.registrationNumber}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Model *
               </label>
               <input
@@ -153,13 +161,14 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="model"
                 value={formData.model}
                 onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                placeholder="e.g., Toyota Hiace"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
+              {errors.model && <p className="text-red-500 text-xs mt-1">{errors.model}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Year *
               </label>
               <input
@@ -167,21 +176,23 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100focus:border-transparent"
+                placeholder="e.g., 2023"
+                min="2000"
+                max="2030"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
+              {errors.year && <p className="text-red-500 text-xs mt-1">{errors.year}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Type *
               </label>
               <select
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="advanced_life_support">Advanced Life Support</option>
                 <option value="basic_life_support">Basic Life Support</option>
@@ -191,15 +202,14 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Status *
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="AVAILABLE">Available</option>
                 <option value="BUSY">Busy</option>
@@ -208,15 +218,14 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Fuel Type *
               </label>
               <select
                 name="fuelType"
                 value={formData.fuelType}
                 onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="DIESEL">Diesel</option>
                 <option value="PETROL">Petrol</option>
@@ -226,17 +235,20 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium  mb-2">
-                Capacity *
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Capacity (Patients) *
               </label>
               <input
                 type="number"
                 name="capacity"
                 value={formData.capacity}
                 onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                placeholder="e.g., 2"
+                min="1"
+                max="10"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
+              {errors.capacity && <p className="text-red-500 text-xs mt-1">{errors.capacity}</p>}
             </div>
 
             <div className="flex items-center space-x-6">
@@ -246,7 +258,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                   name="equippedForICU"
                   checked={formData.equippedForICU}
                   onChange={handleChange}
-                  className="w-4 h-4 text-green-600 rounded focus:ring-gray-100"
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-700"
                 />
                 <span className="text-sm font-medium text-gray-700">ICU Equipped</span>
               </label>
@@ -256,35 +268,36 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                   name="gpsEnabled"
                   checked={formData.gpsEnabled}
                   onChange={handleChange}
-                  className="w-4 h-4 text-green-600 rounded focus:ring-gray-100"
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-700"
                 />
                 <span className="text-sm font-medium text-gray-700">GPS Enabled</span>
               </label>
             </div>
 
-            {/* Assignment Section */}
+            {/* Current Assignment Section */}
             <div className="col-span-2 mt-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
                 <MapPin className="w-5 h-5 mr-2 text-blue-600" />
-                Current Assignment
+                Initial Assignment (Optional)
               </h3>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location
+                Base Location
               </label>
               <input
                 type="text"
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                placeholder="e.g., Nairobi Central Station"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Driver Name
               </label>
               <input
@@ -292,12 +305,13 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="driverName"
                 value={formData.driverName}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                placeholder="e.g., John Kamau"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Driver Phone
               </label>
               <input
@@ -305,33 +319,35 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="driverPhone"
                 value={formData.driverPhone}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                placeholder="e.g., +254700123456"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
-                Medical Personnel
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Medic/Paramedic Name
               </label>
               <input
                 type="text"
                 name="medicName"
                 value={formData.medicName}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                placeholder="e.g., Dr. Sarah Kimani"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
-            {/* Insurance Section */}
+            {/* Insurance Details Section */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
                 <Shield className="w-5 h-5 mr-2 text-blue-600" />
                 Insurance Details
               </h3>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Insurance Provider
               </label>
               <input
@@ -339,12 +355,13 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="insuranceProvider"
                 value={formData.insuranceProvider}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                placeholder="e.g., AAR Insurance"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Policy Number
               </label>
               <input
@@ -352,111 +369,119 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="insurancePolicyNumber"
                 value={formData.insurancePolicyNumber}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                placeholder="e.g., POL-2024-001"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
-            {/* Maintenance Section */}
+            {/* Maintenance Information Section */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold  mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
                 <Calendar className="w-5 h-5 mr-2 text-blue-600" />
-                Maintenance
+                Maintenance Information
               </h3>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
-                Last Maintenance
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Last Maintenance Date
               </label>
               <input
                 type="date"
                 name="lastMaintenance"
                 value={formData.lastMaintenance}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
-                Next Maintenance
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Next Maintenance Date
               </label>
               <input
                 type="date"
                 name="nextMaintenance"
                 value={formData.nextMaintenance}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
-                Mileage (km)
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Current Mileage (km)
               </label>
               <input
                 type="number"
                 name="mileage"
                 value={formData.mileage}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                placeholder="e.g., 45000"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Fuel Level (%)
               </label>
               <input
                 type="number"
                 name="fuelLevel"
-                min="0"
-                max="100"
                 value={formData.fuelLevel}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                min="0"
+                max="100"
+                placeholder="e.g., 85"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               />
             </div>
 
-            {/* Notes Section */}
+            {/* Additional Notes */}
             <div className="col-span-2 mt-4">
-              <label className="flex items-center text-sm font-medium mb-2">
-                <FileText className="w-4 h-4 mr-2 text-blue-600" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
+                <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                Additional Information
+              </h3>
+            </div>
+
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Notes
               </label>
               <textarea
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
-                placeholder="Add any additional notes about this ambulance..."
+                rows="3"
+                placeholder="Any additional notes or special instructions..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent resize-none"
               />
             </div>
           </div>
-        </form>
 
-        {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t">
-          <button
-            onClick={onClose}
-            type="button"
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            Save Changes
-          </button>
-        </div>
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-3 mt-6 pt-6 border-t">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Add Ambulance
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 };
 
-export default EditAmbulanceModal;
+export default AddAmbulanceModal;
