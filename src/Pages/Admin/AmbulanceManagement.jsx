@@ -1239,76 +1239,82 @@ const AmbulanceManagement = () => {
 
           {/* Drivers Tab */}
           {activeTab === 'drivers' && (
-            <div className=" shadow-sm border border-gray-200 overflow-hidden">
+            <div className="shadow-sm border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Driver</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Vehicle</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Experience</th>
-                      {/* <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Rating</th> */}
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Total Trips</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Actions</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Driver</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Email</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Phone</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Status</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Shift Time</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Vehicle</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Location</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Experience</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Certifications</th>
+                      <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">Total Trips</th>
+                      <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredDrivers.map((driver) => (
-                      <tr key={driver.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
+                      <tr key={driver.id} className="hover:bg-gray-50 transition-colors border-b border-gray-200">
+                        <td className="px-3 py-3">
+                          <div className="flex items-center whitespace-nowrap">
                             <img
                               src={driver.avatar}
                               alt={driver.name}
-                              className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                              className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 flex-shrink-0"
                               onError={(e) => {
-                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=3B82F6&color=fff&size=40`;
+                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=3B82F6&color=fff&size=32`;
                               }}
                             />
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{driver.name}</div>
-                              <div className="text-sm text-gray-500">{driver.email}</div>
-                              <div className="text-xs text-gray-400">{driver.phone}</div>
-                            </div>
+                            <span className="ml-3 text-sm font-medium text-gray-900">{driver.name}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className="text-sm text-gray-600">{driver.email}</span>
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className="text-sm text-gray-600">{driver.phone}</span>
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap">
                           <div className="flex items-center">
                             {getStatusIcon(driver.status)}
-                            <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(driver.status)}`}>
+                            <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(driver.status)}`}>
                               {driver.status.replace('_', ' ').toUpperCase()}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-500 mt-1">
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className="text-sm text-gray-600">
                             {driver.shiftStart} - {driver.shiftEnd}
-                          </div>
+                          </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{driver.currentVehicle}</div>
-                          <div className="text-sm text-gray-500">{driver.location}</div>
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className="text-sm font-medium text-gray-900">{driver.currentVehicle}</span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{driver.experience}</div>
-                          <div className="text-xs text-gray-500">
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className="text-sm text-gray-600">{driver.location}</span>
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">{driver.experience}</span>
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className="text-sm text-gray-600">
                             {driver.certifications.slice(0, 2).join(', ')}
-                          </div>
+                          </span>
                         </td>
-                        {/* <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                            <span className="text-sm font-medium text-gray-900">{driver.rating}</span>
-                          </div>
-                        </td> */}
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{driver.totalTrips}</div>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <span className="text-sm font-medium text-gray-900">{driver.totalTrips}</span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center space-x-2">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="flex items-center justify-center space-x-2">
                             <button className="text-blue-600 hover:text-blue-900 transition-colors">
                               <Eye className="w-4 h-4" />
                             </button>
-                            <button className="text-green-600 hover:text-green-900 transition-colors">
+                            <button className="text-blue-600 hover:text-blue-900 transition-colors">
                               <Edit3 className="w-4 h-4" />
                             </button>
                             <button className="text-gray-400 hover:text-gray-600 transition-colors">
