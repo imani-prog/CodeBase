@@ -62,6 +62,7 @@ import ViewDriverModal from './AmbulanceManagement/modals/ViewDriverModal';
 import EditDriverModal from './AmbulanceManagement/modals/EditDriverModal';
 import MoreOptionsDriverModal from './AmbulanceManagement/modals/MoreOptionsDriverModal';
 import MoreOptionsModal from './AmbulanceManagement/modals/MoreOptionsModal';
+import Pagination from '../../Components/Admin/Pagination';
 
 const AmbulanceManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,6 +72,11 @@ const AmbulanceManagement = () => {
   const [_selectedItems, _setSelectedItems] = useState([]);
   const [showDispatchModal, setShowDispatchModal] = useState(false);
   const [selectedAmbulance, setSelectedAmbulance] = useState(null);
+  
+  // Pagination states
+  const [ambulancePage, setAmbulancePage] = useState(1);
+  const [driverPage, setDriverPage] = useState(1);
+  const itemsPerPage = 10;
   
   // Modal states
   const [showViewModal, setShowViewModal] = useState(false);
@@ -742,6 +748,19 @@ const AmbulanceManagement = () => {
     return matchesSearch;
   });
 
+  // Paginated data
+  const paginatedAmbulances = useMemo(() => {
+    const startIndex = (ambulancePage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredAmbulances.slice(startIndex, endIndex);
+  }, [filteredAmbulances, ambulancePage]);
+
+  const paginatedDrivers = useMemo(() => {
+    const startIndex = (driverPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredDrivers.slice(startIndex, endIndex);
+  }, [filteredDrivers, driverPage]);
+
   // Dispatch handling functions
   const handleDispatch = (ambulanceId, callId) => {
     const call = emergencyCalls.find(c => c.id === callId);
@@ -1180,6 +1199,7 @@ const AmbulanceManagement = () => {
 
           {/* Ambulances Tab */}
               {activeTab === 'ambulances' && (
+              <>
               <div className="bg-white shadow overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-100 uppercase text-xs font-semibold">
@@ -1199,7 +1219,7 @@ const AmbulanceManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredAmbulances.map((a) => (
+              {paginatedAmbulances.map((a) => (
                 <tr key={a.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                   {/* Vehicle Plate */}
                   <td className="px-3 py-3 whitespace-nowrap">
@@ -1308,7 +1328,17 @@ const AmbulanceManagement = () => {
             </div>
           )}
         </div>
-
+        
+        {filteredAmbulances.length > 0 && (
+          <Pagination
+            currentPage={ambulancePage}
+            totalItems={filteredAmbulances.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setAmbulancePage}
+            itemName="ambulances"
+          />
+        )}
+        </>
           )}
 
           {/* Drivers Tab */}
@@ -1332,7 +1362,7 @@ const AmbulanceManagement = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredDrivers.map((driver) => (
+                    {paginatedDrivers.map((driver) => (
                       <tr key={driver.id} className="hover:bg-gray-50 transition-colors border-b border-gray-200">
                         <td className="px-3 py-3">
                           <div className="flex items-center whitespace-nowrap">
@@ -1422,6 +1452,15 @@ const AmbulanceManagement = () => {
                   </tbody>
                 </table>
               </div>
+              {filteredDrivers.length > 0 && (
+                <Pagination
+                  currentPage={driverPage}
+                  totalItems={filteredDrivers.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setDriverPage}
+                  itemName="drivers"
+                />
+              )}
             </div>
           )}
 

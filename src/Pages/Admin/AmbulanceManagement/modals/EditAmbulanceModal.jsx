@@ -110,7 +110,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Vehicle Information Section */}
             <div className="col-span-2">
-              <h3 className="text-lg font-semibold mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Truck className="w-5 h-5 mr-2 text-blue-600" />
                 Vehicle Information
               </h3>
@@ -126,7 +126,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.vehiclePlate}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -140,7 +140,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.registrationNumber}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -154,7 +154,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.model}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -168,7 +168,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.year}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -181,7 +181,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.type}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               >
                 <option value="advanced_life_support">Advanced Life Support</option>
                 <option value="basic_life_support">Basic Life Support</option>
@@ -199,7 +199,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.status}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               >
                 <option value="AVAILABLE">Available</option>
                 <option value="BUSY">Busy</option>
@@ -216,7 +216,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.fuelType}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               >
                 <option value="DIESEL">Diesel</option>
                 <option value="PETROL">Petrol</option>
@@ -235,7 +235,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.capacity}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -264,7 +264,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
 
             {/* Assignment Section */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <MapPin className="w-5 h-5 mr-2 text-blue-600" />
                 Current Assignment
               </h3>
@@ -279,7 +279,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -292,7 +292,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="driverName"
                 value={formData.driverName}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -305,7 +305,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="driverPhone"
                 value={formData.driverPhone}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -318,13 +318,13 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="medicName"
                 value={formData.medicName}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
             {/* Insurance Section */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2 text-blue-600" />
                 Insurance Details
               </h3>
@@ -339,7 +339,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="insuranceProvider"
                 value={formData.insuranceProvider}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -352,13 +352,13 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="insurancePolicyNumber"
                 value={formData.insurancePolicyNumber}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
             {/* Maintenance Section */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold  mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold  mb-4 flex items-center">
                 <Calendar className="w-5 h-5 mr-2 text-blue-600" />
                 Maintenance
               </h3>
@@ -373,7 +373,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="lastMaintenance"
                 value={formData.lastMaintenance}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -386,7 +386,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="nextMaintenance"
                 value={formData.nextMaintenance}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -399,7 +399,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 name="mileage"
                 value={formData.mileage}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -414,7 +414,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 max="100"
                 value={formData.fuelLevel}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
               />
             </div>
 
@@ -429,7 +429,7 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 value={formData.notes}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                 placeholder="Add any additional notes about this ambulance..."
               />
             </div>
