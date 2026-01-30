@@ -116,7 +116,7 @@ const AddAmbulanceModal = ({ onClose, onSave }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Vehicle Information Section */}
             <div className="col-span-2">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Truck className="w-5 h-5 mr-2 text-blue-600" />
                 Vehicle Information
               </h3>
@@ -276,7 +276,7 @@ const AddAmbulanceModal = ({ onClose, onSave }) => {
 
             {/* Current Assignment Section */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <MapPin className="w-5 h-5 mr-2 text-blue-600" />
                 Initial Assignment (Optional)
               </h3>
@@ -340,7 +340,7 @@ const AddAmbulanceModal = ({ onClose, onSave }) => {
 
             {/* Insurance Details Section */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2 text-blue-600" />
                 Insurance Details
               </h3>
@@ -376,7 +376,7 @@ const AddAmbulanceModal = ({ onClose, onSave }) => {
 
             {/* Maintenance Information Section */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Calendar className="w-5 h-5 mr-2 text-blue-600" />
                 Maintenance Information
               </h3>
@@ -440,7 +440,7 @@ const AddAmbulanceModal = ({ onClose, onSave }) => {
 
             {/* Additional Notes */}
             <div className="col-span-2 mt-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-blue-600" />
                 Additional Information
               </h3>

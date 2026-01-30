@@ -57,6 +57,10 @@ import {
 import ViewAmbulanceModal from './AmbulanceManagement/modals/ViewAmbulanceModal';
 import EditAmbulanceModal from './AmbulanceManagement/modals/EditAmbulanceModal';
 import AddAmbulanceModal from './AmbulanceManagement/modals/AddAmbulanceModal';
+import AddDriverModal from './AmbulanceManagement/modals/AddDriverModal';
+import ViewDriverModal from './AmbulanceManagement/modals/ViewDriverModal';
+import EditDriverModal from './AmbulanceManagement/modals/EditDriverModal';
+import MoreOptionsDriverModal from './AmbulanceManagement/modals/MoreOptionsDriverModal';
 import MoreOptionsModal from './AmbulanceManagement/modals/MoreOptionsModal';
 
 const AmbulanceManagement = () => {
@@ -72,8 +76,15 @@ const AmbulanceManagement = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [currentAmbulance, setCurrentAmbulance] = useState(null);
+  
+  // Driver modal states
+  const [showViewDriverModal, setShowViewDriverModal] = useState(false);
+  const [showEditDriverModal, setShowEditDriverModal] = useState(false);
+  const [showMoreDriverModal, setShowMoreDriverModal] = useState(false);
+  const [currentDriver, setCurrentDriver] = useState(null);
   const [_liveTracking, _setLiveTracking] = useState({});
   const [dispatchForm, setDispatchForm] = useState({
     priority: 'HIGH', // matches backend DispatchPriority enum
@@ -838,6 +849,71 @@ const AmbulanceManagement = () => {
     alert('Ambulance added successfully!');
   };
 
+  const handleAddDriverSave = (newDriver) => {
+    // TODO: Implement API call to add new driver
+    console.log('Adding new driver:', newDriver);
+    
+    // Close modal
+    setShowAddDriverModal(false);
+    
+    // Show success message
+    alert('Driver added successfully!');
+  };
+
+  const handleEditDriverSave = (updatedDriver) => {
+    // TODO: Implement API call to update driver
+    console.log('Updating driver:', updatedDriver);
+    
+    // Close modal
+    setShowEditDriverModal(false);
+    setCurrentDriver(null);
+    
+    // Show success message
+    alert('Driver updated successfully!');
+  };
+
+  const handleMoreDriverAction = (action, driver) => {
+    console.log(`Action: ${action} for driver:`, driver);
+    
+    switch(action) {
+      case 'view-history':
+        alert(`Loading trip history for ${driver.name}...`);
+        break;
+      case 'schedule':
+        alert(`Opening schedule management for ${driver.name}...`);
+        break;
+      case 'location':
+        alert(`Tracking location for ${driver.name}...`);
+        break;
+      case 'export':
+        alert(`Exporting details for ${driver.name}...`);
+        break;
+      case 'suspend':
+        if (confirm(`Are you sure you want to suspend ${driver.name}?`)) {
+          alert(`${driver.name} has been suspended.`);
+        }
+        break;
+      case 'deactivate':
+        if (confirm(`Are you sure you want to deactivate ${driver.name}? This action cannot be undone.`)) {
+          alert(`${driver.name} has been deactivated.`);
+        }
+        break;
+      case 'delete':
+        if (confirm(`Are you sure you want to permanently delete ${driver.name}? This action cannot be undone and all data will be lost.`)) {
+          // TODO: Implement API call to delete driver
+          alert(`${driver.name} has been deleted from the system.`);
+          console.log('Deleting driver:', driver);
+        }
+        break;
+      default:
+        alert(`Action ${action} not implemented yet.`);
+    }
+    
+    // Close the more options modal
+    setShowMoreDriverModal(false);
+    setCurrentDriver(null);
+  };
+
   const handleMoreAction = (action, ambulance) => {
     console.log(`Action: ${action} for ambulance:`, ambulance);
     
@@ -1089,6 +1165,8 @@ const AmbulanceManagement = () => {
                     onClick={() => {
                       if (activeTab === 'ambulances') {
                         setShowAddModal(true);
+                      } else if (activeTab === 'drivers') {
+                        setShowAddDriverModal(true);
                       }
                     }}
                     className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
@@ -1133,10 +1211,6 @@ const AmbulanceManagement = () => {
                     <p className="text-sm text-gray-700">{a.registrationNumber}</p>
                   </td>
 
-                  {/* Year */}
-                  <td className="px-3 py-3 whitespace-nowrap">
-                    <p className="text-sm text-gray-700">{a.year}</p>
-                  </td>
                   {/* Year */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-sm text-gray-700">{a.year}</p>
@@ -1311,13 +1385,34 @@ const AmbulanceManagement = () => {
                         </td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
                           <div className="flex items-center justify-center space-x-2">
-                            <button className="text-blue-600 hover:text-blue-900 transition-colors">
+                            <button 
+                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              onClick={() => {
+                                setCurrentDriver(driver);
+                                setShowViewDriverModal(true);
+                              }}
+                              title="View Details"
+                            >
                               <Eye className="w-4 h-4" />
                             </button>
-                            <button className="text-blue-600 hover:text-blue-900 transition-colors">
+                            <button 
+                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              onClick={() => {
+                                setCurrentDriver(driver);
+                                setShowEditDriverModal(true);
+                              }}
+                              title="Edit"
+                            >
                               <Edit3 className="w-4 h-4" />
                             </button>
-                            <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                            <button 
+                              className="p-1.5 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                              onClick={() => {
+                                setCurrentDriver(driver);
+                                setShowMoreDriverModal(true);
+                              }}
+                              title="More Options"
+                            >
                               <MoreHorizontal className="w-4 h-4" />
                             </button>
                           </div>
@@ -2182,6 +2277,47 @@ const AmbulanceManagement = () => {
         <AddAmbulanceModal
           onClose={() => setShowAddModal(false)}
           onSave={handleAddSave}
+        />
+      )}
+
+      {showAddDriverModal && (
+        <AddDriverModal
+          onClose={() => setShowAddDriverModal(false)}
+          onSave={handleAddDriverSave}
+        />
+      )}
+
+      {/* Driver Modals */}
+      {showViewDriverModal && currentDriver && (
+        <ViewDriverModal
+          driver={currentDriver}
+          onClose={() => {
+            setShowViewDriverModal(false);
+            setCurrentDriver(null);
+          }}
+          getStatusColor={getStatusColor}
+        />
+      )}
+
+      {showEditDriverModal && currentDriver && (
+        <EditDriverModal
+          driver={currentDriver}
+          onClose={() => {
+            setShowEditDriverModal(false);
+            setCurrentDriver(null);
+          }}
+          onSave={handleEditDriverSave}
+        />
+      )}
+
+      {showMoreDriverModal && currentDriver && (
+        <MoreOptionsDriverModal
+          driver={currentDriver}
+          onClose={() => {
+            setShowMoreDriverModal(false);
+            setCurrentDriver(null);
+          }}
+          onAction={handleMoreDriverAction}
         />
       )}
     </div>
