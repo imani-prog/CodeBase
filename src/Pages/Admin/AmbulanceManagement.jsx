@@ -58,6 +58,7 @@ import ViewAmbulanceModal from './AmbulanceManagement/modals/ViewAmbulanceModal'
 import EditAmbulanceModal from './AmbulanceManagement/modals/EditAmbulanceModal';
 import AddAmbulanceModal from './AmbulanceManagement/modals/AddAmbulanceModal';
 import AddDriverModal from './AmbulanceManagement/modals/AddDriverModal';
+import AddDispatchModal from './AmbulanceManagement/modals/AddDispatchModal';
 import ViewDriverModal from './AmbulanceManagement/modals/ViewDriverModal';
 import EditDriverModal from './AmbulanceManagement/modals/EditDriverModal';
 import MoreOptionsDriverModal from './AmbulanceManagement/modals/MoreOptionsDriverModal';
@@ -83,6 +84,7 @@ const AmbulanceManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
+  const [showAddDispatchModal, setShowAddDispatchModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [currentAmbulance, setCurrentAmbulance] = useState(null);
   
@@ -1186,6 +1188,8 @@ const AmbulanceManagement = () => {
                         setShowAddModal(true);
                       } else if (activeTab === 'drivers') {
                         setShowAddDriverModal(true);
+                      } else if (activeTab === 'dispatch') {
+                        setShowAddDispatchModal(true);
                       }
                     }}
                     className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
@@ -1490,7 +1494,7 @@ const AmbulanceManagement = () => {
                   </thead>
                   <tbody>
                     {emergencyCalls.map((call) => (
-                      <tr key={call.id} className="border-b hover:bg-gray-50 transition-colors">
+                      <tr key={call.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         {/* Call ID */}
                         <td className="px-4 py-4">
                           <div className="font-semibold text-gray-900">{call.id}</div>
@@ -2323,6 +2327,19 @@ const AmbulanceManagement = () => {
         <AddDriverModal
           onClose={() => setShowAddDriverModal(false)}
           onSave={handleAddDriverSave}
+        />
+      )}
+
+      {showAddDispatchModal && (
+        <AddDispatchModal
+          ambulances={ambulances}
+          onClose={() => setShowAddDispatchModal(false)}
+          onSave={(newDispatch) => {
+            console.log('New dispatch created:', newDispatch);
+            // Add the new dispatch to emergency calls
+            setEmergencyCalls(prev => [newDispatch, ...prev]);
+            setShowAddDispatchModal(false);
+          }}
         />
       )}
 
