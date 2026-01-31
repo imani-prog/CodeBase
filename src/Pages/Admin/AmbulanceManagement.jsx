@@ -59,6 +59,7 @@ import EditAmbulanceModal from './AmbulanceManagement/modals/EditAmbulanceModal'
 import AddAmbulanceModal from './AmbulanceManagement/modals/AddAmbulanceModal';
 import AddDriverModal from './AmbulanceManagement/modals/AddDriverModal';
 import AddDispatchModal from './AmbulanceManagement/modals/AddDispatchModal';
+import AddTrackingUnitModal from './AmbulanceManagement/modals/AddTrackingUnitModal';
 import ViewDriverModal from './AmbulanceManagement/modals/ViewDriverModal';
 import EditDriverModal from './AmbulanceManagement/modals/EditDriverModal';
 import MoreOptionsDriverModal from './AmbulanceManagement/modals/MoreOptionsDriverModal';
@@ -85,6 +86,7 @@ const AmbulanceManagement = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [showAddDispatchModal, setShowAddDispatchModal] = useState(false);
+  const [showAddTrackingModal, setShowAddTrackingModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [currentAmbulance, setCurrentAmbulance] = useState(null);
   
@@ -888,6 +890,24 @@ const AmbulanceManagement = () => {
     }, 100);
   };
 
+  const handleAddTrackingSave = (newTrackingData) => {
+    console.log('Adding unit to tracking:', newTrackingData);
+    
+    // Close modal first
+    setShowAddTrackingModal(false);
+    
+    // Add the tracking data to the trackingData state
+    setTrackingData(prev => ({
+      ...prev,
+      [newTrackingData.vehicleId]: newTrackingData
+    }));
+    
+    // Show success message after modal closes
+    setTimeout(() => {
+      alert(`✅ ${newTrackingData.vehicleId} added to live tracking!`);
+    }, 100);
+  };
+
   const handleEditDriverSave = (updatedDriver) => {
     // TODO: Implement API call to update driver
     console.log('Updating driver:', updatedDriver);
@@ -1199,6 +1219,8 @@ const AmbulanceManagement = () => {
                         setShowAddDriverModal(true);
                       } else if (activeTab === 'dispatch') {
                         setShowAddDispatchModal(true);
+                      } else if (activeTab === 'tracking') {
+                        setShowAddTrackingModal(true);
                       }
                     }}
                     className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
@@ -2483,6 +2505,14 @@ const AmbulanceManagement = () => {
             setCurrentDriver(null);
           }}
           onAction={handleMoreDriverAction}
+        />
+      )}
+
+      {showAddTrackingModal && (
+        <AddTrackingUnitModal
+          ambulances={ambulances}
+          onClose={() => setShowAddTrackingModal(false)}
+          onSave={handleAddTrackingSave}
         />
       )}
     </div>

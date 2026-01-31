@@ -90,6 +90,7 @@ const AddDispatchModal = ({ ambulances, onClose, onSave }) => {
       arrivalTime: null,
       completionTime: null,
       estimatedResponse: 'Calculating...',
+      nearestAmbulances: formData.selectedAmbulance ? [formData.selectedAmbulance] : [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
