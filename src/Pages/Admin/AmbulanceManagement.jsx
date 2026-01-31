@@ -1741,7 +1741,7 @@ const AmbulanceManagement = () => {
                         if (!ambulance) return null;
 
                         return (
-                          <tr key={vehicleId} className="border-b hover:bg-gray-50 transition-colors">
+                          <tr key={vehicleId} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                             {/* Vehicle ID */}
                             <td className="px-4 py-4">
                               <div className="font-semibold text-gray-900">{vehicleId}</div>
