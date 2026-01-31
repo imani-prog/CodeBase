@@ -94,6 +94,7 @@ const AmbulanceManagement = () => {
   const [showMoreDriverModal, setShowMoreDriverModal] = useState(false);
   const [currentDriver, setCurrentDriver] = useState(null);
   const [_liveTracking, _setLiveTracking] = useState({});
+  const [isDispatching, setIsDispatching] = useState(false);
   const [dispatchForm, setDispatchForm] = useState({
     priority: 'HIGH', // matches backend DispatchPriority enum
     incidentType: 'TRAFFIC_ACCIDENT',
@@ -851,46 +852,54 @@ const AmbulanceManagement = () => {
     console.log('Saving updated ambulance:', updatedAmbulance);
     
   
-    // Close modal
+    // Close modal first
     setShowEditModal(false);
     setCurrentAmbulance(null);
     
-    // Show success message
-    alert('Ambulance updated successfully!');
+    // Show success message after modal closes
+    setTimeout(() => {
+      alert('✅ Ambulance updated successfully!');
+    }, 100);
   };
 
   const handleAddSave = (newAmbulance) => {
     // TODO: Implement API call to add new ambulance
     console.log('Adding new ambulance:', newAmbulance);
     
-    // Close modal
+    // Close modal first
     setShowAddModal(false);
     
-    // Show success message
-    alert('Ambulance added successfully!');
+    // Show success message after modal closes
+    setTimeout(() => {
+      alert('✅ Ambulance added successfully!');
+    }, 100);
   };
 
   const handleAddDriverSave = (newDriver) => {
     // TODO: Implement API call to add new driver
     console.log('Adding new driver:', newDriver);
     
-    // Close modal
+    // Close modal first
     setShowAddDriverModal(false);
     
-    // Show success message
-    alert('Driver added successfully!');
+    // Show success message after modal closes
+    setTimeout(() => {
+      alert('✅ Driver added successfully!');
+    }, 100);
   };
 
   const handleEditDriverSave = (updatedDriver) => {
     // TODO: Implement API call to update driver
     console.log('Updating driver:', updatedDriver);
     
-    // Close modal
+    // Close modal first
     setShowEditDriverModal(false);
     setCurrentDriver(null);
     
-    // Show success message
-    alert('Driver updated successfully!');
+    // Show success message after modal closes
+    setTimeout(() => {
+      alert('✅ Driver updated successfully!');
+    }, 100);
   };
 
   const handleMoreDriverAction = (action, driver) => {
@@ -1011,7 +1020,7 @@ const AmbulanceManagement = () => {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-white border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total Fleet</p>
@@ -1027,7 +1036,7 @@ const AmbulanceManagement = () => {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-white border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Active Drivers</p>
@@ -1044,7 +1053,7 @@ const AmbulanceManagement = () => {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-white border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Emergency Calls</p>
@@ -1061,7 +1070,7 @@ const AmbulanceManagement = () => {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-white border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Active Tracking</p>
@@ -1865,7 +1874,7 @@ const AmbulanceManagement = () => {
                   <select
                     value={dispatchForm.priority}
                     onChange={(e) => setDispatchForm({...dispatchForm, priority: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                   >
                     <option value="CRITICAL">Critical</option>
                     <option value="HIGH">High</option>
@@ -1879,7 +1888,7 @@ const AmbulanceManagement = () => {
                   <select
                     value={dispatchForm.incidentType}
                     onChange={(e) => setDispatchForm({...dispatchForm, incidentType: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                   >
                     <option value="TRAFFIC_ACCIDENT">Traffic Accident</option>
                     <option value="CARDIAC_ARREST">Cardiac Arrest</option>
@@ -1897,7 +1906,7 @@ const AmbulanceManagement = () => {
                   <select
                     value={selectedAmbulance || ''}
                     onChange={(e) => setSelectedAmbulance(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                   >
                     <option value="">Auto-Select Nearest</option>
                     {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').map(ambulance => (
@@ -1910,7 +1919,7 @@ const AmbulanceManagement = () => {
               </div>
 
               {/* Patient Information */}
-              <div className="border-t pt-4">
+              <div className="pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
                   <Users className="w-5 h-5 mr-2 text-blue-600" />
                   Patient Information
@@ -1922,7 +1931,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.patientId}
                       onChange={(e) => setDispatchForm({...dispatchForm, patientId: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="PAT-2024-XXX"
                     />
                   </div>
@@ -1932,7 +1941,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.patientName}
                       onChange={(e) => setDispatchForm({...dispatchForm, patientName: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Enter patient name"
                     />
                   </div>
@@ -1942,7 +1951,7 @@ const AmbulanceManagement = () => {
                       type="number"
                       value={dispatchForm.patientAge}
                       onChange={(e) => setDispatchForm({...dispatchForm, patientAge: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Age"
                     />
                   </div>
@@ -1953,14 +1962,14 @@ const AmbulanceManagement = () => {
                     type="text"
                     value={dispatchForm.condition}
                     onChange={(e) => setDispatchForm({...dispatchForm, condition: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                     placeholder="Describe the medical condition"
                   />
                 </div>
               </div>
 
               {/* Pickup Location */}
-              <div className="border-t pt-4">
+              <div className="pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
                   <MapPin className="w-5 h-5 mr-2 text-blue-600" />
                   Pickup Location
@@ -1972,7 +1981,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupAddressLine1}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupAddressLine1: e.target.value, pickupLocation: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Street address, building name"
                     />
                   </div>
@@ -1982,7 +1991,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupAddressLine2}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupAddressLine2: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Apartment, floor, etc."
                     />
                   </div>
@@ -1992,7 +2001,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupCity}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupCity: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="City"
                     />
                   </div>
@@ -2002,7 +2011,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupState}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupState: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="State/County"
                     />
                   </div>
@@ -2012,7 +2021,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupPostalCode}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupPostalCode: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="00100"
                     />
                   </div>
@@ -2022,7 +2031,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupCountry}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupCountry: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Kenya"
                     />
                   </div>
@@ -2034,7 +2043,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupLatitude}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupLatitude: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="-1.2921"
                     />
                   </div>
@@ -2044,7 +2053,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.pickupLongitude}
                       onChange={(e) => setDispatchForm({...dispatchForm, pickupLongitude: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="36.8219"
                     />
                   </div>
@@ -2052,7 +2061,7 @@ const AmbulanceManagement = () => {
               </div>
 
               {/* Destination/Dropoff Location */}
-              <div className="border-t pt-4">
+              <div className="pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
                   <Navigation className="w-5 h-5 mr-2 text-blue-600" />
                   Destination Hospital
@@ -2065,7 +2074,7 @@ const AmbulanceManagement = () => {
                       const hospitalId = e.target.value;
                       setDispatchForm({...dispatchForm, hospitalId, destination: e.target.options[e.target.selectedIndex].text});
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                   >
                     <option value="">Select destination hospital</option>
                     <option value="HOSP-001">Kenyatta National Hospital</option>
@@ -2083,7 +2092,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffAddressLine1}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffAddressLine1: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Hospital address"
                     />
                   </div>
@@ -2093,7 +2102,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffAddressLine2}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffAddressLine2: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Department, wing, etc."
                     />
                   </div>
@@ -2103,7 +2112,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffCity}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffCity: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="City"
                     />
                   </div>
@@ -2113,7 +2122,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffState}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffState: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="State/County"
                     />
                   </div>
@@ -2123,7 +2132,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffPostalCode}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffPostalCode: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="00100"
                     />
                   </div>
@@ -2133,7 +2142,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffCountry}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffCountry: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Kenya"
                     />
                   </div>
@@ -2145,7 +2154,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffLatitude}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffLatitude: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="-1.3018"
                     />
                   </div>
@@ -2155,7 +2164,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.dropoffLongitude}
                       onChange={(e) => setDispatchForm({...dispatchForm, dropoffLongitude: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="36.8073"
                     />
                   </div>
@@ -2163,7 +2172,7 @@ const AmbulanceManagement = () => {
               </div>
 
               {/* Caller Information */}
-              <div className="border-t pt-4">
+              <div className="pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
                   <Phone className="w-5 h-5 mr-2 text-blue-600" />
                   Caller Information
@@ -2175,7 +2184,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.callerName}
                       onChange={(e) => setDispatchForm({...dispatchForm, callerName: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="Who is calling?"
                     />
                   </div>
@@ -2185,7 +2194,7 @@ const AmbulanceManagement = () => {
                       type="tel"
                       value={dispatchForm.callerPhone}
                       onChange={(e) => setDispatchForm({...dispatchForm, callerPhone: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="+254 7xx xxx xxx"
                     />
                   </div>
@@ -2196,14 +2205,14 @@ const AmbulanceManagement = () => {
                     value={dispatchForm.callerNotes}
                     onChange={(e) => setDispatchForm({...dispatchForm, callerNotes: e.target.value})}
                     rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                     placeholder="Additional information from the caller..."
                   />
                 </div>
               </div>
 
               {/* Clinical/Operational Notes */}
-              <div className="border-t pt-4">
+              <div className="pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
                   <Activity className="w-5 h-5 mr-2 text-blue-600" />
                   Clinical & Operational Notes
@@ -2214,14 +2223,14 @@ const AmbulanceManagement = () => {
                     value={dispatchForm.notes}
                     onChange={(e) => setDispatchForm({...dispatchForm, notes: e.target.value, specialInstructions: e.target.value})}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                     placeholder="Any special instructions for the medical team, clinical observations, operational notes..."
                   />
                 </div>
               </div>
 
               {/* Estimates */}
-              <div className="border-t pt-4">
+              <div className="pt-4">
                 <h4 className="text-md font-semibold text-gray-900 mb-3">Estimates</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -2230,7 +2239,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.estimatedDistance}
                       onChange={(e) => setDispatchForm({...dispatchForm, estimatedDistance: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="e.g., 12.5 km"
                     />
                   </div>
@@ -2240,7 +2249,7 @@ const AmbulanceManagement = () => {
                       type="text"
                       value={dispatchForm.estimatedTime}
                       onChange={(e) => setDispatchForm({...dispatchForm, estimatedTime: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                       placeholder="e.g., 15 minutes"
                     />
                   </div>
@@ -2251,29 +2260,124 @@ const AmbulanceManagement = () => {
                 <button
                   onClick={() => setShowDispatchModal(false)}
                   className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={isDispatching}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => {
+                    // Prevent multiple clicks
+                    if (isDispatching) return;
+                    
                     const ambulanceToDispatch = selectedAmbulance || ambulances.find(a => a.status === 'AVAILABLE' || a.status === 'available')?.vehicleNumber;
                     
                     // Validate required fields
                     if (!ambulanceToDispatch) {
-                      alert('No ambulance available for dispatch');
+                      alert('❌ No ambulance available for dispatch');
                       return;
                     }
                     if (!dispatchForm.patientName || !dispatchForm.pickupAddressLine1 || !dispatchForm.callerName) {
-                      alert('Please fill in all required fields (Patient Name, Pickup Address, Caller Name)');
+                      alert('❌ Please fill in all required fields:\n• Patient Name\n• Pickup Address\n• Caller Name');
                       return;
                     }
                     
-                    handleDispatch(ambulanceToDispatch, 'manual-dispatch');
+                    // Set loading state
+                    setIsDispatching(true);
+                    
+                    try {
+                      // Create a new emergency call from the form data
+                      const newEmergencyCall = {
+                        id: `EMG-${String(Date.now()).slice(-3)}`,
+                        priority: dispatchForm.priority.toLowerCase(),
+                        status: 'dispatched',
+                        patientName: dispatchForm.patientName,
+                        condition: dispatchForm.condition || 'Not specified',
+                        location: dispatchForm.pickupAddressLine1 + (dispatchForm.pickupAddressLine2 ? ', ' + dispatchForm.pickupAddressLine2 : '') + ', ' + dispatchForm.pickupCity,
+                        callerName: dispatchForm.callerName,
+                        callerPhone: dispatchForm.callerPhone,
+                        callTime: new Date(),
+                        estimatedResponse: dispatchForm.estimatedTime || 'Calculating...',
+                        nearestAmbulances: [ambulanceToDispatch],
+                        assignedAmbulance: ambulanceToDispatch
+                      };
+                      
+                      // Add to emergency calls
+                      setEmergencyCalls(prev => [newEmergencyCall, ...prev]);
+                      
+                      // Note: ambulances is static mock data, cannot update status
+                      // In production, this would update via API call
+                      
+                      // Reset form first
+                      setDispatchForm({
+                        priority: 'HIGH',
+                        incidentType: 'TRAFFIC_ACCIDENT',
+                        patientName: '',
+                        patientId: '',
+                        patientAge: '',
+                        condition: '',
+                        pickupLocation: '',
+                        pickupAddressLine1: '',
+                        pickupAddressLine2: '',
+                        pickupCity: '',
+                        pickupState: '',
+                        pickupPostalCode: '',
+                        pickupCountry: 'Kenya',
+                        pickupLatitude: '',
+                        pickupLongitude: '',
+                        destination: '',
+                        hospitalId: '',
+                        dropoffAddressLine1: '',
+                        dropoffAddressLine2: '',
+                        dropoffCity: '',
+                        dropoffState: '',
+                        dropoffPostalCode: '',
+                        dropoffCountry: 'Kenya',
+                        dropoffLatitude: '',
+                        dropoffLongitude: '',
+                        callerName: '',
+                        callerPhone: '',
+                        callerNotes: '',
+                        specialInstructions: '',
+                        notes: '',
+                        estimatedDistance: '',
+                        estimatedTime: ''
+                      });
+                      setSelectedAmbulance(null);
+                      
+                      // Close modal immediately
+                      setShowDispatchModal(false);
+                      setIsDispatching(false);
+                      
+                      // Show success notification after modal closes
+                      setTimeout(() => {
+                        alert(`✅ Ambulance Dispatched Successfully!\n\n` +
+                              `Call ID: ${newEmergencyCall.id}\n` +
+                              `Ambulance: ${ambulanceToDispatch}\n` +
+                              `Patient: ${dispatchForm.patientName}\n` +
+                              `Location: ${dispatchForm.pickupAddressLine1}, ${dispatchForm.pickupCity}\n` +
+                              `Priority: ${dispatchForm.priority}`);
+                      }, 100);
+                      
+                    } catch (error) {
+                      console.error('Dispatch error:', error);
+                      setIsDispatching(false);
+                      alert('❌ Failed to dispatch ambulance. Please try again.');
+                    }
                   }}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                  disabled={isDispatching}
+                  className={`px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center ${isDispatching ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <Send className="w-4 h-4 mr-2" />
-                  Dispatch Ambulance
+                  {isDispatching ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Dispatching...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      Dispatch Ambulance
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -2336,9 +2440,14 @@ const AmbulanceManagement = () => {
           onClose={() => setShowAddDispatchModal(false)}
           onSave={(newDispatch) => {
             console.log('New dispatch created:', newDispatch);
+            // Close modal first
+            setShowAddDispatchModal(false);
             // Add the new dispatch to emergency calls
             setEmergencyCalls(prev => [newDispatch, ...prev]);
-            setShowAddDispatchModal(false);
+            // Show success message
+            setTimeout(() => {
+              alert(`✅ Dispatch Created Successfully!\n\nCall ID: ${newDispatch.id}\nPatient: ${newDispatch.patientName}`);
+            }, 100);
           }}
         />
       )}
