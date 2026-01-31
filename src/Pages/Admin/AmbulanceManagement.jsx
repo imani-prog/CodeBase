@@ -98,14 +98,14 @@ const AmbulanceManagement = () => {
   const [_liveTracking, _setLiveTracking] = useState({});
   const [isDispatching, setIsDispatching] = useState(false);
   const [dispatchForm, setDispatchForm] = useState({
-    priority: 'HIGH', // matches backend DispatchPriority enum
+    priority: 'HIGH', 
     incidentType: 'TRAFFIC_ACCIDENT',
     patientName: '',
     patientId: '',
     patientAge: '',
     condition: '',
-    // Pickup location fields (structured address)
-    pickupLocation: '', // legacy
+    
+    pickupLocation: '',
     pickupAddressLine1: '',
     pickupAddressLine2: '',
     pickupCity: '',
@@ -114,8 +114,8 @@ const AmbulanceManagement = () => {
     pickupCountry: 'Kenya',
     pickupLatitude: '',
     pickupLongitude: '',
-    // Dropoff location fields
-    destination: '', // legacy
+    
+    destination: '',
     hospitalId: '',
     dropoffAddressLine1: '',
     dropoffAddressLine2: '',
@@ -125,11 +125,11 @@ const AmbulanceManagement = () => {
     dropoffCountry: 'Kenya',
     dropoffLatitude: '',
     dropoffLongitude: '',
-    // Caller information
+    
     callerName: '',
     callerPhone: '',
     callerNotes: '',
-    // Additional fields
+   
     specialInstructions: '',
     notes: '',
     estimatedDistance: '',
@@ -364,18 +364,18 @@ const AmbulanceManagement = () => {
       priority: 'CRITICAL',
       status: 'TRANSPORTING',
       
-      // Caller information
+  
       callerName: 'Dr. Susan Mwangi',
       callerPhone: '+254712890123',
       callerNotes: 'Patient is unconscious, CPR in progress by bystanders',
       
-      // Patient information
+ 
       patientId: 'PAT-2024-045',
       patientName: 'Michael Ochieng',
       patientAge: 45,
       condition: 'Chest Pain - Suspected Myocardial Infarction',
       
-      // Pickup location (structured address matching backend)
+      
       pickupLocation: 'Mathare Shopping Center',
       pickupAddressLine1: 'Mathare Shopping Center',
       pickupAddressLine2: 'Juja Road',
@@ -386,7 +386,7 @@ const AmbulanceManagement = () => {
       pickupLatitude: -1.2541,
       pickupLongitude: 36.8749,
       
-      // Dropoff location (structured address matching backend)
+  
       destination: 'Kenyatta Hospital Emergency',
       hospitalId: 'HOSP-001',
       dropoffAddressLine1: 'Kenyatta National Hospital',
@@ -398,7 +398,6 @@ const AmbulanceManagement = () => {
       dropoffLatitude: -1.3018,
       dropoffLongitude: 36.8073,
       
-      // Timestamps (matching backend)
       requestTime: '2024-10-11T16:15:00+03:00',
       dispatchTime: '2024-10-11T16:16:30+03:00', 
       enRouteTime: '2024-10-11T16:17:45+03:00', 
@@ -407,7 +406,7 @@ const AmbulanceManagement = () => {
       arrivalAtHospitalTime: null,
       completionTime: null, 
       
-      // Legacy fields
+      
       callTime: '2024-10-11 16:15:00',
       arrivalTime: null,
       
@@ -623,7 +622,7 @@ const AmbulanceManagement = () => {
         
         Object.keys(updatedData).forEach(vehicleId => {
           const data = updatedData[vehicleId];
-          // Simulate movement for ambulances in transit (BUSY status or in_transit)
+          
           const ambulance = ambulances.find(a => a.vehicleNumber === vehicleId);
           if (ambulance && (ambulance.status === 'BUSY' || ambulance.status === 'in_transit' || ambulance.status === 'TRANSPORTING')) {
             updatedData[vehicleId] = {
@@ -639,8 +638,7 @@ const AmbulanceManagement = () => {
         
         return updatedData;
       });
-    }, 5000); // Update every 5 seconds
-
+    }, 5000);
     return () => clearInterval(interval);
   }, [ambulances]);
 
@@ -832,7 +830,7 @@ const AmbulanceManagement = () => {
       estimatedTime: ''
     });
 
-    // Show success notification
+    
     alert(`Ambulance ${ambulanceId} successfully dispatched to ${call.location}`);
   };
 
@@ -843,32 +841,29 @@ const AmbulanceManagement = () => {
       return;
     }
 
-    // Find nearest available ambulance (simplified logic)
+    
     const nearestAmbulance = availableAmbulances[0];
     handleDispatch(nearestAmbulance.vehicleNumber, call.id);
   };
 
-  // Modal handlers
   const handleEditSave = (updatedAmbulance) => {
-    // TODO: Implement API call to update ambulance
+    
     console.log('Saving updated ambulance:', updatedAmbulance);
     
   
-    // Close modal first
     setShowEditModal(false);
     setCurrentAmbulance(null);
     
-    // Show success message after modal closes
+    
     setTimeout(() => {
       alert('✅ Ambulance updated successfully!');
     }, 100);
   };
 
   const handleAddSave = (newAmbulance) => {
-    // TODO: Implement API call to add new ambulance
+  
     console.log('Adding new ambulance:', newAmbulance);
     
-    // Close modal first
     setShowAddModal(false);
     
     // Show success message after modal closes
