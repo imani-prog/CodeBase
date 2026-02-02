@@ -22,6 +22,7 @@ import {
   Mail,
   FileText
 } from 'lucide-react';
+import Pagination from '../../Components/Admin/Pagination';
 
 const AdminAppointments = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -33,6 +34,8 @@ const AdminAppointments = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   // Sample appointments data - this will come from your backend API
   const appointments = {
@@ -244,6 +247,15 @@ const AdminAppointments = () => {
     return matchesSearch && matchesStatus && matchesType && matchesTab;
   });
 
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentAppointments = filteredAppointments.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   const handleViewDetails = (appointment) => {
     setSelectedAppointment(appointment);
     setShowDetailsModal(true);
@@ -268,210 +280,359 @@ const AdminAppointments = () => {
   };
 
   const DetailsModal = () => (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Appointment Details</h2>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="relative px-8 py-6 bg-blue-950 text-white">
           <button
             onClick={() => setShowDetailsModal(false)}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
+
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
+                <Calendar className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold mb-1">{selectedAppointment?.appointmentCode}</h2>
+              <p className="text-sm text-white/80">{selectedAppointment?.patientName} • {formatDateTime(selectedAppointment?.scheduledStart).date}</p>
+            </div>
+          </div>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Appointment Code */}
-          <div className="p-4">
-            <p className="text-sm font-medium">Appointment Code</p>
-            <p className="text-xl font-bold">{selectedAppointment?.appointmentCode}</p>
+        {/* Content */}
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+          {/* Status Badge */}
+          <div className="mb-6">
+            <span className={`px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(selectedAppointment?.status)}`}>
+              {selectedAppointment?.status?.replace('_', ' ').toUpperCase()}
+            </span>
           </div>
 
-          {/* Status & Type */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Status</p>
-              <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedAppointment?.status)}`}>
-                {selectedAppointment?.status}
-              </span>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Type</p>
-              <div className="flex items-center gap-2">
-                {getTypeIcon(selectedAppointment?.type)}
-                <span className="text-sm font-medium">{selectedAppointment?.type}</span>
-              </div>
-            </div>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          {/* Patient Information */}
-          <div className="border border-gray-100 shadow-md p-4">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-600" />
-              Patient Information
-            </h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Name:</span>
-                <span className="text-sm font-medium text-gray-900">{selectedAppointment?.patientName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Patient ID:</span>
-                <span className="text-sm font-medium text-gray-900">{selectedAppointment?.patientId}</span>
-              </div>
-              {selectedAppointment?.phone && (
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Phone:</span>
-                  <span className="text-sm font-medium text-gray-900 flex items-center gap-1">
-                    <Phone className="w-4 h-4 text-blue-600" />
-                    {selectedAppointment.phone}
-                  </span>
+            {/* Patient Information */}
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <User className="w-5 h-5 mr-2 text-blue-600" />
+                Patient Information
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500">Name</p>
+                  <p className="text-sm font-medium">{selectedAppointment?.patientName}</p>
                 </div>
-              )}
-              {selectedAppointment?.email && (
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Email:</span>
-                  <span className="text-sm font-medium text-gray-900 flex items-center gap-1">
-                    <Mail className="w-4 h-4 text-blue-600" />
-                    {selectedAppointment.email}
-                  </span>
+                <div>
+                  <p className="text-xs text-gray-500">Patient ID</p>
+                  <p className="text-sm font-medium">{selectedAppointment?.patientId}</p>
                 </div>
-              )}
+                {selectedAppointment?.phone && (
+                  <div>
+                    <p className="text-xs text-gray-500">Phone</p>
+                    <p className="text-sm font-medium flex items-center">
+                      <Phone className="w-3 h-3 mr-1" />
+                      {selectedAppointment.phone}
+                    </p>
+                  </div>
+                )}
+                {selectedAppointment?.email && (
+                  <div>
+                    <p className="text-xs text-gray-500">Email</p>
+                    <p className="text-sm font-medium flex items-center">
+                      <Mail className="w-3 h-3 mr-1" />
+                      {selectedAppointment.email}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Appointment Type */}
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                Appointment Type
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  {getTypeIcon(selectedAppointment?.type)}
+                  <div>
+                    <p className="text-xs text-gray-500">Type</p>
+                    <p className="text-sm font-medium capitalize">{selectedAppointment?.type?.replace('_', ' ')}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Provider Information */}
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Users className="w-5 h-5 mr-2 text-blue-600" />
+                Provider Information
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500">Provider</p>
+                  <p className="text-sm font-medium">{selectedAppointment?.providerName}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Schedule Information */}
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Clock className="w-5 h-5 mr-2 text-blue-600" />
+                Schedule Information
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500">Start Time</p>
+                  <p className="text-sm font-medium">{formatDateTime(selectedAppointment?.scheduledStart).date}</p>
+                  <p className="text-sm font-medium text-blue-600 flex items-center">
+                    <Clock className="w-4 h-4 mr-1" />
+                    {formatDateTime(selectedAppointment?.scheduledStart).time}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">End Time</p>
+                  <p className="text-sm font-medium">{formatDateTime(selectedAppointment?.scheduledEnd).date}</p>
+                  <p className="text-sm font-medium text-blue-600 flex items-center">
+                    <Clock className="w-4 h-4 mr-1" />
+                    {formatDateTime(selectedAppointment?.scheduledEnd).time}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Location Information */}
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <MapPin className="w-5 h-5 mr-2 text-blue-600" />
+                Location Information
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500">Hospital</p>
+                  <p className="text-sm font-medium">{selectedAppointment?.hospital}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Location</p>
+                  <p className="text-sm font-medium">{selectedAppointment?.location}</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Provider Information */}
-          <div className="p-4">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
-              Provider Information
-            </h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Provider:</span>
-                <span className="text-sm font-medium">{selectedAppointment?.providerName}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Schedule Information */}
-          <div className="p-4">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-blue-600" />
-              Schedule Information
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Start Time</p>
-                <p className="text-sm font-medium">{formatDateTime(selectedAppointment?.scheduledStart).date}</p>
-                <p className="text-sm font-medium text-blue-600">{formatDateTime(selectedAppointment?.scheduledStart).time}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">End Time</p>
-                <p className="text-sm font-medium">{formatDateTime(selectedAppointment?.scheduledEnd).date}</p>
-                <p className="text-sm font-medium text-blue-600">{formatDateTime(selectedAppointment?.scheduledEnd).time}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Location Information */}
-          <div className="p-4">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-blue-600" />
-              Location Information
-            </h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Hospital:</span>
-                <span className="text-sm font-medium text-gray-900">{selectedAppointment?.hospital}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Location:</span>
-                <span className="text-sm font-medium text-gray-900">{selectedAppointment?.location}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Reason & Notes */}
+          {/* Reason for Visit */}
           {selectedAppointment?.reason && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">Reason for Visit</h3>
-              <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedAppointment.reason}</p>
+            <div className="mt-6 border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                Reason for Visit
+              </h3>
+              <p className="text-sm text-gray-700">{selectedAppointment.reason}</p>
             </div>
           )}
 
+          {/* Notes */}
           {selectedAppointment?.notes && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">Additional Notes</h3>
-              <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedAppointment.notes}</p>
+            <div className="mt-6 border-l-4 border-blue-500 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                Notes
+              </h3>
+              <p className="text-sm text-gray-700">{selectedAppointment.notes}</p>
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-6 pt-4 border-t border-gray-200">
+        </div>
+
+        {/* Footer */}
+        <div className="bg-gray-50 px-4 py-2 flex justify-end space-x-3 border-t">
+          {['SCHEDULED', 'CONFIRMED'].includes(selectedAppointment?.status) && (
             <button
-              onClick={() => handleAssignProvider(selectedAppointment)}
-              className="flex-1 w-1/2 ml-20 bg-blue-600 text-white px-1 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+              onClick={() => {
+                setShowDetailsModal(false);
+                handleCancelAppointment(selectedAppointment);
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
             >
-              <Edit className="w-4 h-4" />
-              Assign/Update
+              <XCircle className="w-4 h-4" />
+              Cancel
             </button>
-            {['SCHEDULED', 'CONFIRMED'].includes(selectedAppointment?.status) && (
-              <button
-                onClick={() => handleCancelAppointment(selectedAppointment)}
-                className="flex-1 mr-20 bg-red-600 text-white px-1 py-2 rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2"
-              >
-                <XCircle className="w-4 h-4" />
-                Cancel
-              </button>
-            )}
-          </div>
+          )}
+          <button
+            onClick={() => {
+              setShowDetailsModal(false);
+              handleAssignProvider(selectedAppointment);
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <Edit className="w-4 h-4" />
+            Assign/Update
+          </button>
+          <button
+            onClick={() => setShowDetailsModal(false)}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
   );
 
   const AssignModal = () => (
-    <div className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Assign/Update Appointment</h2>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="relative px-6 py-4 bg-blue-950 text-white">
           <button
             onClick={() => setShowAssignModal(false)}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
+          <h2 className="text-xl font-bold">Edit Appointment</h2>
         </div>
 
-        <div className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Provider Name</label>
-            <input
-              type="text"
-              defaultValue={selectedAppointment?.providerName}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+        <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-180px)]">
+          {/* Patient Information */}
+          <div className="border border-gray-200 p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+              <User className="w-5 h-5 mr-2 text-blue-600" />
+              Patient Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Patient Name</label>
+                <input
+                  type="text"
+                  defaultValue={selectedAppointment?.patientName}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Patient ID</label>
+                <input
+                  type="text"
+                  defaultValue={selectedAppointment?.patientId}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50"
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input
+                  type="tel"
+                  defaultValue={selectedAppointment?.phone}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  defaultValue={selectedAppointment?.email}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-            <select
-              defaultValue={selectedAppointment?.status}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {statusTypes.filter(s => s !== 'all').map(status => (
-                <option key={status} value={status}>{status}</option>
-              ))}
-            </select>
+          {/* Appointment Details */}
+          <div className="border border-gray-200 p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+              <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+              Appointment Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Appointment Type</label>
+                <select
+                  defaultValue={selectedAppointment?.type}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  {appointmentTypes.filter(t => t !== 'all').map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <select
+                  defaultValue={selectedAppointment?.status}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  {statusTypes.filter(s => s !== 'all').map(status => (
+                    <option key={status} value={status}>{status}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Start Date & Time</label>
+                <input
+                  type="datetime-local"
+                  defaultValue={selectedAppointment?.scheduledStart?.substring(0, 16)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">End Date & Time</label>
+                <input
+                  type="datetime-local"
+                  defaultValue={selectedAppointment?.scheduledEnd?.substring(0, 16)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
           </div>
 
+          {/* Provider & Location */}
+          <div className="border border-gray-200 p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+              <MapPin className="w-5 h-5 mr-2 text-blue-600" />
+              Provider & Location
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Provider Name</label>
+                <input
+                  type="text"
+                  defaultValue={selectedAppointment?.providerName}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Hospital/Facility</label>
+                <input
+                  type="text"
+                  defaultValue={selectedAppointment?.hospital}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Location/Room</label>
+                <input
+                  type="text"
+                  defaultValue={selectedAppointment?.location}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Information */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Location/Room</label>
-            <input
-              type="text"
-              defaultValue={selectedAppointment?.location}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <label className="block text-sm font-medium text-gray-700 mb-2">Reason for Visit</label>
+            <textarea
+              defaultValue={selectedAppointment?.reason}
+              rows={2}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
@@ -480,38 +641,46 @@ const AdminAppointments = () => {
             <textarea
               defaultValue={selectedAppointment?.notes}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
+        </div>
 
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={() => {
-                // API call to update appointment
-                console.log('Updating appointment:', selectedAppointment.id);
-                setShowAssignModal(false);
-              }}
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              Save Changes
-            </button>
-            <button
-              onClick={() => setShowAssignModal(false)}
-              className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
-            >
-              Cancel
-            </button>
-          </div>
+        {/* Footer */}
+        <div className="bg-gray-50 px-4 py-2 flex justify-end space-x-3 border-t">
+          <button
+            onClick={() => setShowAssignModal(false)}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              // API call to update appointment
+              console.log('Updating appointment:', selectedAppointment.id);
+              setShowAssignModal(false);
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Save Changes
+          </button>
         </div>
       </div>
     </div>
   );
 
   const CancelModal = () => (
-    <div className="fixed inset-0  bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Cancel Appointment</h2>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white shadow-2xl max-w-md w-full overflow-hidden">
+        {/* Header */}
+        <div className="relative px-6 py-4 bg-blue-950 text-white">
+          <button
+            onClick={() => setShowCancelModal(false)}
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <h2 className="text-xl font-bold">Cancel Appointment</h2>
         </div>
 
         <div className="p-6 space-y-4">
@@ -526,51 +695,64 @@ const AdminAppointments = () => {
             <textarea
               rows={3}
               placeholder="Enter reason for cancellation..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
+        </div>
 
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={() => {
-                // API call to cancel appointment
-                console.log('Cancelling appointment:', selectedAppointment.id);
-                setShowCancelModal(false);
-              }}
-              className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-            >
-              Confirm Cancel
-            </button>
-            <button
-              onClick={() => setShowCancelModal(false)}
-              className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
-            >
-              Keep Appointment
-            </button>
-          </div>
+        {/* Footer */}
+        <div className="bg-gray-50 px-4 py-2 flex justify-end space-x-3 border-t">
+          <button
+            onClick={() => setShowCancelModal(false)}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Keep Appointment
+          </button>
+          <button
+            onClick={() => {
+              // API call to cancel appointment
+              console.log('Cancelling appointment:', selectedAppointment.id);
+              setShowCancelModal(false);
+            }}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Confirm Cancel
+          </button>
         </div>
       </div>
     </div>
   );
 
   const CreateAppointmentModal = () => (
-    <div className="fixed inset-0  bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Create New Appointment</h2>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="relative px-8 py-6 bg-blue-950 text-white">
           <button
             onClick={() => setShowCreateModal(false)}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
+
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
+                <Plus className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold mb-1">Create New Appointment</h2>
+              <p className="text-sm text-white/80">Schedule a new appointment for a patient</p>
+            </div>
+          </div>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-200px)]">
           {/* Patient Information */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-600" />
+          <div className="border border-gray-200 p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+              <User className="w-5 h-5 mr-2 text-blue-600" />
               Patient Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -579,7 +761,7 @@ const AdminAppointments = () => {
                 <input
                   type="text"
                   placeholder="PT-2023-001"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 />
               </div>
@@ -588,7 +770,7 @@ const AdminAppointments = () => {
                 <input
                   type="text"
                   placeholder="Full Name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 />
               </div>
@@ -597,7 +779,7 @@ const AdminAppointments = () => {
                 <input
                   type="tel"
                   placeholder="+254 712 345 678"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -605,23 +787,23 @@ const AdminAppointments = () => {
                 <input
                   type="email"
                   placeholder="patient@example.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Appointment Details */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-blue-600" />
+          <div className="border border-gray-200 p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+              <Calendar className="w-5 h-5 mr-2 text-blue-600" />
               Appointment Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Appointment Type *</label>
                 <select
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 >
                   <option value="">Select Type</option>
@@ -633,7 +815,7 @@ const AdminAppointments = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                 <select
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   defaultValue="SCHEDULED"
                 >
                   {statusTypes.filter(s => s !== 'all').map(status => (
@@ -645,7 +827,7 @@ const AdminAppointments = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Start Date & Time *</label>
                 <input
                   type="datetime-local"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 />
               </div>
@@ -653,7 +835,7 @@ const AdminAppointments = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">End Date & Time *</label>
                 <input
                   type="datetime-local"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 />
               </div>
@@ -661,9 +843,9 @@ const AdminAppointments = () => {
           </div>
 
           {/* Provider & Location */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-blue-600" />
+          <div className="border border-gray-200 p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+              <MapPin className="w-5 h-5 mr-2 text-blue-600" />
               Provider & Location
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -672,7 +854,7 @@ const AdminAppointments = () => {
                 <input
                   type="text"
                   placeholder="Dr. John Doe"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 />
               </div>
@@ -681,7 +863,7 @@ const AdminAppointments = () => {
                 <input
                   type="text"
                   placeholder="Nairobi Health Center"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -689,7 +871,7 @@ const AdminAppointments = () => {
                 <input
                   type="text"
                   placeholder="Room 204"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -697,7 +879,7 @@ const AdminAppointments = () => {
                 <input
                   type="number"
                   placeholder="1"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -709,7 +891,7 @@ const AdminAppointments = () => {
             <textarea
               rows={2}
               placeholder="Describe the reason for the appointment..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               required
             />
           </div>
@@ -719,7 +901,7 @@ const AdminAppointments = () => {
             <textarea
               rows={3}
               placeholder="Any additional information or special instructions..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
@@ -735,26 +917,27 @@ const AdminAppointments = () => {
             </label>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button
-              onClick={() => {
-                // API call to create appointment
-                console.log('Creating new appointment');
-                setShowCreateModal(false);
-              }}
-              className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
-            >
-              <CheckCircle className="w-5 h-5" />
-              Create Appointment
-            </button>
-            <button
-              onClick={() => setShowCreateModal(false)}
-              className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
-            >
-              Cancel
-            </button>
-          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="bg-gray-50 px-4 py-2 flex justify-end space-x-3 border-t">
+          <button
+            onClick={() => setShowCreateModal(false)}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              // API call to create appointment
+              console.log('Creating new appointment');
+              setShowCreateModal(false);
+            }}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+          >
+            <CheckCircle className="w-5 h-5" />
+            Create Appointment
+          </button>
         </div>
       </div>
     </div>
@@ -784,65 +967,69 @@ const AdminAppointments = () => {
         })}
       </div>
 
-      {/* Filters and Search */}
-      <div className="bg-white p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search appointments..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+      
+        {/* Filters and Search */}
+        <div className="bg-white p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search appointments..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
+
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="all">All Statuses</option>
+              {statusTypes.filter(s => s !== 'all').map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="all">All Types</option>
+              {appointmentTypes.filter(t => t !== 'all').map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+
+            {/* Wrap both buttons in a container aligned to the right */}
+            <div className="md:col-span-2 flex gap-2 justify-end items-center">
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition inline-flex items-center gap-1.5 text-sm whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                New Appointment
+              </button>
+
+              <button className="bg-gray-600 text-white py-2 px-3 rounded-lg hover:bg-gray-700 transition inline-flex items-center gap-1.5 text-sm whitespace-nowrap">
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+            </div>
           </div>
-
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">All Statuses</option>
-            {statusTypes.filter(s => s !== 'all').map(status => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
-
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">All Types</option>
-            {appointmentTypes.filter(t => t !== 'all').map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white ml-25 px-1 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            New Appointment
-          </button>
-
-          <button className="bg-gray-600 ml-20 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center justify-center gap-2">
-            <Download className="w-5 h-5" />
-            Export
-          </button>
         </div>
-      </div>
 
       {/* Tabs */}
-      <div className="bg-white shadow-sm border border-gray-200 mb-6">
+      <div className="mb-6">
         <div className="flex overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 min-w-[150px] px-6 py-4 font-medium border-b-2 transition ${
+              className={`flex-1 min-w-[150px] px-6 py-4 font-semibold border-b-2 transition ${
                 activeTab === tab.id
                   ? 'border-blue-600 text-blue-600 bg-blue-50'
                   : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -883,7 +1070,7 @@ const AdminAppointments = () => {
                   </td>
                 </tr>
               ) : (
-                filteredAppointments.map((appointment) => {
+                currentAppointments.map((appointment) => {
                   const { date, time } = formatDateTime(appointment.scheduledStart);
                   return (
                     <tr key={appointment.id} className="hover:bg-gray-50 transition">
@@ -963,6 +1150,15 @@ const AdminAppointments = () => {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalItems={filteredAppointments.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+        itemName="appointments"
+      />
 
       {/* Modals */}
       {showDetailsModal && <DetailsModal />}
