@@ -43,138 +43,200 @@ const AdminAppointments = () => {
       {
         id: 1,
         appointmentCode: 'APT-2024-001234',
-        patientName: 'Sarah Wanjiru',
+        // Patient Info
         patientId: 'PT-2023-001',
-        providerName: 'Dr. John Kamau',
-        type: 'CONSULTATION',
+        patientName: 'Sarah Wanjiru',
+        phone: '+254 712 345 678',
+        email: 'sarah.wanjiru@example.com',
+        // Hospital Info
+        hospitalId: 1,
+        hospital: 'Nairobi Health Center',
+        // Scheduling
         scheduledStart: '2024-10-25T10:00:00',
         scheduledEnd: '2024-10-25T10:30:00',
-        hospital: 'Nairobi Health Center',
-        location: 'Room 204',
+        checkInTime: null,
+        checkOutTime: null,
+        // Classification
         status: 'SCHEDULED',
+        type: 'CONSULTATION',
+        // Details
+        providerName: 'Dr. John Kamau',
+        room: '204',
+        location: 'Outpatient Department',
         reason: 'Annual checkup',
         notes: 'Patient requested morning slot',
-        phone: '+254 712 345 678',
-        email: 'sarah.wanjiru@example.com'
+        reminderSent: true,
+        // Audit
+        createdAt: '2024-10-20T08:00:00',
+        updatedAt: '2024-10-20T08:00:00'
       },
       {
         id: 2,
         appointmentCode: 'APT-2024-001235',
-        patientName: 'John Mwangi',
         patientId: 'PT-2023-045',
-        providerName: 'Dr. Mary Ochieng',
-        type: 'FOLLOW_UP',
+        patientName: 'John Mwangi',
+        phone: '+254 723 456 789',
+        email: 'john.mwangi@example.com',
+        hospitalId: 2,
+        hospital: 'Kiambu Medical Center',
         scheduledStart: '2024-10-25T14:00:00',
         scheduledEnd: '2024-10-25T14:45:00',
-        hospital: 'Kiambu Medical Center',
-        location: 'Cardiology Dept',
+        checkInTime: null,
+        checkOutTime: null,
         status: 'CONFIRMED',
+        type: 'FOLLOW_UP',
+        providerName: 'Dr. Mary Ochieng',
+        room: 'Ward B',
+        location: 'Cardiology Dept',
         reason: 'Follow-up consultation',
         notes: 'Review test results',
-        phone: '+254 723 456 789',
-        email: 'john.mwangi@example.com'
+        reminderSent: true,
+        createdAt: '2024-10-21T09:30:00',
+        updatedAt: '2024-10-21T10:00:00'
       },
       {
         id: 3,
         appointmentCode: 'APT-2024-001236',
-        patientName: 'Grace Akinyi',
         patientId: 'PT-2023-089',
-        providerName: 'Nurse Jane Ochieng',
-        type: 'TELEHEALTH',
+        patientName: 'Grace Akinyi',
+        phone: '+254 734 567 890',
+        email: 'grace.akinyi@example.com',
+        hospitalId: 3,
+        hospital: 'Virtual Clinic',
         scheduledStart: '2024-10-26T09:00:00',
         scheduledEnd: '2024-10-26T09:30:00',
-        hospital: 'Virtual Clinic',
-        location: 'Video Consultation',
+        checkInTime: '2024-10-26T08:55:00',
+        checkOutTime: null,
         status: 'IN_PROGRESS',
+        type: 'TELEHEALTH',
+        providerName: 'Nurse Jane Ochieng',
+        room: 'Virtual',
+        location: 'Telehealth Department',
         reason: 'Prenatal checkup',
         notes: 'Third trimester follow-up',
-        phone: '+254 734 567 890',
-        email: 'grace.akinyi@example.com'
+        reminderSent: true,
+        createdAt: '2024-10-22T11:00:00',
+        updatedAt: '2024-10-26T08:55:00'
       },
       {
         id: 4,
         appointmentCode: 'APT-2024-001237',
-        patientName: 'Peter Odhiambo',
         patientId: 'PT-2023-112',
-        providerName: 'Dr. Sarah Kamau',
-        type: 'LAB_TEST',
+        patientName: 'Peter Odhiambo',
+        phone: '+254 745 678 901',
+        email: 'peter.odhiambo@example.com',
+        hospitalId: 1,
+        hospital: 'Nairobi Health Center',
         scheduledStart: '2024-10-27T11:00:00',
         scheduledEnd: '2024-10-27T11:30:00',
-        hospital: 'Nairobi Health Center',
-        location: 'Laboratory',
+        checkInTime: '2024-10-27T10:50:00',
+        checkOutTime: null,
         status: 'CHECKED_IN',
+        type: 'LAB_TEST',
+        providerName: 'Dr. Sarah Kamau',
+        room: 'Lab 1',
+        location: 'Laboratory',
         reason: 'Blood test',
         notes: 'Fasting required',
-        phone: '+254 745 678 901',
-        email: 'peter.odhiambo@example.com'
+        reminderSent: true,
+        createdAt: '2024-10-23T14:20:00',
+        updatedAt: '2024-10-27T10:50:00'
       },
       {
         id: 5,
         appointmentCode: 'APT-2024-001238',
-        patientName: 'Mary Njoki',
         patientId: 'PT-2023-156',
-        providerName: 'Dr. David Kibet',
-        type: 'CONSULTATION',
+        patientName: 'Mary Njoki',
+        phone: '+254 756 789 012',
+        email: 'mary.njoki@example.com',
+        hospitalId: 4,
+        hospital: 'Machakos County Hospital',
         scheduledStart: '2024-10-22T10:30:00',
         scheduledEnd: '2024-10-22T11:00:00',
-        hospital: 'Machakos County Hospital',
-        location: 'Room 301',
+        checkInTime: '2024-10-22T10:25:00',
+        checkOutTime: '2024-10-22T10:55:00',
         status: 'COMPLETED',
+        type: 'CONSULTATION',
+        providerName: 'Dr. David Kibet',
+        room: '301',
+        location: 'General Medicine',
         reason: 'General checkup',
         notes: 'Patient satisfied with consultation',
-        phone: '+254 756 789 012',
-        email: 'mary.njoki@example.com'
+        reminderSent: true,
+        createdAt: '2024-10-18T09:00:00',
+        updatedAt: '2024-10-22T10:55:00'
       },
       {
         id: 6,
         appointmentCode: 'APT-2024-001239',
-        patientName: 'James Otieno',
         patientId: 'PT-2023-201',
-        providerName: 'Dr. Anne Wambui',
-        type: 'SURGERY',
+        patientName: 'James Otieno',
+        phone: '+254 767 890 123',
+        email: 'james.otieno@example.com',
+        hospitalId: 5,
+        hospital: 'Kenyatta National Hospital',
         scheduledStart: '2024-10-28T08:00:00',
         scheduledEnd: '2024-10-28T10:00:00',
-        hospital: 'Kenyatta National Hospital',
-        location: 'Operating Theater 2',
+        checkInTime: null,
+        checkOutTime: null,
         status: 'SCHEDULED',
+        type: 'SURGERY',
+        providerName: 'Dr. Anne Wambui',
+        room: 'Theater 2',
+        location: 'Operating Theater',
         reason: 'Minor surgery',
         notes: 'Pre-op completed',
-        phone: '+254 767 890 123',
-        email: 'james.otieno@example.com'
+        reminderSent: false,
+        createdAt: '2024-10-15T16:00:00',
+        updatedAt: '2024-10-15T16:00:00'
       },
       {
         id: 7,
         appointmentCode: 'APT-2024-001240',
-        patientName: 'Lucy Wambui',
         patientId: 'PT-2023-178',
-        providerName: 'Dr. Michael Njoroge',
-        type: 'CONSULTATION',
+        patientName: 'Lucy Wambui',
+        phone: '+254 778 901 234',
+        email: 'lucy.wambui@example.com',
+        hospitalId: 6,
+        hospital: 'Nakuru General Hospital',
         scheduledStart: '2024-10-20T15:00:00',
         scheduledEnd: '2024-10-20T15:30:00',
-        hospital: 'Nakuru General Hospital',
-        location: 'Room 105',
+        checkInTime: null,
+        checkOutTime: null,
         status: 'CANCELED',
+        type: 'CONSULTATION',
+        providerName: 'Dr. Michael Njoroge',
+        room: '105',
+        location: 'Outpatient Department',
         reason: 'General checkup',
         notes: 'Patient requested reschedule due to work emergency',
-        phone: '+254 778 901 234',
-        email: 'lucy.wambui@example.com'
+        reminderSent: true,
+        createdAt: '2024-10-17T12:00:00',
+        updatedAt: '2024-10-19T14:00:00'
       },
       {
         id: 8,
         appointmentCode: 'APT-2024-001241',
-        patientName: 'Robert Kimani',
         patientId: 'PT-2023-234',
-        providerName: 'Dr. Elizabeth Nyambura',
-        type: 'VACCINATION',
+        patientName: 'Robert Kimani',
+        phone: '+254 789 012 345',
+        email: 'robert.kimani@example.com',
+        hospitalId: 7,
+        hospital: 'Mombasa Medical Center',
         scheduledStart: '2024-10-24T13:00:00',
         scheduledEnd: '2024-10-24T13:15:00',
-        hospital: 'Mombasa Medical Center',
-        location: 'Vaccination Room',
+        checkInTime: '2024-10-24T12:55:00',
+        checkOutTime: '2024-10-24T13:10:00',
         status: 'COMPLETED',
+        type: 'VACCINATION',
+        providerName: 'Dr. Elizabeth Nyambura',
+        room: 'Vacc 1',
+        location: 'Vaccination Room',
         reason: 'COVID-19 booster',
         notes: 'No adverse reactions',
-        phone: '+254 789 012 345',
-        email: 'robert.kimani@example.com'
+        reminderSent: true,
+        createdAt: '2024-10-20T10:00:00',
+        updatedAt: '2024-10-24T13:10:00'
       }
     ]
   };
@@ -420,8 +482,74 @@ const AdminAppointments = () => {
                   <p className="text-sm font-medium">{selectedAppointment?.hospital}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Location</p>
+                  <p className="text-xs text-gray-500">Department/Location</p>
                   <p className="text-sm font-medium">{selectedAppointment?.location}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Room</p>
+                  <p className="text-sm font-medium">{selectedAppointment?.room || 'N/A'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Check-in/Check-out Information */}
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Clock className="w-5 h-5 mr-2 text-blue-600" />
+                Attendance
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500">Check-in Time</p>
+                  <p className="text-sm font-medium">
+                    {selectedAppointment?.checkInTime 
+                      ? formatDateTime(selectedAppointment.checkInTime).time
+                      : 'Not checked in'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Check-out Time</p>
+                  <p className="text-sm font-medium">
+                    {selectedAppointment?.checkOutTime 
+                      ? formatDateTime(selectedAppointment.checkOutTime).time
+                      : 'Not checked out'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Reminder Sent</p>
+                  <p className="text-sm font-medium">
+                    {selectedAppointment?.reminderSent ? (
+                      <span className="text-green-600">✓ Yes</span>
+                    ) : (
+                      <span className="text-gray-400">✗ No</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Audit Information */}
+            <div className="border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+                Timeline
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500">Created At</p>
+                  <p className="text-sm font-medium">
+                    {selectedAppointment?.createdAt 
+                      ? formatDateTime(selectedAppointment.createdAt).date + ' ' + formatDateTime(selectedAppointment.createdAt).time
+                      : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Last Updated</p>
+                  <p className="text-sm font-medium">
+                    {selectedAppointment?.updatedAt 
+                      ? formatDateTime(selectedAppointment.updatedAt).date + ' ' + formatDateTime(selectedAppointment.updatedAt).time
+                      : 'N/A'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -616,10 +744,19 @@ const AdminAppointments = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location/Room</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Department/Location</label>
                 <input
                   type="text"
                   defaultValue={selectedAppointment?.location}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Room Number</label>
+                <input
+                  type="text"
+                  defaultValue={selectedAppointment?.room}
+                  placeholder="e.g., 204"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
@@ -643,6 +780,19 @@ const AdminAppointments = () => {
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
+          </div>
+
+          {/* Reminder Checkbox */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="reminderSentEdit"
+              defaultChecked={selectedAppointment?.reminderSent}
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="reminderSentEdit" className="text-sm text-gray-700">
+              Reminder sent to patient
+            </label>
           </div>
         </div>
 
@@ -690,12 +840,44 @@ const AdminAppointments = () => {
             </p>
           </div>
 
+          {/* Appointment Details Summary */}
+          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <h4 className="text-sm font-semibold text-gray-900 mb-3">Appointment Details</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Code:</span>
+                <span className="font-medium">{selectedAppointment?.appointmentCode}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Type:</span>
+                <span className="font-medium">{selectedAppointment?.type}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Date:</span>
+                <span className="font-medium">{formatDateTime(selectedAppointment?.scheduledStart).date}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Time:</span>
+                <span className="font-medium">{formatDateTime(selectedAppointment?.scheduledStart).time}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Provider:</span>
+                <span className="font-medium">{selectedAppointment?.providerName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Location:</span>
+                <span className="font-medium">{selectedAppointment?.hospital}</span>
+              </div>
+            </div>
+          </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Cancellation Reason</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Cancellation Reason *</label>
             <textarea
               rows={3}
               placeholder="Enter reason for cancellation..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              required
             />
           </div>
         </div>
@@ -867,10 +1049,18 @@ const AdminAppointments = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location/Room</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Department/Location</label>
                 <input
                   type="text"
-                  placeholder="Room 204"
+                  placeholder="Outpatient Department"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Room Number</label>
+                <input
+                  type="text"
+                  placeholder="204"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
@@ -956,7 +1146,7 @@ const AdminAppointments = () => {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white shadow-sm border border-gray-200 p-6">
+            <div key={index} className="shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-semibold">{stat.label}</p>
                 <Icon className={`w-8 h-8 text-${stat.color}-600`} />
@@ -969,7 +1159,7 @@ const AdminAppointments = () => {
 
       
         {/* Filters and Search */}
-        <div className="bg-white p-6 mb-6">
+        <div className="p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -1112,7 +1302,7 @@ const AdminAppointments = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
                           <p className="text-sm font-medium">{appointment.hospital}</p>
-                          <p className="text-xs text-gray-500">{appointment.location}</p>
+                          <p className="text-xs text-gray-500">{appointment.location} {appointment.room ? `• Room ${appointment.room}` : ''}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
