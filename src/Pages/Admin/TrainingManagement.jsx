@@ -42,6 +42,10 @@ import {
   UserCheck,
   Building
 } from 'lucide-react';
+import CreateCourseModal from '../../Components/Admin/CreateCourseModal';
+import BulkEnrollmentModal from '../../Components/Admin/BulkEnrollmentModal';
+import IssueCertificatesModal from '../../Components/Admin/IssueCertificatesModal';
+import ExportReportsModal from '../../Components/Admin/ExportReportsModal';
 
 
 const TrainingManagement = () => {
@@ -49,6 +53,12 @@ const TrainingManagement = () => {
   const [_selectedPeriod, _setSelectedPeriod] = useState('this-month');
   const [searchTerm, setSearchTerm] = useState('');
   const [courseFilter, setCourseFilter] = useState('all');
+
+  // Modal states
+  const [showCreateCourseModal, setShowCreateCourseModal] = useState(false);
+  const [showBulkEnrollmentModal, setShowBulkEnrollmentModal] = useState(false);
+  const [showIssueCertificatesModal, setShowIssueCertificatesModal] = useState(false);
+  const [showExportReportsModal, setShowExportReportsModal] = useState(false);
 
   // Sample training courses data with your provided structure
   const trainingCourses = [
@@ -543,19 +553,31 @@ const TrainingManagement = () => {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold ">Training Overview</h2>
         <div className="flex items-center gap-2">
-          <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => setShowCreateCourseModal(true)}
+            className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <Plus className="w-4 h-4 mr-1.5" />
             Create Course
           </button>
-          <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => setShowBulkEnrollmentModal(true)}
+            className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <UserPlus className="w-4 h-4 mr-1.5" />
             Bulk Enrollment
           </button>
-          <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => setShowIssueCertificatesModal(true)}
+            className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <Award className="w-4 h-4 mr-1.5" />
             Issue Certificates
           </button>
-          <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => setShowExportReportsModal(true)}
+            className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <Download className="w-4 h-4 mr-1.5" />
             Export Reports
           </button>
@@ -571,11 +593,11 @@ const TrainingManagement = () => {
               <p className="text-3xl font-bold">{trainingOverview.totalCourses}</p>
               <div className="flex items-center mt-2">
                 <BookOpen className="w-4 h-4 text-blue-500 mr-1" />
-                <span className="text-sm text-blue-600">{trainingOverview.activeCourses} active</span>
+                <span className="text-sm">{trainingOverview.activeCourses} active</span>
               </div>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
-              <GraduationCap className="w-10 h-10 text-blue-600" />
+              <GraduationCap className="w-10 h-10" />
             </div>
           </div>
         </div>
@@ -587,7 +609,7 @@ const TrainingManagement = () => {
               <p className="text-3xl font-bold">{trainingOverview.totalStudents}</p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="w-4 h-4 text-blue-500 mr-1" />
-                <span className="text-sm text-blue-600">+{trainingOverview.monthlyGrowth}% this month</span>
+                <span className="text-sm ">+{trainingOverview.monthlyGrowth}% this month</span>
               </div>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
@@ -603,7 +625,7 @@ const TrainingManagement = () => {
               <p className="text-3xl font-bold">{formatCurrency(trainingOverview.totalRevenue)}</p>
               <div className="flex items-center mt-2">
                 <DollarSign className="w-4 h-4 text-blue-500 mr-1" />
-                <span className="text-sm text-blue-600">From training programs</span>
+                <span className="text-sm">From training programs</span>
               </div>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
@@ -619,7 +641,7 @@ const TrainingManagement = () => {
               <p className="text-3xl font-bold">{trainingOverview.certificatesIssued}</p>
               <div className="flex items-center mt-2">
                 <Award className="w-4 h-4 text-blue-500 mr-1" />
-                <span className="text-sm text-blue-600">{trainingOverview.avgCompletionRate.toFixed(1)}% completion</span>
+                <span className="text-sm">{trainingOverview.avgCompletionRate.toFixed(1)}% completion</span>
               </div>
             </div>
             <div className="w-12 h-12 flex items-center justify-center">
@@ -637,7 +659,7 @@ const TrainingManagement = () => {
             {enrollmentTrends.map((trend, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium ">{trend.month} 2024</p>
+                  <p className="font-medium ">{trend.month} 2025</p>
                   <p className="text-sm text-gray-600">{trend.enrollments} new students</p>
                 </div>
                 <div className="text-right">
@@ -1492,8 +1514,55 @@ const TrainingManagement = () => {
     );
   };
 
+  // Modal handlers
+  const handleSaveCourse = (courseData) => {
+    console.log('New course created:', courseData);
+    // Add logic to save course to backend/state
+  };
+
+  const handleBulkEnroll = (enrollmentData) => {
+    console.log('Bulk enrollment:', enrollmentData);
+    // Add logic to process bulk enrollment
+  };
+
+  const handleIssueCertificates = (certificateData) => {
+    console.log('Certificates issued:', certificateData);
+    // Add logic to issue certificates
+  };
+
+  const handleExportReport = (reportData) => {
+    console.log('Report exported:', reportData);
+    // Add logic to generate and download report
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Modals */}
+      <CreateCourseModal 
+        showModal={showCreateCourseModal}
+        setShowModal={setShowCreateCourseModal}
+        onSaveCourse={handleSaveCourse}
+      />
+      <BulkEnrollmentModal 
+        showModal={showBulkEnrollmentModal}
+        setShowModal={setShowBulkEnrollmentModal}
+        courses={trainingCourses}
+        onBulkEnroll={handleBulkEnroll}
+      />
+      <IssueCertificatesModal 
+        showModal={showIssueCertificatesModal}
+        setShowModal={setShowIssueCertificatesModal}
+        courses={trainingCourses}
+        students={[]} 
+        onIssueCertificates={handleIssueCertificates}
+      />
+      <ExportReportsModal 
+        showModal={showExportReportsModal}
+        setShowModal={setShowExportReportsModal}
+        courses={trainingCourses}
+        onExportReport={handleExportReport}
+      />
+
       <div className="">
         <div className="">
           {/* Header Section */}
@@ -1511,7 +1580,7 @@ const TrainingManagement = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="border border-gray-200 mb-6">
+          <div className=" mb-6">
             <div className="flex overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -1522,7 +1591,7 @@ const TrainingManagement = () => {
                     className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600 bg-blue-50'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        : 'border-transparent  hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     <Icon className="w-4 h-4 mr-2" />
