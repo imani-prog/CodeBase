@@ -191,7 +191,7 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport }
                             value={type.value}
                             checked={formData.reportType === type.value}
                             onChange={handleChange}
-                            className="mt-1 w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                            className="mt-1 w-4 h-4  "
                           />
                           <div className="ml-3 flex-1">
                             <p className="font-medium text-gray-900">{type.label}</p>
@@ -351,7 +351,7 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport }
                               type="checkbox"
                               checked={formData.selectedCourses.includes(course.id)}
                               onChange={() => handleCourseToggle(course.id)}
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                              className="w-4 h-4 text-blue-600 rounded "
                             />
                             <span className="ml-3 text-sm text-gray-900">{course.title}</span>
                           </label>
@@ -403,7 +403,7 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport }
                 /* Success Display */
                 <div className="py-8">
                   <div className="text-center mb-6">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                    <div className="w-16 h-16 mx-auto mb-4  flex items-center justify-center">
                       <CheckCircle className="w-10 h-10 text-green-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Report Generated!</h3>
@@ -427,17 +427,19 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport }
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // Trigger download
-                      console.log('Downloading report...');
-                    }}
-                    className="w-full mt-6 flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                  >
-                    <Download className="w-5 h-5 mr-2" />
-                    Download Report
-                  </button>
+                  <div className="flex justify-center mt-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        
+                        console.log('Downloading report...');
+                      }}
+                      className="flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Report
+                    </button>
+                  </div>
                 </div>
               )}
 

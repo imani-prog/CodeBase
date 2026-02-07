@@ -40,28 +40,40 @@ import {
   CreditCard,
   TrendingDown,
   UserCheck,
+  User,
   Building
 } from 'lucide-react';
 import CreateCourseModal from '../../Components/Admin/CreateCourseModal';
 import BulkEnrollmentModal from '../../Components/Admin/BulkEnrollmentModal';
 import IssueCertificatesModal from '../../Components/Admin/IssueCertificatesModal';
 import ExportReportsModal from '../../Components/Admin/ExportReportsModal';
+import CourseDetailsModal from '../../Components/Admin/CourseDetailsModal';
+import EditCourseModal from '../../Components/Admin/EditCourseModal';
+import ConfirmationModal from '../../Components/Admin/ConfirmationModal';
+import StudentDetailsModal from '../../Components/Admin/StudentDetailsModal';
 
 
 const TrainingManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [_selectedPeriod, _setSelectedPeriod] = useState('this-month');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [courseFilter, setCourseFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');  const [courseFilter, setCourseFilter] = useState('all');
+  const [actionFeedback, setActionFeedback] = useState({ show: false, message: '', type: '' });
 
   // Modal states
   const [showCreateCourseModal, setShowCreateCourseModal] = useState(false);
   const [showBulkEnrollmentModal, setShowBulkEnrollmentModal] = useState(false);
   const [showIssueCertificatesModal, setShowIssueCertificatesModal] = useState(false);
   const [showExportReportsModal, setShowExportReportsModal] = useState(false);
+  const [showCourseDetailsModal, setShowCourseDetailsModal] = useState(false);
+  const [showEditCourseModal, setShowEditCourseModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showStudentDetailsModal, setShowStudentDetailsModal] = useState(false);
+  const [confirmationAction, setConfirmationAction] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   // Sample training courses data with your provided structure
-  const trainingCourses = [
+  const [trainingCourses, setTrainingCourses] = useState([
     {
       id: 1,
       title: "Community Health Worker Certification",
@@ -310,7 +322,19 @@ const TrainingManagement = () => {
       maxStudents: 200,
       passRate: 96
     }
-  ];
+  ]);
+
+  // Student enrollment data
+  const [enrolledStudents, _setEnrolledStudents] = useState([
+    { id: 1, name: 'Sarah Wanjiru', email: 'sarah.w@example.com', phone: '+254 712 345 678', courseId: 1, enrollmentDate: '2024-06-20', progress: 85, score: 92, status: 'Active', lastActivity: '2024-10-15' },
+    { id: 2, name: 'John Kamau', email: 'john.k@example.com', phone: '+254 723 456 789', courseId: 2, enrollmentDate: '2024-07-05', progress: 72, score: 88, status: 'Active', lastActivity: '2024-10-14' },
+    { id: 3, name: 'Mary Akinyi', email: 'mary.a@example.com', phone: '+254 734 567 890', courseId: 1, enrollmentDate: '2024-06-15', progress: 100, score: 95, status: 'Completed', lastActivity: '2024-09-30' },
+    { id: 4, name: 'Peter Omondi', email: 'peter.o@example.com', phone: '+254 745 678 901', courseId: 3, enrollmentDate: '2024-08-01', progress: 45, score: 78, status: 'Active', lastActivity: '2024-10-10' },
+    { id: 5, name: 'Grace Njeri', email: 'grace.n@example.com', phone: '+254 756 789 012', courseId: 2, enrollmentDate: '2024-07-20', progress: 90, score: 91, status: 'Active', lastActivity: '2024-10-16' },
+    { id: 6, name: 'David Mwangi', email: 'david.m@example.com', phone: '+254 767 890 123', courseId: 4, enrollmentDate: '2024-08-15', progress: 65, score: 82, status: 'Active', lastActivity: '2024-10-12' },
+    { id: 7, name: 'Lucy Nyambura', email: 'lucy.n@example.com', phone: '+254 778 901 234', courseId: 1, enrollmentDate: '2024-06-25', progress: 95, score: 94, status: 'Active', lastActivity: '2024-10-17' },
+    { id: 8, name: 'James Otieno', email: 'james.o@example.com', phone: '+254 789 012 345', courseId: 5, enrollmentDate: '2024-09-01', progress: 30, score: 75, status: 'Active', lastActivity: '2024-10-08' }
+  ]);
 
     const trainingOverview = {
       totalCourses: trainingCourses.length,
@@ -522,24 +546,71 @@ const TrainingManagement = () => {
     }
   };
 
+  const showFeedback = (message, type) => {
+    setActionFeedback({ show: true, message, type });
+    setTimeout(() => {
+      setActionFeedback({ show: false, message: '', type: '' });
+    }, 3000);
+  };
+
   const handleActivateCourse = (courseId) => {
-    console.log('Activating course:', courseId);
-    // Implement course activation logic
+    const course = trainingCourses.find(c => c.id === courseId);
+    setSelectedCourse(course);
+    setConfirmationAction(() => () => {
+      setTrainingCourses(prevCourses => 
+        prevCourses.map(c => 
+          c.id === courseId ? { ...c, status: 'active' } : c
+        )
+      );
+      showFeedback('Course activated successfully!', 'success');
+    });
+    setShowConfirmationModal(true);
   };
 
   const handlePauseCourse = (courseId) => {
-    console.log('Pausing course:', courseId);
-    // Implement course pause logic
+    const course = trainingCourses.find(c => c.id === courseId);
+    setSelectedCourse(course);
+    setConfirmationAction(() => () => {
+      setTrainingCourses(prevCourses => 
+        prevCourses.map(c => 
+          c.id === courseId ? { ...c, status: 'paused' } : c
+        )
+      );
+      showFeedback('Course paused successfully!', 'warning');
+    });
+    setShowConfirmationModal(true);
   };
 
   const handleEnrollStudent = (courseId) => {
     console.log('Enrolling student to course:', courseId);
-    // Implement student enrollment logic
+    setShowBulkEnrollmentModal(true);
   };
 
   const handleUpdateCourse = (courseId) => {
-    console.log('Updating course:', courseId);
-    // Implement course update logic
+    const course = trainingCourses.find(c => c.id === courseId);
+    setSelectedCourse(course);
+    setShowEditCourseModal(true);
+  };
+
+  const handleSaveEditedCourse = (updatedCourse) => {
+    setTrainingCourses(prevCourses => 
+      prevCourses.map(course => 
+        course.id === updatedCourse.id ? updatedCourse : course
+      )
+    );
+    showFeedback('Course updated successfully!', 'success');
+  };
+
+  const handleViewCourse = (courseId) => {
+    const course = trainingCourses.find(c => c.id === courseId);
+    setSelectedCourse(course);
+    setShowCourseDetailsModal(true);
+  };
+
+  const handleViewStudent = (student, course) => {
+    setSelectedStudent(student);
+    setSelectedCourse(course);
+    setShowStudentDetailsModal(true);
   };
 
   const _handleDeleteCourse = (courseId) => {
@@ -717,7 +788,10 @@ const TrainingManagement = () => {
             <option value="paused">Paused</option>
             <option value="draft">Draft</option>
           </select>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => setShowCreateCourseModal(true)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <Plus className="w-4 h-4 mr-2" />
             New Course
           </button>
@@ -793,35 +867,43 @@ const TrainingManagement = () => {
                   </span>
                 </td>
                 <td className="px-4 py-4">
-                  <div className="flex items-center justify-end space-x-1">
-                    <button
-                      onClick={() => handleActivateCourse(course.id)}
-                      className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                      title="Activate"
-                    >
-                      <Play className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handlePauseCourse(course.id)}
-                      className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
-                      title="Pause"
-                    >
-                      <Pause className="w-4 h-4" />
-                    </button>
+                  <div className="flex items-center justify-end space-x-2">
+                    {course.status !== 'active' && (
+                      <button
+                        onClick={() => handleActivateCourse(course.id)}
+                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110"
+                        title="Activate Course"
+                      >
+                        <Play className="w-4 h-4" />
+                      </button>
+                    )}
+                    {course.status === 'active' && (
+                      <button
+                        onClick={() => handlePauseCourse(course.id)}
+                        className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-all duration-200 hover:scale-110"
+                        title="Pause Course"
+                      >
+                        <Pause className="w-4 h-4" />
+                      </button>
+                    )}
                     <button
                       onClick={() => handleUpdateCourse(course.id)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Edit"
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+                      title="Edit Course"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" title="View">
+                    <button 
+                      onClick={() => handleViewCourse(course.id)}
+                      className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 hover:scale-110" 
+                      title="View Details"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleEnrollStudent(course.id)}
-                      className="px-2 py-1 text-sm border text-blue-700 rounded hover:bg-blue-200 transition-colors"
-                      title="Enroll"
+                      className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 hover:shadow-md"
+                      title="Enroll Students"
                     >
                       Enroll
                     </button>
@@ -840,7 +922,10 @@ const TrainingManagement = () => {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold">Student Enrollment Management</h3>
         <div className="flex items-center space-x-3">
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => setShowBulkEnrollmentModal(true)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <UserPlus className="w-4 h-4 mr-2" />
             Bulk Enrollment
           </button>
@@ -885,74 +970,95 @@ const TrainingManagement = () => {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 uppercase text-xs">
             <tr>
-              <th className="px-4 py-3 text-left">Course</th>
-              <th className="px-4 py-3 text-center">Category</th>
-              <th className="px-4 py-3 text-center">Duration</th>
-              <th className="px-4 py-3 text-center">Enrolled</th>
-              <th className="px-4 py-3 text-center">Completion Rate</th>
-              <th className="px-4 py-3 text-center">Pass Rate</th>
-              <th className="px-4 py-3 text-center">Avg Rating</th>
-              <th className="px-4 py-3 text-right">Revenue</th>
-              <th className="px-4 py-3 text-right">Revenue/Student</th>
+              <th className="px-4 py-3 text-left">Student Name</th>
+              <th className="px-4 py-3 text-left">Email</th>
+              <th className="px-4 py-3 text-left">Phone</th>
+              <th className="px-4 py-3 text-center">Enrolled Course</th>
+              <th className="px-4 py-3 text-center">Enrollment Date</th>
+              <th className="px-4 py-3 text-center">Progress</th>
+              <th className="px-4 py-3 text-center">Score</th>
+              <th className="px-4 py-3 text-center">Status</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {trainingCourses.map((course) => (
-              <tr key={course.id} className="hover:bg-gray-50">
-                <td className="px-4 py-4">
-                  <p className="font-semibold">{course.title}</p>
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <span className=" font-semibold">{course.category}</span>
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <span className="">{course.duration}</span>
-                </td>
-                <td className="px-4 py-4 text-center">
-                    <div>
-                      <p className="font-semibold ">{course.enrolledStudents}/{course.maxStudents}</p>
-                    <p className="text-xs text-gray-500">
-                      {Math.round((course.enrolledStudents / course.maxStudents) * 100)}% capacity
-                    </p>
-                  </div>
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <div className="flex flex-col items-center">
-                    <span className="text-sm font-medium  mb-1">{course.completionRate}%</span>
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-500 h-2 rounded-full" 
-                        style={{ width: `${course.completionRate}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <span className="font-semibold ">{course.passRate}%</span>
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <div className="flex items-center justify-center">
-                    <Star className="w-4 h-4 text-blue-500 mr-1" />
-                    <span className="font-medium ">{course.rating}</span>
-                  </div>
-                </td>
-                <td className="px-4 py-4 text-right">
-                  <span className="font-semibold ">{formatCurrency(course.revenue)}</span>
-                </td>
-                <td className="px-4 py-4 text-right">
-                  <span className="font-semibold">{formatCurrency(course.price)}</span>
-                </td>
-                <td className="px-4 py-4 text-right">
-                  <button
-                    onClick={() => handleEnrollStudent(course.id)}
-                    className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Add Students
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {enrolledStudents.map((student) => {
+                const course = trainingCourses.find(c => c.id === student.courseId);
+                return (
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                          <User className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{student.name}</p>
+                          <p className="text-xs text-gray-500">ID: STU-{student.id}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="text-gray-700">{student.email}</span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="text-gray-700">{student.phone}</span>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <div>
+                        <p className="font-medium text-gray-900">{course?.title}</p>
+                        <p className="text-xs text-gray-500">{course?.category}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex items-center justify-center">
+                        <Calendar className="w-4 h-4 text-gray-400 mr-1" />
+                        <span className="text-gray-700">{new Date(student.enrollmentDate).toLocaleDateString()}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex flex-col items-center">
+                        <span className="text-sm font-medium mb-1">{student.progress}%</span>
+                        <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full" 
+                            style={{ width: `${student.progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <span className="font-semibold text-gray-900">{student.score}%</span>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        student.status === 'Completed' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {student.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <div className="flex items-center justify-end space-x-1">
+                        <button
+                          onClick={() => handleViewStudent(student, course)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="View Student Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleViewCourse(course?.id)}
+                          className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                          title="View Course"
+                        >
+                          <BookOpen className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       </div>
@@ -1168,7 +1274,10 @@ const TrainingManagement = () => {
                   <span className="font-semibold">{formatCurrency(500)}</span>
                 </td>
                 <td className="px-4 py-4 text-right">
-                  <button className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <button 
+                    onClick={() => setShowIssueCertificatesModal(true)}
+                    className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
                     Issue Certificates
                   </button>
                 </td>
@@ -1185,7 +1294,10 @@ const TrainingManagement = () => {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold">Instructor Management</h3>
         <div className="flex items-center space-x-3">
-          <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => setShowExportReportsModal(true)}
+            className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </button>
@@ -1517,26 +1629,43 @@ const TrainingManagement = () => {
   // Modal handlers
   const handleSaveCourse = (courseData) => {
     console.log('New course created:', courseData);
-    // Add logic to save course to backend/state
+   
   };
 
   const handleBulkEnroll = (enrollmentData) => {
     console.log('Bulk enrollment:', enrollmentData);
-    // Add logic to process bulk enrollment
+    
   };
 
   const handleIssueCertificates = (certificateData) => {
     console.log('Certificates issued:', certificateData);
-    // Add logic to issue certificates
+    
   };
 
   const handleExportReport = (reportData) => {
     console.log('Report exported:', reportData);
-    // Add logic to generate and download report
+  
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Feedback Notification */}
+      {actionFeedback.show && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+          <div className={`flex items-center px-6 py-3 rounded-lg shadow-lg ${
+            actionFeedback.type === 'success' ? 'bg-green-500' :
+            actionFeedback.type === 'warning' ? 'bg-yellow-500' :
+            actionFeedback.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+          } text-white`}>
+            {actionFeedback.type === 'success' && <CheckCircle className="w-5 h-5 mr-2" />}
+            {actionFeedback.type === 'warning' && <AlertCircle className="w-5 h-5 mr-2" />}
+            {actionFeedback.type === 'error' && <XCircle className="w-5 h-5 mr-2" />}
+            {actionFeedback.type === 'info' && <AlertCircle className="w-5 h-5 mr-2" />}
+            <span className="font-medium">{actionFeedback.message}</span>
+          </div>
+        </div>
+      )}
+
       {/* Modals */}
       <CreateCourseModal 
         showModal={showCreateCourseModal}
@@ -1561,6 +1690,36 @@ const TrainingManagement = () => {
         setShowModal={setShowExportReportsModal}
         courses={trainingCourses}
         onExportReport={handleExportReport}
+      />
+      <CourseDetailsModal 
+        showModal={showCourseDetailsModal}
+        setShowModal={setShowCourseDetailsModal}
+        course={selectedCourse}
+        students={enrolledStudents.filter(s => s.courseId === selectedCourse?.id)}
+      />
+      <EditCourseModal 
+        showModal={showEditCourseModal}
+        setShowModal={setShowEditCourseModal}
+        course={selectedCourse}
+        onUpdateCourse={handleSaveEditedCourse}
+      />
+      <ConfirmationModal 
+        showModal={showConfirmationModal}
+        setShowModal={setShowConfirmationModal}
+        title={selectedCourse?.status === 'active' ? 'Pause Course' : 'Activate Course'}
+        message={
+          selectedCourse?.status === 'active' 
+            ? `Are you sure you want to pause "${selectedCourse?.title}"? Students will not be able to access this course until it is activated again.`
+            : `Are you sure you want to activate "${selectedCourse?.title}"? This course will be visible and accessible to students.`
+        }
+        type={selectedCourse?.status === 'active' ? 'warning' : 'success'}
+        onConfirm={confirmationAction}
+      />
+      <StudentDetailsModal 
+        showModal={showStudentDetailsModal}
+        setShowModal={setShowStudentDetailsModal}
+        student={selectedStudent}
+        course={selectedCourse}
       />
 
       <div className="">
