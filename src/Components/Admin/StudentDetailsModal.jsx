@@ -103,23 +103,23 @@ const StudentDetailsModal = ({ showModal, setShowModal, student, course }) => {
               <div className="space-y-6">
                 {/* Contact Information */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="border border-gray-200 p-4">
                     <div className="flex items-center mb-2">
                       <Mail className="w-5 h-5 text-blue-600 mr-2" />
                       <span className="text-sm font-medium text-gray-700">Email</span>
                     </div>
                     <p className="text-gray-900">{student.email}</p>
                   </div>
-                  <div className="bg-green-50 p-4 rounded-lg">
+                  <div className="border border-gray-200 p-4">
                     <div className="flex items-center mb-2">
-                      <Phone className="w-5 h-5 text-green-600 mr-2" />
+                      <Phone className="w-5 h-5 text-blue-600 mr-2" />
                       <span className="text-sm font-medium text-gray-700">Phone</span>
                     </div>
                     <p className="text-gray-900">{student.phone}</p>
                   </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="border border-gray-200 p-4">
                     <div className="flex items-center mb-2">
-                      <Calendar className="w-5 h-5 text-purple-600 mr-2" />
+                      <Calendar className="w-5 h-5 text-blue-600 mr-2" />
                       <span className="text-sm font-medium text-gray-700">Enrolled</span>
                     </div>
                     <p className="text-gray-900">{new Date(student.enrollmentDate).toLocaleDateString()}</p>
@@ -127,7 +127,7 @@ const StudentDetailsModal = ({ showModal, setShowModal, student, course }) => {
                 </div>
 
                 {/* Course Information */}
-                <div className="bg-white border border-gray-200 p-6 rounded-lg">
+                <div className="border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <BookOpen className="w-5 h-5 text-blue-600 mr-2" />
                     Enrolled Course
@@ -154,26 +154,26 @@ const StudentDetailsModal = ({ showModal, setShowModal, student, course }) => {
 
                 {/* Performance Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-lg text-white">
+                  <div className="p-6 border border-gray-200">
                     <div className="flex items-center justify-between mb-2">
-                      <TrendingUp className="w-6 h-6" />
-                      <span className="text-2xl font-bold">{student.progress}%</span>
+                      <TrendingUp className="w-6 h-6 text-blue-600" />
+                      <span className="text-2xl">{student.progress}%</span>
                     </div>
-                    <p className="text-sm text-blue-100">Course Progress</p>
+                    <p className="text-sm">Course Progress</p>
                   </div>
-                  <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-lg text-white">
+                  <div className=" p-6 border border-gray-200">
                     <div className="flex items-center justify-between mb-2">
-                      <Award className="w-6 h-6" />
-                      <span className="text-2xl font-bold">{student.score}%</span>
+                      <Award className="w-6 h-6 text-blue-500" />
+                      <span className="text-2xl">{student.score}%</span>
                     </div>
-                    <p className="text-sm text-green-100">Average Score</p>
+                    <p className="text-sm">Average Score</p>
                   </div>
-                  <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-lg text-white">
+                  <div className="p-6 border border-gray-200">
                     <div className="flex items-center justify-between mb-2">
-                      <CheckCircle className="w-6 h-6" />
-                      <span className="text-2xl font-bold">{moduleProgress.filter(m => m.status === 'completed').length}/{moduleProgress.length}</span>
+                      <CheckCircle className="w-6 h-6 text-blue-500" />
+                      <span className="text-2xl">{moduleProgress.filter(m => m.status === 'completed').length}/{moduleProgress.length}</span>
                     </div>
-                    <p className="text-sm text-purple-100">Modules Completed</p>
+                    <p className="text-sm">Modules Completed</p>
                   </div>
                 </div>
               </div>
@@ -182,12 +182,12 @@ const StudentDetailsModal = ({ showModal, setShowModal, student, course }) => {
             {/* Progress Tab */}
             {activeTab === 'progress' && (
               <div className="space-y-6">
-                <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                <div className="p-4 mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-                    <span className="text-lg font-bold text-blue-600">{student.progress}%</span>
+                    <span className="font-bold">Overall Progress </span>
+                    <span className="text-lg">{student.progress}%</span>
                   </div>
-                  <div className="w-full bg-blue-200 rounded-full h-3">
+                  <div className="w-full bg-blue-100 rounded-full h-3">
                     <div 
                       className="bg-blue-600 h-3 rounded-full transition-all duration-500" 
                       style={{ width: `${student.progress}%` }}
@@ -195,27 +195,27 @@ const StudentDetailsModal = ({ showModal, setShowModal, student, course }) => {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Module Progress</h3>
+                <h3 className="text-lg font-semibold mb-4">Module Progress</h3>
                 <div className="space-y-4">
                   {moduleProgress.map((module) => (
-                    <div key={module.id} className="bg-white border border-gray-200 p-5 rounded-lg">
+                    <div key={module.id} className="border border-gray-200 p-5">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 mb-1">{module.name}</h4>
+                          <h4 className="font-medium mb-1">{module.name}</h4>
                           {module.completedDate && (
                             <p className="text-xs text-gray-500">Completed on {new Date(module.completedDate).toLocaleDateString()}</p>
                           )}
                         </div>
                         <div className="flex items-center space-x-3">
                           {module.score !== null && (
-                            <span className="text-sm font-semibold text-green-600">{module.score}%</span>
+                            <span className="text-sm font-semibold">{module.score}%</span>
                           )}
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                             module.status === 'completed' 
-                              ? 'bg-green-100 text-green-800' 
+                              ? ' text-green-800' 
                               : module.status === 'in-progress'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-gray-100 text-gray-800'
+                              ? ' text-yellow-800'
+                              : 'text-gray-800'
                           }`}>
                             {module.status === 'completed' ? 'Completed' : module.status === 'in-progress' ? 'In Progress' : 'Not Started'}
                           </span>
@@ -236,35 +236,35 @@ const StudentDetailsModal = ({ showModal, setShowModal, student, course }) => {
             {activeTab === 'assessments' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">Assessment Results</h3>
-                  <div className="bg-green-50 px-4 py-2 rounded-lg">
-                    <span className="text-sm text-gray-600">Average: </span>
-                    <span className="text-lg font-bold text-green-600">{student.score}%</span>
+                  <h3 className="text-lg font-semibold">Assessment Results</h3>
+                  <div className="px-4 py-2 ">
+                    <span className="text-sm">Average: </span>
+                    <span className="text-lg font-bold">{student.score}%</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-gray-200 overflow-hidden rounded-lg">
+                <div className="bg-white border border-gray-200 overflow-hidden">
                   <table className="w-full">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-100">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assessment</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Score</th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Submitted</th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Assessment</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Type</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium uppercase">Score</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium uppercase">Submitted</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium uppercase">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {assessments.map((assessment) => (
                         <tr key={assessment.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4">
-                            <p className="font-medium text-gray-900">{assessment.title}</p>
+                            <p className="font-medium">{assessment.title}</p>
                           </td>
                           <td className="px-6 py-4">
                             <span className="text-gray-700">{assessment.type}</span>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <span className="font-semibold text-gray-900">{assessment.score}/{assessment.maxScore}</span>
+                            <span className="font-semibold ">{assessment.score}/{assessment.maxScore}</span>
                           </td>
                           <td className="px-6 py-4 text-center">
                             <span className="text-gray-700">{new Date(assessment.submittedDate).toLocaleDateString()}</span>
@@ -272,8 +272,8 @@ const StudentDetailsModal = ({ showModal, setShowModal, student, course }) => {
                           <td className="px-6 py-4 text-center">
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                               assessment.status === 'Passed' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
+                                ? ' text-green-800' 
+                                : ' text-red-800'
                             }`}>
                               {assessment.status}
                             </span>
@@ -292,7 +292,7 @@ const StudentDetailsModal = ({ showModal, setShowModal, student, course }) => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
                 <div className="space-y-3">
                   {activityLog.map((activity) => (
-                    <div key={activity.id} className="bg-white border border-gray-200 p-4 rounded-lg hover:shadow-md transition-shadow">
+                    <div key={activity.id} className="bg-white border border-gray-200 p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start">
                         <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-4"></div>
                         <div className="flex-1">

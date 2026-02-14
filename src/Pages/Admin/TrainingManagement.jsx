@@ -936,8 +936,8 @@ const TrainingManagement = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="border border-gray-100 shadow-md p-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="border border-gray-200 shadow-md p-6">
           <div className="flex items-center">
             <Users className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -946,7 +946,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md p-6">
+        <div className="border border-gray-200 shadow-md p-6">
           <div className="flex items-center">
             <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -955,7 +955,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md  p-6">
+        <div className="border border-gray-200 shadow-md  p-6">
           <div className="flex items-center">
             <Award className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -968,7 +968,7 @@ const TrainingManagement = () => {
 
       <div className="bg-white border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 uppercase text-xs">
+          <thead className="bg-gray-100 uppercase text-xs">
             <tr>
               <th className="px-4 py-3 text-left">Student Name</th>
               <th className="px-4 py-3 text-left">Email</th>
@@ -988,9 +988,9 @@ const TrainingManagement = () => {
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                        {/* <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                           <User className="w-4 h-4 text-blue-600" />
-                        </div>
+                        </div> */}
                         <div>
                           <p className="font-semibold">{student.name}</p>
                           <p className="text-xs text-gray-500">ID: STU-{student.id}</p>
@@ -1032,8 +1032,8 @@ const TrainingManagement = () => {
                     <td className="px-4 py-4 text-center">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         student.status === 'Completed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-blue-100 text-blue-800'
+                          ? 'text-green-800' 
+                          : 'text-blue-800'
                       }`}>
                         {student.status}
                       </span>
@@ -1192,7 +1192,7 @@ const TrainingManagement = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="shadow-md border border-gray-200 p-6">
           <div className="flex items-center">
             <Award className="w-8 h-8 text-blue-600 mr-3" />
