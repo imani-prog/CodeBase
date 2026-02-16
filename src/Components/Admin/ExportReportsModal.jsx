@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Download, AlertCircle, FileText, Calendar, Filter, CheckCircle } from 'lucide-react';
 
-const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport }) => {
+const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport, module = 'training' }) => {
   const [formData, setFormData] = useState({
     reportType: '',
     format: 'pdf',
@@ -18,7 +18,8 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport }
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
 
-  const reportTypes = [
+  // Report types based on module
+  const trainingReportTypes = [
     { value: 'overview', label: 'Training Overview Report', description: 'Complete summary of all training activities' },
     { value: 'revenue', label: 'Revenue Analysis Report', description: 'Financial performance and revenue breakdown' },
     { value: 'enrollment', label: 'Enrollment Trends Report', description: 'Student enrollment statistics and trends' },
@@ -26,6 +27,18 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport }
     { value: 'instructor', label: 'Instructor Performance Report', description: 'Teaching effectiveness and ratings' },
     { value: 'custom', label: 'Custom Report', description: 'Build a custom report with selected metrics' }
   ];
+
+  const telemedicineReportTypes = [
+    { value: 'overview', label: 'Telemedicine Overview Report', description: 'Complete summary of all telemedicine sessions and activities' },
+    { value: 'revenue', label: 'Revenue Analysis Report', description: 'Financial performance and revenue breakdown by specialty' },
+    { value: 'sessions', label: 'Session Analytics Report', description: 'Detailed session statistics, duration, and completion rates' },
+    { value: 'doctors', label: 'Doctor Performance Report', description: 'Doctor availability, session counts, and patient ratings' },
+    { value: 'patients', label: 'Patient Engagement Report', description: 'Patient usage patterns and satisfaction metrics' },
+    { value: 'platform', label: 'Platform Usage Report', description: 'Video, audio, and messaging platform distribution' },
+    { value: 'custom', label: 'Custom Report', description: 'Build a custom report with selected metrics' }
+  ];
+
+  const reportTypes = module === 'telemedicine' ? telemedicineReportTypes : trainingReportTypes;
 
   const dateRanges = [
     { value: 'today', label: 'Today' },
@@ -160,7 +173,11 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport }
               </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold mb-1">Export Reports</h2>
-                <p className="text-sm">Generate and download training reports</p>
+                <p className="text-sm">
+                  {module === 'telemedicine' 
+                    ? 'Generate and download telemedicine reports' 
+                    : 'Generate and download training reports'}
+                </p>
               </div>
             </div>
           </div>

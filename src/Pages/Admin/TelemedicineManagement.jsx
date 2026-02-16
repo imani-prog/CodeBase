@@ -44,7 +44,14 @@ import {
   Award,
   Settings,
   RefreshCw,
-  ChevronDown
+  ChevronDown,
+  Bell,
+  Shield,
+  Lock,
+  Save,
+  Volume2,
+  Mail,
+  Smartphone
 } from 'lucide-react';
 import {
   BarChart,
@@ -56,6 +63,8 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import ScheduleSessionModal from '../../Components/Admin/ScheduleSessionModal';
+import ExportReportsModal from '../../Components/Admin/ExportReportsModal';
 
 
 const TelemedicineManagement = () => {
@@ -64,6 +73,70 @@ const TelemedicineManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sessionFilter, setSessionFilter] = useState('all');
   const [expandedRow, setExpandedRow] = useState(null);
+  
+  // Modal states
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+
+  // Platform settings state
+  const [platformSettings, setPlatformSettings] = useState({
+    // General Settings
+    platformName: 'MediLink Telemedicine',
+    platformEnabled: true,
+    maxConcurrentSessions: 100,
+    sessionTimeout: 30,
+    
+    // Session Settings
+    allowVideoCall: true,
+    allowAudioCall: true,
+    allowMessaging: true,
+    videoQuality: 'high',
+    autoRecordSessions: false,
+    maxSessionDuration: 60,
+    minSessionDuration: 5,
+    
+    // Notification Settings
+    emailNotifications: true,
+    smsNotifications: true,
+    pushNotifications: true,
+    reminderBefore: 15,
+    
+    // Security Settings
+    requirePatientVerification: true,
+    requireDoctorVerification: true,
+    endToEndEncryption: true,
+    sessionRecordingConsent: true,
+    
+    // Payment Settings
+    allowInstantPayment: true,
+    allowInsuranceBilling: true,
+    requirePaymentUpfront: false,
+    
+    // Availability Settings
+    operatingHours: {
+      start: '07:00',
+      end: '22:00'
+    },
+    weekendAvailable: true,
+    emergencyAvailable: true
+  });
+
+  const [settingsSaved, setSettingsSaved] = useState(false);
+
+  const handleSettingChange = (key, value) => {
+    setPlatformSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
+    setSettingsSaved(false);
+  };
+
+  const handleSaveSettings = () => {
+    console.log('Saving platform settings:', platformSettings);
+    // Add API call here to save settings
+    setSettingsSaved(true);
+    setTimeout(() => setSettingsSaved(false), 3000);
+  };
 
   const toggleRow = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
@@ -321,18 +394,54 @@ const TelemedicineManagement = () => {
   };
 
   const handleTerminateSession = (sessionId) => {
-    console.log('Terminating session:', sessionId);
-    // Implement session termination logic
+    if (window.confirm('Are you sure you want to terminate this session?')) {
+      console.log('Terminating session:', sessionId);
+      // Implement session termination logic
+      alert('Session terminated successfully');
+    }
   };
 
-  const handleDeleteSession = (sessionId) => {
-    console.log('Deleting session:', sessionId);
-    // Implement session deletion logic
+  const _handleDeleteSession = (sessionId) => {
+    if (window.confirm('Are you sure you want to delete this session record?')) {
+      console.log('Deleting session:', sessionId);
+      // Implement session deletion logic
+      alert('Session record deleted successfully');
+    }
   };
 
   const handleScheduleSession = () => {
-    console.log('Scheduling new session');
-    // Implement session scheduling logic
+    setShowScheduleModal(true);
+  };
+
+  const handleScheduleSessionSubmit = (sessionData) => {
+    console.log('Scheduling new session:', sessionData);
+    // Implement session scheduling logic with backend API
+    alert(`Session scheduled for ${sessionData.patientName} with ${sessionData.doctorName} on ${sessionData.date} at ${sessionData.time}`);
+  };
+
+  const handleExportReports = () => {
+    setShowExportModal(true);
+  };
+
+  const handleExportReportsSubmit = (reportData) => {
+    console.log('Exporting report:', reportData);
+    // Implement export logic
+    alert('Report exported successfully!');
+  };
+
+  const handleOpenSettings = () => {
+    setActiveTab('settings');
+  };
+
+  const handleViewSession = (session) => {
+    console.log('Viewing session details:', session);
+    // You can implement a view modal here if needed
+    alert(`Viewing session: ${session.id}\nPatient: ${session.patient}\nDoctor: ${session.doctor}`);
+  };
+
+  const handlePauseSession = (sessionId) => {
+    console.log('Pausing session:', sessionId);
+    alert('Session paused');
   };
 
   const renderOverview = () => (
@@ -348,11 +457,17 @@ const TelemedicineManagement = () => {
             <Plus className="w-4 h-4 mr-1.5" />
             Schedule Session
           </button>
-          <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={handleExportReports}
+            className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <Download className="w-4 h-4 mr-1.5" />
             Export Reports
           </button>
-          <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={handleOpenSettings}
+            className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <Settings className="w-4 h-4 mr-1.5" />
             Settings
           </button>
@@ -620,14 +735,25 @@ const TelemedicineManagement = () => {
 
                         {/* Actions */}
                         <div className="flex items-start justify-end gap-3">
-                          <button className="p-2 text-blue-600 hover:bg-blue-50 rounded">
+                          <button 
+                            onClick={() => handleViewSession(session)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                            title="View Details"
+                          >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-yellow-600 hover:bg-yellow-50 rounded">
+                          <button 
+                            onClick={() => handlePauseSession(session.id)}
+                            className="p-2 text-yellow-600 hover:bg-yellow-50 rounded"
+                            title="Pause Session"
+                          >
                             <Pause className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleTerminateSession(session.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTerminateSession(session.id);
+                            }}
                             className="text-sm text-red-600 hover:underline"
                           >
                             End Session
@@ -783,13 +909,25 @@ const TelemedicineManagement = () => {
 
                         {/* Actions */}
                         <div className="flex items-start justify-end gap-3">
-                          <button className="p-2 text-blue-600 hover:bg-blue-50 rounded">
+                          <button 
+                            onClick={() => console.log('Viewing doctor profile:', doctor.id)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                            title="View Profile"
+                          >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-green-600 hover:bg-green-50 rounded">
+                          <button 
+                            onClick={() => console.log('Messaging doctor:', doctor.id)}
+                            className="p-2 text-green-600 hover:bg-green-50 rounded"
+                            title="Send Message"
+                          >
                             <MessageSquare className="w-4 h-4" />
                           </button>
-                          <button className="p-2 text-purple-600 hover:bg-purple-50 rounded">
+                          <button 
+                            onClick={() => console.log('Editing doctor:', doctor.id)}
+                            className="p-2 text-purple-600 hover:bg-purple-50 rounded"
+                            title="Edit Profile"
+                          >
                             <Edit className="w-4 h-4" />
                           </button>
                         </div>
@@ -820,7 +958,10 @@ const TelemedicineManagement = () => {
             <option value="month">This Month</option>
             <option value="all">All Time</option>
           </select>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={handleExportReports}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export
           </button>
@@ -881,14 +1022,26 @@ const TelemedicineManagement = () => {
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-800">
+                      <button 
+                        onClick={() => handleViewSession(session)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="View Details"
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="text-green-600 hover:text-green-800">
+                      <button 
+                        onClick={() => console.log('View prescription:', session.id)}
+                        className="text-green-600 hover:text-green-800"
+                        title="View Prescription"
+                      >
                         <FileText className="w-4 h-4" />
                       </button>
                       {session.status === 'completed' && (
-                        <button className="text-blue-600 hover:text-blue-800">
+                        <button 
+                          onClick={() => console.log('Download report:', session.id)}
+                          className="text-blue-600 hover:text-blue-800"
+                          title="Download Report"
+                        >
                           <Download className="w-4 h-4" />
                         </button>
                       )}
@@ -1013,7 +1166,569 @@ const TelemedicineManagement = () => {
     </div>
   );
 
+  const renderSettings = () => (
+    <div className="space-y-6">
+      {/* Save Bar */}
+      {!settingsSaved && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <AlertCircle className="w-5 h-5 text-blue-600 mr-3" />
+            <span className="text-sm text-blue-900">You have unsaved changes</span>
+          </div>
+          <button
+            onClick={handleSaveSettings}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Save Changes
+          </button>
+        </div>
+      )}
 
+      {settingsSaved && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+          <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+          <span className="text-sm text-green-900">Settings saved successfully</span>
+        </div>
+      )}
+
+      {/* General Settings */}
+      <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+            <Settings className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">General Settings</h3>
+            <p className="text-sm text-gray-600">Configure basic platform parameters</p>
+          </div>
+        </div>
+        
+        <div className="space-y-5">
+          <div className="pb-4 border-b border-gray-200">
+            <label className="block text-sm font-medium mb-2">Platform Name</label>
+            <input
+              type="text"
+              value={platformSettings.platformName}
+              onChange={(e) => handleSettingChange('platformName', e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter platform name"
+            />
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Enable Platform</label>
+                <p className="text-xs text-gray-500">Allow telemedicine services to operate</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.platformEnabled}
+                  onChange={(e) => handleSettingChange('platformEnabled', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <label className="block text-sm font-medium mb-2">Max Concurrent Sessions</label>
+            <input
+              type="number"
+              value={platformSettings.maxConcurrentSessions}
+              onChange={(e) => handleSettingChange('maxConcurrentSessions', parseInt(e.target.value))}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min="1"
+              max="1000"
+            />
+            <p className="text-xs text-gray-500 mt-1">Maximum number of simultaneous sessions allowed</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Session Timeout (minutes)</label>
+            <input
+              type="number"
+              value={platformSettings.sessionTimeout}
+              onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min="5"
+              max="120"
+            />
+            <p className="text-xs text-gray-500 mt-1">Automatically end inactive sessions after this duration</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Session Configuration */}
+      <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+            <Video className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Session Configuration</h3>
+            <p className="text-sm text-gray-600">Configure session types and quality settings</p>
+          </div>
+        </div>
+        
+        <div className="space-y-5">
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Video className="w-5 h-5 text-blue-600 mr-3" />
+                <div>
+                  <label className="block text-sm font-medium mb-1">Video Call Sessions</label>
+                  <p className="text-xs text-gray-500">Enable video consultation capability</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.allowVideoCall}
+                  onChange={(e) => handleSettingChange('allowVideoCall', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Phone className="w-5 h-5 text-green-600 mr-3" />
+                <div>
+                  <label className="block text-sm font-medium mb-1">Audio Call Sessions</label>
+                  <p className="text-xs text-gray-500">Enable voice-only consultation</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.allowAudioCall}
+                  onChange={(e) => handleSettingChange('allowAudioCall', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <MessageSquare className="w-5 h-5 text-indigo-600 mr-3" />
+                <div>
+                  <label className="block text-sm font-medium mb-1">Messaging Sessions</label>
+                  <p className="text-xs text-gray-500">Enable text-based consultation</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.allowMessaging}
+                  onChange={(e) => handleSettingChange('allowMessaging', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <label className="block text-sm font-medium mb-2">Video Quality</label>
+            <select
+              value={platformSettings.videoQuality}
+              onChange={(e) => handleSettingChange('videoQuality', e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="low">Low (360p) - Best for slow connections</option>
+              <option value="medium">Medium (480p) - Balanced quality</option>
+              <option value="high">High (720p) - Recommended</option>
+              <option value="hd">HD (1080p) - Best quality</option>
+            </select>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Auto-Record Sessions</label>
+                <p className="text-xs text-gray-500">Automatically record all telemedicine sessions</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.autoRecordSessions}
+                  onChange={(e) => handleSettingChange('autoRecordSessions', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <label className="block text-sm font-medium mb-2">Maximum Session Duration (minutes)</label>
+            <input
+              type="number"
+              value={platformSettings.maxSessionDuration}
+              onChange={(e) => handleSettingChange('maxSessionDuration', parseInt(e.target.value))}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min="5"
+              max="240"
+            />
+            <p className="text-xs text-gray-500 mt-1">Maximum allowed time for a single session</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Minimum Session Duration (minutes)</label>
+            <input
+              type="number"
+              value={platformSettings.minSessionDuration}
+              onChange={(e) => handleSettingChange('minSessionDuration', parseInt(e.target.value))}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min="1"
+              max="30"
+            />
+            <p className="text-xs text-gray-500 mt-1">Minimum billable session duration</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Notification Settings */}
+      <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center mr-4">
+            <Bell className="w-5 h-5 text-yellow-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Notification Settings</h3>
+            <p className="text-sm text-gray-600">Configure how users receive notifications</p>
+          </div>
+        </div>
+        
+        <div className="space-y-5">
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Mail className="w-5 h-5 text-blue-600 mr-3" />
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email Notifications</label>
+                  <p className="text-xs text-gray-500">Send session updates via email</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.emailNotifications}
+                  onChange={(e) => handleSettingChange('emailNotifications', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Smartphone className="w-5 h-5 text-green-600 mr-3" />
+                <div>
+                  <label className="block text-sm font-medium mb-1">SMS Notifications</label>
+                  <p className="text-xs text-gray-500">Send session updates via SMS</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.smsNotifications}
+                  onChange={(e) => handleSettingChange('smsNotifications', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Volume2 className="w-5 h-5 text-purple-600 mr-3" />
+                <div>
+                  <label className="block text-sm font-medium mb-1">Push Notifications</label>
+                  <p className="text-xs text-gray-500">Send in-app notifications</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.pushNotifications}
+                  onChange={(e) => handleSettingChange('pushNotifications', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Reminder Before Session (minutes)</label>
+            <select
+              value={platformSettings.reminderBefore}
+              onChange={(e) => handleSettingChange('reminderBefore', parseInt(e.target.value))}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="5">5 minutes before</option>
+              <option value="10">10 minutes before</option>
+              <option value="15">15 minutes before</option>
+              <option value="30">30 minutes before</option>
+              <option value="60">1 hour before</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">When to notify patients and doctors about upcoming sessions</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Security & Privacy */}
+      <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mr-4">
+            <Shield className="w-5 h-5 text-red-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Security & Privacy</h3>
+            <p className="text-sm text-gray-600">Configure security and compliance settings</p>
+          </div>
+        </div>
+        
+        <div className="space-y-5">
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Require Patient Verification</label>
+                <p className="text-xs text-gray-500">Verify patient identity before session starts</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.requirePatientVerification}
+                  onChange={(e) => handleSettingChange('requirePatientVerification', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Require Doctor Verification</label>
+                <p className="text-xs text-gray-500">Verify doctor credentials before allowing sessions</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.requireDoctorVerification}
+                  onChange={(e) => handleSettingChange('requireDoctorVerification', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Lock className="w-5 h-5 text-red-600 mr-3" />
+                <div>
+                  <label className="block text-sm font-medium mb-1">End-to-End Encryption</label>
+                  <p className="text-xs text-gray-500">Encrypt all session data in transit</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.endToEndEncryption}
+                  onChange={(e) => handleSettingChange('endToEndEncryption', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Session Recording Consent</label>
+                <p className="text-xs text-gray-500">Require explicit consent before recording sessions</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.sessionRecordingConsent}
+                  onChange={(e) => handleSettingChange('sessionRecordingConsent', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Payment Settings */}
+      <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+            <DollarSign className="w-5 h-5 text-green-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Payment Options</h3>
+            <p className="text-sm text-gray-600">Configure payment and billing settings</p>
+          </div>
+        </div>
+        
+        <div className="space-y-5">
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Allow Instant Payment</label>
+                <p className="text-xs text-gray-500">Enable pay-per-session functionality</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.allowInstantPayment}
+                  onChange={(e) => handleSettingChange('allowInstantPayment', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Allow Insurance Billing</label>
+                <p className="text-xs text-gray-500">Support insurance claim submissions</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.allowInsuranceBilling}
+                  onChange={(e) => handleSettingChange('allowInsuranceBilling', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Require Payment Upfront</label>
+                <p className="text-xs text-gray-500">Patients must pay before session begins</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.requirePaymentUpfront}
+                  onChange={(e) => handleSettingChange('requirePaymentUpfront', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Operating Hours */}
+      <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center mr-4">
+            <Clock className="w-5 h-5 text-indigo-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Operating Hours</h3>
+            <p className="text-sm text-gray-600">Configure platform availability schedule</p>
+          </div>
+        </div>
+        
+        <div className="space-y-5">
+          <div className="pb-4 border-b border-gray-200">
+            <label className="block text-sm font-medium mb-2">Platform Start Time</label>
+            <input
+              type="time"
+              value={platformSettings.operatingHours.start}
+              onChange={(e) => handleSettingChange('operatingHours', {
+                ...platformSettings.operatingHours,
+                start: e.target.value
+              })}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <label className="block text-sm font-medium mb-2">Platform End Time</label>
+            <input
+              type="time"
+              value={platformSettings.operatingHours.end}
+              onChange={(e) => handleSettingChange('operatingHours', {
+                ...platformSettings.operatingHours,
+                end: e.target.value
+              })}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Weekend Availability</label>
+                <p className="text-xs text-gray-500">Allow sessions on weekends</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.weekendAvailable}
+                  onChange={(e) => handleSettingChange('weekendAvailable', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-1">Emergency 24/7 Availability</label>
+                <p className="text-xs text-gray-500">Allow emergency sessions at any time</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={platformSettings.emergencyAvailable}
+                  onChange={(e) => handleSettingChange('emergencyAvailable', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1034,7 +1749,7 @@ const TelemedicineManagement = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="border border-gray-200 mb-6">
+          <div className="mb-6">
             <div className="flex overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -1045,7 +1760,7 @@ const TelemedicineManagement = () => {
                     className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600 bg-blue-50'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        : 'border-transparent hover:text-gray-900 hover:border-gray-300'
                     }`}
                   >
                     <Icon className="w-4 h-4 mr-2" />
@@ -1063,23 +1778,24 @@ const TelemedicineManagement = () => {
             {activeTab === 'doctors' && renderOnlineDoctors()}
             {activeTab === 'session-history' && renderSessionHistory()}
             {activeTab === 'revenue' && renderRevenue()}
-            
-            
-            {/* Placeholder for settings tab */}
-            {activeTab === 'settings' && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Settings className="w-12 h-12 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Platform Settings</h3>
-                <p className="text-gray-600">
-                  Advanced telemedicine platform configuration options will be available here.
-                </p>
-              </div>
-            )}
+            {activeTab === 'settings' && renderSettings()}
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <ScheduleSessionModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onSchedule={handleScheduleSessionSubmit}
+      />
+
+      <ExportReportsModal
+        showModal={showExportModal}
+        setShowModal={setShowExportModal}
+        onExportReport={handleExportReportsSubmit}
+        module="telemedicine"
+      />
     </div>
   );
 };
