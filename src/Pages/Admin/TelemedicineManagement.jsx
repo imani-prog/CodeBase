@@ -1170,7 +1170,7 @@ const TelemedicineManagement = () => {
     <div className="space-y-6">
       {/* Save Bar */}
       {!settingsSaved && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+        <div className="p-4 flex items-center justify-between">
           <div className="flex items-center">
             <AlertCircle className="w-5 h-5 text-blue-600 mr-3" />
             <span className="text-sm text-blue-900">You have unsaved changes</span>
@@ -1193,9 +1193,9 @@ const TelemedicineManagement = () => {
       )}
 
       {/* General Settings */}
-      <div className="bg-white shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+          <div className="w-10 h-10  flex items-center justify-center mr-4">
             <Settings className="w-5 h-5 text-blue-600" />
           </div>
           <div>
@@ -1211,7 +1211,7 @@ const TelemedicineManagement = () => {
               type="text"
               value={platformSettings.platformName}
               onChange={(e) => handleSettingChange('platformName', e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
               placeholder="Enter platform name"
             />
           </div>
@@ -1240,7 +1240,7 @@ const TelemedicineManagement = () => {
               type="number"
               value={platformSettings.maxConcurrentSessions}
               onChange={(e) => handleSettingChange('maxConcurrentSessions', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
               min="1"
               max="1000"
             />
@@ -1253,7 +1253,7 @@ const TelemedicineManagement = () => {
               type="number"
               value={platformSettings.sessionTimeout}
               onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
               min="5"
               max="120"
             />
@@ -1263,10 +1263,10 @@ const TelemedicineManagement = () => {
       </div>
 
       {/* Session Configuration */}
-      <div className="bg-white shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
-            <Video className="w-5 h-5 text-purple-600" />
+          <div className="w-10 h-10 flex items-center justify-center mr-4">
+            <Video className="w-5 h-5 text-blue-600" />
           </div>
           <div>
             <h3 className="text-lg font-semibold">Session Configuration</h3>
@@ -1299,7 +1299,7 @@ const TelemedicineManagement = () => {
           <div className="pb-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Phone className="w-5 h-5 text-green-600 mr-3" />
+                <Phone className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
                   <label className="block text-sm font-medium mb-1">Audio Call Sessions</label>
                   <p className="text-xs text-gray-500">Enable voice-only consultation</p>
@@ -1320,7 +1320,7 @@ const TelemedicineManagement = () => {
           <div className="pb-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <MessageSquare className="w-5 h-5 text-indigo-600 mr-3" />
+                <MessageSquare className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
                   <label className="block text-sm font-medium mb-1">Messaging Sessions</label>
                   <p className="text-xs text-gray-500">Enable text-based consultation</p>
@@ -1343,7 +1343,7 @@ const TelemedicineManagement = () => {
             <select
               value={platformSettings.videoQuality}
               onChange={(e) => handleSettingChange('videoQuality', e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
             >
               <option value="low">Low (360p) - Best for slow connections</option>
               <option value="medium">Medium (480p) - Balanced quality</option>
@@ -1376,7 +1376,7 @@ const TelemedicineManagement = () => {
               type="number"
               value={platformSettings.maxSessionDuration}
               onChange={(e) => handleSettingChange('maxSessionDuration', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
               min="5"
               max="240"
             />
@@ -1389,7 +1389,7 @@ const TelemedicineManagement = () => {
               type="number"
               value={platformSettings.minSessionDuration}
               onChange={(e) => handleSettingChange('minSessionDuration', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
               min="1"
               max="30"
             />
@@ -1399,10 +1399,10 @@ const TelemedicineManagement = () => {
       </div>
 
       {/* Notification Settings */}
-      <div className="bg-white shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center mr-4">
-            <Bell className="w-5 h-5 text-yellow-600" />
+          <div className="w-10 h-10 flex items-center justify-center mr-4">
+            <Bell className="w-5 h-5 text-blue-600" />
           </div>
           <div>
             <h3 className="text-lg font-semibold">Notification Settings</h3>
@@ -1435,7 +1435,7 @@ const TelemedicineManagement = () => {
           <div className="pb-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Smartphone className="w-5 h-5 text-green-600 mr-3" />
+                <Smartphone className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
                   <label className="block text-sm font-medium mb-1">SMS Notifications</label>
                   <p className="text-xs text-gray-500">Send session updates via SMS</p>
@@ -1456,7 +1456,7 @@ const TelemedicineManagement = () => {
           <div className="pb-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Volume2 className="w-5 h-5 text-purple-600 mr-3" />
+                <Volume2 className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
                   <label className="block text-sm font-medium mb-1">Push Notifications</label>
                   <p className="text-xs text-gray-500">Send in-app notifications</p>
@@ -1479,7 +1479,7 @@ const TelemedicineManagement = () => {
             <select
               value={platformSettings.reminderBefore}
               onChange={(e) => handleSettingChange('reminderBefore', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
             >
               <option value="5">5 minutes before</option>
               <option value="10">10 minutes before</option>
@@ -1493,10 +1493,10 @@ const TelemedicineManagement = () => {
       </div>
 
       {/* Security & Privacy */}
-      <div className="bg-white shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mr-4">
-            <Shield className="w-5 h-5 text-red-600" />
+          <div className="w-10 h-10 flex items-center justify-center mr-4">
+            <Shield className="w-5 h-5 text-blue-600" />
           </div>
           <div>
             <h3 className="text-lg font-semibold">Security & Privacy</h3>
@@ -1544,7 +1544,7 @@ const TelemedicineManagement = () => {
           <div className="pb-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Lock className="w-5 h-5 text-red-600 mr-3" />
+                <Lock className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
                   <label className="block text-sm font-medium mb-1">End-to-End Encryption</label>
                   <p className="text-xs text-gray-500">Encrypt all session data in transit</p>
@@ -1583,10 +1583,10 @@ const TelemedicineManagement = () => {
       </div>
 
       {/* Payment Settings */}
-      <div className="bg-white shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-4">
-            <DollarSign className="w-5 h-5 text-green-600" />
+          <div className="w-10 h-10 flex items-center justify-center mr-4">
+             <DollarSign className="w-5 h-5 text-blue-600" />
           </div>
           <div>
             <h3 className="text-lg font-semibold">Payment Options</h3>
@@ -1652,10 +1652,10 @@ const TelemedicineManagement = () => {
       </div>
 
       {/* Operating Hours */}
-      <div className="bg-white shadow-sm border border-gray-200 p-6">
+      <div className="p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center mr-4">
-            <Clock className="w-5 h-5 text-indigo-600" />
+          <div className="w-10 h-10 flex items-center justify-center mr-4">
+            <Clock className="w-5 h-5 text-blue-600" />
           </div>
           <div>
             <h3 className="text-lg font-semibold">Operating Hours</h3>
@@ -1673,7 +1673,7 @@ const TelemedicineManagement = () => {
                 ...platformSettings.operatingHours,
                 start: e.target.value
               })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500  focus:outline-none focus:border-transparent"
             />
           </div>
 
@@ -1686,7 +1686,7 @@ const TelemedicineManagement = () => {
                 ...platformSettings.operatingHours,
                 end: e.target.value
               })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
             />
           </div>
 
