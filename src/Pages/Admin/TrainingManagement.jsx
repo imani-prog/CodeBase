@@ -51,6 +51,9 @@ import CourseDetailsModal from '../../Components/Admin/CourseDetailsModal';
 import EditCourseModal from '../../Components/Admin/EditCourseModal';
 import ConfirmationModal from '../../Components/Admin/ConfirmationModal';
 import StudentDetailsModal from '../../Components/Admin/StudentDetailsModal';
+import ViewInstructorModal from '../../Components/Admin/ViewInstructorModal';
+import EditInstructorModal from '../../Components/Admin/EditInstructorModal';
+import AddInstructorModal from '../../Components/Admin/AddInstructorModal';
 
 
 const TrainingManagement = () => {
@@ -68,9 +71,16 @@ const TrainingManagement = () => {
   const [showEditCourseModal, setShowEditCourseModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showStudentDetailsModal, setShowStudentDetailsModal] = useState(false);
+  const [showViewInstructorModal, setShowViewInstructorModal] = useState(false);
+  const [showEditInstructorModal, setShowEditInstructorModal] = useState(false);
+  const [showAddInstructorModal, setShowAddInstructorModal] = useState(false);
   const [confirmationAction, setConfirmationAction] = useState(null);
+  const [confirmationTitle, setConfirmationTitle] = useState('');
+  const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [confirmationType, setConfirmationType] = useState('warning');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedInstructor, setSelectedInstructor] = useState(null);
 
   // Sample training courses data with your provided structure
   const [trainingCourses, setTrainingCourses] = useState([
@@ -359,7 +369,7 @@ const TrainingManagement = () => {
   ];
 
   // Instructors data
-  const instructors = [
+  const [instructors, setInstructors] = useState([
     {
       id: 1,
       name: 'Dr. Grace Achieng',
@@ -488,7 +498,7 @@ const TrainingManagement = () => {
       completedCourses: 28,
       salary: 260000
     }
-  ];
+  ]);
 
   const enrollmentTrends = [
     { month: 'Jun', enrollments: 180, revenue: 2850000 },
@@ -556,6 +566,9 @@ const TrainingManagement = () => {
   const handleActivateCourse = (courseId) => {
     const course = trainingCourses.find(c => c.id === courseId);
     setSelectedCourse(course);
+    setConfirmationTitle('');
+    setConfirmationMessage('');
+    setConfirmationType('');
     setConfirmationAction(() => () => {
       setTrainingCourses(prevCourses => 
         prevCourses.map(c => 
@@ -570,6 +583,9 @@ const TrainingManagement = () => {
   const handlePauseCourse = (courseId) => {
     const course = trainingCourses.find(c => c.id === courseId);
     setSelectedCourse(course);
+    setConfirmationTitle('');
+    setConfirmationMessage('');
+    setConfirmationType('');
     setConfirmationAction(() => () => {
       setTrainingCourses(prevCourses => 
         prevCourses.map(c => 
@@ -616,6 +632,45 @@ const TrainingManagement = () => {
   const _handleDeleteCourse = (courseId) => {
     console.log('Deleting course:', courseId);
     // Implement course deletion logic
+  };
+
+  // Instructor handlers
+  const handleViewInstructor = (instructor) => {
+    setSelectedInstructor(instructor);
+    setShowViewInstructorModal(true);
+  };
+
+  const handleEditInstructor = (instructor) => {
+    setSelectedInstructor(instructor);
+    setShowEditInstructorModal(true);
+  };
+
+  const handleSaveEditedInstructor = (updatedInstructor) => {
+    setInstructors(prevInstructors => 
+      prevInstructors.map(instructor => 
+        instructor.id === updatedInstructor.id ? updatedInstructor : instructor
+      )
+    );
+    showFeedback('Instructor updated successfully!', 'success');
+  };
+
+  const handleAddInstructor = (newInstructor) => {
+    setInstructors(prevInstructors => [...prevInstructors, newInstructor]);
+    showFeedback('Instructor added successfully!', 'success');
+  };
+
+  const handleDeleteInstructor = (instructor) => {
+    setSelectedInstructor(instructor);
+    setConfirmationTitle('Delete Instructor');
+    setConfirmationMessage(`Are you sure you want to delete "${instructor.name}"? This action cannot be undone.`);
+    setConfirmationType('danger');
+    setConfirmationAction(() => () => {
+      setInstructors(prevInstructors => 
+        prevInstructors.filter(i => i.id !== instructor.id)
+      );
+      showFeedback('Instructor deleted successfully!', 'success');
+    });
+    setShowConfirmationModal(true);
   };
 
   const renderOverview = () => (
@@ -1301,7 +1356,10 @@ const TrainingManagement = () => {
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </button>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => setShowAddInstructorModal(true)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <UserPlus className="w-4 h-4 mr-2" />
             Add Instructor
           </button>
@@ -1408,13 +1466,25 @@ const TrainingManagement = () => {
                 </td>
                 <td className="px-4 py-4 text-right">
                   <div className="flex items-center justify-end space-x-2">
-                    <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                    <button 
+                      onClick={() => handleViewInstructor(instructor)}
+                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      title="View Details"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                    <button 
+                      onClick={() => handleEditInstructor(instructor)}
+                      className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                      title="Edit Instructor"
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">
+                    <button 
+                      onClick={() => handleDeleteInstructor(instructor)}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      title="Delete Instructor"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -1706,13 +1776,15 @@ const TrainingManagement = () => {
       <ConfirmationModal 
         showModal={showConfirmationModal}
         setShowModal={setShowConfirmationModal}
-        title={selectedCourse?.status === 'active' ? 'Pause Course' : 'Activate Course'}
+        title={confirmationTitle || (selectedCourse?.status === 'active' ? 'Pause Course' : 'Activate Course')}
         message={
-          selectedCourse?.status === 'active' 
-            ? `Are you sure you want to pause "${selectedCourse?.title}"? Students will not be able to access this course until it is activated again.`
-            : `Are you sure you want to activate "${selectedCourse?.title}"? This course will be visible and accessible to students.`
+          confirmationMessage || (
+            selectedCourse?.status === 'active' 
+              ? `Are you sure you want to pause "${selectedCourse?.title}"? Students will not be able to access this course until it is activated again.`
+              : `Are you sure you want to activate "${selectedCourse?.title}"? This course will be visible and accessible to students.`
+          )
         }
-        type={selectedCourse?.status === 'active' ? 'warning' : 'success'}
+        type={confirmationType || (selectedCourse?.status === 'active' ? 'warning' : 'success')}
         onConfirm={confirmationAction}
       />
       <StudentDetailsModal 
@@ -1720,6 +1792,22 @@ const TrainingManagement = () => {
         setShowModal={setShowStudentDetailsModal}
         student={selectedStudent}
         course={selectedCourse}
+      />
+      <ViewInstructorModal 
+        showModal={showViewInstructorModal}
+        setShowModal={setShowViewInstructorModal}
+        instructor={selectedInstructor}
+      />
+      <EditInstructorModal 
+        showModal={showEditInstructorModal}
+        setShowModal={setShowEditInstructorModal}
+        instructor={selectedInstructor}
+        onUpdateInstructor={handleSaveEditedInstructor}
+      />
+      <AddInstructorModal 
+        showModal={showAddInstructorModal}
+        setShowModal={setShowAddInstructorModal}
+        onAddInstructor={handleAddInstructor}
       />
 
       <div className="">
