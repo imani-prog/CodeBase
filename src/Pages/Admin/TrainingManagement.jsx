@@ -514,8 +514,9 @@ const TrainingManagement = () => {
     { id: 'students', label: 'Student Enrollment', icon: Users },
     { id: 'revenue', label: 'Revenue Analytics', icon: DollarSign },
     { id: 'certificates', label: 'Certifications', icon: Award },
-    { id: 'instructors', label: 'Instructors', icon: UserCheck },
-    { id: 'reports', label: 'Training Reports', icon: FileText }
+    { id: 'instructors', label: 'Instructors', icon: UserCheck }
+
+    // { id: 'reports', label: 'Training Reports', icon: FileText }
   ];
 
   const formatCurrency = (amount) => {
@@ -1857,7 +1858,11 @@ const TrainingManagement = () => {
             {activeTab === 'revenue' && renderRevenue()}
             {activeTab === 'certificates' && renderCertificates()}
             {activeTab === 'instructors' && renderInstructors()}
+
+
             {activeTab === 'reports' && renderReports()}
+
+            
           </div>
         </div>
       </div>
