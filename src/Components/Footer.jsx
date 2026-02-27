@@ -43,7 +43,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative w-full bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 text-gray-100 mt-auto overflow-hidden">
+    <footer className="relative w-full bg-slate-900 text-gray-100 mt-auto overflow-hidden">
       {/* Background Pattern */}
       
 

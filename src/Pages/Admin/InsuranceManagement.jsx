@@ -52,6 +52,16 @@ const InsuranceManagement = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('this-month');
   const [hasChanges, setHasChanges] = useState(false);
 
+  // Modal & form state
+  const [showAddProviderModal, setShowAddProviderModal] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [newProvider, setNewProvider] = useState({
+    name: '', type: 'Private', contactPerson: '', phone: '', email: '',
+    coverage: '', coveragePercentage: 80, ambulanceCover: false,
+    averageProcessingTime: '7 days', policyTypes: ''
+  });
+  const [providerErrors, setProviderErrors] = useState({});
+
   // Sample data for Kenyan insurance context
   const insuranceOverview = {
     totalProviders: 8,
@@ -336,12 +346,67 @@ const InsuranceManagement = () => {
     }
   };
 
+  // ---------- Quick Action handlers ----------
+
+  const handleAddProvider = () => {
+    setNewProvider({ name: '', type: 'Private', contactPerson: '', phone: '', email: '',
+      coverage: '', coveragePercentage: 80, ambulanceCover: false, averageProcessingTime: '7 days', policyTypes: '' });
+    setProviderErrors({});
+    setShowAddProviderModal(true);
+  };
+
+  const validateProvider = () => {
+    const errors = {};
+    if (!newProvider.name.trim()) errors.name = 'Provider name is required';
+    if (!newProvider.contactPerson.trim()) errors.contactPerson = 'Contact person is required';
+    if (!newProvider.phone.trim()) errors.phone = 'Phone number is required';
+    if (!newProvider.email.trim()) errors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newProvider.email)) errors.email = 'Enter a valid email';
+    if (!newProvider.coverage.trim()) errors.coverage = 'Coverage description is required';
+    return errors;
+  };
+
+  const handleAddProviderSubmit = (e) => {
+    e.preventDefault();
+    const errors = validateProvider();
+    if (Object.keys(errors).length > 0) { setProviderErrors(errors); return; }
+    // In a real app: POST to API then refresh providers list
+    alert(`Provider "${newProvider.name}" added successfully!`);
+    setShowAddProviderModal(false);
+  };
+
+  const handleProcessClaims = () => setActiveTab('claims');
+
+  const handleExportReport = () => {
+    setExportLoading(true);
+    // Build CSV from providers data
+    const headers = ['Provider Name','Type','Patients','Claims Processed','Total Amount (KES)','Coverage %','Ambulance Cover','Contact Person','Phone','Email','Status'];
+    const rows = insuranceProviders.map(p => [
+      `"${p.name}"`, p.type, p.patients, p.claimsProcessed, p.totalAmount,
+      p.coveragePercentage + '%', p.ambulanceCover ? 'Yes' : 'No',
+      `"${p.contactPerson}"`, p.phone, p.email, p.status
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `insurance-report-${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setTimeout(() => setExportLoading(false), 800);
+  };
+
+  const handleOpenSettings = () => setActiveTab('settings');
+
   // Render Overview Tab
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="border border-gray-200 p-6">
+        <div className="shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Total Providers</p>
@@ -420,19 +485,32 @@ const InsuranceManagement = () => {
         <div className="shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <button
+              onClick={handleAddProvider}
+              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
+            >
               <Plus className="w-5 h-5 text-blue-600 mr-2" />
               Add Provider
             </button>
-            <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <button
+              onClick={handleProcessClaims}
+              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
+            >
               <FileText className="w-5 h-5 text-blue-600 mr-2" />
               Process Claims
             </button>
-            <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <Download className="w-5 h-5 text-blue-600 mr-2" />
-              Export Report
+            <button
+              onClick={handleExportReport}
+              disabled={exportLoading}
+              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <Download className={`w-5 h-5 text-blue-600 mr-2 ${exportLoading ? 'animate-bounce' : ''}`} />
+              {exportLoading ? 'Exporting...' : 'Export Report'}
             </button>
-            <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <button
+              onClick={handleOpenSettings}
+              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
+            >
               <Settings className="w-5 h-5 text-blue-600 mr-2" />
               Settings
             </button>
@@ -537,84 +615,96 @@ const InsuranceManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 uppercase text-xs">
+      <div className="bg-white border border-gray-200 overflow-hidden overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
             <tr>
-              <th className="px-4 py-3 text-left">Provider Name</th>
-              <th className="px-4 py-3 text-center">Type</th>
-              <th className="px-4 py-3 text-center">Patients</th>
-              <th className="px-4 py-3 text-center">Claims</th>
-              <th className="px-4 py-3 text-right">Total Amount</th>
-              <th className="px-4 py-3 text-center">Coverage</th>
-              <th className="px-4 py-3 text-center">Ambulance</th>
-              <th className="px-4 py-3 text-left">Contact Person</th>
-              <th className="px-4 py-3 text-center">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="px-3 py-2 text-left font-semibold">Provider</th>
+              <th className="px-3 py-2 text-center font-semibold">Type</th>
+              <th className="px-3 py-2 text-center font-semibold">Patients</th>
+              <th className="px-3 py-2 text-center font-semibold">Claims</th>
+              <th className="px-3 py-2 text-right font-semibold">Total Amount</th>
+              <th className="px-3 py-2 text-center font-semibold">Coverage %</th>
+              <th className="px-3 py-2 text-center font-semibold">Proc. Time</th>
+              <th className="px-3 py-2 text-center font-semibold">Ambulance</th>
+              <th className="px-3 py-2 text-center font-semibold">Policy Types</th>
+              <th className="px-3 py-2 text-left font-semibold">Contact</th>
+              <th className="px-3 py-2 text-center font-semibold">Status</th>
+              <th className="px-3 py-2 text-right font-semibold">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-100">
             {insuranceProviders.map((provider) => (
-              <tr key={provider.id} className="hover:bg-gray-50">
-                <td className="px-4 py-4">
-                  <div>
-                    <p className="font-semibold">{provider.name}</p>
-                    <p className="text-xs text-gray-500">{provider.coverage}</p>
-                  </div>
+              <tr key={provider.id} className="hover:bg-blue-50/40 transition-colors">
+                <td className="px-3 py-2 max-w-[180px]">
+                  <p className="font-semibold text-gray-800 leading-tight truncate">{provider.name}</p>
+                  <p className="text-gray-400 truncate leading-tight">{provider.coverage}</p>
                 </td>
-                <td className="px-4 py-4 text-center">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${
-                    provider.type === 'Government' ? ' text-blue-800' : ' text-blue-800'
+                <td className="px-3 py-2 text-center whitespace-nowrap">
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${
+                    provider.type === 'Government'
+                      ? 'text-blue-700 border-blue-200'
+                      : 'text-blue-950 border-blue-950'
                   }`}>
                     {provider.type}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-center">
-                  <span className="font-semibold">{provider.patients.toLocaleString()}</span>
+                <td className="px-3 py-2 text-center font-semibold text-gray-800">
+                  {provider.patients.toLocaleString()}
                 </td>
-                <td className="px-4 py-4 text-center">
-                  <span className="font-semibold">{provider.claimsProcessed}</span>
+                <td className="px-3 py-2 text-center font-semibold text-gray-800">
+                  {provider.claimsProcessed}
                 </td>
-                <td className="px-4 py-4 text-right">
-                  <span className="font-semibold">{formatCurrency(provider.totalAmount)}</span>
+                <td className="px-3 py-2 text-right font-semibold text-gray-800 whitespace-nowrap">
+                  {formatCurrency(provider.totalAmount)}
                 </td>
-                <td className="px-4 py-4 text-center">
-                  <div className="flex flex-col items-center">
-                    <span className="text-sm font-medium mb-1">{provider.coveragePercentage}%</span>
-                    <div className="w-16 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-500 h-2 rounded-full" 
+                <td className="px-3 py-2 text-center">
+                  <div className="flex items-center gap-1.5 justify-center">
+                    <div className="">
+                      <div
+                        
                         style={{ width: `${provider.coveragePercentage}%` }}
-                      ></div>
+                      />
                     </div>
+                    <span className="font-semibold text-gray-700 w-7 text-right leading-none">
+                      {provider.coveragePercentage}%
+                    </span>
                   </div>
                 </td>
-                <td className="px-4 py-4 text-center">
-                  <span className={`px-2 py-1 font-medium rounded-full border ${
-                    provider.ambulanceCover ? ' text-green-800' : ' text-red-800'
+                <td className="px-3 py-2 text-center font-semibold">
+                  {provider.averageProcessingTime}
+                </td>
+                <td className="px-3 py-2 text-center">
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${
+                    provider.ambulanceCover
+                      ? 'text-green-700 '
+                      : 'text-red-600'
                   }`}>
                     {provider.ambulanceCover ? 'Yes' : 'No'}
                   </span>
                 </td>
-                <td className="px-4 py-4">
-                  <div>
-                    <p className="text-sm font-medium">{provider.contactPerson}</p>
-                    <p className="text-xs text-gray-500">{provider.phone}</p>
-                    <p className="text-xs text-gray-500">{provider.email}</p>
-                  </div>
+                <td className="px-3 py-2 text-center">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 font-medium">
+                    {provider.policyTypes.length}
+                    <span className="">plans</span>
+                  </span>
                 </td>
-                <td className="px-4 py-4 text-center">
-                  <span className="px-2 py-1 font-medium text-green-800">
+                <td className="px-3 py-2 max-w-[160px]">
+                  <p className="font-medium text-gray-900 leading-tight truncate">{provider.contactPerson}</p>
+                  <p className="text-gray-600 leading-tight truncate">{provider.phone} · {provider.email}</p>
+                </td>
+                <td className="px-3 py-2 text-center">
+                  <span className="px-2 py-0.5 text-xs font-medium text-green-700 ">
                     {provider.status}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-right">
-                  <div className="flex items-center justify-end space-x-2">
-                    <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
-                      <Eye className="w-4 h-4" />
+                <td className="px-3 py-2 text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <button className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors">
+                      <Eye className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors">
-                      <Edit className="w-4 h-4" />
+                    <button className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors">
+                      <Edit className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </td>
@@ -1674,8 +1764,194 @@ const InsuranceManagement = () => {
     );
   };
 
+  // ---------- Add Provider Modal -
+  const renderAddProviderModal = () => {
+    if (!showAddProviderModal) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/60 backdrop-blur" onClick={() => setShowAddProviderModal(false)} />
+        <div className="relative bg-white shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-5 border-b border-gray-200">
+            <div className="flex items-center">
+              <Building2 className="w-5 h-5 text-blue-600 mr-2" />
+              <h2 className="text-lg font-semibold">Add Insurance Provider</h2>
+            </div>
+            <button onClick={() => setShowAddProviderModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500">
+              <XCircle className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleAddProviderSubmit} className="p-5 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Provider Name */}
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium mb-1">Provider Name <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={newProvider.name}
+                  onChange={e => { setNewProvider(p => ({...p, name: e.target.value})); setProviderErrors(er => ({...er, name: ''})); }}
+                  placeholder="e.g. APA Insurance"
+                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.name ? 'border-red-400' : 'border-gray-300'}`}
+                />
+                {providerErrors.name && <p className="text-xs text-red-500 mt-1">{providerErrors.name}</p>}
+              </div>
+
+              {/* Type */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Provider Type</label>
+                <select
+                  value={newProvider.type}
+                  onChange={e => setNewProvider(p => ({...p, type: e.target.value}))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Government">Government</option>
+                  <option value="Private">Private</option>
+                  <option value="NGO">NGO</option>
+                  <option value="Corporate">Corporate</option>
+                </select>
+              </div>
+
+              {/* Coverage Description */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Coverage Description <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={newProvider.coverage}
+                  onChange={e => { setNewProvider(p => ({...p, coverage: e.target.value})); setProviderErrors(er => ({...er, coverage: ''})); }}
+                  placeholder="e.g. Comprehensive Health Insurance"
+                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.coverage ? 'border-red-400' : 'border-gray-300'}`}
+                />
+                {providerErrors.coverage && <p className="text-xs text-red-500 mt-1">{providerErrors.coverage}</p>}
+              </div>
+
+              {/* Contact Person */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Contact Person <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={newProvider.contactPerson}
+                  onChange={e => { setNewProvider(p => ({...p, contactPerson: e.target.value})); setProviderErrors(er => ({...er, contactPerson: ''})); }}
+                  placeholder="Full name"
+                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.contactPerson ? 'border-red-400' : 'border-gray-300'}`}
+                />
+                {providerErrors.contactPerson && <p className="text-xs text-red-500 mt-1">{providerErrors.contactPerson}</p>}
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Phone Number <span className="text-red-500">*</span></label>
+                <input
+                  type="tel"
+                  value={newProvider.phone}
+                  onChange={e => { setNewProvider(p => ({...p, phone: e.target.value})); setProviderErrors(er => ({...er, phone: ''})); }}
+                  placeholder="+254-700-000000"
+                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.phone ? 'border-red-400' : 'border-gray-300'}`}
+                />
+                {providerErrors.phone && <p className="text-xs text-red-500 mt-1">{providerErrors.phone}</p>}
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Email Address <span className="text-red-500">*</span></label>
+                <input
+                  type="email"
+                  value={newProvider.email}
+                  onChange={e => { setNewProvider(p => ({...p, email: e.target.value})); setProviderErrors(er => ({...er, email: ''})); }}
+                  placeholder="claims@provider.co.ke"
+                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.email ? 'border-red-400' : 'border-gray-300'}`}
+                />
+                {providerErrors.email && <p className="text-xs text-red-500 mt-1">{providerErrors.email}</p>}
+              </div>
+
+              {/* Coverage % */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Coverage Percentage</label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="range" min="0" max="100"
+                    value={newProvider.coveragePercentage}
+                    onChange={e => setNewProvider(p => ({...p, coveragePercentage: parseInt(e.target.value)}))}
+                    className="flex-1 accent-blue-600"
+                  />
+                  <span className="text-sm font-semibold w-10 text-right">{newProvider.coveragePercentage}%</span>
+                </div>
+              </div>
+
+              {/* Avg Processing Time */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Average Processing Time</label>
+                <select
+                  value={newProvider.averageProcessingTime}
+                  onChange={e => setNewProvider(p => ({...p, averageProcessingTime: e.target.value}))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="1 day">1 day</option>
+                  <option value="3 days">3 days</option>
+                  <option value="5 days">5 days</option>
+                  <option value="7 days">7 days</option>
+                  <option value="10 days">10 days</option>
+                  <option value="14 days">14 days</option>
+                </select>
+              </div>
+
+              {/* Policy Types */}
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium mb-1">Policy Types</label>
+                <input
+                  type="text"
+                  value={newProvider.policyTypes}
+                  onChange={e => setNewProvider(p => ({...p, policyTypes: e.target.value}))}
+                  placeholder="e.g. Inpatient, Outpatient, Maternity (comma-separated)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Ambulance Cover toggle */}
+              <div className="sm:col-span-2 flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium">Ambulance Coverage</p>
+                  <p className="text-xs text-gray-500">Does this provider cover ambulance services?</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newProvider.ambulanceCover}
+                    onChange={e => setNewProvider(p => ({...p, ambulanceCover: e.target.checked}))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end space-x-3 pt-2 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => setShowAddProviderModal(false)}
+                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+              >
+                <Plus className="w-4 h-4 mr-1.5" />
+                Add Provider
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {renderAddProviderModal()}
       <div className="">
         <main className="">
           <div className="">
