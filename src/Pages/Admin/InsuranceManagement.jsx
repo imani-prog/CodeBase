@@ -70,6 +70,17 @@ const InsuranceManagement = () => {
   const [editProvider, setEditProvider] = useState(null);
   const [editProviderErrors, setEditProviderErrors] = useState({});
 
+  // Patient coverage modal state
+  const [showViewCoverageModal, setShowViewCoverageModal] = useState(false);
+  const [selectedCoverageData, setSelectedCoverageData] = useState(null);
+
+  const [showEditCoverageModal, setShowEditCoverageModal] = useState(false);
+  const [editCoverage, setEditCoverage] = useState(null);
+  const [editCoverageErrors, setEditCoverageErrors] = useState({});
+
+  const [showClaimsHistoryModal, setShowClaimsHistoryModal] = useState(false);
+  const [selectedClaimsPatient, setSelectedClaimsPatient] = useState(null);
+
   // Sample data for Kenyan insurance context
   const insuranceOverview = {
     totalProviders: 8,
@@ -411,6 +422,40 @@ const InsuranceManagement = () => {
     if (Object.keys(errors).length > 0) { setEditProviderErrors(errors); return; }
     alert(`Provider "${editProvider.name}" updated successfully!`);
     setShowEditProviderModal(false);
+  };
+
+  // Patient coverage modal handlers
+  const handleViewCoverage = (patient) => {
+    setSelectedCoverageData(patient);
+    setShowViewCoverageModal(true);
+  };
+
+  const handleEditCoverage = (patient) => {
+    setEditCoverage({ ...patient });
+    setEditCoverageErrors({});
+    setShowEditCoverageModal(true);
+  };
+
+  const validateEditCoverage = () => {
+    const errors = {};
+    if (!editCoverage.insuranceProvider.trim()) errors.insuranceProvider = 'Provider is required';
+    if (!editCoverage.policyNumber.trim()) errors.policyNumber = 'Policy number is required';
+    if (!editCoverage.policyType.trim()) errors.policyType = 'Policy type is required';
+    if (!editCoverage.renewalDate) errors.renewalDate = 'Renewal date is required';
+    return errors;
+  };
+
+  const handleEditCoverageSubmit = (e) => {
+    e.preventDefault();
+    const errors = validateEditCoverage();
+    if (Object.keys(errors).length > 0) { setEditCoverageErrors(errors); return; }
+    alert(`Coverage for "${editCoverage.patientName}" updated successfully!`);
+    setShowEditCoverageModal(false);
+  };
+
+  const handleViewClaimsHistory = (patient) => {
+    setSelectedClaimsPatient(patient);
+    setShowClaimsHistoryModal(true);
   };
 
   const handleProcessClaims = () => setActiveTab('claims');
@@ -866,13 +911,13 @@ const InsuranceManagement = () => {
                     </td>
                     <td className="px-3 py-2 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="View">
+                        <button onClick={() => handleViewCoverage(patient)} className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="View coverage">
                           <Eye className="w-3.5 h-3.5" />
                         </button>
-                        <button className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors" title="Edit">
+                        <button onClick={() => handleEditCoverage(patient)} className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors" title="Edit coverage">
                           <Edit className="w-3.5 h-3.5" />
                         </button>
-                        <button className="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors" title="Claims">
+                        <button onClick={() => handleViewClaimsHistory(patient)} className="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors" title="Claims history">
                           <Receipt className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -1834,7 +1879,400 @@ const InsuranceManagement = () => {
     );
   };
 
-  // ---------- Add Provider Modal -
+
+  // ─── Patient Coverage Modals ────────────────────────────────
+  const renderViewCoverageModal = () => {
+    if (!showViewCoverageModal || !selectedCoverageData) return null;
+    const p = selectedCoverageData;
+    const remainingPct = Math.round((p.remainingAmount / p.coverageAmount) * 100);
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowViewCoverageModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-xl overflow-hidden">
+            {/* Header */}
+            <div className="relative px-6 py-5 bg-blue-950 text-white">
+              <button onClick={() => setShowViewCoverageModal(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all">
+                <XCircle className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center ring-4 ring-white/20">
+                  <span className="text-xl font-bold">{p.patientName.split(' ').map(n => n[0]).join('')}</span>
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold leading-tight">{p.patientName}</h2>
+                  <p className="text-sm text-blue-200">{p.patientId} &middot; {p.dependents} dependents</p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-500/30 text-blue-100">{p.insuranceProvider}</span>
+                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-white/20 text-white">{p.policyType}</span>
+                    <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                      p.status === 'Active' ? 'bg-green-500/30 text-green-100' : 'bg-red-500/30 text-red-100'
+                    }`}>{p.status}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4 max-h-[68vh] overflow-y-auto">
+
+              {/* Donut chart — used vs remaining */}
+              {(() => {
+                const usedPct = 100 - remainingPct;
+                const r = 36;
+                const cx = 52;
+                const cy = 52;
+                const circumference = 2 * Math.PI * r;
+                const usedDash = (usedPct / 100) * circumference;
+                const remainDash = (remainingPct / 100) * circumference;
+                const usedColor = usedPct < 50 ? '#22c55e' : usedPct < 75 ? '#f59e0b' : '#ef4444';
+                const remainColor = '#3b82f6';
+                return (
+                  <div className="border border-gray-200 p-4 flex items-center gap-5">
+                    {/* SVG donut */}
+                    <svg width="104" height="104" viewBox="0 0 104 104" className="flex-shrink-0">
+                      {/* Track */}
+                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth="13" />
+                      {/* Remaining arc */}
+                      <circle
+                        cx={cx} cy={cy} r={r} fill="none"
+                        stroke={remainColor} strokeWidth="13"
+                        strokeDasharray={`${remainDash} ${circumference - remainDash}`}
+                        strokeDashoffset={-usedDash}
+                        strokeLinecap="butt"
+                        style={{ transform: 'rotate(-90deg)', transformOrigin: `${cx}px ${cy}px` }}
+                      />
+                      {/* Used arc */}
+                      <circle
+                        cx={cx} cy={cy} r={r} fill="none"
+                        stroke={usedColor} strokeWidth="13"
+                        strokeDasharray={`${usedDash} ${circumference - usedDash}`}
+                        strokeLinecap="butt"
+                        style={{ transform: 'rotate(-90deg)', transformOrigin: `${cx}px ${cy}px` }}
+                      />
+                      {/* Center label */}
+                      <text x={cx} y={cy - 5} textAnchor="middle" fontSize="13" fontWeight="700" fill="#1e3a5f">{usedPct}%</text>
+                      <text x={cx} y={cy + 10} textAnchor="middle" fontSize="8" fill="#6b7280">USED</text>
+                    </svg>
+
+                    {/* Legend */}
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: usedColor }} />
+                          <span className="text-xs font-medium text-gray-600">Used</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-gray-800">{formatCurrency(p.usedAmount)}</p>
+                          <p className="text-xs text-gray-400">{usedPct}% of cover</p>
+                        </div>
+                      </div>
+                      <div className="h-px bg-gray-100" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: remainColor }} />
+                          <span className="text-xs font-medium text-gray-600">Remaining</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-gray-800">{formatCurrency(p.remainingAmount)}</p>
+                          <p className="text-xs text-gray-400">{remainingPct}% of cover</p>
+                        </div>
+                      </div>
+                      <div className="h-px bg-gray-100" />
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-gray-500">Total Cover</span>
+                        <span className="text-sm font-bold text-gray-800">{formatCurrency(p.coverageAmount)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Policy Details */}
+              <div className="border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Receipt className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Policy Details</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {[
+                    ['Policy Number', p.policyNumber],
+                    ['Policy Type', p.policyType],
+                    ['Insurance Provider', p.insuranceProvider],
+                    ['Expiry / Renewal', p.renewalDate],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider">{label}</p>
+                      <p className="font-medium text-gray-800 mt-0.5">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Last Claim */}
+              <div className="border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Last Claim</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider">Date</p>
+                    <p className="font-medium text-gray-800 mt-0.5">{p.lastClaim}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider">Amount</p>
+                    <p className="font-medium text-gray-800 mt-0.5">{formatCurrency(p.claimAmount)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button onClick={() => setShowViewCoverageModal(false)} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium">Close</button>
+              <button
+                onClick={() => { setShowViewCoverageModal(false); handleEditCoverage(p); }}
+                className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
+              >
+                <Edit className="w-4 h-4" /> Edit Coverage
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderEditCoverageModal = () => {
+    if (!showEditCoverageModal || !editCoverage) return null;
+    const fieldErr = (key) => editCoverageErrors[key] ? (
+      <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{editCoverageErrors[key]}</p>
+    ) : null;
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowEditCoverageModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-xl overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-5 bg-blue-950 text-white">
+              <button onClick={() => setShowEditCoverageModal(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all">
+                <XCircle className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Edit className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">Edit Patient Coverage</h2>
+                  <p className="text-sm text-blue-200">{editCoverage.patientName} &middot; {editCoverage.patientId}</p>
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={handleEditCoverageSubmit} className="p-6 space-y-5 max-h-[72vh] overflow-y-auto">
+              {/* Policy Information */}
+              <div className="border border-gray-200 rounded-xl p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Receipt className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Policy Information</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Insurance Provider <span className="text-red-500">*</span></label>
+                    <input type="text" value={editCoverage.insuranceProvider}
+                      onChange={e => { setEditCoverage(p => ({...p, insuranceProvider: e.target.value})); setEditCoverageErrors(er => ({...er, insuranceProvider: ''})); }}
+                      className={`w-full px-4 py-2.5 border ${ editCoverageErrors.insuranceProvider ? 'border-red-400' : 'border-gray-300'} rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent`}
+                    />
+                    {fieldErr('insuranceProvider')}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Policy Type <span className="text-red-500">*</span></label>
+                    <input type="text" value={editCoverage.policyType}
+                      onChange={e => { setEditCoverage(p => ({...p, policyType: e.target.value})); setEditCoverageErrors(er => ({...er, policyType: ''})); }}
+                      className={`w-full px-4 py-2.5 border ${ editCoverageErrors.policyType ? 'border-red-400' : 'border-gray-300'} rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent`}
+                    />
+                    {fieldErr('policyType')}
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Policy Number <span className="text-red-500">*</span></label>
+                    <input type="text" value={editCoverage.policyNumber}
+                      onChange={e => { setEditCoverage(p => ({...p, policyNumber: e.target.value})); setEditCoverageErrors(er => ({...er, policyNumber: ''})); }}
+                      className={`w-full px-4 py-2.5 border ${ editCoverageErrors.policyNumber ? 'border-red-400' : 'border-gray-300'} rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent font-mono`}
+                    />
+                    {fieldErr('policyNumber')}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Renewal Date <span className="text-red-500">*</span></label>
+                    <input type="date" value={editCoverage.renewalDate}
+                      onChange={e => { setEditCoverage(p => ({...p, renewalDate: e.target.value})); setEditCoverageErrors(er => ({...er, renewalDate: ''})); }}
+                      className={`w-full px-4 py-2.5 border ${ editCoverageErrors.renewalDate ? 'border-red-400' : 'border-gray-300'} rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent`}
+                    />
+                    {fieldErr('renewalDate')}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Dependents</label>
+                    <input type="number" min="0" value={editCoverage.dependents}
+                      onChange={e => setEditCoverage(p => ({...p, dependents: parseInt(e.target.value) || 0}))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Coverage Amounts */}
+              <div className="border border-gray-200 rounded-xl p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Coverage Amounts</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[['Coverage Amount', 'coverageAmount'], ['Used Amount', 'usedAmount'], ['Remaining Amount', 'remainingAmount']].map(([label, key]) => (
+                    <div key={key}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+                      <div className="relative">
+                        <span className="absolute left-3 inset-y-0 flex items-center text-gray-400 text-sm">KES</span>
+                        <input type="number" value={editCoverage[key]}
+                          onChange={e => setEditCoverage(p => ({...p, [key]: parseFloat(e.target.value) || 0}))}
+                          className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="border border-gray-200 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Activity className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Status</span>
+                </div>
+                <select value={editCoverage.status}
+                  onChange={e => setEditCoverage(p => ({...p, status: e.target.value}))}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Expired">Expired</option>
+                  <option value="Suspended">Suspended</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-1 border-t border-gray-100">
+                <button type="button" onClick={() => setShowEditCoverageModal(false)} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">Cancel</button>
+                <button type="submit" className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium">
+                  <Save className="w-4 h-4" /> Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderClaimsHistoryModal = () => {
+    if (!showClaimsHistoryModal || !selectedClaimsPatient) return null;
+    const p = selectedClaimsPatient;
+    // Sample claims for this patient derived from claimsData or mock fallback
+    const patientClaims = claimsData.filter(c =>
+      c.insuranceProvider === p.insuranceProvider
+    ).slice(0, 4);
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowClaimsHistoryModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-2xl overflow-hidden">
+            {/* Header */}
+            <div className="relative px-6 py-5 bg-blue-950 text-white">
+              <button onClick={() => setShowClaimsHistoryModal(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all">
+                <XCircle className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center ring-4 ring-white/20">
+                  <Receipt className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">Claims History</h2>
+                  <p className="text-sm text-blue-200">{p.patientName} &middot; {p.patientId} &middot; {p.insuranceProvider}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+              {/* Summary */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Last Claim Date', value: p.lastClaim },
+                  { label: 'Last Claim Amount', value: formatCurrency(p.claimAmount) },
+                  { label: 'Total Used', value: formatCurrency(p.usedAmount) },
+                ].map(({ label, value }) => (
+                  <div key={label} className="border border-gray-200 rounded-xl p-3 text-center bg-gray-50">
+                    <p className="text-sm font-bold text-gray-800">{value}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Claims table */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden">
+                <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Recent Claims ({patientClaims.length})</span>
+                </div>
+                {patientClaims.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-sm text-gray-400">No claims found for this patient.</div>
+                ) : (
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-semibold uppercase tracking-wide">Claim No.</th>
+                        <th className="px-3 py-2 text-left font-semibold uppercase tracking-wide">Type</th>
+                        <th className="px-3 py-2 text-left font-semibold uppercase tracking-wide">Diagnosis</th>
+                        <th className="px-3 py-2 text-right font-semibold uppercase tracking-wide">Claimed</th>
+                        <th className="px-3 py-2 text-right font-semibold uppercase tracking-wide">Approved</th>
+                        <th className="px-3 py-2 text-center font-semibold uppercase tracking-wide">Status</th>
+                        <th className="px-3 py-2 text-center font-semibold uppercase tracking-wide">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {patientClaims.map((claim) => (
+                        <tr key={claim.id} className="hover:bg-blue-50/30">
+                          <td className="px-3 py-2 font-mono text-gray-700">{claim.claimNumber}</td>
+                          <td className="px-3 py-2 text-gray-600">{claim.claimType}</td>
+                          <td className="px-3 py-2 text-gray-600 max-w-[140px] truncate">{claim.diagnosis}</td>
+                          <td className="px-3 py-2 text-right font-medium text-gray-800">{formatCurrency(claim.claimAmount)}</td>
+                          <td className="px-3 py-2 text-right font-medium text-green-700">{formatCurrency(claim.approvedAmount)}</td>
+                          <td className="px-3 py-2 text-center">
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${
+                              claim.status === 'Approved' ? 'bg-green-50 text-green-700 border-green-200'
+                              : claim.status === 'Processing' ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                              : 'bg-red-50 text-red-600 border-red-200'
+                            }`}>{claim.status}</span>
+                          </td>
+                          <td className="px-3 py-2 text-center text-gray-500">{claim.submissionDate}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button onClick={() => setShowClaimsHistoryModal(false)} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium">Close</button>
+              <button
+                onClick={() => { setShowClaimsHistoryModal(false); setActiveTab('claims'); }}
+                className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
+              >
+                <FileText className="w-4 h-4" /> Go to Claims
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderViewProviderModal = () => {
     if (!showViewProviderModal || !selectedProviderData) return null;
     const p = selectedProviderData;
@@ -2344,6 +2782,9 @@ const InsuranceManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {renderViewCoverageModal()}
+      {renderEditCoverageModal()}
+      {renderClaimsHistoryModal()}
       {renderViewProviderModal()}
       {renderEditProviderModal()}
       {renderAddProviderModal()}
