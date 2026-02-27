@@ -1167,561 +1167,397 @@ const TelemedicineManagement = () => {
   );
 
   const renderSettings = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Save Bar */}
-      {!settingsSaved && (
-        <div className="p-4 flex items-center justify-between">
+      {/* {!settingsSaved && (
+        <div className="border border-blue-200 bg-blue-50 rounded-lg px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center">
-            <AlertCircle className="w-5 h-5 text-blue-600 mr-3" />
+            <AlertCircle className="w-4 h-4 text-blue-600 mr-2" />
             <span className="text-sm text-blue-900">You have unsaved changes</span>
           </div>
           <button
             onClick={handleSaveSettings}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="w-3.5 h-3.5 mr-1.5" />
             Save Changes
           </button>
         </div>
-      )}
+      )} */}
 
       {settingsSaved && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
-          <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 flex items-center">
+          <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
           <span className="text-sm text-green-900">Settings saved successfully</span>
         </div>
       )}
 
-      {/* General Settings */}
-      <div className="p-6">
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10  flex items-center justify-center mr-4">
-            <Settings className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold">General Settings</h3>
-            <p className="text-sm text-gray-600">Configure basic platform parameters</p>
-          </div>
-        </div>
-        
-        <div className="space-y-5">
-          <div className="pb-4 border-b border-gray-200">
-            <label className="block text-sm font-medium mb-2">Platform Name</label>
-            <input
-              type="text"
-              value={platformSettings.platformName}
-              onChange={(e) => handleSettingChange('platformName', e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
-              placeholder="Enter platform name"
-            />
-          </div>
+      {/* General + Session Configuration */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+        {/* General Settings */}
+        <div className="bg-white border border-gray-200 p-4">
+          <div className="flex items-center mb-4">
+            <Settings className="w-4 h-4 text-blue-600 mr-2" />
+            <div>
+              <h3 className="text-sm font-semibold">General Settings</h3>
+              <p className="text-xs text-gray-500">Configure basic platform parameters</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium mb-1">Platform Name</label>
+              <input
+                type="text"
+                value={platformSettings.platformName}
+                onChange={(e) => handleSettingChange('platformName', e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
+                placeholder="Enter platform name"
+              />
+            </div>
+            <div className="flex items-center justify-between py-2 border-t border-gray-100">
               <div>
-                <label className="block text-sm font-medium mb-1">Enable Platform</label>
+                <p className="text-xs font-medium">Enable Platform</p>
                 <p className="text-xs text-gray-500">Allow telemedicine services to operate</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.platformEnabled}
-                  onChange={(e) => handleSettingChange('platformEnabled', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.platformEnabled} onChange={(e) => handleSettingChange('platformEnabled', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <label className="block text-sm font-medium mb-2">Max Concurrent Sessions</label>
-            <input
-              type="number"
-              value={platformSettings.maxConcurrentSessions}
-              onChange={(e) => handleSettingChange('maxConcurrentSessions', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
-              min="1"
-              max="1000"
-            />
-            <p className="text-xs text-gray-500 mt-1">Maximum number of simultaneous sessions allowed</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Session Timeout (minutes)</label>
-            <input
-              type="number"
-              value={platformSettings.sessionTimeout}
-              onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
-              min="5"
-              max="120"
-            />
-            <p className="text-xs text-gray-500 mt-1">Automatically end inactive sessions after this duration</p>
+            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-gray-100">
+              <div>
+                <label className="block text-xs font-medium mb-1">Max Concurrent Sessions</label>
+                <input
+                  type="number"
+                  value={platformSettings.maxConcurrentSessions}
+                  onChange={(e) => handleSettingChange('maxConcurrentSessions', parseInt(e.target.value))}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  min="1" max="1000"
+                />
+                <p className="text-xs text-gray-400 mt-0.5">Max simultaneous sessions</p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1">Session Timeout (min)</label>
+                <input
+                  type="number"
+                  value={platformSettings.sessionTimeout}
+                  onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  min="5" max="120"
+                />
+                <p className="text-xs text-gray-400 mt-0.5">Auto-end inactive sessions</p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Session Configuration */}
-      <div className="p-6">
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10 flex items-center justify-center mr-4">
-            <Video className="w-5 h-5 text-blue-600" />
+        {/* Session Configuration */}
+        <div className="bg-white border border-gray-200 p-4">
+          <div className="flex items-center mb-4">
+            <Video className="w-4 h-4 text-blue-600 mr-2" />
+            <div>
+              <h3 className="text-sm font-semibold">Session Configuration</h3>
+              <p className="text-xs text-gray-500">Configure session types and quality</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold">Session Configuration</h3>
-            <p className="text-sm text-gray-600">Configure session types and quality settings</p>
-          </div>
-        </div>
-        
-        <div className="space-y-5">
-          <div className="pb-4 border-b border-gray-200">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Video className="w-5 h-5 text-blue-600 mr-3" />
+                <Video className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
-                  <label className="block text-sm font-medium mb-1">Video Call Sessions</label>
-                  <p className="text-xs text-gray-500">Enable video consultation capability</p>
+                  <p className="text-xs font-medium">Video Call Sessions</p>
+                  <p className="text-xs text-gray-500">Enable video consultation</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.allowVideoCall}
-                  onChange={(e) => handleSettingChange('allowVideoCall', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.allowVideoCall} onChange={(e) => handleSettingChange('allowVideoCall', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div className="flex items-center">
-                <Phone className="w-5 h-5 text-blue-600 mr-3" />
+                <Phone className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
-                  <label className="block text-sm font-medium mb-1">Audio Call Sessions</label>
+                  <p className="text-xs font-medium">Audio Call Sessions</p>
                   <p className="text-xs text-gray-500">Enable voice-only consultation</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.allowAudioCall}
-                  onChange={(e) => handleSettingChange('allowAudioCall', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.allowAudioCall} onChange={(e) => handleSettingChange('allowAudioCall', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div className="flex items-center">
-                <MessageSquare className="w-5 h-5 text-blue-600 mr-3" />
+                <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
-                  <label className="block text-sm font-medium mb-1">Messaging Sessions</label>
+                  <p className="text-xs font-medium">Messaging Sessions</p>
                   <p className="text-xs text-gray-500">Enable text-based consultation</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.allowMessaging}
-                  onChange={(e) => handleSettingChange('allowMessaging', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.allowMessaging} onChange={(e) => handleSettingChange('allowMessaging', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <label className="block text-sm font-medium mb-2">Video Quality</label>
-            <select
-              value={platformSettings.videoQuality}
-              onChange={(e) => handleSettingChange('videoQuality', e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
-            >
-              <option value="low">Low (360p) - Best for slow connections</option>
-              <option value="medium">Medium (480p) - Balanced quality</option>
-              <option value="high">High (720p) - Recommended</option>
-              <option value="hd">HD (1080p) - Best quality</option>
-            </select>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div>
-                <label className="block text-sm font-medium mb-1">Auto-Record Sessions</label>
-                <p className="text-xs text-gray-500">Automatically record all telemedicine sessions</p>
+                <p className="text-xs font-medium">Auto-Record Sessions</p>
+                <p className="text-xs text-gray-500">Record all sessions automatically</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.autoRecordSessions}
-                  onChange={(e) => handleSettingChange('autoRecordSessions', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.autoRecordSessions} onChange={(e) => handleSettingChange('autoRecordSessions', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <label className="block text-sm font-medium mb-2">Maximum Session Duration (minutes)</label>
-            <input
-              type="number"
-              value={platformSettings.maxSessionDuration}
-              onChange={(e) => handleSettingChange('maxSessionDuration', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
-              min="5"
-              max="240"
-            />
-            <p className="text-xs text-gray-500 mt-1">Maximum allowed time for a single session</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Minimum Session Duration (minutes)</label>
-            <input
-              type="number"
-              value={platformSettings.minSessionDuration}
-              onChange={(e) => handleSettingChange('minSessionDuration', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
-              min="1"
-              max="30"
-            />
-            <p className="text-xs text-gray-500 mt-1">Minimum billable session duration</p>
+            <div className="border-t border-gray-100 pt-2">
+              <label className="block text-xs font-medium mb-1">Video Quality</label>
+              <select
+                value={platformSettings.videoQuality}
+                onChange={(e) => handleSettingChange('videoQuality', e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                <option value="low">Low (360p)</option>
+                <option value="medium">Medium (480p)</option>
+                <option value="high">High (720p)</option>
+                <option value="hd">HD (1080p)</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-2">
+              <div>
+                <label className="block text-xs font-medium mb-1">Max Duration (min)</label>
+                <input type="number" value={platformSettings.maxSessionDuration} onChange={(e) => handleSettingChange('maxSessionDuration', parseInt(e.target.value))} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" min="5" max="240" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1">Min Duration (min)</label>
+                <input type="number" value={platformSettings.minSessionDuration} onChange={(e) => handleSettingChange('minSessionDuration', parseInt(e.target.value))} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" min="1" max="30" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Notification Settings */}
-      <div className="p-6">
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10 flex items-center justify-center mr-4">
-            <Bell className="w-5 h-5 text-blue-600" />
+      {/* Notifications + Security */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        {/* Notification Settings */}
+        <div className="bg-white border border-gray-200 p-4">
+          <div className="flex items-center mb-4">
+            <Bell className="w-4 h-4 text-blue-600 mr-2" />
+            <div>
+              <h3 className="text-sm font-semibold">Notification Settings</h3>
+              <p className="text-xs text-gray-500">Configure how users receive notifications</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold">Notification Settings</h3>
-            <p className="text-sm text-gray-600">Configure how users receive notifications</p>
-          </div>
-        </div>
-        
-        <div className="space-y-5">
-          <div className="pb-4 border-b border-gray-200">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Mail className="w-5 h-5 text-blue-600 mr-3" />
+                <Mail className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
-                  <label className="block text-sm font-medium mb-1">Email Notifications</label>
-                  <p className="text-xs text-gray-500">Send session updates via email</p>
+                  <p className="text-xs font-medium">Email Notifications</p>
+                  <p className="text-xs text-gray-500">Send updates via email</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.emailNotifications}
-                  onChange={(e) => handleSettingChange('emailNotifications', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.emailNotifications} onChange={(e) => handleSettingChange('emailNotifications', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div className="flex items-center">
-                <Smartphone className="w-5 h-5 text-blue-600 mr-3" />
+                <Smartphone className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
-                  <label className="block text-sm font-medium mb-1">SMS Notifications</label>
-                  <p className="text-xs text-gray-500">Send session updates via SMS</p>
+                  <p className="text-xs font-medium">SMS Notifications</p>
+                  <p className="text-xs text-gray-500">Send updates via SMS</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.smsNotifications}
-                  onChange={(e) => handleSettingChange('smsNotifications', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.smsNotifications} onChange={(e) => handleSettingChange('smsNotifications', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div className="flex items-center">
-                <Volume2 className="w-5 h-5 text-blue-600 mr-3" />
+                <Volume2 className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
-                  <label className="block text-sm font-medium mb-1">Push Notifications</label>
+                  <p className="text-xs font-medium">Push Notifications</p>
                   <p className="text-xs text-gray-500">Send in-app notifications</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.pushNotifications}
-                  onChange={(e) => handleSettingChange('pushNotifications', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.pushNotifications} onChange={(e) => handleSettingChange('pushNotifications', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Reminder Before Session (minutes)</label>
-            <select
-              value={platformSettings.reminderBefore}
-              onChange={(e) => handleSettingChange('reminderBefore', parseInt(e.target.value))}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
-            >
-              <option value="5">5 minutes before</option>
-              <option value="10">10 minutes before</option>
-              <option value="15">15 minutes before</option>
-              <option value="30">30 minutes before</option>
-              <option value="60">1 hour before</option>
-            </select>
-            <p className="text-xs text-gray-500 mt-1">When to notify patients and doctors about upcoming sessions</p>
+            <div className="border-t border-gray-100 pt-2">
+              <label className="block text-xs font-medium mb-1">Reminder Before Session</label>
+              <select
+                value={platformSettings.reminderBefore}
+                onChange={(e) => handleSettingChange('reminderBefore', parseInt(e.target.value))}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                <option value="5">5 minutes before</option>
+                <option value="10">10 minutes before</option>
+                <option value="15">15 minutes before</option>
+                <option value="30">30 minutes before</option>
+                <option value="60">1 hour before</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Security & Privacy */}
-      <div className="p-6">
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10 flex items-center justify-center mr-4">
-            <Shield className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold">Security & Privacy</h3>
-            <p className="text-sm text-gray-600">Configure security and compliance settings</p>
-          </div>
-        </div>
-        
-        <div className="space-y-5">
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="block text-sm font-medium mb-1">Require Patient Verification</label>
-                <p className="text-xs text-gray-500">Verify patient identity before session starts</p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.requirePatientVerification}
-                  onChange={(e) => handleSettingChange('requirePatientVerification', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
+        {/* Security & Privacy */}
+        <div className="bg-white border border-gray-200 p-4">
+          <div className="flex items-center mb-4">
+            <Shield className="w-4 h-4 text-blue-600 mr-2" />
+            <div>
+              <h3 className="text-sm font-semibold">Security & Privacy</h3>
+              <p className="text-xs text-gray-500">Configure security and compliance settings</p>
             </div>
           </div>
-
-          <div className="pb-4 border-b border-gray-200">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <div>
-                <label className="block text-sm font-medium mb-1">Require Doctor Verification</label>
-                <p className="text-xs text-gray-500">Verify doctor credentials before allowing sessions</p>
+                <p className="text-xs font-medium">Require Patient Verification</p>
+                <p className="text-xs text-gray-500">Verify patient identity before session</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.requireDoctorVerification}
-                  onChange={(e) => handleSettingChange('requireDoctorVerification', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.requirePatientVerification} onChange={(e) => handleSettingChange('requirePatientVerification', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
+              <div>
+                <p className="text-xs font-medium">Require Doctor Verification</p>
+                <p className="text-xs text-gray-500">Verify doctor credentials before sessions</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked={platformSettings.requireDoctorVerification} onChange={(e) => handleSettingChange('requireDoctorVerification', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div className="flex items-center">
-                <Lock className="w-5 h-5 text-blue-600 mr-3" />
+                <Lock className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
-                  <label className="block text-sm font-medium mb-1">End-to-End Encryption</label>
+                  <p className="text-xs font-medium">End-to-End Encryption</p>
                   <p className="text-xs text-gray-500">Encrypt all session data in transit</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.endToEndEncryption}
-                  onChange={(e) => handleSettingChange('endToEndEncryption', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.endToEndEncryption} onChange={(e) => handleSettingChange('endToEndEncryption', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div>
-                <label className="block text-sm font-medium mb-1">Session Recording Consent</label>
-                <p className="text-xs text-gray-500">Require explicit consent before recording sessions</p>
+                <p className="text-xs font-medium">Session Recording Consent</p>
+                <p className="text-xs text-gray-500">Require consent before recording</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.sessionRecordingConsent}
-                  onChange={(e) => handleSettingChange('sessionRecordingConsent', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.sessionRecordingConsent} onChange={(e) => handleSettingChange('sessionRecordingConsent', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Payment Settings */}
-      <div className="p-6">
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10 flex items-center justify-center mr-4">
-             <DollarSign className="w-5 h-5 text-blue-600" />
+      {/* Row 3: Payment + Operating Hours */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        {/* Payment Settings */}
+        <div className="bg-white border border-gray-200 p-4">
+          <div className="flex items-center mb-4">
+            <DollarSign className="w-4 h-4 text-blue-600 mr-2" />
+            <div>
+              <h3 className="text-sm font-semibold">Payment Options</h3>
+              <p className="text-xs text-gray-500">Configure payment and billing settings</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold">Payment Options</h3>
-            <p className="text-sm text-gray-600">Configure payment and billing settings</p>
-          </div>
-        </div>
-        
-        <div className="space-y-5">
-          <div className="pb-4 border-b border-gray-200">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <div>
-                <label className="block text-sm font-medium mb-1">Allow Instant Payment</label>
+                <p className="text-xs font-medium">Allow Instant Payment</p>
                 <p className="text-xs text-gray-500">Enable pay-per-session functionality</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.allowInstantPayment}
-                  onChange={(e) => handleSettingChange('allowInstantPayment', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.allowInstantPayment} onChange={(e) => handleSettingChange('allowInstantPayment', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div>
-                <label className="block text-sm font-medium mb-1">Allow Insurance Billing</label>
+                <p className="text-xs font-medium">Allow Insurance Billing</p>
                 <p className="text-xs text-gray-500">Support insurance claim submissions</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.allowInsuranceBilling}
-                  onChange={(e) => handleSettingChange('allowInsuranceBilling', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.allowInsuranceBilling} onChange={(e) => handleSettingChange('allowInsuranceBilling', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div>
-                <label className="block text-sm font-medium mb-1">Require Payment Upfront</label>
+                <p className="text-xs font-medium">Require Payment Upfront</p>
                 <p className="text-xs text-gray-500">Patients must pay before session begins</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.requirePaymentUpfront}
-                  onChange={(e) => handleSettingChange('requirePaymentUpfront', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.requirePaymentUpfront} onChange={(e) => handleSettingChange('requirePaymentUpfront', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Operating Hours */}
-      <div className="p-6">
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10 flex items-center justify-center mr-4">
-            <Clock className="w-5 h-5 text-blue-600" />
+        {/* Operating Hours */}
+        <div className="bg-white border border-gray-200 p-4">
+          <div className="flex items-center mb-4">
+            <Clock className="w-4 h-4 text-blue-600 mr-2" />
+            <div>
+              <h3 className="text-sm font-semibold">Operating Hours</h3>
+              <p className="text-xs text-gray-500">Configure platform availability schedule</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold">Operating Hours</h3>
-            <p className="text-sm text-gray-600">Configure platform availability schedule</p>
-          </div>
-        </div>
-        
-        <div className="space-y-5">
-          <div className="pb-4 border-b border-gray-200">
-            <label className="block text-sm font-medium mb-2">Platform Start Time</label>
-            <input
-              type="time"
-              value={platformSettings.operatingHours.start}
-              onChange={(e) => handleSettingChange('operatingHours', {
-                ...platformSettings.operatingHours,
-                start: e.target.value
-              })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500  focus:outline-none focus:border-transparent"
-            />
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <label className="block text-sm font-medium mb-2">Platform End Time</label>
-            <input
-              type="time"
-              value={platformSettings.operatingHours.end}
-              onChange={(e) => handleSettingChange('operatingHours', {
-                ...platformSettings.operatingHours,
-                end: e.target.value
-              })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
-            />
-          </div>
-
-          <div className="pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Weekend Availability</label>
+                <label className="block text-xs font-medium mb-1">Start Time</label>
+                <input
+                  type="time"
+                  value={platformSettings.operatingHours.start}
+                  onChange={(e) => handleSettingChange('operatingHours', { ...platformSettings.operatingHours, start: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1">End Time</label>
+                <input
+                  type="time"
+                  value={platformSettings.operatingHours.end}
+                  onChange={(e) => handleSettingChange('operatingHours', { ...platformSettings.operatingHours, end: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
+              <div>
+                <p className="text-xs font-medium">Weekend Availability</p>
                 <p className="text-xs text-gray-500">Allow sessions on weekends</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.weekendAvailable}
-                  onChange={(e) => handleSettingChange('weekendAvailable', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.weekendAvailable} onChange={(e) => handleSettingChange('weekendAvailable', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
               <div>
-                <label className="block text-sm font-medium mb-1">Emergency 24/7 Availability</label>
+                <p className="text-xs font-medium">Emergency 24/7 Availability</p>
                 <p className="text-xs text-gray-500">Allow emergency sessions at any time</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={platformSettings.emergencyAvailable}
-                  onChange={(e) => handleSettingChange('emergencyAvailable', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <input type="checkbox" checked={platformSettings.emergencyAvailable} onChange={(e) => handleSettingChange('emergencyAvailable', e.target.checked)} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
           </div>
@@ -1732,25 +1568,23 @@ const TelemedicineManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="">
-        <div className="">
+      <div className="py-2">
+        <div>
           {/* Header Section */}
-          <div className="mb-8">
-            <div className="">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-4xl font-bold mb-2">Telemedicine Management</h1>
-                  <p className=" text-lg">
-                    Comprehensive oversight of telemedicine services and virtual healthcare delivery
-                  </p>
-                </div>
+          <div className="mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold mb-0.5">Telemedicine Management</h1>
+                <p className="text-sm text-gray-500">
+                  Comprehensive oversight of telemedicine services and virtual healthcare delivery
+                </p>
               </div>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="mb-6">
-            <div className="flex overflow-x-auto">
+          <div className="mb-4">
+            <div className="flex overflow-x-auto ">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
