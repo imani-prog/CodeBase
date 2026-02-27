@@ -62,6 +62,14 @@ const InsuranceManagement = () => {
   });
   const [providerErrors, setProviderErrors] = useState({});
 
+  // View / Edit provider modal state
+  const [showViewProviderModal, setShowViewProviderModal] = useState(false);
+  const [selectedProviderData, setSelectedProviderData] = useState(null);
+
+  const [showEditProviderModal, setShowEditProviderModal] = useState(false);
+  const [editProvider, setEditProvider] = useState(null);
+  const [editProviderErrors, setEditProviderErrors] = useState({});
+
   // Sample data for Kenyan insurance context
   const insuranceOverview = {
     totalProviders: 8,
@@ -375,6 +383,36 @@ const InsuranceManagement = () => {
     setShowAddProviderModal(false);
   };
 
+  const handleViewProvider = (provider) => {
+    setSelectedProviderData(provider);
+    setShowViewProviderModal(true);
+  };
+
+  const handleEditProvider = (provider) => {
+    setEditProvider({ ...provider, policyTypes: Array.isArray(provider.policyTypes) ? provider.policyTypes.join(', ') : provider.policyTypes });
+    setEditProviderErrors({});
+    setShowEditProviderModal(true);
+  };
+
+  const validateEditProvider = () => {
+    const errors = {};
+    if (!editProvider.name.trim()) errors.name = 'Provider name is required';
+    if (!editProvider.contactPerson.trim()) errors.contactPerson = 'Contact person is required';
+    if (!editProvider.phone.trim()) errors.phone = 'Phone number is required';
+    if (!editProvider.email.trim()) errors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editProvider.email)) errors.email = 'Enter a valid email';
+    if (!editProvider.coverage.trim()) errors.coverage = 'Coverage description is required';
+    return errors;
+  };
+
+  const handleEditProviderSubmit = (e) => {
+    e.preventDefault();
+    const errors = validateEditProvider();
+    if (Object.keys(errors).length > 0) { setEditProviderErrors(errors); return; }
+    alert(`Provider "${editProvider.name}" updated successfully!`);
+    setShowEditProviderModal(false);
+  };
+
   const handleProcessClaims = () => setActiveTab('claims');
 
   const handleExportReport = () => {
@@ -564,7 +602,7 @@ const InsuranceManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold">Insurance Providers</h3>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+        <button onClick={handleAddProvider} className="bg-blue-600 text-white px-4 py-2 hover:bg-blue-800 transition-colors flex items-center">
           <Plus className="w-4 h-4 mr-2" />
           Add Provider
         </button>
@@ -700,10 +738,18 @@ const InsuranceManagement = () => {
                 </td>
                 <td className="px-3 py-2 text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <button className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors">
+                    <button
+                      onClick={() => handleViewProvider(provider)}
+                      className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                      title="View details"
+                    >
                       <Eye className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors">
+                    <button
+                      onClick={() => handleEditProvider(provider)}
+                      className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors"
+                      title="Edit provider"
+                    >
                       <Edit className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -746,72 +792,96 @@ const InsuranceManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Patient</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Insurance Provider</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Policy Details</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Coverage</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
+                <th className="px-3 py-2 text-left font-semibold">Patient</th>
+                <th className="px-3 py-2 text-center font-semibold">Provider</th>
+                <th className="px-3 py-2 text-center font-semibold">Plan</th>
+                <th className="px-3 py-2 text-left font-semibold">Policy No.</th>
+                <th className="px-3 py-2 text-center font-semibold">Expires</th>
+                <th className="px-3 py-2 text-right font-semibold">Total Cover</th>
+                <th className="px-3 py-2 text-right font-semibold">Used</th>
+                <th className="px-3 py-2 text-center font-semibold">Remaining %</th>
+                <th className="px-3 py-2 text-center font-semibold">Last Claim</th>
+                <th className="px-3 py-2 text-right font-semibold">Claim Amt</th>
+                <th className="px-3 py-2 text-center font-semibold">Status</th>
+                <th className="px-3 py-2 text-right font-semibold">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {patientCoverage.map((patient) => (
-                <tr key={patient.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-semibold">{patient.patientName}</div>
-                      <div className="text-sm ">ID: {patient.patientId}</div>
-                      <div className="text-sm text-gray-500">{patient.dependents} dependents</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold">{patient.insuranceProvider}</div>
-                    <div className="text-sm ">{patient.policyType}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold">{patient.policyNumber}</div>
-                    <div className="text-sm ">Expires: {patient.renewalDate}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm">
-                      <div className="font-semibold mb-2">{formatCurrency(patient.coverageAmount)} Total</div>
-                      <div className="">{formatCurrency(patient.remainingAmount)} Remaining</div>
-                      {/* <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                        <div 
-                          className="bg-blue-500 h-2 rounded-full" 
-                          style={{ width: `${(patient.remainingAmount / patient.coverageAmount) * 100}%` }}
-                        ></div>
-                      </div> */}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 inline-flex leading-5 ${getStatusColor(patient.status)}`}>
-                      {patient.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="text-green-600 hover:text-green-900">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="text-blue-800 hover:text-blue-900">
-                        <Receipt className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+            <tbody className="divide-y divide-gray-100">
+              {patientCoverage.map((patient) => {
+                const remainingPct = Math.round((patient.remainingAmount / patient.coverageAmount) * 100);
+                return (
+                  <tr key={patient.id} className="hover:bg-blue-50/40 transition-colors">
+                    <td className="px-3 py-2">
+                      <p className="font-semibold text-gray-800 leading-tight">{patient.patientName}</p>
+                      <p className="text-gray-400 leading-tight">
+                        {patient.patientId} &middot;
+                        {/* <span className="ml-1 px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded-full">{patient.dependents} dep.</span> */}
+                      </p>
+                    </td>
+                    <td className="px-3 py-2 text-center font-semibold text-gray-800 whitespace-nowrap">
+                      {patient.insuranceProvider}
+                    </td>
+                    <td className="px-3 py-2 text-center whitespace-nowrap">
+                      <span className="px-2 py-0.5  text-blue-700  font-medium">
+                        {patient.policyType}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {patient.policyNumber}
+                    </td>
+                    <td className="px-3 py-2 text-center whitespace-nowrap">
+                      {patient.renewalDate}
+                    </td>
+                    <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">
+                      {formatCurrency(patient.coverageAmount)}
+                    </td>
+                    <td className="px-3 py-2 text-right text-blue-600 font-medium whitespace-nowrap">
+                      {formatCurrency(patient.usedAmount)}
+                    </td>
+                    <td className="px-3 py-2 text-center whitespace-nowrap">
+                      <span className={`font-semibold ${remainingPct > 50 ? 'text-green-600' : remainingPct > 25 ? 'text-yellow-600' : 'text-red-500'}`}>
+                        {remainingPct}%
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-center whitespace-nowrap">
+                      {patient.lastClaim}
+                    </td>
+                    <td className="px-3 py-2 text-right font-medium whitespace-nowrap">
+                      {formatCurrency(patient.claimAmount)}
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      <span className={`px-2 py-0.5 text-xs font-medium  ${
+                        patient.status === 'Active'
+                          ? ' text-green-700'
+                          : patient.status === 'Expired'
+                          ? ' text-red-600'
+                          : ' text-yellow-700'
+                      }`}>
+                        {patient.status}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="View">
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
+                        <button className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors" title="Edit">
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button className="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors" title="Claims">
+                          <Receipt className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-        </div>
       </div>
     </div>
   );
@@ -1765,185 +1835,508 @@ const InsuranceManagement = () => {
   };
 
   // ---------- Add Provider Modal -
-  const renderAddProviderModal = () => {
-    if (!showAddProviderModal) return null;
+  const renderViewProviderModal = () => {
+    if (!showViewProviderModal || !selectedProviderData) return null;
+    const p = selectedProviderData;
+    const infoRow = (icon, label, value) => (
+      <div>
+        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-0.5">{label}</p>
+        <div className="flex items-center gap-1.5 text-sm text-gray-800">
+          {React.createElement(icon, { className: 'w-3.5 h-3.5 text-gray-400 flex-shrink-0' })}
+          <span>{value}</span>
+        </div>
+      </div>
+    );
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/60 backdrop-blur" onClick={() => setShowAddProviderModal(false)} />
-        <div className="relative bg-white shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-          {/* Modal Header */}
-          <div className="flex items-center justify-between p-5 border-b border-gray-200">
-            <div className="flex items-center">
-              <Building2 className="w-5 h-5 text-blue-600 mr-2" />
-              <h2 className="text-lg font-semibold">Add Insurance Provider</h2>
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowViewProviderModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-2xl overflow-hidden">
+            {/* Header */}
+            <div className="relative px-6 py-5 bg-blue-950 text-white">
+              <button
+                onClick={() => setShowViewProviderModal(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center ring-4 ring-white/20">
+                  <Building2 className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold leading-tight">{p.name}</h2>
+                  <p className="text-sm text-blue-200">{p.coverage}</p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                      p.type === 'Government' ? 'bg-blue-500/30 text-blue-100' : 'bg-purple-500/30 text-purple-100'
+                    }`}>{p.type}</span>
+                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-500/30 text-green-100">{p.status}</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <button onClick={() => setShowAddProviderModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500">
-              <XCircle className="w-5 h-5" />
-            </button>
-          </div>
 
-          {/* Form */}
-          <form onSubmit={handleAddProviderSubmit} className="p-5 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Provider Name */}
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium mb-1">Provider Name <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={newProvider.name}
-                  onChange={e => { setNewProvider(p => ({...p, name: e.target.value})); setProviderErrors(er => ({...er, name: ''})); }}
-                  placeholder="e.g. APA Insurance"
-                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.name ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {providerErrors.name && <p className="text-xs text-red-500 mt-1">{providerErrors.name}</p>}
+            <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+              {/* Stats Row */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { icon: Users, label: 'Patients', value: p.patients.toLocaleString() },
+                  { icon: FileText, label: 'Claims', value: p.claimsProcessed.toLocaleString() },
+                  { icon: DollarSign, label: 'Total Amount', value: formatCurrency(p.totalAmount) },
+                ].map((stat) => (
+                  <div key={stat.label} className="border border-gray-200 p-3 text-center bg-gray-50">
+                    {React.createElement(stat.icon, { className: 'w-5 h-5 text-blue-600 mx-auto mb-1' })}
+                    <p className="text-base font-bold text-gray-800">{stat.value}</p>
+                    <p className="text-xs text-gray-500">{stat.label}</p>
+                  </div>
+                ))}
               </div>
 
-              {/* Type */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Provider Type</label>
-                <select
-                  value={newProvider.type}
-                  onChange={e => setNewProvider(p => ({...p, type: e.target.value}))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="Government">Government</option>
-                  <option value="Private">Private</option>
-                  <option value="NGO">NGO</option>
-                  <option value="Corporate">Corporate</option>
-                </select>
-              </div>
-
-              {/* Coverage Description */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Coverage Description <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={newProvider.coverage}
-                  onChange={e => { setNewProvider(p => ({...p, coverage: e.target.value})); setProviderErrors(er => ({...er, coverage: ''})); }}
-                  placeholder="e.g. Comprehensive Health Insurance"
-                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.coverage ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {providerErrors.coverage && <p className="text-xs text-red-500 mt-1">{providerErrors.coverage}</p>}
-              </div>
-
-              {/* Contact Person */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Contact Person <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={newProvider.contactPerson}
-                  onChange={e => { setNewProvider(p => ({...p, contactPerson: e.target.value})); setProviderErrors(er => ({...er, contactPerson: ''})); }}
-                  placeholder="Full name"
-                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.contactPerson ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {providerErrors.contactPerson && <p className="text-xs text-red-500 mt-1">{providerErrors.contactPerson}</p>}
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Phone Number <span className="text-red-500">*</span></label>
-                <input
-                  type="tel"
-                  value={newProvider.phone}
-                  onChange={e => { setNewProvider(p => ({...p, phone: e.target.value})); setProviderErrors(er => ({...er, phone: ''})); }}
-                  placeholder="+254-700-000000"
-                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.phone ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {providerErrors.phone && <p className="text-xs text-red-500 mt-1">{providerErrors.phone}</p>}
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Email Address <span className="text-red-500">*</span></label>
-                <input
-                  type="email"
-                  value={newProvider.email}
-                  onChange={e => { setNewProvider(p => ({...p, email: e.target.value})); setProviderErrors(er => ({...er, email: ''})); }}
-                  placeholder="claims@provider.co.ke"
-                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${providerErrors.email ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {providerErrors.email && <p className="text-xs text-red-500 mt-1">{providerErrors.email}</p>}
-              </div>
-
-              {/* Coverage % */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Coverage Percentage</label>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="range" min="0" max="100"
-                    value={newProvider.coveragePercentage}
-                    onChange={e => setNewProvider(p => ({...p, coveragePercentage: parseInt(e.target.value)}))}
-                    className="flex-1 accent-blue-600"
-                  />
-                  <span className="text-sm font-semibold w-10 text-right">{newProvider.coveragePercentage}%</span>
+              {/* Contact Information */}
+              <div className="border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Phone className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Contact Information</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {infoRow(UserCheck, 'Contact Person', p.contactPerson)}
+                  {infoRow(Phone, 'Phone', p.phone)}
+                  {infoRow(Mail, 'Email', p.email)}
                 </div>
               </div>
 
-              {/* Avg Processing Time */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Average Processing Time</label>
-                <select
-                  value={newProvider.averageProcessingTime}
-                  onChange={e => setNewProvider(p => ({...p, averageProcessingTime: e.target.value}))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="1 day">1 day</option>
-                  <option value="3 days">3 days</option>
-                  <option value="5 days">5 days</option>
-                  <option value="7 days">7 days</option>
-                  <option value="10 days">10 days</option>
-                  <option value="14 days">14 days</option>
-                </select>
+              {/* Coverage Details */}
+              <div className="border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Coverage Details</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Coverage %</p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${p.coveragePercentage}%` }} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-800">{p.coveragePercentage}%</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Processing Time</p>
+                    <div className="flex items-center gap-1.5 text-sm text-gray-800">
+                      <Clock className="w-3.5 h-3.5 text-gray-400" />
+                      <span>{p.averageProcessingTime}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Ambulance</p>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full ${
+                      p.ambulanceCover ? 'text-green-700' : 'text-red-600'
+                    }`}>
+                      {p.ambulanceCover ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                      {p.ambulanceCover ? 'Covered' : 'Not Covered'}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Policy Types */}
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium mb-1">Policy Types</label>
-                <input
-                  type="text"
-                  value={newProvider.policyTypes}
-                  onChange={e => setNewProvider(p => ({...p, policyTypes: e.target.value}))}
-                  placeholder="e.g. Inpatient, Outpatient, Maternity (comma-separated)"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              {/* Ambulance Cover toggle */}
-              <div className="sm:col-span-2 flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
-                <div>
-                  <p className="text-sm font-medium">Ambulance Coverage</p>
-                  <p className="text-xs text-gray-500">Does this provider cover ambulance services?</p>
+              <div className="border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Receipt className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Policy Types ({p.policyTypes.length})</span>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={newProvider.ambulanceCover}
-                    onChange={e => setNewProvider(p => ({...p, ambulanceCover: e.target.checked}))}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+                <div className="flex flex-wrap gap-2">
+                  {p.policyTypes.map((pt, i) => (
+                    <span key={i} className="px-3 py-1  text-blue-700 rounded-full text-xs font-medium border border-blue-100">{pt}</span>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end space-x-3 pt-2 border-t border-gray-200">
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
               <button
-                type="button"
-                onClick={() => setShowAddProviderModal(false)}
-                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => setShowViewProviderModal(false)}
+                className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium"
               >
-                Cancel
+                Close
               </button>
               <button
-                type="submit"
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                onClick={() => { setShowViewProviderModal(false); handleEditProvider(p); }}
+                className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
               >
-                <Plus className="w-4 h-4 mr-1.5" />
-                Add Provider
+                <Edit className="w-4 h-4" /> Edit Provider
               </button>
             </div>
-          </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderEditProviderModal = () => {
+    if (!showEditProviderModal || !editProvider) return null;
+
+    const field = (label, key, type = 'text', placeholder = '', required = false, Icon = null) => (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <div className="relative">
+          {Icon && (
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Icon className="h-4 w-4 text-gray-400" />
+            </div>
+          )}
+          <input
+            type={type}
+            value={editProvider[key] || ''}
+            onChange={e => { setEditProvider(p => ({...p, [key]: e.target.value})); setEditProviderErrors(er => ({...er, [key]: ''})); }}
+            placeholder={placeholder}
+            className={`w-full ${Icon ? 'pl-9' : 'px-4'} pr-4 py-2.5 border ${
+              editProviderErrors[key] ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-700'
+            } rounded-lg text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+          />
+          {editProviderErrors[key] && (
+            <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />{editProviderErrors[key]}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowEditProviderModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-2xl overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-5 bg-blue-950 text-white">
+              <button
+                onClick={() => setShowEditProviderModal(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Edit className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">Edit Insurance Provider</h2>
+                  <p className="text-sm text-blue-200 truncate max-w-xs">{editProvider.name}</p>
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={handleEditProviderSubmit} className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+              {/* Provider Identity */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Building2 className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Provider Identity</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">{field('Provider Name', 'name', 'text', 'e.g. APA Insurance', true, Building2)}</div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Provider Type</label>
+                    <select
+                      value={editProvider.type}
+                      onChange={e => setEditProvider(p => ({...p, type: e.target.value}))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    >
+                      <option value="Government">Government</option>
+                      <option value="Private">Private</option>
+                      <option value="NGO">NGO</option>
+                      <option value="Corporate">Corporate</option>
+                    </select>
+                  </div>
+                  <div>{field('Coverage Description', 'coverage', 'text', 'e.g. Comprehensive Health Insurance', true, Shield)}</div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Policy Types</label>
+                    <input
+                      type="text"
+                      value={typeof editProvider.policyTypes === 'string' ? editProvider.policyTypes : editProvider.policyTypes?.join(', ') || ''}
+                      onChange={e => setEditProvider(p => ({...p, policyTypes: e.target.value}))}
+                      placeholder="e.g. Inpatient, Outpatient, Maternity (comma-separated)"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Phone className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Contact Information</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>{field('Contact Person', 'contactPerson', 'text', 'Full name', true, UserCheck)}</div>
+                  <div>{field('Phone Number', 'phone', 'tel', '+254-700-000000', true, Phone)}</div>
+                  <div className="sm:col-span-2">{field('Email Address', 'email', 'email', 'claims@provider.co.ke', true, Mail)}</div>
+                </div>
+              </div>
+
+              {/* Coverage Settings */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Coverage Settings</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Coverage Percentage — <span className="text-blue-600 font-semibold">{editProvider.coveragePercentage}%</span>
+                    </label>
+                    <input
+                      type="range" min="0" max="100"
+                      value={editProvider.coveragePercentage}
+                      onChange={e => setEditProvider(p => ({...p, coveragePercentage: parseInt(e.target.value)}))}
+                      className="w-full accent-blue-600 h-2 mt-3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Average Processing Time</label>
+                    <select
+                      value={editProvider.averageProcessingTime}
+                      onChange={e => setEditProvider(p => ({...p, averageProcessingTime: e.target.value}))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    >
+                      {['1 day','3 days','5 days','7 days','10 days','14 days'].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                    <select
+                      value={editProvider.status}
+                      onChange={e => setEditProvider(p => ({...p, status: e.target.value}))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Suspended">Suspended</option>
+                    </select>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <div className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Ambulance Coverage</p>
+                        <p className="text-xs text-gray-500">Does this provider cover ambulance services?</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={editProvider.ambulanceCover}
+                          onChange={e => setEditProvider(p => ({...p, ambulanceCover: e.target.checked}))}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-end gap-3 pt-1 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowEditProviderModal(false)}
+                  className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
+                >
+                  <Save className="w-4 h-4" />
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAddProviderModal = () => {
+    if (!showAddProviderModal) return null;
+
+    const field = (label, key, type = 'text', placeholder = '', required = false, Icon = null) => (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <div className="relative">
+          {Icon && (
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Icon className="h-4 w-4 text-gray-400" />
+            </div>
+          )}
+          <input
+            type={type}
+            value={newProvider[key]}
+            onChange={e => { setNewProvider(p => ({...p, [key]: e.target.value})); setProviderErrors(er => ({...er, [key]: ''})); }}
+            placeholder={placeholder}
+            className={`w-full ${Icon ? 'pl-9' : 'px-4'} pr-4 py-2.5 border ${
+              providerErrors[key] ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-700'
+            } rounded-lg text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+          />
+          {providerErrors[key] && (
+            <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />{providerErrors[key]}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowAddProviderModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-2xl overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-5 bg-blue-950 text-white">
+              <button
+                onClick={() => setShowAddProviderModal(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">Add Insurance Provider</h2>
+                  <p className="text-sm text-blue-200">Fill in the details to register a new provider</p>
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={handleAddProviderSubmit} className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+              {/* Provider Identity */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Building2 className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Provider Identity</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">{field('Provider Name', 'name', 'text', 'e.g. APA Insurance', true, Building2)}</div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Provider Type</label>
+                    <select
+                      value={newProvider.type}
+                      onChange={e => setNewProvider(p => ({...p, type: e.target.value}))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    >
+                      <option value="Government">Government</option>
+                      <option value="Private">Private</option>
+                      <option value="NGO">NGO</option>
+                      <option value="Corporate">Corporate</option>
+                    </select>
+                  </div>
+                  <div>{field('Coverage Description', 'coverage', 'text', 'e.g. Comprehensive Health Insurance', true, Shield)}</div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Policy Types</label>
+                    <input
+                      type="text"
+                      value={newProvider.policyTypes}
+                      onChange={e => setNewProvider(p => ({...p, policyTypes: e.target.value}))}
+                      placeholder="e.g. Inpatient, Outpatient, Maternity (comma-separated)"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Phone className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Contact Information</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>{field('Contact Person', 'contactPerson', 'text', 'Full name', true, UserCheck)}</div>
+                  <div>{field('Phone Number', 'phone', 'tel', '+254-700-000000', true, Phone)}</div>
+                  <div className="sm:col-span-2">{field('Email Address', 'email', 'email', 'claims@provider.co.ke', true, Mail)}</div>
+                </div>
+              </div>
+
+              {/* Coverage Settings */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Coverage Settings</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Coverage Percentage — <span className="text-blue-600 font-semibold">{newProvider.coveragePercentage}%</span>
+                    </label>
+                    <input
+                      type="range" min="0" max="100"
+                      value={newProvider.coveragePercentage}
+                      onChange={e => setNewProvider(p => ({...p, coveragePercentage: parseInt(e.target.value)}))}
+                      className="w-full accent-blue-600 h-2 mt-3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Average Processing Time</label>
+                    <select
+                      value={newProvider.averageProcessingTime}
+                      onChange={e => setNewProvider(p => ({...p, averageProcessingTime: e.target.value}))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    >
+                      {['1 day','3 days','5 days','7 days','10 days','14 days'].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <div className="flex items-center justify-between border border-gray-200 px-4 py-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Ambulance Coverage</p>
+                        <p className="text-xs text-gray-500">Does this provider cover ambulance services?</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProvider.ambulanceCover}
+                          onChange={e => setNewProvider(p => ({...p, ambulanceCover: e.target.checked}))}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border  after:border-gray-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-end gap-3 pt-1 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddProviderModal(false)}
+                  className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Provider
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     );
@@ -1951,6 +2344,8 @@ const InsuranceManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {renderViewProviderModal()}
+      {renderEditProviderModal()}
       {renderAddProviderModal()}
       <div className="">
         <main className="">
