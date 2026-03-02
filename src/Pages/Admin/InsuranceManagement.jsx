@@ -81,6 +81,30 @@ const InsuranceManagement = () => {
   const [showClaimsHistoryModal, setShowClaimsHistoryModal] = useState(false);
   const [selectedClaimsPatient, setSelectedClaimsPatient] = useState(null);
 
+  // --- Claim modals state ---
+  const [showAddClaimModal, setShowAddClaimModal] = useState(false);
+  const [newClaim, setNewClaim] = useState({
+    patientName: '', patientId: '', insuranceProvider: '', claimType: 'Outpatient',
+    claimAmount: '', diagnosis: '', hospital: '', submissionDate: new Date().toISOString().slice(0, 10),
+    notes: ''
+  });
+  const [claimErrors, setClaimErrors] = useState({});
+
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
+  const [bulkFile, setBulkFile] = useState(null);
+  const [bulkUploadStep, setBulkUploadStep] = useState('select'); // 'select' | 'preview' | 'done'
+
+  const [showViewClaimModal, setShowViewClaimModal] = useState(false);
+  const [selectedClaim, setSelectedClaim] = useState(null);
+
+  const [showApproveClaimModal, setShowApproveClaimModal] = useState(false);
+  const [claimToApprove, setClaimToApprove] = useState(null);
+  const [approvalData, setApprovalData] = useState({ approvedAmount: '', notes: '', processingTime: '' });
+  const [approvalErrors, setApprovalErrors] = useState({});
+
+  const [showDeleteClaimModal, setShowDeleteClaimModal] = useState(false);
+  const [claimToDelete, setClaimToDelete] = useState(null);
+
   // Sample data for Kenyan insurance context
   const insuranceOverview = {
     totalProviders: 8,
@@ -456,6 +480,74 @@ const InsuranceManagement = () => {
   const handleViewClaimsHistory = (patient) => {
     setSelectedClaimsPatient(patient);
     setShowClaimsHistoryModal(true);
+  };
+
+  // --- Claim action handlers ---
+  const handleOpenAddClaim = () => {
+    setNewClaim({
+      patientName: '', patientId: '', insuranceProvider: '', claimType: 'Outpatient',
+      claimAmount: '', diagnosis: '', hospital: '', submissionDate: new Date().toISOString().slice(0, 10), notes: ''
+    });
+    setClaimErrors({});
+    setShowAddClaimModal(true);
+  };
+
+  const validateNewClaim = () => {
+    const e = {};
+    if (!newClaim.patientName.trim()) e.patientName = 'Patient name is required';
+    if (!newClaim.patientId.trim()) e.patientId = 'Patient ID is required';
+    if (!newClaim.insuranceProvider.trim()) e.insuranceProvider = 'Insurance provider is required';
+    if (!newClaim.claimAmount || isNaN(newClaim.claimAmount) || Number(newClaim.claimAmount) <= 0) e.claimAmount = 'Enter a valid claim amount';
+    if (!newClaim.diagnosis.trim()) e.diagnosis = 'Diagnosis is required';
+    if (!newClaim.hospital.trim()) e.hospital = 'Hospital is required';
+    if (!newClaim.submissionDate) e.submissionDate = 'Submission date is required';
+    return e;
+  };
+
+  const handleAddClaimSubmit = (e) => {
+    e.preventDefault();
+    const errs = validateNewClaim();
+    if (Object.keys(errs).length > 0) { setClaimErrors(errs); return; }
+    alert(`Claim for "${newClaim.patientName}" submitted successfully!`);
+    setShowAddClaimModal(false);
+  };
+
+  const handleOpenBulkUpload = () => {
+    setBulkFile(null);
+    setBulkUploadStep('select');
+    setShowBulkUploadModal(true);
+  };
+
+  const handleViewClaim = (claim) => {
+    setSelectedClaim(claim);
+    setShowViewClaimModal(true);
+  };
+
+  const handleOpenApproveClaim = (claim) => {
+    setClaimToApprove(claim);
+    setApprovalData({ approvedAmount: claim.approvedAmount || '', notes: '', processingTime: claim.processingTime || '' });
+    setApprovalErrors({});
+    setShowApproveClaimModal(true);
+  };
+
+  const handleApproveClaimSubmit = (e) => {
+    e.preventDefault();
+    const errs = {};
+    if (!approvalData.approvedAmount || isNaN(approvalData.approvedAmount) || Number(approvalData.approvedAmount) <= 0)
+      errs.approvedAmount = 'Enter a valid approved amount';
+    if (Object.keys(errs).length > 0) { setApprovalErrors(errs); return; }
+    alert(`Claim ${claimToApprove.claimNumber} approved for ${formatCurrency(Number(approvalData.approvedAmount))}.`);
+    setShowApproveClaimModal(false);
+  };
+
+  const handleOpenDeleteClaim = (claim) => {
+    setClaimToDelete(claim);
+    setShowDeleteClaimModal(true);
+  };
+
+  const handleDeleteClaimConfirm = () => {
+    alert(`Claim ${claimToDelete.claimNumber} has been deleted.`);
+    setShowDeleteClaimModal(false);
   };
 
   const handleProcessClaims = () => setActiveTab('claims');
@@ -937,11 +1029,11 @@ const InsuranceManagement = () => {
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Claims Management</h3>
         <div className="flex items-center space-x-4">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+          <button onClick={handleOpenAddClaim} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
             <Plus className="w-4 h-4 mr-2" />
             New Claim
           </button>
-          <button className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center">
+          <button onClick={handleOpenBulkUpload} className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center">
             <Upload className="w-4 h-4 mr-2" />
             Bulk Upload
           </button>
@@ -1000,64 +1092,55 @@ const InsuranceManagement = () => {
       </div>
 
       {/* Claims Table */}
-      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Claim Details</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Patient</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Provider</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
+                <th className="px-3 py-2 text-left font-semibold">Claim No.</th>
+                <th className="px-3 py-2 text-center font-semibold">Type</th>
+                <th className="px-3 py-2 text-center font-semibold">Submitted</th>
+                <th className="px-3 py-2 text-left font-semibold">Patient</th>
+                <th className="px-3 py-2 text-left font-semibold">Diagnosis</th>
+                <th className="px-3 py-2 text-left font-semibold">Provider</th>
+                <th className="px-3 py-2 text-left font-semibold">Hospital</th>
+                <th className="px-3 py-2 text-right font-semibold">Claim Amt</th>
+                <th className="px-3 py-2 text-right font-semibold">Approved</th>
+                <th className="px-3 py-2 text-center font-semibold">Status</th>
+                <th className="px-3 py-2 text-center font-semibold">Proc. Time</th>
+                <th className="px-3 py-2 text-right font-semibold">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-100">
               {claimsData.map((claim) => (
-                <tr key={claim.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-semibold">{claim.claimNumber}</div>
-                      <div className="text-sm">{claim.claimType}</div>
-                      <div className="text-sm text-gray-500">Submitted: {claim.submissionDate}</div>
-                    </div>
+                <tr key={claim.id} className="hover:bg-blue-50/40 transition-colors">
+                  <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">{claim.claimNumber}</td>
+                  <td className="px-3 py-2 text-center whitespace-nowrap">{claim.claimType}</td>
+                  <td className="px-3 py-2 text-center text-gray-500 whitespace-nowrap">{claim.submissionDate}</td>
+                  <td className="px-3 py-2 whitespace-nowrap">
+                    <span className="font-semibold text-gray-800">{claim.patientName}</span>
+                    <span className="text-gray-400 ml-1">&middot; {claim.patientId}</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-semibold">{claim.patientName}</div>
-                      <div className="text-sm">ID: {claim.patientId}</div>
-                      <div className="text-sm text-gray-500">{claim.diagnosis}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-semibold">{claim.insuranceProvider}</div>
-                      <div className="text-sm">{claim.hospital}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-semibold">{formatCurrency(claim.claimAmount)}</div>
-                      <div className="text-sm">Approved: {formatCurrency(claim.approvedAmount)}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusColor(claim.status)}`}>
+                  <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{claim.diagnosis}</td>
+                  <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">{claim.insuranceProvider}</td>
+                  <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{claim.hospital}</td>
+                  <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">{formatCurrency(claim.claimAmount)}</td>
+                  <td className="px-3 py-2 text-right text-blue-600 font-medium whitespace-nowrap">{formatCurrency(claim.approvedAmount)}</td>
+                  <td className="px-3 py-2 text-center whitespace-nowrap">
+                    <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColor(claim.status)}`}>
                       {claim.status}
                     </span>
-                    <div className="text-xs mt-1">{claim.processingTime}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <Eye className="w-4 h-4" />
+                  <td className="px-3 py-2 text-center text-gray-500 whitespace-nowrap">{claim.processingTime}</td>
+                  <td className="px-3 py-2 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => handleViewClaim(claim)} className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="View claim">
+                        <Eye className="w-3.5 h-3.5" />
                       </button>
-                      <button className="text-green-600 hover:text-green-900">
-                        <CheckCircle className="w-4 h-4" />
+                      <button onClick={() => handleOpenApproveClaim(claim)} className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors" title="Approve claim">
+                        <CheckCircle className="w-3.5 h-3.5" />
                       </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="w-4 h-4" />
+                      <button onClick={() => handleOpenDeleteClaim(claim)} className="p-1 text-red-500 hover:bg-red-100 rounded transition-colors" title="Delete claim">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </td>
@@ -1065,7 +1148,6 @@ const InsuranceManagement = () => {
               ))}
             </tbody>
           </table>
-        </div>
       </div>
     </div>
   );
@@ -1117,86 +1199,66 @@ const InsuranceManagement = () => {
       </div>
 
       {/* Ambulance Insurance Table */}
-      <div className="bg-white border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 uppercase text-xs">
+      <div className="bg-white border border-gray-200 overflow-hidden overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
             <tr>
-              <th className="px-4 py-3 text-left">Vehicle</th>
-              <th className="px-4 py-3 text-left">Insurance Provider</th>
-              <th className="px-4 py-3 text-center">Policy Type</th>
-              <th className="px-4 py-3 text-right">Coverage Amount</th>
-              <th className="px-4 py-3 text-right">Premium</th>
-              <th className="px-4 py-3 text-right">Deductible</th>
-              <th className="px-4 py-3 text-center">Expiry Date</th>
-              <th className="px-4 py-3 text-center">Drivers</th>
-              <th className="px-4 py-3 text-left">Last Claim</th>
-              <th className="px-4 py-3 text-center">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="px-3 py-2 text-left font-semibold">Vehicle</th>
+              <th className="px-3 py-2 text-left font-semibold">Provider</th>
+              <th className="px-3 py-2 text-left font-semibold">Policy No.</th>
+              <th className="px-3 py-2 text-center font-semibold">Policy Type</th>
+              <th className="px-3 py-2 text-right font-semibold">Coverage</th>
+              <th className="px-3 py-2 text-right font-semibold">Premium</th>
+              <th className="px-3 py-2 text-right font-semibold">Deductible</th>
+              <th className="px-3 py-2 text-center font-semibold">Expiry</th>
+              <th className="px-3 py-2 text-center font-semibold">Drivers</th>
+              <th className="px-3 py-2 text-center font-semibold">Last Claim</th>
+              <th className="px-3 py-2 text-right font-semibold">Claim Amt</th>
+              <th className="px-3 py-2 text-center font-semibold">Status</th>
+              <th className="px-3 py-2 text-right font-semibold">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-100">
             {ambulanceInsurance.map((ambulance) => (
-              <tr key={ambulance.id} className="hover:bg-gray-50">
-                <td className="px-4 py-4">
-                  <div className="flex items-center">
-                    <span className="font-semibold">{ambulance.vehicleNumber}</span>
-                  </div>
-                </td>
-                <td className="px-4 py-4">
-                  <div>
-                    <p className="font-semibold">{ambulance.insuranceProvider}</p>
-                    <p className="text-sm">{ambulance.policyNumber}</p>
-                  </div>
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <span className="px-2 py-1 text-xs font-medium rounded-full border text-blue-800">
+              <tr key={ambulance.id} className="hover:bg-blue-50/40 transition-colors">
+                <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">{ambulance.vehicleNumber}</td>
+                <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">{ambulance.insuranceProvider}</td>
+                <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{ambulance.policyNumber}</td>
+                <td className="px-3 py-2 text-center whitespace-nowrap">
+                  <span className="px-2 py-0.5 text-xs font-medium rounded-full border text-blue-800">
                     {ambulance.policyType}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-right">
-                  <span className="font-semibold">{formatCurrency(ambulance.coverageAmount)}</span>
+                <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">{formatCurrency(ambulance.coverageAmount)}</td>
+                <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">{formatCurrency(ambulance.premium)}</td>
+                <td className="px-3 py-2 text-right font-medium whitespace-nowrap">{formatCurrency(ambulance.deductible)}</td>
+                <td className="px-3 py-2 text-center whitespace-nowrap">{ambulance.expiryDate}</td>
+                <td className="px-3 py-2 text-center font-semibold whitespace-nowrap">{ambulance.driversCovered}</td>
+                <td className="px-3 py-2 text-center whitespace-nowrap">
+                  {ambulance.lastClaim ? ambulance.lastClaim : <span className="text-gray-400">—</span>}
                 </td>
-                <td className="px-4 py-4 text-right">
-                  <span className="font-semibold">{formatCurrency(ambulance.premium)}</span>
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  {ambulance.lastClaim ? formatCurrency(ambulance.claimAmount) : <span className="text-gray-400">—</span>}
                 </td>
-                <td className="px-4 py-4 text-right">
-                  <span className="font-medium">{formatCurrency(ambulance.deductible)}</span>
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <span className="">{ambulance.expiryDate}</span>
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <span className="font-semibold">{ambulance.driversCovered}</span>
-                </td>
-                <td className="px-4 py-4">
-                  {ambulance.lastClaim ? (
-                    <div>
-                      <p className="text-sm font-medium">{ambulance.lastClaim}</p>
-                      <p className="text-xs">{formatCurrency(ambulance.claimAmount)}</p>
-                    </div>
-                  ) : (
-                    <span className="text-gray-400">No claims</span>
-                  )}
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <span className={`px-2 py-1 text-sm font-medium ${
-                    ambulance.status === 'Active' ? ' text-green-800' :
-                    ambulance.status === 'Expiring Soon' ? ' text-yellow-800' :
-                    ' text-red-800'
+                <td className="px-3 py-2 text-center whitespace-nowrap">
+                  <span className={`px-2 py-0.5 text-xs font-medium ${
+                    ambulance.status === 'Active' ? 'text-green-700' :
+                    ambulance.status === 'Expiring Soon' ? 'text-yellow-700' :
+                    'text-red-700'
                   }`}>
                     {ambulance.status}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-right">
-                  <div className="flex items-center justify-end space-x-2">
-                    <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
-                      <Eye className="w-4 h-4" />
+                <td className="px-3 py-2 text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <button className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="View">
+                      <Eye className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors">
-                      <RefreshCw className="w-4 h-4" />
+                    <button className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors" title="Renew">
+                      <RefreshCw className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors">
-                      <Edit className="w-4 h-4" />
+                    <button className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors" title="Edit">
+                      <Edit className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </td>
@@ -2070,7 +2132,7 @@ const InsuranceManagement = () => {
 
             <form onSubmit={handleEditCoverageSubmit} className="p-6 space-y-5 max-h-[72vh] overflow-y-auto">
               {/* Policy Information */}
-              <div className="border border-gray-200 rounded-xl p-4 space-y-4">
+              <div className="border border-gray-200 p-4 space-y-4">
                 <div className="flex items-center gap-2">
                   <Receipt className="w-4 h-4 text-blue-600" />
                   <span className="text-sm font-semibold text-gray-700">Policy Information</span>
@@ -2119,7 +2181,7 @@ const InsuranceManagement = () => {
               </div>
 
               {/* Coverage Amounts */}
-              <div className="border border-gray-200 rounded-xl p-4 space-y-4">
+              <div className="border border-gray-200 p-4 space-y-4">
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4 text-blue-600" />
                   <span className="text-sm font-semibold text-gray-700">Coverage Amounts</span>
@@ -2141,7 +2203,7 @@ const InsuranceManagement = () => {
               </div>
 
               {/* Status */}
-              <div className="border border-gray-200 rounded-xl p-4">
+              <div className="border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Activity className="w-4 h-4 text-blue-600" />
                   <span className="text-sm font-semibold text-gray-700">Status</span>
@@ -2206,7 +2268,7 @@ const InsuranceManagement = () => {
                   { label: 'Last Claim Amount', value: formatCurrency(p.claimAmount) },
                   { label: 'Total Used', value: formatCurrency(p.usedAmount) },
                 ].map(({ label, value }) => (
-                  <div key={label} className="border border-gray-200 rounded-xl p-3 text-center bg-gray-50">
+                  <div key={label} className="border border-gray-200 p-3 text-center bg-gray-50">
                     <p className="text-sm font-bold text-gray-800">{value}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{label}</p>
                   </div>
@@ -2214,7 +2276,7 @@ const InsuranceManagement = () => {
               </div>
 
               {/* Claims table */}
-              <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <div className="border border-gray-200 overflow-hidden">
                 <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
                   <FileText className="w-4 h-4 text-blue-600" />
                   <span className="text-sm font-semibold text-gray-700">Recent Claims ({patientClaims.length})</span>
@@ -2265,6 +2327,454 @@ const InsuranceManagement = () => {
                 className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
               >
                 <FileText className="w-4 h-4" /> Go to Claims
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── Add New Claim Modal ───────────────────────────────────────────────────
+  const renderAddClaimModal = () => {
+    if (!showAddClaimModal) return null;
+    const field = (label, key, type = 'text', placeholder = '', required = false, Icon = null) => (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <div className="relative">
+          {Icon && <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Icon className="h-4 w-4 text-gray-400" /></div>}
+          <input
+            type={type}
+            value={newClaim[key]}
+            onChange={e => { setNewClaim(p => ({ ...p, [key]: e.target.value })); setClaimErrors(er => ({ ...er, [key]: '' })); }}
+            placeholder={placeholder}
+            className={`w-full ${Icon ? 'pl-9' : 'px-4'} pr-4 py-2.5 border ${claimErrors[key] ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-700'} rounded-lg text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+          />
+          {claimErrors[key] && <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{claimErrors[key]}</p>}
+        </div>
+      </div>
+    );
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowAddClaimModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="px-6 py-5 bg-blue-950 text-white">
+              <button onClick={() => setShowAddClaimModal(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all">
+                <XCircle className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">New Insurance Claim</h2>
+                  <p className="text-sm text-blue-200">Submit a new claim for processing</p>
+                </div>
+              </div>
+            </div>
+            <form onSubmit={handleAddClaimSubmit} className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+              {/* Patient Info */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Patient Information</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>{field('Patient Name', 'patientName', 'text', 'e.g. Sarah Wanjiku', true, UserCheck)}</div>
+                  <div>{field('Patient ID', 'patientId', 'text', 'e.g. PT045', true)}</div>
+                </div>
+              </div>
+              {/* Claim Details */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Receipt className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">Claim Details</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Insurance Provider <span className="text-red-500">*</span></label>
+                    <select
+                      value={newClaim.insuranceProvider}
+                      onChange={e => { setNewClaim(p => ({ ...p, insuranceProvider: e.target.value })); setClaimErrors(er => ({ ...er, insuranceProvider: '' })); }}
+                      className={`w-full px-4 py-2.5 border ${claimErrors.insuranceProvider ? 'border-red-400' : 'border-gray-300'} rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700`}
+                    >
+                      <option value="">Select provider…</option>
+                      {['SHA', 'NHIF', 'AAR Insurance', 'Jubilee Insurance', 'Britam', 'UAP Insurance', 'CIC Insurance', 'Resolution Insurance'].map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                    {claimErrors.insuranceProvider && <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{claimErrors.insuranceProvider}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Claim Type</label>
+                    <select
+                      value={newClaim.claimType}
+                      onChange={e => setNewClaim(p => ({ ...p, claimType: e.target.value }))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700"
+                    >
+                      {['Outpatient', 'Inpatient', 'Emergency', 'Maternity', 'Dental', 'Optical', 'Surgery', 'Physiotherapy'].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>{field('Diagnosis / Condition', 'diagnosis', 'text', 'e.g. Hypertension Management', true, Activity)}</div>
+                  <div>{field('Hospital / Facility', 'hospital', 'text', 'e.g. Kenyatta National Hospital', true, Building2)}</div>
+                  <div>{field('Claim Amount (KES)', 'claimAmount', 'number', '0.00', true, DollarSign)}</div>
+                  <div>{field('Submission Date', 'submissionDate', 'date', '', true, Calendar)}</div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Notes / Additional Information</label>
+                    <textarea
+                      value={newClaim.notes}
+                      onChange={e => setNewClaim(p => ({ ...p, notes: e.target.value }))}
+                      rows={3}
+                      placeholder="Any supporting notes or additional context…"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button onClick={() => setShowAddClaimModal(false)} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium">Cancel</button>
+              <button onClick={handleAddClaimSubmit} className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium">
+                <Plus className="w-4 h-4" /> Submit Claim
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── Bulk Upload Modal ──────────────────────────────────────────────────────
+  const renderBulkUploadModal = () => {
+    if (!showBulkUploadModal) return null;
+    const sampleRows = [
+      ['CLM-2024-010', 'John Mwangi', 'PT112', 'SHA', 'Outpatient', '12000', 'Malaria Treatment', 'Kenyatta National Hospital', '2024-10-15'],
+      ['CLM-2024-011', 'Amina Hassan', 'PT088', 'NHIF', 'Inpatient', '55000', 'Appendectomy', 'Aga Khan University Hospital', '2024-10-16'],
+    ];
+    const downloadTemplate = () => {
+      const headers = 'Claim Number,Patient Name,Patient ID,Insurance Provider,Claim Type,Claim Amount (KES),Diagnosis,Hospital,Submission Date';
+      const sample = sampleRows.map(r => r.join(',')).join('\n');
+      const blob = new Blob([headers + '\n' + sample], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'claims_bulk_upload_template.csv'; a.click();
+    };
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBulkUploadModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-xl overflow-hidden">
+            <div className="px-6 py-5 bg-blue-950 text-white">
+              <button onClick={() => setShowBulkUploadModal(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all">
+                <XCircle className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">Bulk Upload Claims</h2>
+                  <p className="text-sm text-blue-200">Upload multiple claims via CSV file</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {bulkUploadStep === 'select' && (
+                <>
+                  {/* Step 1 — Instructions */}
+                  <div className="border border-blue-100 bg-blue-50 rounded-lg p-4 space-y-2">
+                    <p className="text-sm font-semibold text-blue-800 flex items-center gap-2"><AlertCircle className="w-4 h-4" /> Upload Instructions</p>
+                    <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                      <li>Download the CSV template below and fill in claim details.</li>
+                      <li>Ensure all required columns are present and correctly formatted.</li>
+                      <li>Claim amounts should be numeric values in KES (no commas).</li>
+                      <li>Dates must be in YYYY-MM-DD format.</li>
+                    </ul>
+                  </div>
+                  <button onClick={downloadTemplate} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium">
+                    <Download className="w-4 h-4" /> Download CSV Template
+                  </button>
+                  {/* Drop zone */}
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${bulkFile ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-blue-400 bg-gray-50'}`}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) setBulkFile(f); }}
+                  >
+                    {bulkFile ? (
+                      <div className="space-y-1">
+                        <CheckCircle className="w-10 h-10 text-green-500 mx-auto" />
+                        <p className="text-sm font-semibold text-green-700">{bulkFile.name}</p>
+                        <p className="text-xs text-green-600">{(bulkFile.size / 1024).toFixed(1)} KB — ready to upload</p>
+                        <button onClick={() => setBulkFile(null)} className="text-xs text-red-500 hover:underline mt-1">Remove</button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Upload className="w-10 h-10 text-gray-400 mx-auto" />
+                        <p className="text-sm font-medium text-gray-600">Drag & drop your CSV here, or</p>
+                        <label className="cursor-pointer inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                          Browse File
+                          <input type="file" accept=".csv" className="hidden" onChange={e => setBulkFile(e.target.files[0])} />
+                        </label>
+                        <p className="text-xs text-gray-400">CSV files only, max 5 MB</p>
+                      </div>
+                    )}
+                  </div>
+                  {bulkFile && (
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                        <span className="text-xs font-semibold uppercase text-gray-500">Preview (sample rows)</span>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead className="bg-gray-50 border-b">
+                            <tr>{['Claim No.','Patient','ID','Provider','Type','Amount','Diagnosis','Hospital','Date'].map(h => <th key={h} className="px-2 py-1.5 text-left font-semibold text-gray-500 uppercase">{h}</th>)}</tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100">
+                            {sampleRows.map((r, i) => <tr key={i} className="hover:bg-gray-50">{r.map((c, j) => <td key={j} className="px-2 py-1.5 text-gray-700 whitespace-nowrap">{c}</td>)}</tr>)}
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="text-[10px] text-gray-400 px-4 py-2">Showing template sample — actual file rows will be validated on upload.</p>
+                    </div>
+                  )}
+                </>
+              )}
+              {bulkUploadStep === 'done' && (
+                <div className="py-8 text-center space-y-3">
+                  <CheckCircle className="w-14 h-14 text-green-500 mx-auto" />
+                  <p className="text-lg font-bold text-gray-800">Upload Successful!</p>
+                  <p className="text-sm text-gray-500">Your claims file has been processed and queued for review.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button onClick={() => setShowBulkUploadModal(false)} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium">Cancel</button>
+              {bulkUploadStep === 'select' && (
+                <button
+                  disabled={!bulkFile}
+                  onClick={() => setBulkUploadStep('done')}
+                  className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Upload className="w-4 h-4" /> Upload Claims
+                </button>
+              )}
+              {bulkUploadStep === 'done' && (
+                <button onClick={() => setShowBulkUploadModal(false)} className="px-5 py-2.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 font-medium">
+                  <CheckCircle className="w-4 h-4" /> Done
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── View Claim Modal ───────────────────────────────────────────────────────
+  const renderViewClaimModal = () => {
+    if (!showViewClaimModal || !selectedClaim) return null;
+    const c = selectedClaim;
+    const row = (label, value, bold = false) => (
+      <div>
+        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-0.5">{label}</p>
+        <p className={`text-sm ${bold ? 'font-semibold text-gray-900' : 'text-gray-700'}`}>{value}</p>
+      </div>
+    );
+    const statusBadge = (s) => {
+      const map = { Approved: 'bg-green-50 text-green-700 border-green-200', Processing: 'bg-yellow-50 text-yellow-700 border-yellow-200', Rejected: 'bg-red-50 text-red-600 border-red-200', Pending: 'bg-gray-50 text-gray-600 border-gray-200' };
+      return <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${map[s] || map.Pending}`}>{s}</span>;
+    };
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowViewClaimModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-xl overflow-hidden">
+            <div className="px-6 py-5 bg-blue-950 text-white">
+              <button onClick={() => setShowViewClaimModal(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all"><XCircle className="w-5 h-5" /></button>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center ring-4 ring-white/20">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold leading-tight">{c.claimNumber}</h2>
+                  <p className="text-sm text-blue-200">{c.claimType} · {c.diagnosis}</p>
+                  <div className="mt-1.5">{statusBadge(c.status)}</div>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 space-y-5 max-h-[68vh] overflow-y-auto">
+              {/* Summary amounts */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Claim Amount', value: formatCurrency(c.claimAmount) },
+                  { label: 'Approved Amount', value: formatCurrency(c.approvedAmount) },
+                  { label: 'Processing Time', value: c.processingTime },
+                ].map(({ label, value }) => (
+                  <div key={label} className="border border-gray-200 p-3 text-center bg-gray-50">
+                    <p className="text-sm font-bold text-gray-800">{value}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+                  </div>
+                ))}
+              </div>
+              {/* Patient & Claim Details */}
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1"><Users className="w-4 h-4 text-blue-600" /><span className="text-sm font-semibold text-gray-700">Patient</span></div>
+                <div className="grid grid-cols-2 gap-4">
+                  {row('Name', c.patientName, true)}
+                  {row('Patient ID', c.patientId)}
+                </div>
+              </div>
+              <div className="border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-1"><Receipt className="w-4 h-4 text-blue-600" /><span className="text-sm font-semibold text-gray-700">Claim Details</span></div>
+                <div className="grid grid-cols-2 gap-4">
+                  {row('Provider', c.insuranceProvider, true)}
+                  {row('Hospital', c.hospital)}
+                  {row('Claim Type', c.claimType)}
+                  {row('Submission Date', c.submissionDate)}
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button onClick={() => setShowViewClaimModal(false)} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium">Close</button>
+              <button
+                onClick={() => { setShowViewClaimModal(false); handleOpenApproveClaim(c); }}
+                className="px-5 py-2.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 font-medium"
+              >
+                <CheckCircle className="w-4 h-4" /> Approve Claim
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── Approve Claim Modal ────────────────────────────────────────────────────
+  const renderApproveClaimModal = () => {
+    if (!showApproveClaimModal || !claimToApprove) return null;
+    const c = claimToApprove;
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowApproveClaimModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-lg overflow-hidden">
+            <div className="px-6 py-5 bg-green-700 text-white">
+              <button onClick={() => setShowApproveClaimModal(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all"><XCircle className="w-5 h-5" /></button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">Approve Claim</h2>
+                  <p className="text-sm text-green-200">{c.claimNumber} · {c.patientName}</p>
+                </div>
+              </div>
+            </div>
+            <form onSubmit={handleApproveClaimSubmit} className="p-6 space-y-5">
+              {/* Claim summary */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Claim Amount', value: formatCurrency(c.claimAmount) },
+                  { label: 'Provider', value: c.insuranceProvider },
+                  { label: 'Claim Type', value: c.claimType },
+                ].map(({ label, value }) => (
+                  <div key={label} className="bg-gray-50 border border-gray-200 p-3 text-center">
+                    <p className="text-sm font-bold text-gray-800">{value}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+                  </div>
+                ))}
+              </div>
+              {/* Approved amount */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Approved Amount (KES) <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <DollarSign className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="number"
+                    value={approvalData.approvedAmount}
+                    onChange={e => { setApprovalData(p => ({ ...p, approvedAmount: e.target.value })); setApprovalErrors(er => ({ ...er, approvedAmount: '' })); }}
+                    placeholder="e.g. 13950"
+                    className={`w-full pl-9 pr-4 py-2.5 border ${approvalErrors.approvedAmount ? 'border-red-400' : 'border-gray-300'} rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600`}
+                  />
+                  {approvalErrors.approvedAmount && <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{approvalErrors.approvedAmount}</p>}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Processing Time</label>
+                <input
+                  type="text"
+                  value={approvalData.processingTime}
+                  onChange={e => setApprovalData(p => ({ ...p, processingTime: e.target.value }))}
+                  placeholder="e.g. 5 days"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Approval Notes</label>
+                <textarea
+                  value={approvalData.notes}
+                  onChange={e => setApprovalData(p => ({ ...p, notes: e.target.value }))}
+                  rows={3}
+                  placeholder="Optional notes for the approval decision…"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600 resize-none"
+                />
+              </div>
+              <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-800 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>This action will mark the claim as <strong>Approved</strong> and notify the patient and provider.</span>
+              </div>
+            </form>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button onClick={() => setShowApproveClaimModal(false)} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium">Cancel</button>
+              <button onClick={handleApproveClaimSubmit} className="px-5 py-2.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 font-medium">
+                <CheckCircle className="w-4 h-4" /> Confirm Approval
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── Delete Claim Confirmation Modal ───────────────────────────────────────
+  const renderDeleteClaimModal = () => {
+    if (!showDeleteClaimModal || !claimToDelete) return null;
+    const c = claimToDelete;
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowDeleteClaimModal(false)} />
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-white shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="px-6 py-5 bg-red-600 text-white">
+              <button onClick={() => setShowDeleteClaimModal(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all"><XCircle className="w-5 h-5" /></button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Trash2 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">Delete Claim</h2>
+                  <p className="text-sm text-red-200">This action cannot be undone</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
+                <p className="text-sm text-red-800 font-medium">You are about to permanently delete the following claim:</p>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><p className="text-xs text-red-500 uppercase font-medium mb-0.5">Claim Number</p><p className="font-semibold text-red-900">{c.claimNumber}</p></div>
+                  <div><p className="text-xs text-red-500 uppercase font-medium mb-0.5">Patient</p><p className="font-semibold text-red-900">{c.patientName}</p></div>
+                  <div><p className="text-xs text-red-500 uppercase font-medium mb-0.5">Provider</p><p className="text-red-800">{c.insuranceProvider}</p></div>
+                  <div><p className="text-xs text-red-500 uppercase font-medium mb-0.5">Claim Amount</p><p className="text-red-800">{formatCurrency(c.claimAmount)}</p></div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">This will permanently remove the claim record from the system. A deletion log entry will be created for audit purposes.</p>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button onClick={() => setShowDeleteClaimModal(false)} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium">Cancel</button>
+              <button onClick={handleDeleteClaimConfirm} className="px-5 py-2.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 font-medium">
+                <Trash2 className="w-4 h-4" /> Delete Claim
               </button>
             </div>
           </div>
@@ -2788,6 +3298,11 @@ const InsuranceManagement = () => {
       {renderViewProviderModal()}
       {renderEditProviderModal()}
       {renderAddProviderModal()}
+      {renderAddClaimModal()}
+      {renderBulkUploadModal()}
+      {renderViewClaimModal()}
+      {renderApproveClaimModal()}
+      {renderDeleteClaimModal()}
       <div className="">
         <main className="">
           <div className="">
