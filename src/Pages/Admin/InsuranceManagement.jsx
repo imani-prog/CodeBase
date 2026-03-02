@@ -1114,15 +1114,15 @@ const InsuranceManagement = () => {
               {claimsData.map((claim) => (
                 <tr key={claim.id} className="hover:bg-blue-50/40 transition-colors">
                   <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">{claim.claimNumber}</td>
-                  <td className="px-3 py-2 text-center whitespace-nowrap">{claim.claimType}</td>
-                  <td className="px-3 py-2 text-center text-gray-500 whitespace-nowrap">{claim.submissionDate}</td>
+                  <td className="px-3 py-2 text-center">{claim.claimType}</td>
+                  <td className="px-3 py-2 text-center text-gray-800 font-semibold">{claim.submissionDate}</td>
                   <td className="px-3 py-2 whitespace-nowrap">
                     <span className="font-semibold text-gray-800">{claim.patientName}</span>
                     <span className="text-gray-400 ml-1">&middot; {claim.patientId}</span>
                   </td>
-                  <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{claim.diagnosis}</td>
-                  <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">{claim.insuranceProvider}</td>
-                  <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{claim.hospital}</td>
+                  <td className="px-3 py-2 text-gray-800 font-semibold">{claim.diagnosis}</td>
+                  <td className="px-3 py-2 font-semibold text-gray-800">{claim.insuranceProvider}</td>
+                  <td className="px-3 py-2 text-gray-800 font-semibold">{claim.hospital}</td>
                   <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">{formatCurrency(claim.claimAmount)}</td>
                   <td className="px-3 py-2 text-right text-blue-600 font-medium whitespace-nowrap">{formatCurrency(claim.approvedAmount)}</td>
                   <td className="px-3 py-2 text-center whitespace-nowrap">
@@ -1130,7 +1130,7 @@ const InsuranceManagement = () => {
                       {claim.status}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-center text-gray-500 whitespace-nowrap">{claim.processingTime}</td>
+                  <td className="px-3 py-2 text-center text-gray-800 font-semibold">{claim.processingTime}</td>
                   <td className="px-3 py-2 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button onClick={() => handleViewClaim(claim)} className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="View claim">
