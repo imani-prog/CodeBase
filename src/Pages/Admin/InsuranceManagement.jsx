@@ -2103,7 +2103,7 @@ const InsuranceManagement = () => {
 
     const field = (label, key, type = 'text', placeholder = '', required = false) => (
       <div>
-        <label className="block text-xs font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
           {label}{required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
         <input
@@ -2111,26 +2111,26 @@ const InsuranceManagement = () => {
           value={newInsurancePolicy[key] || ''}
           onChange={e => setNewInsurancePolicy(p => ({ ...p, [key]: e.target.value }))}
           placeholder={placeholder}
-          className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newInsurancePolicyErrors[key] ? 'border-red-400' : 'border-gray-300'}`}
+          className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newInsurancePolicyErrors[key] ? 'border-red-400' : 'border-gray-300'}`}
         />
-        {newInsurancePolicyErrors[key] && <p className="text-xs text-red-500 mt-0.5">{newInsurancePolicyErrors[key]}</p>}
+        {newInsurancePolicyErrors[key] && <p className="text-xs text-red-500 mt-1">{newInsurancePolicyErrors[key]}</p>}
       </div>
     );
 
     return (
       <div className="fixed inset-0 z-50 overflow-y-auto">
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCreateInsurancePolicyModal(false)} />
-        <div className="flex items-center justify-center min-h-screen p-4">
-          <div className="relative bg-white shadow-2xl w-full max-w-2xl overflow-hidden rounded-xl">
+        <div className="flex items-center justify-center min-h-screen p-20">
+          <div className="relative bg-white shadow-2xl w-full max-w-4xl overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-5 bg-blue-950 text-white flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-white" />
+            <div className="px-8 py-6 bg-blue-950 text-white flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center ring-4 ring-white/10">
+                  <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold">Create New Policy</h2>
-                  <p className="text-xs text-blue-200">Fill in the policy details below</p>
+                  <h2 className="text-lg font-bold">Create New Policy</h2>
+                  <p className="text-sm text-blue-200">Fill in the policy details below</p>
                 </div>
               </div>
               <button onClick={() => setShowCreateInsurancePolicyModal(false)} className="p-2 rounded-full hover:bg-white/20 transition-all">
@@ -2138,94 +2138,92 @@ const InsuranceManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              {/* Policy Holder & Number */}
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="p-8">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+
+                {/* Row 1: Policy Holder | Policy Number */}
                 {field('Policy Holder', 'policyHolder', 'text', 'Full name or company', true)}
                 {field('Policy Number', 'policyNumber', 'text', 'e.g. JUB-2025-001', true)}
-              </div>
 
-              {/* Category, Type, Provider */}
-              <div className="grid grid-cols-3 gap-4">
+                {/* Row 2: Category | Type */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Category<span className="text-red-500 ml-0.5">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Category<span className="text-red-500 ml-0.5">*</span></label>
                   <select value={newInsurancePolicy.category} onChange={e => setNewInsurancePolicy(p => ({ ...p, category: e.target.value }))}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     {categoryOptions.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Type<span className="text-red-500 ml-0.5">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Type<span className="text-red-500 ml-0.5">*</span></label>
                   <select value={newInsurancePolicy.type} onChange={e => setNewInsurancePolicy(p => ({ ...p, type: e.target.value }))}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     {typeOptions.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
+
+                {/* Row 3: Provider | Beneficiaries */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Provider<span className="text-red-500 ml-0.5">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Provider<span className="text-red-500 ml-0.5">*</span></label>
                   <select value={newInsurancePolicy.provider} onChange={e => setNewInsurancePolicy(p => ({ ...p, provider: e.target.value }))}
-                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newInsurancePolicyErrors.provider ? 'border-red-400' : 'border-gray-300'}`}>
+                    className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newInsurancePolicyErrors.provider ? 'border-red-400' : 'border-gray-300'}`}>
                     <option value="">Select provider</option>
                     {providerOptions.map(pr => <option key={pr} value={pr}>{pr}</option>)}
                   </select>
-                  {newInsurancePolicyErrors.provider && <p className="text-xs text-red-500 mt-0.5">{newInsurancePolicyErrors.provider}</p>}
+                  {newInsurancePolicyErrors.provider && <p className="text-xs text-red-500 mt-1">{newInsurancePolicyErrors.provider}</p>}
                 </div>
-              </div>
-
-              {/* Coverage & Premium */}
-              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Coverage Amount (KES)<span className="text-red-500 ml-0.5">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Beneficiaries</label>
+                  <input type="number" min="1" value={newInsurancePolicy.beneficiaries}
+                    onChange={e => setNewInsurancePolicy(p => ({ ...p, beneficiaries: e.target.value }))}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                {/* Row 4: Coverage Amount | Annual Premium */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Coverage Amount (KES)<span className="text-red-500 ml-0.5">*</span></label>
                   <div className="relative">
-                    <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">Ksh</span>
+                    <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm font-medium">Ksh</span>
                     <input type="number" value={newInsurancePolicy.coverage}
                       onChange={e => setNewInsurancePolicy(p => ({ ...p, coverage: e.target.value }))}
                       placeholder="e.g. 1500000"
-                      className={`w-full pl-10 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newInsurancePolicyErrors.coverage ? 'border-red-400' : 'border-gray-300'}`} />
+                      className={`w-full pl-11 pr-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newInsurancePolicyErrors.coverage ? 'border-red-400' : 'border-gray-300'}`} />
                   </div>
-                  {newInsurancePolicyErrors.coverage && <p className="text-xs text-red-500 mt-0.5">{newInsurancePolicyErrors.coverage}</p>}
+                  {newInsurancePolicyErrors.coverage && <p className="text-xs text-red-500 mt-1">{newInsurancePolicyErrors.coverage}</p>}
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Annual Premium (KES)<span className="text-red-500 ml-0.5">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Annual Premium (KES)<span className="text-red-500 ml-0.5">*</span></label>
                   <div className="relative">
-                    <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">Ksh</span>
+                    <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm font-medium">Ksh</span>
                     <input type="number" value={newInsurancePolicy.premium}
                       onChange={e => setNewInsurancePolicy(p => ({ ...p, premium: e.target.value }))}
                       placeholder="e.g. 45000"
-                      className={`w-full pl-10 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newInsurancePolicyErrors.premium ? 'border-red-400' : 'border-gray-300'}`} />
+                      className={`w-full pl-11 pr-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newInsurancePolicyErrors.premium ? 'border-red-400' : 'border-gray-300'}`} />
                   </div>
-                  {newInsurancePolicyErrors.premium && <p className="text-xs text-red-500 mt-0.5">{newInsurancePolicyErrors.premium}</p>}
+                  {newInsurancePolicyErrors.premium && <p className="text-xs text-red-500 mt-1">{newInsurancePolicyErrors.premium}</p>}
                 </div>
-              </div>
 
-              {/* Dates & Beneficiaries */}
-              <div className="grid grid-cols-3 gap-4">
+                {/* Row 5: Start Date | Expiry Date */}
                 {field('Start Date', 'startDate', 'date', '', true)}
                 {field('Expiry Date', 'expiryDate', 'date', '', true)}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Beneficiaries</label>
-                  <input type="number" min="1" value={newInsurancePolicy.beneficiaries}
-                    onChange={e => setNewInsurancePolicy(p => ({ ...p, beneficiaries: e.target.value }))}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+                {/* Row 6: Notes (full width) */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Notes (optional)</label>
+                  <textarea rows={3} value={newInsurancePolicy.notes}
+                    onChange={e => setNewInsurancePolicy(p => ({ ...p, notes: e.target.value }))}
+                    placeholder="Additional policy details..."
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
                 </div>
+
               </div>
 
-              {/* Notes */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
-                <textarea rows={2} value={newInsurancePolicy.notes}
-                  onChange={e => setNewInsurancePolicy(p => ({ ...p, notes: e.target.value }))}
-                  placeholder="Additional policy details..."
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-1 border-t border-gray-100">
+              <div className="flex items-center justify-end gap-3 pt-5 mt-2 border-t border-gray-100">
                 <button type="button" onClick={() => setShowCreateInsurancePolicyModal(false)}
-                  className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                  className="px-6 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                   Cancel
                 </button>
                 <button type="submit"
-                  className="px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium">
+                  className="px-6 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium">
                   <Plus className="w-4 h-4" /> Create Policy
                 </button>
               </div>
