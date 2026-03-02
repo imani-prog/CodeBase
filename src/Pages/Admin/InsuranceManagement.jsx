@@ -2780,7 +2780,7 @@ const InsuranceManagement = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* General Settings */}
-          <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <div className="shadow-sm border border-gray-200 p-6">
             <div className="flex items-center mb-6">
               <div className="p-2  mr-3">
                 <Settings className="w-8 h-8 text-blue-600" />
@@ -2870,7 +2870,7 @@ const InsuranceManagement = () => {
           </div>
 
           {/* Notification Settings */}
-          <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <div className="shadow-sm border border-gray-200 p-6">
             <div className="flex items-center mb-6">
               <div className="p-2 mr-3">
                 <Bell className="w-8 h-8 text-blue-600" />
@@ -2976,7 +2976,7 @@ const InsuranceManagement = () => {
 
 
           {/* Integration & API Settings */}
-          <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <div className="shadow-sm border border-gray-200 p-6">
             <div className="flex items-center mb-6">
               <div className="p-2 mr-3">
                 <Truck className="w-5 h-5 text-blue-600" />
