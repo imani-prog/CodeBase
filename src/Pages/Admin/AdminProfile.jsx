@@ -1,10 +1,30 @@
 import { useState } from "react";
-import { 
-  User, Mail, Phone, Shield, Settings, Activity, Bell, Key, 
-  Monitor, Camera, Check, X, Edit3, Save, Calendar, MapPin, 
-  Globe, Moon, Sun, Download, LogOut, AlertTriangle, 
-  Smartphone, Clock, Wifi, Eye, EyeOff, Plus, Trash2 
+import {
+  User, Mail, Phone, Shield, Settings, Activity, Bell, Key,
+  Monitor, Camera, Check, X, Edit3, Save, MapPin,
+  Globe, Download, LogOut, Plus, Eye, EyeOff
 } from "lucide-react";
+
+/* ── Compact section header ── */
+const SectionHeader = ({ icon: Icon, title, subtitle }) => (
+  <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-200 bg-white rounded-t-xl">
+    <div className="p-1.5 ">
+      <Icon className="w-4 h-4 text-blue-600" />
+    </div>
+    <div>
+      <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
+      {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
+    </div>
+  </div>
+);
+
+/* ── Read-only display field ── */
+const Field = ({ label, value }) => (
+  <div>
+    <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
+    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800">{value}</p>
+  </div>
+);
 
 const AdminProfile = () => {
   const [profile, setProfile] = useState({
@@ -18,17 +38,12 @@ const AdminProfile = () => {
     location: "Nairobi, Kenya",
     timezone: "EAT (UTC+3)",
     language: "English",
-    status: "Active"
+    status: "Active",
   });
-  
+
   const [editMode, setEditMode] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState({
-    email: true,
-    sms: false,
-    push: true,
-    security: true
-  });
+  const [notifications, setNotifications] = useState({ email: true, sms: false, push: true, security: true });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -37,13 +52,13 @@ const AdminProfile = () => {
     { action: "Approved staff access request", time: "4 hours ago", type: "approval" },
     { action: "Generated monthly report", time: "1 day ago", type: "report" },
     { action: "Modified system settings", time: "2 days ago", type: "settings" },
-    { action: "Added new user account", time: "3 days ago", type: "create" }
+    { action: "Added new user account", time: "3 days ago", type: "create" },
   ];
 
   const loginSessions = [
     { device: "Windows PC", location: "Nairobi, Kenya", time: "Current session", status: "active" },
     { device: "iPhone 14", location: "Nairobi, Kenya", time: "2 hours ago", status: "active" },
-    { device: "MacBook Pro", location: "Mombasa, Kenya", time: "1 day ago", status: "inactive" }
+    { device: "MacBook Pro", location: "Mombasa, Kenya", time: "1 day ago", status: "inactive" },
   ];
 
   const permissions = [
@@ -51,481 +66,369 @@ const AdminProfile = () => {
     { module: "Staff Management", access: "Full Access", active: true },
     { module: "Financial Reports", access: "Read Only", active: true },
     { module: "System Settings", access: "Full Access", active: true },
-    { module: "Audit Logs", access: "Full Access", active: true }
+    { module: "Audit Logs", access: "Full Access", active: true },
   ];
 
-  const handleSave = () => {
-    setEditMode(false);
-    // Add save logic here
+  const activityDot = {
+    update: "bg-blue-400", approval: "bg-blue-400",
+    report: "bg-blue-400", settings: "bg-blue-400", create: "bg-blue-400",
   };
-
-  const renderPersonalInfo = () => (
-    <div className="bg-white shadow-md p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-        <User className="w-6 h-6 mr-2 text-blue-600" />
-        Personal Information
-      </h2>
-      
-      {/* Profile Header */}
-      <div className="flex items-start justify-between border-b pb-6">
-        <div className="flex items-center space-x-6">
-          <div className="relative">
-            <img
-              src="https://ui-avatars.com/api/?name=Sarah+Mitchell&background=3B82F6&color=fff&size=120"
-              alt="Profile"
-              className="w-24 h-24 rounded-full border-2 border-blue-200 shadow-lg"
-            />
-            <button className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
-              <Camera className="w-4 h-4" />
-            </button>
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">{profile.name}</h3>
-            <p className="text-lg text-blue-600 font-medium">{profile.role}</p>
-            <p className="text-gray-600">{profile.department}</p>
-            <div className="flex items-center mt-2">
-              <div className="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
-              <span className="text-sm text-gray-600">{profile.status}</span>
-            </div>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-500">Employee ID</p>
-          <p className="font-mono text-sm font-medium">{profile.employeeId}</p>
-          <p className="text-sm text-gray-500 mt-2">Joined</p>
-          <p className="text-sm font-medium">{profile.joinDate}</p>
-        </div>
-      </div>
-
-      {/* Profile Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <User className="w-4 h-4 mr-2 text-blue-600" />
-              Full Name
-            </label>
-            {editMode ? (
-              <input
-                type="text"
-                value={profile.name}
-                onChange={(e) => setProfile({...profile, name: e.target.value})}
-                className="w-full px-3 py-2 border rounded-md border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white"
-              />
-            ) : (
-              <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.name}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <Mail className="w-4 h-4 mr-2 text-blue-600" />
-              Email Address
-            </label>
-            {editMode ? (
-              <input
-                type="email"
-                value={profile.email}
-                onChange={(e) => setProfile({...profile, email: e.target.value})}
-                className="w-full px-3 py-2 border rounded-md border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white"
-              />
-            ) : (
-              <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.email}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <Phone className="w-4 h-4 mr-2 text-blue-600" />
-              Phone Number
-            </label>
-            {editMode ? (
-              <input
-                type="tel"
-                value={profile.phone}
-                onChange={(e) => setProfile({...profile, phone: e.target.value})}
-                className="w-full px-3 py-2 border rounded-md border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white"
-              />
-            ) : (
-              <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.phone}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <MapPin className="w-4 h-4 mr-2 text-blue-600" />
-              Location
-            </label>
-            <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.location}</p>
-          </div>
-
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <Globe className="w-4 h-4 mr-2 text-blue-600" />
-              Timezone
-            </label>
-            <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.timezone}</p>
-          </div>
-
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <Globe className="w-4 h-4 mr-2 text-blue-600" />
-              Language
-            </label>
-            <p className="px-3 py-2 bg-gray-50 rounded-lg">{profile.language}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderSecurity = () => (
-    <div className="bg-white shadow-md p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-        <Shield className="w-6 h-6 mr-2 text-blue-600" />
-        Security Settings
-      </h2>
-      
-      {/* Password Section */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Password & Authentication</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter current password"
-                className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white"
-              />
-              <button
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-              <input
-                type="password"
-                placeholder="Enter new password"
-                className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-              <input
-                type="password"
-                placeholder="Confirm new password"
-                className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white"
-              />
-            </div>
-          </div>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            Update Password
-          </button>
-        </div>
-      </div>
-
-      {/* Two-Factor Authentication */}
-      <div className="border-t pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Two-Factor Authentication</h3>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={twoFactorEnabled}
-              onChange={(e) => setTwoFactorEnabled(e.target.checked)}
-              className="mr-2"
-            />
-            <span className="text-sm">{twoFactorEnabled ? "Enabled" : "Disabled"}</span>
-          </div>
-        </div>
-        <p className="text-gray-600 mb-4">Add an extra layer of security to your account with 2FA.</p>
-        {twoFactorEnabled && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="flex items-center">
-              <Check className="w-5 h-5 text-green-600 mr-2" />
-              <span className="text-green-800">Two-factor authentication is active</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Active Sessions */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Active Sessions</h3>
-        <div className="space-y-3">
-          {loginSessions.map((session, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <Monitor className="w-5 h-5 text-gray-600 mr-3" />
-                <div>
-                  <p className="font-medium">{session.device}</p>
-                  <p className="text-sm text-gray-600">{session.location} • {session.time}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-3 ${session.status === 'active' ? 'bg-green-400' : 'bg-gray-400'}`}></div>
-                {session.status === 'active' && index !== 0 && (
-                  <button className="text-red-600 hover:text-red-800 text-sm">Revoke</button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderPreferences = () => (
-    <div className="bg-white shadow-md p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-        <Settings className="w-6 h-6 mr-2 text-blue-600" />
-        Preferences
-      </h2>
-      
-      {/* Theme Settings */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Appearance</h3>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium">Dark Mode</p>
-            <p className="text-sm text-gray-600">Toggle between light and dark themes</p>
-          </div>
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
-              darkMode ? 'bg-blue-600' : 'bg-gray-300'
-            }`}
-          >
-            <span className={`inline-block w-4 h-4 transform transition-transform bg-white rounded-full ${
-              darkMode ? 'translate-x-6' : 'translate-x-1'
-            }`} />
-          </button>
-        </div>
-      </div>
-
-      {/* Notification Settings */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-        <div className="space-y-4">
-          {Object.entries(notifications).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Bell className="w-5 h-5 text-gray-600 mr-3" />
-                <div>
-                  <p className="font-medium capitalize">{key} Notifications</p>
-                  <p className="text-sm text-gray-600">Receive notifications via {key}</p>
-                </div>
-              </div>
-              <input
-                type="checkbox"
-                checked={value}
-                onChange={(e) => setNotifications({...notifications, [key]: e.target.checked})}
-                className="h-4 w-4 text-blue-600"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Language & Region */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Language & Region</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
-            <select className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white">
-              <option>English</option>
-              <option>Swahili</option>
-              <option>French</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
-            <select className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-1 focus:ring-blue-200 bg-white">
-              <option>EAT (UTC+3)</option>
-              <option>GMT (UTC+0)</option>
-              <option>EST (UTC-5)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderActivity = () => (
-    <div className="bg-white shadow-md p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-        <Activity className="w-6 h-6 mr-2 text-blue-600" />
-        Activity & History
-      </h2>
-      
-      {/* Recent Activity */}
-      <div className="border-t pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Recent Activity</h3>
-          <button className="flex items-center text-blue-600 hover:text-blue-800">
-            <Download className="w-4 h-4 mr-1" />
-            Export
-          </button>
-        </div>
-        <div className="space-y-3">
-          {recentActivity.map((activity, index) => (
-            <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
-              <div className={`w-2 h-2 rounded-full mr-3 ${
-                activity.type === 'update' ? 'bg-blue-400' :
-                activity.type === 'approval' ? 'bg-green-400' :
-                activity.type === 'report' ? 'bg-purple-400' :
-                activity.type === 'settings' ? 'bg-orange-400' : 'bg-gray-400'
-              }`}></div>
-              <div className="flex-1">
-                <p className="font-medium">{activity.action}</p>
-                <p className="text-sm text-gray-600">{activity.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Login History */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Login History</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left py-2">Date</th>
-                <th className="text-left py-2">Device</th>
-                <th className="text-left py-2">Location</th>
-                <th className="text-left py-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loginSessions.map((session, index) => (
-                <tr key={index} className="border-b">
-                  <td className="py-2">{session.time}</td>
-                  <td className="py-2">{session.device}</td>
-                  <td className="py-2">{session.location}</td>
-                  <td className="py-2">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      session.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {session.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderPermissions = () => (
-    <div className="bg-white shadow-md p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-        <Key className="w-6 h-6 mr-2 text-blue-600" />
-        Permissions & Access
-      </h2>
-      
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Access Control</h3>
-        <div className="space-y-3">
-          {permissions.map((permission, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <Key className="w-5 h-5 text-gray-600 mr-3" />
-                <div>
-                  <p className="font-medium">{permission.module}</p>
-                  <p className="text-sm text-gray-600">{permission.access}</p>
-                </div>
-              </div>
-              <div className={`px-3 py-1 rounded-full text-xs ${
-                permission.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {permission.active ? 'Active' : 'Inactive'}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* API Keys */}
-      <div className="border-t pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">API Keys</h3>
-          <button className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-1" />
-            Generate Key
-          </button>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-gray-600">No API keys generated yet.</p>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="">
-        {/* Header */}
-        <div className="bg-white shadow-md p-8 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Profile</h1>
-              <p className="text-gray-600">Manage your account settings and preferences</p>
-            </div>
-            <div className="flex items-center space-x-3">
-              {editMode ? (
-                <>
-                  <button
-                    onClick={() => setEditMode(false)}
-                    className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Changes
-                  </button>
-                </>
-              ) : (
+      <div className="w-full px-4 py-6">
+
+        {/* ── Page Header ── */}
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Admin Profile</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Manage your account settings and preferences</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {editMode ? (
+              <>
                 <button
-                  onClick={() => setEditMode(true)}
-                  className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  onClick={() => setEditMode(false)}
+                  className="flex items-center px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700"
                 >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Edit Profile
+                  <X className="w-4 h-4 mr-1.5" /> Cancel
                 </button>
-              )}
-              <button className="flex items-center text-red-600 hover:text-red-800 px-4 py-2 border border-red-300 rounded-lg hover:bg-red-50">
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
+                <button
+                  onClick={() => setEditMode(false)}
+                  className="flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <Save className="w-4 h-4 mr-1.5" /> Save Changes
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setEditMode(true)}
+                className="flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Edit3 className="w-4 h-4 mr-1.5" /> Edit Profile
               </button>
-            </div>
+            )}
+            <button className="flex items-center px-3 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50">
+              <LogOut className="w-4 h-4 mr-1.5" /> Logout
+            </button>
           </div>
         </div>
 
-        {/* All Sections on One Page */}
-        <div className="space-y-6">
-          {renderPersonalInfo()}
-          {renderSecurity()}
-          {renderPreferences()}
-          {renderActivity()}
-          {renderPermissions()}
+        <div className="space-y-5">
+
+          {/* ── Personal Information ── */}
+          <div className="border border-gray-200 overflow-hidden">
+            <SectionHeader icon={User} title="Personal Information" subtitle="Your account details and contact information" />
+            <div className="p-5">
+              {/* Avatar row */}
+              <div className="flex items-center gap-4 pb-4 mb-4 border-b border-gray-100">
+                <div className="relative flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm select-none">
+                    TI
+                  </div>
+                  <button className="absolute -bottom-0.5 -right-0.5 bg-blue-600 text-white p-1 rounded-full hover:bg-blue-700">
+                    <Camera className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 text-sm">{profile.name}</p>
+                  <p className="text-xs text-blue-600">{profile.role}</p>
+                  <p className="text-xs text-gray-500">{profile.department}</p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"></span>
+                    <span className="text-xs text-gray-400">{profile.status}</span>
+                  </div>
+                </div>
+                <div className="text-right text-xs text-gray-500 flex-shrink-0">
+                  <p className="font-medium text-gray-700 font-mono">{profile.employeeId}</p>
+                  <p className="mt-0.5">Joined {profile.joinDate}</p>
+                </div>
+              </div>
+
+              {/* Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="flex items-center text-xs font-medium text-gray-500 mb-1">
+                    <User className="w-3.5 h-3.5 mr-1 text-blue-600" /> Full Name
+                  </label>
+                  {editMode ? (
+                    <input type="text" value={profile.name}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none  focus:ring-blue-500 focus:border-blue-500" />
+                  ) : (
+                    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800">{profile.name}</p>
+                  )}
+                </div>
+
+                <Field label="Location" value={profile.location} />
+
+                <div>
+                  <label className="flex items-center text-xs font-medium text-gray-500 mb-1">
+                    <Mail className="w-3.5 h-3.5 mr-1 text-blue-600" /> Email Address
+                  </label>
+                  {editMode ? (
+                    <input type="email" value={profile.email}
+                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                  ) : (
+                    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800">{profile.email}</p>
+                  )}
+                </div>
+
+                <Field label="Timezone" value={profile.timezone} />
+
+                <div>
+                  <label className="flex items-center text-xs font-medium text-gray-500 mb-1">
+                    <Phone className="w-3.5 h-3.5 mr-1 text-blue-600" /> Phone Number
+                  </label>
+                  {editMode ? (
+                    <input type="tel" value={profile.phone}
+                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                  ) : (
+                    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800">{profile.phone}</p>
+                  )}
+                </div>
+
+                <Field label="Language" value={profile.language} />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Security Settings ── */}
+          <div className="border border-gray-200 overflow-hidden">
+            <SectionHeader icon={Shield} title="Security Settings" subtitle="Password, 2FA and active sessions" />
+            <div className="p-5 space-y-5">
+
+              {/* Password */}
+              <div>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Password &amp; Authentication</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="relative">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Current Password</label>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Current password"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-9"
+                    />
+                    <button onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2.5 bottom-2.5 text-gray-400 hover:text-gray-600">
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">New Password</label>
+                    <input type="password" placeholder="New password"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Confirm Password</label>
+                    <input type="password" placeholder="Confirm password"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                  </div>
+                </div>
+                <button className="mt-3 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  Update Password
+                </button>
+              </div>
+
+              {/* 2FA */}
+              <div className="border-t border-gray-100 pt-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Two-Factor Authentication</h3>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">Authenticator App</p>
+                    <p className="text-xs text-gray-500">Add an extra layer of security with 2FA</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">{twoFactorEnabled ? "Enabled" : "Disabled"}</span>
+                    <button onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
+                      className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${twoFactorEnabled ? "bg-blue-600" : "bg-gray-300"}`}>
+                      <span className={`inline-block w-3.5 h-3.5 mt-0.5 ml-0.5 transform bg-white rounded-full transition-transform ${twoFactorEnabled ? "translate-x-4" : "translate-x-0"}`} />
+                    </button>
+                  </div>
+                </div>
+                {twoFactorEnabled && (
+                  <div className="mt-2 flex items-center gap-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+                    <Check className="w-4 h-4 text-blue-600 flex-shrink-0" /> Two-factor authentication is active
+                  </div>
+                )}
+              </div>
+
+              {/* Active Sessions */}
+              <div className="border-t border-gray-100 pt-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Active Sessions</h3>
+                <div className="space-y-2">
+                  {loginSessions.map((session, i) => (
+                    <div key={i} className="flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Monitor className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">{session.device}</p>
+                          <p className="text-xs text-gray-500">{session.location} &bull; {session.time}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${session.status === "active" ? "bg-green-400" : "bg-gray-400"}`} />
+                        {session.status === "active" && i !== 0 && (
+                          <button className="text-xs text-red-600 hover:text-red-800">Revoke</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Preferences ── */}
+          <div className="border border-gray-200 overflow-hidden">
+            <SectionHeader icon={Settings} title="Preferences" subtitle="Appearance, notifications and regional settings" />
+            <div className="p-5 space-y-5">
+
+              {/* Dark Mode */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-800">Dark Mode</p>
+                  <p className="text-xs text-gray-500">Toggle between light and dark themes</p>
+                </div>
+                <button onClick={() => setDarkMode(!darkMode)}
+                  className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${darkMode ? "bg-blue-600" : "bg-gray-300"}`}>
+                  <span className={`inline-block w-3.5 h-3.5 mt-0.5 ml-0.5 transform bg-white rounded-full transition-transform ${darkMode ? "translate-x-4" : "translate-x-0"}`} />
+                </button>
+              </div>
+
+              {/* Notifications */}
+              <div className="border-t border-gray-100 pt-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Notifications</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {Object.entries(notifications).map(([key, val]) => (
+                    <div key={key} className="flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                      <p className="text-sm capitalize text-gray-700">{key}</p>
+                      <input type="checkbox" checked={val}
+                        onChange={(e) => setNotifications({ ...notifications, [key]: e.target.checked })}
+                        className="w-4 h-4 text-blue-600 rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Language & Region */}
+              <div className="border-t border-gray-100 pt-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Language &amp; Region</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Language</label>
+                    <select className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
+                      <option>English</option><option>Swahili</option><option>French</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Timezone</label>
+                    <select className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                      <option>EAT (UTC+3)</option><option>GMT (UTC+0)</option><option>EST (UTC-5)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Activity & History ── */}
+          <div className="border border-gray-200 overflow-hidden">
+            <SectionHeader icon={Activity} title="Activity &amp; History" subtitle="Recent actions and login records" />
+            <div className="p-5 space-y-5">
+
+              {/* Recent Activity */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Recent Activity</h3>
+                  <button className="flex items-center text-xs text-blue-600 hover:text-blue-800">
+                    <Download className="w-3.5 h-3.5 mr-1" /> Export
+                  </button>
+                </div>
+                <div className="space-y-1.5">
+                  {recentActivity.map((a, i) => (
+                    <div key={i} className="flex items-center gap-3 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${activityDot[a.type]}`} />
+                      <p className="flex-1 text-sm text-gray-800">{a.action}</p>
+                      <p className="text-xs text-gray-400 flex-shrink-0">{a.time}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Login History */}
+              <div className="border-t border-gray-100 pt-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Login History</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        {["Date", "Device", "Location", "Status"].map((h) => (
+                          <th key={h} className="text-left py-2 text-xs font-medium text-gray-500">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {loginSessions.map((s, i) => (
+                        <tr key={i} className="border-b border-gray-100">
+                          <td className="py-2 text-gray-700">{s.time}</td>
+                          <td className="py-2 text-gray-700">{s.device}</td>
+                          <td className="py-2 text-gray-700">{s.location}</td>
+                          <td className="py-2">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.status === "active" ? " text-green-700" : " text-gray-600"}`}>
+                              {s.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Permissions & Access ── */}
+          <div className="border border-gray-200 overflow-hidden">
+            <SectionHeader icon={Key} title="Permissions &amp; Access" subtitle="Module access levels and API keys" />
+            <div className="p-5 space-y-5">
+
+              <div>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Access Control</h3>
+                <div className="space-y-1.5">
+                  {permissions.map((p, i) => (
+                    <div key={i} className="flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Key className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">{p.module}</p>
+                          <p className="text-xs text-gray-500">{p.access}</p>
+                        </div>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.active ? " text-green-700" : " text-red-700"}`}>
+                        {p.active ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-gray-100 pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">API Keys</h3>
+                  <button className="flex items-center px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Generate Key
+                  </button>
+                </div>
+                <div className="px-3 py-3 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-sm text-gray-500">No API keys generated yet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
