@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import { 
   Bell, 
   Search, 
@@ -17,6 +18,7 @@ import {
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -167,15 +169,13 @@ const AdminNavbar = () => {
                     : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
-                <img
-                  src="https://ui-avatars.com/api/?name=Dr+Sarah+Mitchell&background=3B82F6&color=fff&size=40"
-                  alt="Admin Avatar"
-                  className="w-8 h-8 rounded-full border-2 border-blue-200 shadow-sm"
-                />
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold border-2 border-blue-200 shadow-sm select-none">
+                  {user?.initials ?? 'AD'}
+                </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold">Dr. Sarah Mitchell</p>
+                  <p className="text-sm font-semibold">{user?.name ?? 'Admin'}</p>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Chief Administrator
+                    {user?.title ?? 'Administrator'}
                   </p>
                 </div>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
@@ -191,15 +191,13 @@ const AdminNavbar = () => {
                   {/* Profile Header */}
                   <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center space-x-3">
-                      <img
-                        src="https://ui-avatars.com/api/?name=Dr+Sarah+Mitchell&background=3B82F6&color=fff&size=48"
-                        alt="Admin Avatar"
-                        className="w-12 h-12 rounded-full border-2 border-blue-200"
-                      />
+                      <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold border-2 border-blue-200 select-none flex-shrink-0">
+                        {user?.initials ?? 'AD'}
+                      </div>
                       <div>
-                        <p className="font-semibold">Dr. Sarah Mitchell</p>
+                        <p className="font-semibold">{user?.name ?? 'Admin'}</p>
                         <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          sarah.mitchell@medilink.com
+                          {user?.email ?? ''}
                         </p>
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 mt-1">
                           <div className="w-2 h-2 bg-green-400 rounded-full mr-1"></div>
@@ -229,6 +227,7 @@ const AdminNavbar = () => {
                         <Link
                           key={item.name}
                           to={item.path}
+                          onClick={() => setProfileDropdownOpen(false)}
                           className={`flex items-center px-4 py-3 text-sm transition-colors ${
                             darkMode
                               ? 'text-gray-300 hover:text-white hover:bg-gray-700'

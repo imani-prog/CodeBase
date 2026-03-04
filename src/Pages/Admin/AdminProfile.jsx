@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 import {
   User, Mail, Phone, Shield, Settings, Activity, Bell, Key,
   Monitor, Camera, Check, X, Edit3, Save, MapPin,
@@ -27,18 +28,19 @@ const Field = ({ label, value }) => (
 );
 
 const AdminProfile = () => {
+  const { user, setUser } = useAuth();
   const [profile, setProfile] = useState({
-    name: "Dr. Timothy Imani",
-    email: "timothy.imani@medilink.com",
-    phone: "+254 700 123456",
-    role: "Chief Administrator",
-    department: "Healthcare Operations",
-    employeeId: "HCA-2024-001",
-    joinDate: "January 15, 2023",
-    location: "Nairobi, Kenya",
-    timezone: "EAT (UTC+3)",
-    language: "English",
-    status: "Active",
+    name: user?.name ?? "Dr. Timothy Imani",
+    email: user?.email ?? "timothy.imani@medilink.com",
+    phone: user?.phone ?? "+254 700 123456",
+    role: user?.title ?? "Chief Administrator",
+    department: user?.department ?? "Healthcare Operations",
+    employeeId: user?.employeeId ?? "HCA-2024-001",
+    joinDate: user?.joinDate ?? "January 15, 2023",
+    location: user?.location ?? "Nairobi, Kenya",
+    timezone: user?.timezone ?? "EAT (UTC+3)",
+    language: user?.language ?? "English",
+    status: user?.status ?? "Active",
   });
 
   const [editMode, setEditMode] = useState(false);
@@ -94,7 +96,26 @@ const AdminProfile = () => {
                   <X className="w-4 h-4 mr-1.5" /> Cancel
                 </button>
                 <button
-                  onClick={() => setEditMode(false)}
+                  onClick={() => {
+                    setUser((prev) => ({
+                      ...prev,
+                      name: profile.name,
+                      email: profile.email,
+                      phone: profile.phone,
+                      title: profile.role,
+                      department: profile.department,
+                      location: profile.location,
+                      timezone: profile.timezone,
+                      language: profile.language,
+                      initials: profile.name
+                        .split(' ')
+                        .filter(Boolean)
+                        .map((w) => w[0].toUpperCase())
+                        .slice(0, 2)
+                        .join(''),
+                    }));
+                    setEditMode(false);
+                  }}
                   className="flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   <Save className="w-4 h-4 mr-1.5" /> Save Changes
@@ -124,7 +145,7 @@ const AdminProfile = () => {
               <div className="flex items-center gap-4 pb-4 mb-4 border-b border-gray-100">
                 <div className="relative flex-shrink-0">
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm select-none">
-                    TI
+                    {profile.name.split(' ').filter(Boolean).map((w) => w[0].toUpperCase()).slice(0, 2).join('')}
                   </div>
                   <button className="absolute -bottom-0.5 -right-0.5 bg-blue-600 text-white p-1 rounded-full hover:bg-blue-700">
                     <Camera className="w-3 h-3" />
