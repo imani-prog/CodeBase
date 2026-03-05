@@ -65,6 +65,9 @@ import {
 } from 'recharts';
 import ScheduleSessionModal from '../../Components/Admin/ScheduleSessionModal';
 import ExportReportsModal from '../../Components/Admin/ExportReportsModal';
+import ViewSessionModal from '../../Components/Admin/ViewSessionModal';
+import PauseSessionModal from '../../Components/Admin/PauseSessionModal';
+import TerminateSessionModal from '../../Components/Admin/TerminateSessionModal';
 
 
 const TelemedicineManagement = () => {
@@ -75,6 +78,12 @@ const TelemedicineManagement = () => {
   // Modal states
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showPauseModal, setShowPauseModal] = useState(false);
+  const [showTerminateModal, setShowTerminateModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [pausedSessionIds, setPausedSessionIds] = useState(new Set());
+  const [terminatedSessionIds, setTerminatedSessionIds] = useState(new Set());
 
   // Platform settings state
   const [platformSettings, setPlatformSettings] = useState({
@@ -196,6 +205,22 @@ const TelemedicineManagement = () => {
       priority: 'normal',
       symptoms: ['Fever', 'Cough'],
       cost: 400
+    },
+    {
+      id: 'TM-004',
+      patient: 'Peter Njoroge',
+      patientId: 'PAT-12348',
+      doctor: 'Dr. Peter Njoroge',
+      doctorId: 'DOC-004',
+      specialty: 'Dermatology',
+      startTime: '2024-10-12T12:00:00',
+      duration: 20,
+      platform: 'Messaging',
+      status: 'active',
+      sessionType: 'follow-up',
+      priority: 'medium',
+      symptoms: ['Rash', 'Itching'],
+      cost: 600
     }
   ];
 
@@ -387,13 +412,7 @@ const TelemedicineManagement = () => {
     }
   };
 
-  const handleTerminateSession = (sessionId) => {
-    if (window.confirm('Are you sure you want to terminate this session?')) {
-      console.log('Terminating session:', sessionId);
-      // Implement session termination logic
-      alert('Session terminated successfully');
-    }
-  };
+
 
   const _handleDeleteSession = (sessionId) => {
     if (window.confirm('Are you sure you want to delete this session record?')) {
@@ -428,14 +447,42 @@ const TelemedicineManagement = () => {
   };
 
   const handleViewSession = (session) => {
-    console.log('Viewing session details:', session);
-    // You can implement a view modal here if needed
-    alert(`Viewing session: ${session.id}\nPatient: ${session.patient}\nDoctor: ${session.doctor}`);
+    setSelectedSession(session);
+    setShowViewModal(true);
   };
 
-  const handlePauseSession = (sessionId) => {
-    console.log('Pausing session:', sessionId);
-    alert('Session paused');
+  const handlePauseSession = (session) => {
+    setSelectedSession(session);
+    setShowPauseModal(true);
+  };
+
+  const handlePauseConfirm = ({ sessionId, reason }) => {
+    console.log('Pausing session:', sessionId, 'Reason:', reason);
+    setPausedSessionIds(prev => new Set([...prev, sessionId]));
+  };
+
+  const handleResumeSession = (sessionId) => {
+    setPausedSessionIds(prev => {
+      const next = new Set(prev);
+      next.delete(sessionId);
+      return next;
+    });
+  };
+
+  const handleTerminateSession = (session) => {
+    setSelectedSession(session);
+    setShowTerminateModal(true);
+  };
+
+  const handleTerminateConfirm = ({ sessionId, reason }) => {
+    console.log('Terminating session:', sessionId, 'Reason:', reason);
+    setTerminatedSessionIds(prev => new Set([...prev, sessionId]));
+    // also remove from paused if it was paused
+    setPausedSessionIds(prev => {
+      const next = new Set(prev);
+      next.delete(sessionId);
+      return next;
+    });
   };
 
   const renderOverview = () => (
@@ -463,7 +510,7 @@ const TelemedicineManagement = () => {
             className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <Settings className="w-4 h-4 mr-1.5" />
-            Settings
+            Settings 
           </button>
         </div>
       </div>
@@ -644,75 +691,111 @@ const TelemedicineManagement = () => {
           </thead>
 
           <tbody>
-            {activeSessions.map((session, index) => (
-              <tr
-                key={session.id}
-                className={`hover:bg-gray-50 ${index !== 0 ? 'border-t border-gray-200' : ''}`}
-              >
-                <td className="px-4 py-3 font-semibold">{session.patient}</td>
+            {activeSessions.map((session, index) => {
+              const isPaused = pausedSessionIds.has(session.id);
+              const isEnded = terminatedSessionIds.has(session.id);
+              return (
+                <tr
+                  key={session.id}
+                  className={`${
+                    isEnded ? 'bg-red-50 opacity-60' :
+                    isPaused ? 'bg-blue-50 opacity-70' : 'hover:bg-gray-50'
+                  } ${index !== 0 ? 'border-t border-gray-200' : ''}`}
+                >
+                  <td className="px-4 py-3 font-semibold">{session.patient}</td>
 
-                <td className="px-4 py-3 text-xs text-gray-500">{session.patientId}</td>
+                  <td className="px-4 py-3 text-xs text-gray-500">{session.patientId}</td>
 
-                <td className="px-4 py-3 font-semibold">{session.doctor}</td>
+                  <td className="px-4 py-3 font-semibold">{session.doctor}</td>
 
-                <td className="px-4 py-3 text-xs text-gray-600">{session.specialty}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{session.specialty}</td>
 
-                <td className="px-4 py-3 text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    {session.platform === 'Video Call' ? (
-                      <Video className="w-4 h-4 text-blue-600" />
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      {session.platform === 'Video Call' ? (
+                        <Video className="w-4 h-4 text-blue-600" />
+                      ) : (
+                        <Phone className="w-4 h-4 text-blue-600" />
+                      )}
+                      <span className="text-xs text-gray-600">{session.platform}</span>
+                    </div>
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    <span className={`text-xs font-medium ${getPriorityColor(session.priority)}`}>
+                      {session.priority}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    {isEnded ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-red-700 text-xs font-semibold">
+                        <Square className="w-3 h-3" />
+                        Ended
+                      </span>
+                    ) : isPaused ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-blue-700 text-xs font-semibold">
+                        <Pause className="w-3 h-3" />
+                        Paused
+                      </span>
                     ) : (
-                      <Phone className="w-4 h-4 text-blue-600" />
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-green-600 text-xs font-semibold">
+                        <Activity className="w-3 h-3" />
+                        Live
+                      </span>
                     )}
-                    <span className="text-xs text-gray-600">{session.platform}</span>
-                  </div>
-                </td>
+                  </td>
 
-                <td className="px-4 py-3 text-center">
-                  <span className={`text-xs font-medium ${getPriorityColor(session.priority)}`}>
-                    {session.priority}
-                  </span>
-                </td>
+                  <td className="px-4 py-3 text-center text-sm">
+                    {formatDuration(session.duration)}
+                  </td>
 
-                <td className="px-4 py-3 text-center">
-                  <span className="text-xs font-medium text-green-700">Live</span>
-                </td>
+                  <td className="px-4 py-3 text-center font-semibold text-sm">
+                    {formatCurrency(session.cost)}
+                  </td>
 
-                <td className="px-4 py-3 text-center text-sm">
-                  {formatDuration(session.duration)}
-                </td>
-
-                <td className="px-4 py-3 text-center font-semibold text-sm">
-                  {formatCurrency(session.cost)}
-                </td>
-
-                <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <button
-                      onClick={() => handleViewSession(session)}
-                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
-                      title="View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handlePauseSession(session.id)}
-                      className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded"
-                      title="Pause Session"
-                    >
-                      <Pause className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleTerminateSession(session.id)}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded"
-                      title="End Session"
-                    >
-                      <Square className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => handleViewSession(session)}
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      {!isEnded && (
+                        isPaused ? (
+                          <button
+                            onClick={() => handleResumeSession(session.id)}
+                            className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+                            title="Resume Session"
+                          >
+                            <Play className="w-4 h-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handlePauseSession(session)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                            title="Pause Session"
+                          >
+                            <Pause className="w-4 h-4" />
+                          </button>
+                        )
+                      )}
+                      {!isEnded && (
+                        <button
+                          onClick={() => handleTerminateSession(session)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                          title="End Session"
+                        >
+                          <Square className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -1526,6 +1609,35 @@ const TelemedicineManagement = () => {
         setShowModal={setShowExportModal}
         onExportReport={handleExportReportsSubmit}
         module="telemedicine"
+      />
+
+      <ViewSessionModal
+        isOpen={showViewModal}
+        onClose={() => { setShowViewModal(false); setSelectedSession(null); }}
+        session={selectedSession}
+        sessionStatus={
+          selectedSession
+            ? terminatedSessionIds.has(selectedSession.id)
+              ? 'ended'
+              : pausedSessionIds.has(selectedSession.id)
+              ? 'paused'
+              : 'live'
+            : 'live'
+        }
+      />
+
+      <PauseSessionModal
+        isOpen={showPauseModal}
+        onClose={() => { setShowPauseModal(false); setSelectedSession(null); }}
+        session={selectedSession}
+        onConfirm={handlePauseConfirm}
+      />
+
+      <TerminateSessionModal
+        isOpen={showTerminateModal}
+        onClose={() => { setShowTerminateModal(false); setSelectedSession(null); }}
+        session={selectedSession}
+        onConfirm={handleTerminateConfirm}
       />
     </div>
   );
