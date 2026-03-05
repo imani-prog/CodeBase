@@ -691,7 +691,13 @@ const TelemedicineManagement = () => {
           </thead>
 
           <tbody>
-            {activeSessions.map((session, index) => {
+            {activeSessions.filter((session) => {
+              if (sessionFilter === 'all') return true;
+              if (sessionFilter === 'video') return session.platform === 'Video Call';
+              if (sessionFilter === 'audio') return session.platform === 'Audio Call';
+              if (sessionFilter === 'high-priority') return session.priority === 'high';
+              return true;
+            }).map((session, index) => {
               const isPaused = pausedSessionIds.has(session.id);
               const isEnded = terminatedSessionIds.has(session.id);
               return (
