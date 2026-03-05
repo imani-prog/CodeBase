@@ -72,8 +72,6 @@ const TelemedicineManagement = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('today');
   const [searchTerm, setSearchTerm] = useState('');
   const [sessionFilter, setSessionFilter] = useState('all');
-  const [expandedRow, setExpandedRow] = useState(null);
-  
   // Modal states
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -131,15 +129,11 @@ const TelemedicineManagement = () => {
     setSettingsSaved(false);
   };
 
-  const handleSaveSettings = () => {
+  const _handleSaveSettings = () => {
     console.log('Saving platform settings:', platformSettings);
     // Add API call here to save settings
     setSettingsSaved(true);
     setTimeout(() => setSettingsSaved(false), 3000);
-  };
-
-  const toggleRow = (id) => {
-    setExpandedRow(expandedRow === id ? null : id);
   };
 
   // Sample telemedicine data
@@ -637,133 +631,87 @@ const TelemedicineManagement = () => {
           <thead className="bg-gray-50 uppercase text-xs">
             <tr>
               <th className="px-4 py-3 text-left font-semibold">Patient</th>
+              <th className="px-4 py-3 text-left font-semibold">Patient ID</th>
               <th className="px-4 py-3 text-left font-semibold">Doctor</th>
-              <th className="px-4 py-3 font-semibold">Platform</th>
-              <th className="px-4 py-3 font-semibold">Priority</th>
-              <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Duration</th>
-              <th className="px-4 py-3 font-semibold">Cost</th>
+              <th className="px-4 py-3 text-left font-semibold">Specialty</th>
+              <th className="px-4 py-3 text-center font-semibold">Platform</th>
+              <th className="px-4 py-3 text-center font-semibold">Priority</th>
+              <th className="px-4 py-3 text-center font-semibold">Status</th>
+              <th className="px-4 py-3 text-center font-semibold">Duration</th>
+              <th className="px-4 py-3 text-center font-semibold">Cost</th>
               <th className="px-4 py-3 font-semibold text-right">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {activeSessions.map((session, index) => (
-              <React.Fragment key={session.id}>
-                {/* MAIN ROW */}
-                <tr
-                  className={`hover:bg-gray-50 cursor-pointer ${index !== 0 ? 'border-t border-gray-200' : ''}`}
-                  onClick={() => toggleRow(session.id)}
-                >
-                  <td className="px-4 py-3 font-semibold">
-                    {session.patient}
-                    <div className="text-xs text-gray-500">
-                      ID: {session.patientId}
-                    </div>
-                  </td>
+              <tr
+                key={session.id}
+                className={`hover:bg-gray-50 ${index !== 0 ? 'border-t border-gray-200' : ''}`}
+              >
+                <td className="px-4 py-3 font-semibold">{session.patient}</td>
 
-                  <td className="px-4 py-3 font-semibold">
-                    {session.doctor}
-                    <div className="text-xs text-gray-500">
-                      {session.specialty}
-                    </div>
-                  </td>
+                <td className="px-4 py-3 text-xs text-gray-500">{session.patientId}</td>
 
-                  <td className="px-4 py-3 text-center">
+                <td className="px-4 py-3 font-semibold">{session.doctor}</td>
+
+                <td className="px-4 py-3 text-xs text-gray-600">{session.specialty}</td>
+
+                <td className="px-4 py-3 text-center">
+                  <div className="flex items-center justify-center gap-1">
                     {session.platform === 'Video Call' ? (
-                      <Video className="w-4 h-4 inline text-blue-600" />
+                      <Video className="w-4 h-4 text-blue-600" />
                     ) : (
-                      <Phone className="w-4 h-4 inline text-blue-600" />
+                      <Phone className="w-4 h-4 text-blue-600" />
                     )}
-                  </td>
+                    <span className="text-xs text-gray-600">{session.platform}</span>
+                  </div>
+                </td>
 
-                  <td className="px-4 py-3 text-center">
-                    <span className={`px-2 py-1  ${getPriorityColor(session.priority)}`}>
-                      {session.priority}
-                    </span>
-                  </td>
+                <td className="px-4 py-3 text-center">
+                  <span className={`text-xs font-medium ${getPriorityColor(session.priority)}`}>
+                    {session.priority}
+                  </span>
+                </td>
 
-                  <td className="px-4 py-3 text-center">
-                    <span className="px-2 py-1 text-green-700">
-                      Live
-                    </span>
-                  </td>
+                <td className="px-4 py-3 text-center">
+                  <span className="text-xs font-medium text-green-700">Live</span>
+                </td>
 
-                  <td className="px-4 py-3 text-center">
-                    {formatDuration(session.duration)}
-                  </td>
+                <td className="px-4 py-3 text-center text-sm">
+                  {formatDuration(session.duration)}
+                </td>
 
-                  <td className="px-4 py-3 text-center font-semibold">
-                    {formatCurrency(session.cost)}
-                  </td>
+                <td className="px-4 py-3 text-center font-semibold text-sm">
+                  {formatCurrency(session.cost)}
+                </td>
 
-                  <td className="px-4 py-3 text-right">
-                    <ChevronDown
-                      className={`w-4 h-4 inline transition-transform ${
-                        expandedRow === session.id ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </td>
-                </tr>
-
-                {/* EXPANDED ROW */}
-                {expandedRow === session.id && (
-                  <tr className="bg-gray-50">
-                    <td colSpan="8" className="px-6 py-4 border-b border-gray-200">
-                      <div className="grid grid-cols-3 gap-6 text-sm">
-                        {/* Symptoms */}
-                        <div>
-                          <p className="font-medium text-gray-700 mb-2">Symptoms</p>
-                          <div className="flex flex-wrap gap-1">
-                            {session.symptoms.map((symptom, i) => (
-                              <span
-                                key={i}
-                                className="px-2 py-1 bg-white border rounded text-xs"
-                              >
-                                {symptom}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Session Info */}
-                        <div>
-                          <p className="font-medium text-gray-700 mb-2">Session Info</p>
-                          <p className="text-gray-600">Type: {session.sessionType}</p>
-                          <p className="text-gray-600">Platform: {session.platform}</p>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-start justify-end gap-3">
-                          <button 
-                            onClick={() => handleViewSession(session)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => handlePauseSession(session.id)}
-                            className="p-2 text-yellow-600 hover:bg-yellow-50 rounded"
-                            title="Pause Session"
-                          >
-                            <Pause className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleTerminateSession(session.id);
-                            }}
-                            className="text-sm text-red-600 hover:underline"
-                          >
-                            End Session
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
+                <td className="px-4 py-3 text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      onClick={() => handleViewSession(session)}
+                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                      title="View Details"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handlePauseSession(session.id)}
+                      className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded"
+                      title="Pause Session"
+                    >
+                      <Pause className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleTerminateSession(session.id)}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                      title="End Session"
+                    >
+                      <Square className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
@@ -801,141 +749,100 @@ const TelemedicineManagement = () => {
           <thead className="bg-gray-50 uppercase text-xs">
             <tr>
               <th className="px-4 py-3 text-left font-semibold">Doctor</th>
-              <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Rating</th>
-              <th className="px-4 py-3 font-semibold">Experience</th>
-              <th className="px-4 py-3 font-semibold">Sessions Today</th>
-              <th className="px-4 py-3 font-semibold">Avg Duration</th>
-              <th className="px-4 py-3 font-semibold">Earnings</th>
+              <th className="px-4 py-3 text-left font-semibold">Specialty</th>
+              <th className="px-4 py-3 text-center font-semibold">Status</th>
+              <th className="px-4 py-3 text-center font-semibold">Rating</th>
+              <th className="px-4 py-3 text-center font-semibold">Experience</th>
+              <th className="px-4 py-3 text-center font-semibold">Sessions Today</th>
+              <th className="px-4 py-3 text-center font-semibold">Avg Duration</th>
+              <th className="px-4 py-3 text-center font-semibold">Earnings</th>
               <th className="px-4 py-3 font-semibold text-right">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {onlineDoctors.map((doctor, index) => (
-              <React.Fragment key={doctor.id}>
-                {/* MAIN ROW */}
-                <tr
-                  className={`hover:bg-gray-50 cursor-pointer ${index !== 0 ? 'border-t border-gray-200' : ''}`}
-                  onClick={() => toggleRow(doctor.id)}
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center">
-                      <div className="relative">
-                        <img
-                          src={doctor.photo}
-                          alt={doctor.name}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                        <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
-                          doctor.currentStatus === 'available' ? 'bg-green-500' :
-                          doctor.currentStatus === 'busy' ? 'bg-yellow-500' : 'bg-red-500'
-                        }`}></div>
-                      </div>
-                      <div className="ml-3">
-                        <p className="font-semibold">{doctor.name}</p>
-                        <p className="text-xs">{doctor.specialty}</p>
-                      </div>
+              <tr
+                key={doctor.id}
+                className={`hover:bg-gray-50 ${index !== 0 ? 'border-t border-gray-200' : ''}`}
+              >
+                <td className="px-4 py-3">
+                  <div className="flex items-center">
+                    <div className="relative flex-shrink-0">
+                      <img
+                        src={doctor.photo}
+                        alt={doctor.name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
+                        doctor.currentStatus === 'available' ? 'bg-green-500' :
+                        doctor.currentStatus === 'busy' ? 'bg-yellow-500' : 'bg-red-500'
+                      }`}></div>
                     </div>
-                  </td>
-
-                  <td className="px-4 py-3 text-center">
-                    <span className={`px-2 py-1 ${getStatusColor(doctor.currentStatus)}`}>
-                      {doctor.currentStatus}
-                    </span>
-                  </td>
-
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex items-center justify-center">
-                      <Star className="w-4 h-4 text-blue-500 mr-1" />
-                      <span className="font-medium">{doctor.rating}</span>
+                    <div className="ml-2">
+                      <span className="font-semibold text-sm">{doctor.name}</span>
                     </div>
-                    <div className="text-xs text-gray-500">{doctor.totalSessions} sessions</div>
-                  </td>
+                  </div>
+                </td>
 
-                  <td className="px-4 py-3 text-center font-medium">
-                    {doctor.experience} years
-                  </td>
+                <td className="px-4 py-3 text-xs text-gray-600">{doctor.specialty}</td>
 
-                  <td className="px-4 py-3 text-center font-medium">
-                    {doctor.sessionsToday}
-                  </td>
+                <td className="px-4 py-3 text-center">
+                  <span className={`text-xs font-medium ${getStatusColor(doctor.currentStatus)}`}>
+                    {doctor.currentStatus}
+                  </span>
+                </td>
 
-                  <td className="px-4 py-3 text-center">
-                    {formatDuration(doctor.avgSessionDuration)}
-                  </td>
+                <td className="px-4 py-3 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <Star className="w-3.5 h-3.5 text-blue-500" />
+                    <span className="font-medium text-sm">{doctor.rating}</span>
+                    <span className="text-xs text-gray-400">({doctor.totalSessions})</span>
+                  </div>
+                </td>
 
-                  <td className="px-4 py-3 text-center font-semibold">
-                    {formatCurrency(doctor.earnings)}
-                  </td>
+                <td className="px-4 py-3 text-center text-sm font-medium">
+                  {doctor.experience} yrs
+                </td>
 
-                  <td className="px-4 py-3 text-right">
-                    <ChevronDown
-                      className={`w-4 h-4 inline transition-transform ${
-                        expandedRow === doctor.id ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </td>
-                </tr>
+                <td className="px-4 py-3 text-center text-sm font-medium">
+                  {doctor.sessionsToday}
+                </td>
 
-                {/* EXPANDED ROW */}
-                {expandedRow === doctor.id && (
-                  <tr className="bg-gray-50">
-                    <td colSpan="8" className="px-6 py-4 border-b border-gray-200">
-                      <div className="grid grid-cols-3 gap-6 text-sm">
-                        {/* Languages */}
-                        <div>
-                          <p className="font-medium text-gray-700 mb-2">Languages</p>
-                          <div className="flex flex-wrap gap-1">
-                            {doctor.languages.map((language, i) => (
-                              <span
-                                key={i}
-                                className="px-2 py-1 bg-white border rounded text-xs text-blue-700"
-                              >
-                                {language}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
+                <td className="px-4 py-3 text-center text-sm">
+                  {formatDuration(doctor.avgSessionDuration)}
+                </td>
 
-                        {/* Location Info */}
-                        <div>
-                          <p className="font-medium text-gray-700 mb-2">Location</p>
-                          <div className="flex items-center text-gray-600">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            <span>{doctor.location}</span>
-                          </div>
-                        </div>
+                <td className="px-4 py-3 text-center text-sm font-semibold">
+                  {formatCurrency(doctor.earnings)}
+                </td>
 
-                        {/* Actions */}
-                        <div className="flex items-start justify-end gap-3">
-                          <button 
-                            onClick={() => console.log('Viewing doctor profile:', doctor.id)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                            title="View Profile"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => console.log('Messaging doctor:', doctor.id)}
-                            className="p-2 text-green-600 hover:bg-green-50 rounded"
-                            title="Send Message"
-                          >
-                            <MessageSquare className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => console.log('Editing doctor:', doctor.id)}
-                            className="p-2 text-purple-600 hover:bg-purple-50 rounded"
-                            title="Edit Profile"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
+                <td className="px-4 py-3 text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      onClick={() => console.log('Viewing doctor profile:', doctor.id)}
+                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                      title="View Profile"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => console.log('Messaging doctor:', doctor.id)}
+                      className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+                      title="Send Message"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => console.log('Editing doctor:', doctor.id)}
+                      className="p-1.5 text-purple-600 hover:bg-purple-50 rounded"
+                      title="Edit Profile"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
@@ -986,60 +893,50 @@ const TelemedicineManagement = () => {
             </thead>
             <tbody>
               {sessionHistory.map((session) => (
-                <tr key={session.id} className="border-b border-gray-100">
-                  <td className="py-4 px-4">
-                    <div>
-                      <p className="font-medium text-gray-900">{session.id}</p>
-                      <p className="text-sm text-gray-600">{session.date}</p>
-                    </div>
+                <tr key={session.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-3 px-4 text-sm">
+                    <span className="font-medium text-gray-900">{session.id}</span>
+                    <span className="text-xs text-gray-400 ml-1">· {session.date}</span>
                   </td>
-                  <td className="py-4 px-4">
-                    <p className="text-gray-900">{session.patient}</p>
-                  </td>
-                  <td className="py-4 px-4">
-                    <p className="text-gray-900">{session.doctor}</p>
-                  </td>
-                  <td className="py-4 px-4">
-                    <p className="text-gray-900">{session.duration > 0 ? formatDuration(session.duration) : '-'}</p>
-                  </td>
-                  <td className="py-4 px-4">
-                    <p className="font-medium text-gray-900">{formatCurrency(session.cost)}</p>
-                  </td>
-                  <td className="py-4 px-4">
+                  <td className="py-3 px-4 text-sm text-gray-900">{session.patient}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900">{session.doctor}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900">{session.duration > 0 ? formatDuration(session.duration) : '-'}</td>
+                  <td className="py-3 px-4 text-sm font-medium text-gray-900">{formatCurrency(session.cost)}</td>
+                  <td className="py-3 px-4 text-sm">
                     {session.rating ? (
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-500 mr-1" />
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 text-yellow-500" />
                         <span className="text-gray-900">{session.rating}</span>
                       </div>
                     ) : (
                       <span className="text-gray-400">-</span>
                     )}
                   </td>
-                  <td className="py-4 px-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(session.status)}`}>
+                  <td className="py-3 px-4 text-sm">
+                    <span className={`text-xs font-medium ${getStatusColor(session.status)}`}>
                       {session.status}
                     </span>
                   </td>
-                  <td className="py-4 px-4">
-                    <div className="flex items-center space-x-2">
-                      <button 
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-1">
+                      <button
                         onClick={() => handleViewSession(session)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => console.log('View prescription:', session.id)}
-                        className="text-green-600 hover:text-green-800"
+                        className="p-1.5 text-green-600 hover:bg-green-50 rounded"
                         title="View Prescription"
                       >
                         <FileText className="w-4 h-4" />
                       </button>
                       {session.status === 'completed' && (
-                        <button 
+                        <button
                           onClick={() => console.log('Download report:', session.id)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                           title="Download Report"
                         >
                           <Download className="w-4 h-4" />
