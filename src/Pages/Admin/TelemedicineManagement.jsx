@@ -68,6 +68,9 @@ import ExportReportsModal from '../../Components/Admin/ExportReportsModal';
 import ViewSessionModal from '../../Components/Admin/ViewSessionModal';
 import PauseSessionModal from '../../Components/Admin/PauseSessionModal';
 import TerminateSessionModal from '../../Components/Admin/TerminateSessionModal';
+import ViewDoctorProfileModal from '../../Components/Admin/ViewDoctorProfileModal';
+import MessageDoctorModal from '../../Components/Admin/MessageDoctorModal';
+import EditDoctorModal from '../../Components/Admin/EditDoctorModal';
 
 
 const TelemedicineManagement = () => {
@@ -84,6 +87,12 @@ const TelemedicineManagement = () => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [pausedSessionIds, setPausedSessionIds] = useState(new Set());
   const [terminatedSessionIds, setTerminatedSessionIds] = useState(new Set());
+  // Doctor modal states
+  const [showViewDoctorModal, setShowViewDoctorModal] = useState(false);
+  const [showMessageDoctorModal, setShowMessageDoctorModal] = useState(false);
+  const [showEditDoctorModal, setShowEditDoctorModal] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [specialtyFilter, setSpecialtyFilter] = useState('all');
 
   // Platform settings state
   const [platformSettings, setPlatformSettings] = useState({
@@ -224,7 +233,7 @@ const TelemedicineManagement = () => {
     }
   ];
 
-  const onlineDoctors = [
+  const [onlineDoctors, setOnlineDoctors] = useState([
     {
       id: 'DOC-001',
       name: 'Dr. Sarah Mitchell',
@@ -289,7 +298,7 @@ const TelemedicineManagement = () => {
       languages: ['English', 'Swahili'],
       location: 'Eldoret'
     }
-  ];
+  ]);
 
   const sessionHistory = [
     {
@@ -483,6 +492,13 @@ const TelemedicineManagement = () => {
       next.delete(sessionId);
       return next;
     });
+  };
+
+  const handleViewDoctor = (doctor) => { setSelectedDoctor(doctor); setShowViewDoctorModal(true); };
+  const handleMessageDoctor = (doctor) => { setSelectedDoctor(doctor); setShowMessageDoctorModal(true); };
+  const handleEditDoctor = (doctor) => { setSelectedDoctor(doctor); setShowEditDoctorModal(true); };
+  const handleEditDoctorSave = (updatedDoctor) => {
+    setOnlineDoctors(prev => prev.map(d => d.id === updatedDoctor.id ? updatedDoctor : d));
   };
 
   const renderOverview = () => (
@@ -823,12 +839,16 @@ const TelemedicineManagement = () => {
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
             />
           </div>
-          <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
-            <option>All Specialties</option>
-            <option>General Medicine</option>
-            <option>Cardiology</option>
-            <option>Pediatrics</option>
-            <option>Dermatology</option>
+          <select
+            value={specialtyFilter}
+            onChange={(e) => setSpecialtyFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+          >
+            <option value="all">All Specialties</option>
+            <option value="General Medicine">General Medicine</option>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Pediatrics">Pediatrics</option>
+            <option value="Dermatology">Dermatology</option>
           </select>
         </div>
       </div>
@@ -850,7 +870,14 @@ const TelemedicineManagement = () => {
           </thead>
 
           <tbody>
-            {onlineDoctors.map((doctor, index) => (
+            {onlineDoctors
+              .filter((doctor) => specialtyFilter === 'all' || doctor.specialty === specialtyFilter)
+              .filter((doctor) => {
+                if (!searchTerm.trim()) return true;
+                const q = searchTerm.toLowerCase();
+                return doctor.name.toLowerCase().includes(q) || doctor.specialty.toLowerCase().includes(q);
+              })
+              .map((doctor, index) => (
               <tr
                 key={doctor.id}
                 className={`hover:bg-gray-50 ${index !== 0 ? 'border-t border-gray-200' : ''}`}
@@ -909,22 +936,22 @@ const TelemedicineManagement = () => {
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-1">
                     <button
-                      onClick={() => console.log('Viewing doctor profile:', doctor.id)}
+                      onClick={() => handleViewDoctor(doctor)}
                       className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                       title="View Profile"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => console.log('Messaging doctor:', doctor.id)}
-                      className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+                      onClick={() => handleMessageDoctor(doctor)}
+                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                       title="Send Message"
                     >
                       <MessageSquare className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => console.log('Editing doctor:', doctor.id)}
-                      className="p-1.5 text-purple-600 hover:bg-purple-50 rounded"
+                      onClick={() => handleEditDoctor(doctor)}
+                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                       title="Edit Profile"
                     >
                       <Edit className="w-4 h-4" />
@@ -1644,6 +1671,26 @@ const TelemedicineManagement = () => {
         onClose={() => { setShowTerminateModal(false); setSelectedSession(null); }}
         session={selectedSession}
         onConfirm={handleTerminateConfirm}
+      />
+
+      <ViewDoctorProfileModal
+        isOpen={showViewDoctorModal}
+        onClose={() => { setShowViewDoctorModal(false); setSelectedDoctor(null); }}
+        doctor={selectedDoctor}
+      />
+
+      <MessageDoctorModal
+        isOpen={showMessageDoctorModal}
+        onClose={() => { setShowMessageDoctorModal(false); setSelectedDoctor(null); }}
+        doctor={selectedDoctor}
+        onConfirm={() => {}}
+      />
+
+      <EditDoctorModal
+        isOpen={showEditDoctorModal}
+        onClose={() => { setShowEditDoctorModal(false); setSelectedDoctor(null); }}
+        doctor={selectedDoctor}
+        onSave={handleEditDoctorSave}
       />
     </div>
   );
