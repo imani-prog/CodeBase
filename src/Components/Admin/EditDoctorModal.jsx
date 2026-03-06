@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, CheckCircle, Edit, Stethoscope, AlertCircle, MapPin, Globe } from 'lucide-react';
+import { X, Save, CheckCircle, Edit, Stethoscope, AlertCircle, MapPin, Globe, CheckCircle2, Clock, XCircle } from 'lucide-react';
 
 const SPECIALTIES = [
   'General Medicine', 'Cardiology', 'Pediatrics', 'Dermatology',
@@ -7,9 +7,9 @@ const SPECIALTIES = [
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'available', label: 'Available', dot: 'bg-green-500', active: 'text-green-800' },
-  { value: 'busy',      label: 'Busy',      dot: 'bg-yellow-500', active: 'text-yellow-800' },
-  { value: 'offline',   label: 'Offline',   dot: 'bg-red-500', active: 'text-red-800' },
+  { value: 'available', label: 'Available', Icon: CheckCircle2, iconClass: 'text-blue-500' },
+  { value: 'busy',      label: 'Busy',      Icon: Clock,        iconClass: 'text-blue-500' },
+  { value: 'offline',   label: 'Offline',   Icon: XCircle,      iconClass: 'text-blue-500' },
 ];
 
 const EditDoctorModal = ({ isOpen, onClose, doctor, onSave }) => {
@@ -122,7 +122,7 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSave }) => {
                           onChange={() => setStatus(opt.value)}
                           className="accent-blue-600 w-4 h-4"
                         />
-                        <span className={`w-2.5 h-2.5 rounded-full ${opt.dot}`} />
+                        <opt.Icon className={`w-4 h-4 ${opt.iconClass}`} />
                         <span className="text-sm text-gray-700">{opt.label}</span>
                       </label>
                     ))}
@@ -138,7 +138,7 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSave }) => {
                     {SPECIALTIES.map((s) => (
                       <label
                         key={s}
-                        className={`flex items-center gap-2 px-3 py-2.5 border cursor-pointer transition-colors ${
+                        className={`flex items-center gap-2 px-3 py-2.5 border rounded-lg cursor-pointer transition-colors ${
                           specialty === s ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
                         }`}
                       >
@@ -167,7 +167,7 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSave }) => {
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                       placeholder="e.g. Nairobi"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -179,13 +179,13 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSave }) => {
                       value={languages}
                       onChange={(e) => setLanguages(e.target.value)}
                       placeholder="e.g. English, Swahili"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <p className="text-xs text-gray-400 mt-1">Comma-separated</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 px-3 py-2.5">
+                <div className="flex items-start gap-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 px-3 rounded-lg py-2.5">
                   <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
                   <span>Changes will be reflected immediately across all active views and the doctor profile.</span>
                 </div>
