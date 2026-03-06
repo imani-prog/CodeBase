@@ -71,6 +71,9 @@ import TerminateSessionModal from '../../Components/Admin/TerminateSessionModal'
 import ViewDoctorProfileModal from '../../Components/Admin/ViewDoctorProfileModal';
 import MessageDoctorModal from '../../Components/Admin/MessageDoctorModal';
 import EditDoctorModal from '../../Components/Admin/EditDoctorModal';
+import ViewHistorySessionModal from '../../Components/Admin/ViewHistorySessionModal';
+import ViewPrescriptionModal from '../../Components/Admin/ViewPrescriptionModal';
+import DownloadReportModal from '../../Components/Admin/DownloadReportModal';
 
 
 const TelemedicineManagement = () => {
@@ -93,6 +96,11 @@ const TelemedicineManagement = () => {
   const [showEditDoctorModal, setShowEditDoctorModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
+  // Session history modal states
+  const [showHistoryViewModal, setShowHistoryViewModal] = useState(false);
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const [showDownloadReportModal, setShowDownloadReportModal] = useState(false);
+  const [selectedHistorySession, setSelectedHistorySession] = useState(null);
 
   // Platform settings state
   const [platformSettings, setPlatformSettings] = useState({
@@ -500,6 +508,10 @@ const TelemedicineManagement = () => {
   const handleEditDoctorSave = (updatedDoctor) => {
     setOnlineDoctors(prev => prev.map(d => d.id === updatedDoctor.id ? updatedDoctor : d));
   };
+
+  const handleHistoryView = (session) => { setSelectedHistorySession(session); setShowHistoryViewModal(true); };
+  const handleHistoryPrescription = (session) => { setSelectedHistorySession(session); setShowPrescriptionModal(true); };
+  const handleHistoryDownload = (session) => { setSelectedHistorySession(session); setShowDownloadReportModal(true); };
 
   const renderOverview = () => (
     <div className="space-y-6">
@@ -1036,14 +1048,14 @@ const TelemedicineManagement = () => {
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => handleViewSession(session)}
+                        onClick={() => handleHistoryView(session)}
                         className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => console.log('View prescription:', session.id)}
+                        onClick={() => handleHistoryPrescription(session)}
                         className="p-1.5 text-green-600 hover:bg-green-50 rounded"
                         title="View Prescription"
                       >
@@ -1051,7 +1063,7 @@ const TelemedicineManagement = () => {
                       </button>
                       {session.status === 'completed' && (
                         <button
-                          onClick={() => console.log('Download report:', session.id)}
+                          onClick={() => handleHistoryDownload(session)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                           title="Download Report"
                         >
@@ -1691,6 +1703,24 @@ const TelemedicineManagement = () => {
         onClose={() => { setShowEditDoctorModal(false); setSelectedDoctor(null); }}
         doctor={selectedDoctor}
         onSave={handleEditDoctorSave}
+      />
+
+      <ViewHistorySessionModal
+        isOpen={showHistoryViewModal}
+        onClose={() => { setShowHistoryViewModal(false); setSelectedHistorySession(null); }}
+        session={selectedHistorySession}
+      />
+
+      <ViewPrescriptionModal
+        isOpen={showPrescriptionModal}
+        onClose={() => { setShowPrescriptionModal(false); setSelectedHistorySession(null); }}
+        session={selectedHistorySession}
+      />
+
+      <DownloadReportModal
+        isOpen={showDownloadReportModal}
+        onClose={() => { setShowDownloadReportModal(false); setSelectedHistorySession(null); }}
+        session={selectedHistorySession}
       />
     </div>
   );
