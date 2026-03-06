@@ -19,7 +19,7 @@ import {
   Phone,
 } from 'lucide-react';
 
-const CHWNavbar = () => {
+const CHWNavbar = ({ onMenuClick }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -99,20 +99,36 @@ const CHWNavbar = () => {
   return (
     // Fixed top navbar that starts after the sidebar (left-64)
     <nav
-      className={`fixed top-0 left-64 right-0 z-40 ${
+      className={`fixed top-0 left-0 right-0 z-40 md:left-64 ${
         darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'
       } border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} shadow-sm`}
     >
-      <div className="px-6 py-3">
+      <div className="px-4 md:px-6 py-3">
         <div className="flex items-center justify-between">
-          {/* Welcome Message */}
-          <div className="hidden md:block">
-            <h2 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Welcome back, <span className="text-blue-600">{chw.name}</span>! 👋
-            </h2>
+
+          {/* Left: hamburger (mobile) + welcome (desktop) */}
+          <div className="flex items-center gap-3">
+            {/* Mobile Menu Button — opens sidebar */}
+            <button
+              onClick={onMenuClick}
+              className={`md:hidden p-2 rounded-lg ${
+                darkMode
+                  ? 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            {/* Welcome Message — desktop */}
+            <div className="hidden md:block">
+              <h2 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Welcome back, <span className="text-blue-600">{chw.name}</span>! 👋
+              </h2>
+            </div>
           </div>
 
-          {/* Desktop Navigation Links */}
+          {/* Centre: Desktop Navigation Links */}
           <div className="hidden lg:flex items-center space-x-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
@@ -134,7 +150,7 @@ const CHWNavbar = () => {
           </div>
 
           {/* Right side controls */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             {/* Search Bar */}
             <div className="hidden md:flex items-center">
               <div className={`relative ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>
@@ -308,17 +324,6 @@ const CHWNavbar = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`lg:hidden p-2 rounded-lg ${
-                darkMode
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-              }`}
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
         </div>
 
