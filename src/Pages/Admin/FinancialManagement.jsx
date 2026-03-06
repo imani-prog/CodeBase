@@ -1325,7 +1325,7 @@ const FinancialManagement = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="shadow-sm border border-gray-200 mb-6">
+          <div className="mb-6">
             <div className="flex overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -1336,7 +1336,7 @@ const FinancialManagement = () => {
                     className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600 bg-blue-50'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        : 'border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300'
                     }`}
                   >
                     <Icon className="w-4 h-4 mr-2" />

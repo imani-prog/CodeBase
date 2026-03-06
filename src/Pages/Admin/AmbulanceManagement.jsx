@@ -1108,8 +1108,8 @@ const AmbulanceManagement = () => {
 
 
           {/* Tabs */}
-          <div className="border border-gray-200 mb-6">
-            <div className="flex border-b border-gray-200 overflow-x-auto">
+          <div className=" mb-6">
+            <div className="flex overflow-x-auto">
               <button
                 onClick={() => setActiveTab('ambulances')}
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
@@ -1844,7 +1844,7 @@ const AmbulanceManagement = () => {
                                   <MessageSquare className="w-4 h-4" />
                                 </button>
                                 <button 
-                                  className="text-purple-600 hover:text-purple-800 transition-colors"
+                                  className="text-blue-600 hover:text-blue-800 transition-colors"
                                   title="View Route"
                                 >
                                   <Navigation2 className="w-4 h-4" />
@@ -2290,11 +2290,11 @@ const AmbulanceManagement = () => {
                     
                     // Validate required fields
                     if (!ambulanceToDispatch) {
-                      alert('❌ No ambulance available for dispatch');
+                      alert(' No ambulance available for dispatch');
                       return;
                     }
                     if (!dispatchForm.patientName || !dispatchForm.pickupAddressLine1 || !dispatchForm.callerName) {
-                      alert('❌ Please fill in all required fields:\n• Patient Name\n• Pickup Address\n• Caller Name');
+                      alert(' Please fill in all required fields:\n• Patient Name\n• Pickup Address\n• Caller Name');
                       return;
                     }
                     
@@ -2367,7 +2367,7 @@ const AmbulanceManagement = () => {
                       
                       // Show success notification after modal closes
                       setTimeout(() => {
-                        alert(`✅ Ambulance Dispatched Successfully!\n\n` +
+                        alert(` Ambulance Dispatched Successfully!\n\n` +
                               `Call ID: ${newEmergencyCall.id}\n` +
                               `Ambulance: ${ambulanceToDispatch}\n` +
                               `Patient: ${dispatchForm.patientName}\n` +
@@ -2378,7 +2378,7 @@ const AmbulanceManagement = () => {
                     } catch (error) {
                       console.error('Dispatch error:', error);
                       setIsDispatching(false);
-                      alert('❌ Failed to dispatch ambulance. Please try again.');
+                      alert('Failed to dispatch ambulance. Please try again.');
                     }
                   }}
                   disabled={isDispatching}
@@ -2463,7 +2463,7 @@ const AmbulanceManagement = () => {
             setEmergencyCalls(prev => [newDispatch, ...prev]);
             // Show success message
             setTimeout(() => {
-              alert(`✅ Dispatch Created Successfully!\n\nCall ID: ${newDispatch.id}\nPatient: ${newDispatch.patientName}`);
+              alert(` Dispatch Created Successfully!\n\nCall ID: ${newDispatch.id}\nPatient: ${newDispatch.patientName}`);
             }, 100);
           }}
         />
