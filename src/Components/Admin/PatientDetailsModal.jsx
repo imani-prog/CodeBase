@@ -66,7 +66,7 @@ const formatMaritalStatus = (status) => {
   return map[status] || status;
 };
 
-const PatientDetailsModal = ({ patient, isOpen, onClose }) => {
+const PatientDetailsModal = ({ patient, isOpen, onClose, onEdit }) => {
   if (!isOpen || !patient) return null;
 
   const formattedId = useMemo(() => `#${String(patient.id).padStart(6, '0')}`, [patient.id]);
@@ -313,12 +313,22 @@ const PatientDetailsModal = ({ patient, isOpen, onClose }) => {
             <div className="text-sm text-gray-500">
               Last updated: {patient.updatedAt ? new Date(patient.updatedAt).toLocaleDateString() : new Date().toLocaleDateString()}
             </div>
-            <button
-              onClick={onClose}
-              className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
-            >
-              Close
-            </button>
+            <div className="flex items-center gap-3">
+              {onEdit && (
+                <button
+                  onClick={onEdit}
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                >
+                  Edit Patient
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       </div>

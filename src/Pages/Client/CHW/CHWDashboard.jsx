@@ -191,7 +191,7 @@ const CHWDashboard = () => {
           return (
             <div
               key={stat.label}
-              className="bg-white rounded-xl shadow-md p-2 border border-gray-200 hover:shadow-lg transition-shadow"
+              className="bg-white shadow-md p-2 border border-gray-200 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses[stat.color]}`}>
