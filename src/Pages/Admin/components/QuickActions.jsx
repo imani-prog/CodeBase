@@ -10,13 +10,13 @@ const QuickActions = () => {
       icon: UserPlus, 
       label: 'Add Patient', 
       color: 'blue',
-      action: () => navigate('/admin/add-patient')
+      action: () => navigate('/admin/active-patients', { state: { openAddModal: true } })
     },
     { 
       icon: Users, 
       label: 'Add CHW', 
       color: 'blue',
-      action: () => navigate('/admin/add-chw')
+      action: () => navigate('/admin/active-chw', { state: { openAddModal: true } })
     },
     { 
       icon: CheckSquare, 

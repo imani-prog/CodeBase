@@ -1,6 +1,6 @@
 
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PatientDetailsModal from '../../Components/Admin/PatientDetailsModal';
 import EditPatientModal from '../../Components/Admin/EditPatientModal';
 import AddPatientModal from '../../Components/Admin/AddPatientModal';
@@ -125,6 +125,7 @@ const dummyPatients = [
 
 const ActivePatients = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -136,6 +137,13 @@ const ActivePatients = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [patients, setPatients] = useState(dummyPatients);
+
+  useEffect(() => {
+    if (location.state?.openAddModal) {
+      setShowAddModal(true);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   // Filter and sort patients
   const filteredAndSortedPatients = useMemo(() => {

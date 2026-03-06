@@ -1,6 +1,6 @@
 
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import CHWDetailsModal from '../../Components/Admin/CHWDetailsModal';
 import EditCHWModal from '../../Components/Admin/EditCHWModal';
 import AddCHWModal from '../../Components/Admin/AddCHWModal';
@@ -181,6 +181,7 @@ const dummyCHWs = [
 
 const ActiveCHW = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -193,6 +194,13 @@ const ActiveCHW = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [chws, setCHWs] = useState(dummyCHWs);
+
+  useEffect(() => {
+    if (location.state?.openAddModal) {
+      setShowAddModal(true);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   // Filter and sort CHWs
   const filteredAndSortedCHWs = useMemo(() => {
