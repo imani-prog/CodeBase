@@ -79,12 +79,12 @@ const InputField = ({
 );
 
 const Section = ({ title, icon: Icon, children }) => (
-  <div className="shadow-sm border border-gray-200 p-6 mb-6 bg-white">
+  <div className="shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 bg-white">
     <div className="flex items-center mb-4">
-      <div className="w-8 h-8 flex items-center justify-center mr-3">
-        <Icon className="w-6 h-6 text-blue-600" />
+      <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center mr-3">
+        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <h3 className="text-base sm:text-lg font-semibold text-gray-900">{title}</h3>
     </div>
     {children}
   </div>
@@ -196,42 +196,42 @@ const EditPatientModal = ({ patient, isOpen, onClose, onSave }) => {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="relative bg-white shadow-2xl transform transition-all max-w-5xl w-full overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="flex items-center justify-center min-h-screen p-0 sm:p-4">
+        <div className="relative bg-white shadow-2xl transform transition-all max-w-5xl w-full overflow-hidden h-screen sm:h-auto sm:max-h-[90vh] flex flex-col">
           {/* Header */}
-          <div className="relative px-8 py-5 bg-blue-950 text-white">
+          <div className="relative px-4 py-4 sm:px-8 sm:py-5 bg-blue-950 text-white">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center space-x-4">
-              <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
-                <Edit3 className="w-7 h-7" />
+            <div className="flex items-center gap-3 sm:gap-4 pr-10">
+              <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30 flex-shrink-0">
+                <Edit3 className="w-5 h-5 sm:w-7 sm:h-7" />
               </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-1">Edit Patient Information</h2>
-                <p className="text-sm ">Update patient details and medical records</p>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg sm:text-2xl font-bold mb-0.5">Edit Patient Information</h2>
+                <p className="text-xs sm:text-sm opacity-80">Update patient details and medical records</p>
               </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="bg-white border-b border-gray-200 px-8">
-            <div className="flex space-x-1 overflow-x-auto">
+          <div className="bg-white border-b border-gray-200 px-2 sm:px-8">
+            <div className="flex space-x-0 sm:space-x-1 overflow-x-auto">
               {tabs.map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                  className={`flex items-center px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'border-blue-600 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  <tab.icon className="w-4 h-4 mr-2" />
+                  <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                   {tab.label}
                 </button>
               ))}
@@ -239,7 +239,7 @@ const EditPatientModal = ({ patient, isOpen, onClose, onSave }) => {
           </div>
 
           {/* Body - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-8 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-gray-50">
             {/* Personal Information Tab */}
             {activeTab === 'personal' && (
               <Section title="Personal Information" icon={User}>
@@ -395,7 +395,7 @@ const EditPatientModal = ({ patient, isOpen, onClose, onSave }) => {
           </div>
 
           {/* Footer */}
-          <div className="bg-white border-t border-gray-200 px-8 py-4 flex justify-between items-center">
+          <div className="bg-white border-t border-gray-200 px-4 py-3 sm:px-8 sm:py-4 flex justify-between items-center gap-3">
             <div className="text-sm text-gray-500 flex items-center">
               <AlertCircle className="w-4 h-4 mr-1" />
               <span className="text-red-500">*</span> Required fields

@@ -173,17 +173,17 @@ const AddPatientModal = ({ showModal, setShowModal, onSavePatient }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white shadow-2xl max-w-5xl w-full h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg">
-              <UserPlus className="w-6 h-6 text-white" />
+        <div className="bg-white border-b border-gray-200 px-4 py-4 sm:px-8 sm:py-5 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg flex-shrink-0">
+              <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Add New Patient</h2>
-              <p className="text-gray-600 text-sm">Step {currentStep} of {steps.length}: {steps[currentStep - 1].title}</p>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Add New Patient</h2>
+              <p className="text-gray-600 text-xs sm:text-sm">Step {currentStep} of {steps.length}: {steps[currentStep - 1].title}</p>
             </div>
           </div>
           <button
@@ -195,7 +195,8 @@ const AddPatientModal = ({ showModal, setShowModal, onSavePatient }) => {
         </div>
 
         {/* Progress Steps */}
-        <div className="px-8 py-3 bg-gray-50 border-b overflow-x-auto">
+        {/* Desktop: full step bar */}
+        <div className="hidden sm:block px-8 py-3 bg-gray-50 border-b overflow-x-auto">
           <div className="flex items-center justify-between min-w-max">
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
@@ -220,10 +221,31 @@ const AddPatientModal = ({ showModal, setShowModal, onSavePatient }) => {
             ))}
           </div>
         </div>
+        {/* Mobile: compact dot progress + progress bar */}
+        <div className="sm:hidden px-4 py-3 bg-gray-50 border-b">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-gray-700">{steps[currentStep - 1].title}</span>
+            <span className="text-xs text-gray-500">{currentStep} / {steps.length}</span>
+          </div>
+          <div className="flex items-center space-x-1.5">
+            {steps.map((step) => (
+              <div
+                key={step.number}
+                className={`h-1.5 flex-1 rounded-full transition-all ${
+                  currentStep > step.number
+                    ? 'bg-green-500'
+                    : currentStep === step.number
+                    ? 'bg-blue-600'
+                    : 'bg-gray-200'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
 
         {/* Form Content - Scrollable */}
         <div className="flex-1 overflow-y-auto">
-          <form onSubmit={currentStep === 6 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }} className="p-8">
+          <form onSubmit={currentStep === 6 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }} className="p-4 sm:p-8">
             
             {/* Step 1: Personal Information */}
             {currentStep === 1 && (
@@ -733,7 +755,7 @@ const AddPatientModal = ({ showModal, setShowModal, onSavePatient }) => {
         </div>
 
         {/* Action Buttons - Fixed at Bottom */}
-        <div className="bg-gray-50 px-8 py-4 border-t border-gray-200 flex justify-between items-center">
+        <div className="bg-gray-50 px-4 py-3 sm:px-8 sm:py-4 border-t border-gray-200 flex justify-between items-center gap-2">
           <button
             type="button"
             onClick={currentStep === 1 ? handleClose : handlePrevious}

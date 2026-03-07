@@ -212,7 +212,7 @@ const MyPatients = () => {
           const initials = ((p.firstName?.[0] ?? '') + (p.lastName?.[0] ?? '')).toUpperCase();
           const avatarBg = AVATAR_COLORS[p.id % AVATAR_COLORS.length];
           return (
-            <div key={p.id} className="bg-white border border-gray-200 p-4">
+            <div key={p.id} className="bg-white border rounded-lg border-gray-200 p-4">
               {/* Card header */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">

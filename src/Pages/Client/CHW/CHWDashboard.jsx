@@ -135,8 +135,8 @@ const CHWDashboard = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">CHW Dashboard</h1>
-        <p className="mt-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">CHW Dashboard</h1>
+        <p className="mt-1 sm:mt-2 text-sm sm:text-base">
           Community Health Worker overview and daily activities
         </p>
       </div>
@@ -178,7 +178,7 @@ const CHWDashboard = () => {
       )} */}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
           const colorClasses = {
@@ -191,19 +191,19 @@ const CHWDashboard = () => {
           return (
             <div
               key={stat.label}
-              className="bg-white shadow-md p-2 border border-gray-200 hover:shadow-lg transition-shadow"
+              className="bg-white shadow-md p-3 sm:p-4 border border-gray-200 hover:shadow-lg transition-shadow"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses[stat.color]}`}>
-                  <Icon className="w-6 h-6" />
+              <div className="flex items-center justify-between mb-3">
+                <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${colorClasses[stat.color]}`}>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 {stat.trend === 'up' && (
-                  <TrendingUp className="w-5 h-5 text-green-500" />
+                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                 )}
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
-              <p className="text-sm text-gray-600 mt-1">{stat.label}</p>
-              <p className="text-xs text-gray-500 mt-2">{stat.change}</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">{stat.label}</p>
+              <p className="text-xs text-gray-500 mt-1 sm:mt-2">{stat.change}</p>
             </div>
           );
         })}
@@ -212,10 +212,10 @@ const CHWDashboard = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upcoming Visits */}
-        <div className="lg:col-span-2 bg-white shadow-md p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold flex items-center">
-              <MapPin className="w-6 h-6 mr-2 text-blue-600" />
+        <div className="lg:col-span-2 bg-white shadow-md p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-bold flex items-center">
+              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" />
               Upcoming Home Visits
             </h2>
             <Link
@@ -236,30 +236,30 @@ const CHWDashboard = () => {
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold">{visit.patientName}</h3>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center flex-wrap gap-2 mb-1">
+                      <h3 className="font-semibold text-sm sm:text-base">{visit.patientName}</h3>
                       {visit.urgent && (
-                        <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                        <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
                           Urgent
                         </span>
                       )}
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full ml-auto">
+                        {visit.type}
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-1">ID: {visit.patientId}</p>
-                    <div className="flex items-center text-sm text-gray-600 space-x-4">
+                    <p className="text-xs text-gray-500 mb-1">ID: {visit.patientId}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center text-xs text-gray-600 gap-1 sm:gap-4">
                       <span className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
+                        <Clock className="w-3.5 h-3.5 mr-1 flex-shrink-0" />
                         {visit.time}
                       </span>
                       <span className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {visit.location}
+                        <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0" />
+                        <span className="truncate">{visit.location}</span>
                       </span>
                     </div>
                   </div>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                    {visit.type}
-                  </span>
                 </div>
               </div>
             ))}
@@ -267,9 +267,9 @@ const CHWDashboard = () => {
         </div>
 
         {/* Recent Activities */}
-        <div className="bg-white shadow-md p-6">
-          <h2 className="text-xl font-bold mb-6 flex items-center">
-            <Activity className="w-6 h-6 mr-2 text-blue-600" />
+        <div className="bg-white shadow-md p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center">
+            <Activity className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" />
             Recent Activity
           </h2>
           <div className="space-y-4">
@@ -300,9 +300,9 @@ const CHWDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Link
             to="/client/chw/patients"
             className="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
