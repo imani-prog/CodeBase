@@ -15,10 +15,27 @@ import {
   Trash2,
   Search
 } from 'lucide-react';
+import AddAppointmentModal from '../../../Components/CHW/AddAppointmentModal';
+import EditAppointmentModal from '../../../Components/CHW/EditAppointmentModal';
+import CancelAppointmentModal from '../../../Components/CHW/CancelAppointmentModal';
 
 const CHWAppointments = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editAppointment, setEditAppointment] = useState(null);
+  const [cancelAppointment, setCancelAppointment] = useState(null);
+
+  const handleAddSave = (newAppointment) => {
+    console.log('New appointment scheduled:', newAppointment);
+  };
+  const handleEditSave = (updated) => {
+    console.log('Updated appointment:', updated);
+    setEditAppointment(null);
+  };
+  const handleCancelConfirm = (appt) => {
+    console.log('Appointment cancelled:', appt);
+  };
 
   // Sample appointments data
   const appointments = {
@@ -156,7 +173,9 @@ const CHWAppointments = () => {
             Manage patient appointments and consultations
           </p>
         </div>
-        <button className="flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-md flex-shrink-0">
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-md flex-shrink-0">
           <Plus className="w-5 h-5" />
           <span className="hidden sm:inline">New Appointment</span>
         </button>
@@ -191,20 +210,20 @@ const CHWAppointments = () => {
       </div>
 
       {/* Tabs */}
-      <div className="">
-        <div className="flex space-x-6 sm:space-x-8 overflow-x-auto">
+      <div className="border-b border-gray-200">
+        <div className="flex w-full">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 sm:py-4 border-b-2 font-medium text-xs sm:text-sm transition-colors ${
                 activeTab === tab.id
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-800 hover:text-gray-900 hover:border-gray-300'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
               }`}
             >
-              <span>{tab.label}</span>
-              <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+              <span className="whitespace-nowrap">{tab.label}</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
                 activeTab === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600'
               }`}>
                 {tab.count}
@@ -275,10 +294,14 @@ const CHWAppointments = () => {
                             <Phone className="w-3 h-3" />Call
                           </button>
                         )}
-                        <button className="flex items-center gap-1 px-2.5 py-1 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium">
+                        <button
+                          onClick={() => setEditAppointment(appt)}
+                          className="flex items-center gap-1 px-2.5 py-1 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium">
                           <Edit className="w-3 h-3" />Edit
                         </button>
-                        <button className="flex items-center gap-1 px-2.5 py-1 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded text-xs font-medium transition-colors">
+                        <button
+                          onClick={() => setCancelAppointment(appt)}
+                          className="flex items-center gap-1 px-2.5 py-1 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded text-xs font-medium transition-colors">
                           <XCircle className="w-3 h-3" />Cancel
                         </button>
                       </div>
@@ -332,10 +355,14 @@ const CHWAppointments = () => {
                       <Phone className="w-3.5 h-3.5" />Call
                     </button>
                   )}
-                  <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-xs font-semibold">
+                  <button
+                    onClick={() => setEditAppointment(appt)}
+                    className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-xs font-semibold">
                     <Edit className="w-3.5 h-3.5" />Edit
                   </button>
-                  <button className="flex items-center gap-1 px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-lg text-xs font-semibold transition-colors">
+                  <button
+                    onClick={() => setCancelAppointment(appt)}
+                    className="flex items-center gap-1 px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-lg text-xs font-semibold transition-colors">
                     <XCircle className="w-3.5 h-3.5" />Cancel
                   </button>
                 </div>
@@ -486,7 +513,9 @@ const CHWAppointments = () => {
                       <span className="line-clamp-2">{appt.cancelReason}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors">
+                      <button
+                        onClick={() => setShowAddModal(true)}
+                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors">
                         Reschedule
                       </button>
                     </td>
@@ -524,7 +553,9 @@ const CHWAppointments = () => {
                 <div className="bg-gray-50 rounded-lg px-3 py-2 mb-3">
                   <p className="text-xs text-gray-700"><span className="font-semibold">Cancellation Reason:</span> {appt.cancelReason}</p>
                 </div>
-                <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors">
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors">
                   Reschedule Appointment
                 </button>
               </div>
@@ -532,6 +563,24 @@ const CHWAppointments = () => {
           </div>
         </>
       )}
+      {/* Add Appointment Modal */}
+      <AddAppointmentModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSave={handleAddSave}
+      />
+      <EditAppointmentModal
+        isOpen={!!editAppointment}
+        appointment={editAppointment}
+        onClose={() => setEditAppointment(null)}
+        onSave={handleEditSave}
+      />
+      <CancelAppointmentModal
+        isOpen={!!cancelAppointment}
+        appointment={cancelAppointment}
+        onClose={() => setCancelAppointment(null)}
+        onConfirm={handleCancelConfirm}
+      />
     </div>
   );
 };
