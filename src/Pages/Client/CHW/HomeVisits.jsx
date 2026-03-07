@@ -11,8 +11,7 @@ import {
   AlertCircle,
   Home,
   Filter,
-  Plus,
-  Map as MapIcon
+  Plus
 } from 'lucide-react';
 
 const HomeVisits = () => {
@@ -143,51 +142,67 @@ const HomeVisits = () => {
       </div>
 
       {/* Map View */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="bg-gradient-to-br from-blue-100 to-blue-200 h-64 flex items-center justify-center relative">
-          <MapIcon className="w-16 h-16 text-blue-600 opacity-50" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <Navigation className="w-12 h-12 text-blue-600 mx-auto mb-2" />
-              <p className="text-blue-900 font-semibold">Interactive Map View</p>
-              <p className="text-sm text-blue-700 mt-1">Showing all scheduled home visits</p>
+      <div className=" border border-gray-200 overflow-hidden">
+        {/* Map Header */}
+        <div className="px-5 py-4 border-b border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-blue-600" />
+                Coverage Area Map
+              </h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                Showing your assigned service zone — Machakos &amp; surrounding regions. Use this map to plan efficient routes between patient home visits.
+              </p>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-gray-500 shrink-0">
+              <span className="flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                Upcoming visits
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                Completed
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span>
+                Cancelled
+              </span>
             </div>
           </div>
-          {/* Simulated location markers */}
-          {homeVisits.upcoming.slice(0, 3).map((visit, index) => (
-            <div
-              key={visit.id}
-              className="absolute w-10 h-10 bg-red-500 border-4 border-white rounded-full shadow-lg flex items-center justify-center animate-pulse"
-              style={{
-                top: `${30 + index * 20}%`,
-                left: `${25 + index * 20}%`
-              }}
-            >
-              <Home className="w-5 h-5 text-white" />
-            </div>
-          ))}
         </div>
+        <iframe
+          src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
+          width="100%"
+          height="600"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Home Visits Map"
+          className="w-full h-48 sm:h-64 md:h-80 lg:h-[600px]"
+        />
       </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
-        <div className="flex space-x-8 overflow-x-auto">
+        <div className="flex overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
-                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                  activeTab === tab.id ? 'bg-white/20' : 'bg-gray-200'
+                <span className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
+                  activeTab === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600'
                 }`}>
                   {tab.count}
                 </span>
@@ -199,159 +214,294 @@ const HomeVisits = () => {
 
       {/* Upcoming Visits */}
       {activeTab === 'upcoming' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {homeVisits.upcoming.map((visit) => (
-            <div
-              key={visit.id}
-              className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 max-w-md ${
-                visit.priority === 'urgent'
-                  ? ''
-                  : visit.priority === 'high'
-                  ? ''
-                  : ''
-              }`}
-            >
-              <div className="flex flex-col">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-base font-bold">{visit.patientName}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getPriorityColor(visit.priority)}`}>
-                      {visit.priority.charAt(0).toUpperCase() + visit.priority.slice(1)}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600 mb-3">Patient ID: {visit.patientId}</p>
-                  
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
-                      <span className="font-medium">{new Date(visit.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
-                    </div>
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Clock className="w-4 h-4 mr-2 text-blue-600" />
-                      <span className="font-medium">{visit.time}</span>
-                    </div>
-                    <div className="flex items-start text-gray-700 text-sm">
-                      <MapPin className="w-4 h-4 mr-2 text-blue-600 mt-0.5" />
-                      <span>{visit.location}</span>
-                    </div>
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Home className="w-4 h-4 mr-2 text-blue-600" />
-                      <span>{visit.type}</span>
-                    </div>
-                  </div>
+        <>
+          {/* Desktop Table — lg and above */}
+          <div className="hidden lg:block bg-white shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Patient</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Date &amp; Time</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-00">Priority</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Notes</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {homeVisits.upcoming.map((visit) => (
+                    <tr key={visit.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-gray-900">{visit.patientName}</p>
+                        <p className="text-xs text-gray-500">{visit.patientId}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center text-gray-700 text-sm">
+                          <Calendar className="w-4 h-4 mr-1.5 text-blue-500 flex-shrink-0" />
+                          <span>{new Date(visit.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                        </div>
+                        <div className="flex items-center text-gray-700 text-sm mt-1">
+                          <Clock className="w-4 h-4 mr-1.5 text-blue-500 flex-shrink-0" />
+                          <span>{visit.time}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center text-gray-700 text-sm">
+                          <MapPin className="w-4 h-4 mr-1.5 text-blue-500 flex-shrink-0" />
+                          <span>{visit.location}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{visit.type}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getPriorityColor(visit.priority)}`}>
+                          {visit.priority.charAt(0).toUpperCase() + visit.priority.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 max-w-xs">{visit.notes}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                            <Navigation className="w-3 h-3" />
+                            <span>Directions</span>
+                          </button>
+                          <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                            <Phone className="w-3 h-3" />
+                            <span>Call</span>
+                          </button>
+                          <button className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                            <CheckCircle className="w-3 h-3" />
+                            <span>Complete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-                  {visit.notes && (
-                    <div className="p-2 mb-3">
-                      <p className="text-gray-700">
-                        <span className="font-semibold">Notes:</span> {visit.notes}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2">
-                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
-                      <Navigation className="w-3 h-3" />
-                      <span>Directions</span>
-                    </button>
-                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
-                      <Phone className="w-3 h-3" />
-                      <span>Call</span>
-                    </button>
-                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
-                      <CheckCircle className="w-3 h-3" />
-                      <span>Complete</span>
-                    </button>
+          {/* Mobile / Tablet Cards — below lg */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {homeVisits.upcoming.map((visit) => (
+              <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-base font-bold text-gray-900">{visit.patientName}</h3>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getPriorityColor(visit.priority)}`}>
+                    {visit.priority.charAt(0).toUpperCase() + visit.priority.slice(1)}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">{visit.patientId}</p>
+                <div className="space-y-1.5 mb-3 text-sm">
+                  <div className="flex items-center text-gray-700">
+                    <Calendar className="w-4 h-4 mr-2 text-blue-600 flex-shrink-0" />
+                    <span>{new Date(visit.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} · {visit.time}</span>
+                  </div>
+                  <div className="flex items-start text-gray-700">
+                    <MapPin className="w-4 h-4 mr-2 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <span>{visit.location}</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <Home className="w-4 h-4 mr-2 text-blue-600 flex-shrink-0" />
+                    <span>{visit.type}</span>
                   </div>
                 </div>
+                {visit.notes && (
+                  <p className="text-xs text-gray-600 mb-3 bg-gray-50 rounded p-2">
+                    <span className="font-semibold">Notes:</span> {visit.notes}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                    <Navigation className="w-3 h-3" />
+                    <span>Directions</span>
+                  </button>
+                  <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                    <Phone className="w-3 h-3" />
+                    <span>Call</span>
+                  </button>
+                  <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                    <CheckCircle className="w-3 h-3" />
+                    <span>Complete</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Completed Visits */}
       {activeTab === 'completed' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {homeVisits.completed.map((visit) => (
-            <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 max-w-md">
-              <div className="flex flex-col">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <CheckCircle className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-base font-bold">{visit.patientName}</h3>
-                  </div>
-                  <p className="text-xs text-gray-600 mb-3">Patient ID: {visit.patientId}</p>
-                  
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{new Date(visit.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                    </div>
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Clock className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{visit.time}</span>
-                    </div>
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Home className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{visit.type}</span>
-                    </div>
-                  </div>
+        <>
+          {/* Desktop Table */}
+          <div className="hidden lg:block bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Patient</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Date &amp; Time</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Outcome</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {homeVisits.completed.map((visit) => (
+                    <tr key={visit.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <div>
+                            <p className="font-semibold text-gray-900">{visit.patientName}</p>
+                            <p className="text-xs text-gray-500">{visit.patientId}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center text-gray-700 text-sm">
+                          <Calendar className="w-4 h-4 mr-1.5 text-gray-400 flex-shrink-0" />
+                          <span>{new Date(visit.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                        </div>
+                        <div className="flex items-center text-gray-700 text-sm mt-1">
+                          <Clock className="w-4 h-4 mr-1.5 text-gray-400 flex-shrink-0" />
+                          <span>{visit.time}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{visit.location}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{visit.type}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{visit.outcome}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-                  <div className="rounded p-2">
-                    <p className="text-gray-900">
-                      <span className="font-semibold">Outcome:</span> {visit.outcome}
-                    </p>
+          {/* Mobile / Tablet Cards */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {homeVisits.completed.map((visit) => (
+              <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <h3 className="text-base font-bold text-gray-900">{visit.patientName}</h3>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">{visit.patientId}</p>
+                <div className="space-y-1.5 mb-3 text-sm">
+                  <div className="flex items-center text-gray-700">
+                    <Calendar className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                    <span>{new Date(visit.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {visit.time}</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <MapPin className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                    <span>{visit.location}</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <Home className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                    <span>{visit.type}</span>
                   </div>
                 </div>
+                <p className="text-xs text-gray-600 bg-green-50 rounded p-2">
+                  <span className="font-semibold">Outcome:</span> {visit.outcome}
+                </p>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Cancelled Visits */}
       {activeTab === 'cancelled' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {homeVisits.cancelled.map((visit) => (
-            <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 max-w-md">
-              <div className="flex flex-col">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <XCircle className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-base font-bold">{visit.patientName}</h3>
-                  </div>
-                  <p className="text-xs text-gray-600 mb-3">Patient ID: {visit.patientId}</p>
-                  
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{new Date(visit.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                    </div>
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Clock className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{visit.time}</span>
-                    </div>
-                    <div className="flex items-center text-gray-700 text-sm">
-                      <Home className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{visit.type}</span>
-                    </div>
-                  </div>
-
-                  <div className="p-2 mb-3">
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Reason:</span> {visit.reason}
-                    </p>
-                  </div>
-
-                  <button className="ml-20 w-1/2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
-                    Reschedule Visit
-                  </button>
-                </div>
-              </div>
+        <>
+          {/* Desktop Table */}
+          <div className="hidden lg:block bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Patient</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Date &amp; Time</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Reason</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {homeVisits.cancelled.map((visit) => (
+                    <tr key={visit.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                          <div>
+                            <p className="font-semibold text-gray-900">{visit.patientName}</p>
+                            <p className="text-xs text-gray-500">{visit.patientId}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center text-gray-700 text-sm">
+                          <Calendar className="w-4 h-4 mr-1.5 text-gray-400 flex-shrink-0" />
+                          <span>{new Date(visit.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                        </div>
+                        <div className="flex items-center text-gray-700 text-sm mt-1">
+                          <Clock className="w-4 h-4 mr-1.5 text-gray-400 flex-shrink-0" />
+                          <span>{visit.time}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{visit.location}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{visit.type}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{visit.reason}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                          Reschedule
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
+          </div>
+
+          {/* Mobile / Tablet Cards */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {homeVisits.cancelled.map((visit) => (
+              <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                  <h3 className="text-base font-bold text-gray-900">{visit.patientName}</h3>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">{visit.patientId}</p>
+                <div className="space-y-1.5 mb-3 text-sm">
+                  <div className="flex items-center text-gray-700">
+                    <Calendar className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                    <span>{new Date(visit.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {visit.time}</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <MapPin className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                    <span>{visit.location}</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <Home className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                    <span>{visit.type}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 bg-red-50 rounded p-2 mb-3">
+                  <span className="font-semibold">Reason:</span> {visit.reason}
+                </p>
+                <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                  Reschedule Visit
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
+
     </div>
   );
 };

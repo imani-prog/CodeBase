@@ -279,19 +279,19 @@ const CHWAppointments = () => {
 
       {/* Tabs */}
       <div className="">
-        <div className="flex">
+        <div className="flex overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-3 sm:py-4 border-b-2 font-medium text-xs sm:text-sm transition-colors ${
+              className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
               }`}
             >
-              <span className="whitespace-nowrap">{tab.label}</span>
-              <span className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
+              {tab.label}
+              <span className={`ml-2 px-1.5 py-0.5 rounded-full text-xs font-bold ${
                 activeTab === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600'
               }`}>
                 {tab.count}
