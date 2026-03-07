@@ -1,6 +1,10 @@
-import { AlertTriangle, X, Calendar, Clock, User } from 'lucide-react';
+import { useState } from 'react';
+import { AlertTriangle, X, Calendar, Clock, User, AlertCircle } from 'lucide-react';
 
 const CancelAppointmentModal = ({ isOpen, onClose, onConfirm, appointment }) => {
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
+
   if (!isOpen || !appointment) return null;
 
   return (
@@ -32,6 +36,13 @@ const CancelAppointmentModal = ({ isOpen, onClose, onConfirm, appointment }) => 
           <p className="text-sm text-gray-600 mb-4">
             Are you sure you want to cancel this appointment? The patient will be notified.
           </p>
+
+          {confirmError && (
+            <div className="flex items-center gap-2 px-3 py-2.5 mb-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{confirmError}</span>
+            </div>
+          )}
 
           {/* Appointment summary */}
           <div className="bg-white border border-gray-200 p-4 space-y-3">
@@ -66,19 +77,39 @@ const CancelAppointmentModal = ({ isOpen, onClose, onConfirm, appointment }) => 
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors"
+            disabled={isConfirming}
+            className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
           >
             Go Back
           </button>
           <button
             type="button"
-            onClick={() => {
-              onConfirm?.(appointment);
-              onClose?.();
+            disabled={isConfirming}
+            onClick={async () => {
+              setIsConfirming(true);
+              setConfirmError('');
+              try {
+                await onConfirm?.(appointment);
+                onClose?.();
+              } catch {
+                setConfirmError('Failed to cancel. Please try again.');
+              } finally {
+                setIsConfirming(false);
+              }
             }}
-            className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow-md"
+            className="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Cancel Appointment
+            {isConfirming ? (
+              <>
+                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Cancelling…
+              </>
+            ) : (
+              'Cancel Appointment'
+            )}
           </button>
         </div>
       </div>

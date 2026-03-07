@@ -56,6 +56,7 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
   const [isSaving, setIsSaving] = useState(false);
   const [patientSearch, setPatientSearch] = useState('');
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   // Populate form when appointment changes
   useEffect(() => {
@@ -111,15 +112,22 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
 
   const handleSubmit = async () => {
     if (isSaving || !validate()) return;
+    setSaveError('');
     setIsSaving(true);
     await new Promise((r) => setTimeout(r, 800));
-    onSave?.({ ...appointment, ...form, patientName: selectedPatient?.name || appointment?.patientName });
-    setIsSaving(false);
-    handleClose();
+    try {
+      onSave?.({ ...appointment, ...form, patientName: selectedPatient?.name || appointment?.patientName });
+      handleClose();
+    } catch {
+      setSaveError('Something went wrong updating the appointment. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleClose = () => {
     setErrors({});
+    setSaveError('');
     setShowPatientDropdown(false);
     onClose?.();
   };
@@ -156,6 +164,12 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
 
           {/* Body */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-gray-50 space-y-5">
+            {saveError && (
+              <div className="flex items-center gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{saveError}</span>
+              </div>
+            )}
 
             {/* Patient */}
             <div className="border border-gray-200 p-4 sm:p-5">

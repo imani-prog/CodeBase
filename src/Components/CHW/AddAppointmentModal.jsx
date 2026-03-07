@@ -57,6 +57,7 @@ const AddAppointmentModal = ({ isOpen, onClose, onSave, patients = SAMPLE_PATIEN
   const [isSaving, setIsSaving] = useState(false);
   const [patientSearch, setPatientSearch] = useState('');
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const filteredPatients = patients.filter(
     (p) =>
@@ -93,29 +94,36 @@ const AddAppointmentModal = ({ isOpen, onClose, onSave, patients = SAMPLE_PATIEN
 
   const handleSubmit = async () => {
     if (isSaving || !validate()) return;
+    setSaveError('');
     setIsSaving(true);
     await new Promise((r) => setTimeout(r, 800));
-    const appointment = {
-      id: Date.now(),
-      patientName: selectedPatient?.name || '',
-      patientId: form.patientId,
-      date: form.date,
-      time: form.time,
-      duration: form.duration,
-      type: form.type,
-      location: form.location,
-      reason: form.reason,
-      notes: form.notes,
-      status: 'pending',
-    };
-    onSave?.(appointment);
-    setIsSaving(false);
-    handleClose();
+    try {
+      const appointment = {
+        id: Date.now(),
+        patientName: selectedPatient?.name || '',
+        patientId: form.patientId,
+        date: form.date,
+        time: form.time,
+        duration: form.duration,
+        type: form.type,
+        location: form.location,
+        reason: form.reason,
+        notes: form.notes,
+        status: 'pending',
+      };
+      onSave?.(appointment);
+      handleClose();
+    } catch {
+      setSaveError('Something went wrong saving the appointment. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleClose = () => {
     setForm(empty);
     setErrors({});
+    setSaveError('');
     setPatientSearch('');
     setShowPatientDropdown(false);
     onClose?.();
@@ -158,6 +166,12 @@ const AddAppointmentModal = ({ isOpen, onClose, onSave, patients = SAMPLE_PATIEN
 
           {/* ── Body ── */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-gray-50 space-y-5">
+            {saveError && (
+              <div className="flex items-center gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{saveError}</span>
+              </div>
+            )}
 
             {/* Patient Selection */}
             <div className="border border-gray-200 p-4 sm:p-5">

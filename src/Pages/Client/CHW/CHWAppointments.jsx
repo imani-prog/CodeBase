@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Calendar,
   Clock,
@@ -13,7 +13,8 @@ import {
   AlertCircle,
   Edit,
   Trash2,
-  Search
+  Search,
+  X
 } from 'lucide-react';
 import AddAppointmentModal from '../../../Components/CHW/AddAppointmentModal';
 import EditAppointmentModal from '../../../Components/CHW/EditAppointmentModal';
@@ -25,20 +26,17 @@ const CHWAppointments = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editAppointment, setEditAppointment] = useState(null);
   const [cancelAppointment, setCancelAppointment] = useState(null);
+  const [toast, setToast] = useState(null);
 
-  const handleAddSave = (newAppointment) => {
-    console.log('New appointment scheduled:', newAppointment);
-  };
-  const handleEditSave = (updated) => {
-    console.log('Updated appointment:', updated);
-    setEditAppointment(null);
-  };
-  const handleCancelConfirm = (appt) => {
-    console.log('Appointment cancelled:', appt);
-  };
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3500);
+    return () => clearTimeout(t);
+  }, [toast]);
 
-  // Sample appointments data
-  const appointments = {
+  const showToast = (type, message) => setToast({ type, message });
+
+  const [appointmentData, setAppointmentData] = useState({
     upcoming: [
       {
         id: 1,
@@ -126,19 +124,70 @@ const CHWAppointments = () => {
         cancelReason: 'Patient requested reschedule'
       }
     ]
+  });
+
+  const handleAddSave = (newAppt) => {
+    try {
+      setAppointmentData((prev) => ({ ...prev, upcoming: [newAppt, ...prev.upcoming] }));
+      showToast('success', `Appointment for ${newAppt.patientName || 'patient'} scheduled successfully.`);
+    } catch {
+      showToast('error', 'Failed to schedule appointment. Please try again.');
+    }
   };
 
+  const handleEditSave = (updated) => {
+    try {
+      setAppointmentData((prev) => ({
+        ...prev,
+        upcoming: prev.upcoming.map((a) => (a.id === updated.id ? { ...a, ...updated } : a)),
+      }));
+      setEditAppointment(null);
+      showToast('success', `Appointment for ${updated.patientName} updated successfully.`);
+    } catch {
+      showToast('error', 'Failed to update appointment. Please try again.');
+    }
+  };
+
+  const handleCancelConfirm = (appt) => {
+    try {
+      setAppointmentData((prev) => ({
+        ...prev,
+        upcoming: prev.upcoming.filter((a) => a.id !== appt.id),
+        cancelled: [{ ...appt, cancelReason: appt.cancelReason || 'Cancelled by CHW' }, ...prev.cancelled],
+      }));
+      showToast('success', `Appointment for ${appt.patientName} has been cancelled.`);
+    } catch {
+      showToast('error', 'Failed to cancel appointment. Please try again.');
+    }
+  };
+
+  const filterAppts = (list) => {
+    if (!searchTerm.trim()) return list;
+    const q = searchTerm.toLowerCase();
+    return list.filter(
+      (a) =>
+        a.patientName?.toLowerCase().includes(q) ||
+        a.patientId?.toLowerCase().includes(q) ||
+        a.reason?.toLowerCase().includes(q) ||
+        a.type?.toLowerCase().includes(q)
+    );
+  };
+
+  const filteredUpcoming = filterAppts(appointmentData.upcoming);
+  const filteredCompleted = filterAppts(appointmentData.completed);
+  const filteredCancelled = filterAppts(appointmentData.cancelled);
+
   const stats = [
-    { label: 'Today\'s Appointments', value: '2', color: 'blue' },
-    { label: 'This Week', value: '7', color: 'blue' },
-    { label: 'Pending Confirmation', value: '1', color: 'blue' },
-    { label: 'Completed This Month', value: '24', color: 'blue' }
+    { label: "Today's Appointments", value: String(appointmentData.upcoming.length), color: 'blue' },
+    { label: 'This Week', value: String(appointmentData.upcoming.length + appointmentData.completed.length), color: 'blue' },
+    { label: 'Pending Confirmation', value: String(appointmentData.upcoming.filter((a) => a.status === 'pending').length), color: 'blue' },
+    { label: 'Completed This Month', value: String(appointmentData.completed.length), color: 'blue' },
   ];
 
   const tabs = [
-    { id: 'upcoming', label: 'Upcoming', count: appointments.upcoming.length },
-    { id: 'completed', label: 'Completed', count: appointments.completed.length },
-    { id: 'cancelled', label: 'Cancelled', count: appointments.cancelled.length }
+    { id: 'upcoming', label: 'Upcoming', count: filteredUpcoming.length },
+    { id: 'completed', label: 'Completed', count: filteredCompleted.length },
+    { id: 'cancelled', label: 'Cancelled', count: filteredCancelled.length },
   ];
 
   const getTypeIcon = (type) => {
@@ -165,6 +214,25 @@ const CHWAppointments = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm z-[100] flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-white text-sm font-medium ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+        >
+          {toast.type === 'success' ? (
+            <CheckCircle className="w-5 h-5 flex-shrink-0" />
+          ) : (
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          )}
+          <span>{toast.message}</span>
+          <button onClick={() => setToast(null)} className="ml-2 hover:opacity-75 transition-opacity">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-start sm:items-center justify-between gap-4">
         <div>
@@ -210,8 +278,8 @@ const CHWAppointments = () => {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <div className="flex w-full">
+      <div className="">
+        <div className="flex">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -233,6 +301,20 @@ const CHWAppointments = () => {
         </div>
       </div>
 
+      {/* Empty search state */}
+      {searchTerm.trim() !== '' &&
+        ((activeTab === 'upcoming' && filteredUpcoming.length === 0) ||
+          (activeTab === 'completed' && filteredCompleted.length === 0) ||
+          (activeTab === 'cancelled' && filteredCancelled.length === 0)) && (
+          <div className="bg-white rounded-xl border border-dashed border-gray-300 p-10 text-center">
+            <Search className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-700 font-semibold">No appointments found</p>
+            <p className="text-sm text-gray-400 mt-1">
+              No results for &ldquo;<span className="font-medium text-gray-500">{searchTerm}</span>&rdquo;
+            </p>
+          </div>
+        )}
+
       {/* Upcoming Appointments */}
       {activeTab === 'upcoming' && (
         <>
@@ -251,7 +333,7 @@ const CHWAppointments = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {appointments.upcoming.map((appt) => (
+                {filteredUpcoming.map((appt) => (
                   <tr key={appt.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <p className="font-semibold text-gray-900">{appt.patientName}</p>
@@ -314,7 +396,7 @@ const CHWAppointments = () => {
 
           {/* Mobile Cards */}
           <div className="md:hidden space-y-3">
-            {appointments.upcoming.map((appt) => (
+            {filteredUpcoming.map((appt) => (
               <div key={appt.id} className={`bg-white rounded-xl shadow-sm border p-4 ${
                 appt.status === 'pending' ? 'border-yellow-200 bg-yellow-50/30' : 'border-gray-200'
               }`}>
@@ -389,7 +471,7 @@ const CHWAppointments = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {appointments.completed.map((appt) => (
+                {filteredCompleted.map((appt) => (
                   <tr key={appt.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -429,7 +511,7 @@ const CHWAppointments = () => {
 
           {/* Mobile Cards */}
           <div className="md:hidden space-y-3">
-            {appointments.completed.map((appt) => (
+            {filteredCompleted.map((appt) => (
               <div key={appt.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
@@ -481,7 +563,7 @@ const CHWAppointments = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {appointments.cancelled.map((appt) => (
+                {filteredCancelled.map((appt) => (
                   <tr key={appt.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -527,7 +609,7 @@ const CHWAppointments = () => {
 
           {/* Mobile Cards */}
           <div className="md:hidden space-y-3">
-            {appointments.cancelled.map((appt) => (
+            {filteredCancelled.map((appt) => (
               <div key={appt.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
