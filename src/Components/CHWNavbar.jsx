@@ -27,9 +27,9 @@ const CHWNavbar = ({ onMenuClick }) => {
 
   // Sample CHW data - replace with actual auth context
   const chw = {
-    name: 'John Doe',
-    email: 'john.doe@medilink.org',
-    avatar: 'JD',
+    name: 'Jane Kamau',
+    email: 'janekamau@medilink.org',
+    avatar: 'JK',
     role: 'Community Health Worker',
     employeeId: 'CHW-2023-001',
   };
@@ -123,7 +123,7 @@ const CHWNavbar = ({ onMenuClick }) => {
             {/* Welcome Message — desktop */}
             <div className="hidden md:block">
               <h2 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Welcome back, <span className="text-blue-600">{chw.name}</span>! 👋
+                Welcome back, <span className="text-blue-600">{chw.name}</span>
               </h2>
             </div>
           </div>

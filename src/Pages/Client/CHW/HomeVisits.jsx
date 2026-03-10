@@ -13,7 +13,9 @@ import {
   Filter,
   Plus,
   X,
-  Map
+  Map,
+  FileText,
+  Save
 } from 'lucide-react';
 
 const HomeVisits = () => {
@@ -21,6 +23,74 @@ const HomeVisits = () => {
   const [showMap, setShowMap] = useState(false);
   const [completeModal, setCompleteModal] = useState({ open: false, visit: null, outcome: '' });
   const [rescheduleModal, setRescheduleModal] = useState({ open: false, visit: null, date: '', time: '' });
+
+  const emptyScheduleForm = {
+    patientName: '',
+    patientId: '',
+    phone: '',
+    date: '',
+    time: '',
+    location: '',
+    type: '',
+    priority: 'normal',
+    notes: ''
+  };
+  const [scheduleModal, setScheduleModal] = useState({ open: false });
+  const [scheduleForm, setScheduleForm] = useState(emptyScheduleForm);
+  const [scheduleErrors, setScheduleErrors] = useState({});
+
+  const openScheduleModal = () => {
+    setScheduleForm(emptyScheduleForm);
+    setScheduleErrors({});
+    setScheduleModal({ open: true });
+  };
+
+  const handleScheduleChange = (e) => {
+    const { name, value } = e.target;
+    setScheduleForm(prev => ({ ...prev, [name]: value }));
+    if (scheduleErrors[name]) setScheduleErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const validateSchedule = () => {
+    const errs = {};
+    if (!scheduleForm.patientName.trim()) errs.patientName = 'Patient name is required';
+    if (!scheduleForm.patientId.trim()) errs.patientId = 'Patient ID is required';
+    if (!scheduleForm.phone.trim()) errs.phone = 'Phone number is required';
+    if (!scheduleForm.date) errs.date = 'Date is required';
+    if (!scheduleForm.time) errs.time = 'Time is required';
+    if (!scheduleForm.location.trim()) errs.location = 'Location is required';
+    if (!scheduleForm.type) errs.type = 'Visit type is required';
+    return errs;
+  };
+
+  const handleScheduleSubmit = (e) => {
+    e.preventDefault();
+    const errs = validateSchedule();
+    if (Object.keys(errs).length > 0) { setScheduleErrors(errs); return; }
+    const [h, m] = scheduleForm.time.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedTime = `${hour % 12 || 12}:${m} ${ampm}`;
+    setVisits(prev => ({
+      ...prev,
+      upcoming: [
+        ...prev.upcoming,
+        {
+          id: Date.now(),
+          patientName: scheduleForm.patientName.trim(),
+          patientId: scheduleForm.patientId.trim(),
+          phone: scheduleForm.phone.trim(),
+          date: scheduleForm.date,
+          time: formattedTime,
+          location: scheduleForm.location.trim(),
+          type: scheduleForm.type,
+          priority: scheduleForm.priority,
+          notes: scheduleForm.notes.trim()
+        }
+      ]
+    }));
+    setScheduleModal({ open: false });
+  };
 
   const [visits, setVisits] = useState({
     upcoming: [
@@ -202,7 +272,10 @@ const HomeVisits = () => {
             <Map className="w-4 h-4 text-blue-600" />
             <span className="hidden sm:inline">Coverage Map</span>
           </button>
-          <button className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-md text-sm sm:text-base">
+          <button
+            onClick={openScheduleModal}
+            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-md text-sm sm:text-base"
+          >
             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Schedule Visit</span>
           </button>
@@ -649,6 +722,249 @@ const HomeVisits = () => {
             ))}
           </div>
         </>
+      )}
+
+      {/* ── Schedule Visit Modal ── */}
+      {scheduleModal.open && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur flex items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white shadow-2xl max-w-2xl w-full h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl">
+
+            {/* Header */}
+            <div className="bg-blue-950 border-b border-gray-200 text-white px-4 py-4 sm:px-8 sm:py-5 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg flex-shrink-0">
+                  <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold">Schedule a Visit</h2>
+                  <p className="text-xs sm:text-sm">Fill in the details to add a new home visit</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScheduleModal({ open: false })}
+                className="font-bold hover:text-blue-600 hover:bg-blue-300 rounded-full transition-colors"
+              >
+                <X className="w-8 h-8" />
+              </button>
+            </div>
+
+            {/* Form Content — Scrollable */}
+            <div className="flex-1 overflow-y-auto">
+              <form onSubmit={handleScheduleSubmit} noValidate className="p-4 sm:p-8 space-y-6">
+
+                {/* Section: Patient Details */}
+                <div>
+                  <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5" /> Patient Details
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Patient Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="patientName"
+                        value={scheduleForm.patientName}
+                        onChange={handleScheduleChange}
+                        placeholder="Enter patient name"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
+                          scheduleErrors.patientName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {scheduleErrors.patientName && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.patientName}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Patient ID <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="patientId"
+                        value={scheduleForm.patientId}
+                        onChange={handleScheduleChange}
+                        placeholder="e.g. PT-2024-001"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
+                          scheduleErrors.patientId ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {scheduleErrors.patientId && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.patientId}</p>}
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Phone Number <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={scheduleForm.phone}
+                        onChange={handleScheduleChange}
+                        placeholder="+254 7XX XXX XXX"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
+                          scheduleErrors.phone ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {scheduleErrors.phone && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.phone}</p>}
+                    </div>
+                  </div>
+                </div>
+
+                <hr className="border-gray-200" />
+
+                {/* Section: Visit Schedule */}
+                <div>
+                  <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" /> Visit Schedule
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        name="date"
+                        value={scheduleForm.date}
+                        onChange={handleScheduleChange}
+                        min={new Date().toISOString().split('T')[0]}
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
+                          scheduleErrors.date ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {scheduleErrors.date && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.date}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Time <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="time"
+                        name="time"
+                        value={scheduleForm.time}
+                        onChange={handleScheduleChange}
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
+                          scheduleErrors.time ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {scheduleErrors.time && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.time}</p>}
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Location / Address <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          name="location"
+                          value={scheduleForm.location}
+                          onChange={handleScheduleChange}
+                          placeholder="e.g. Kibera, Plot 45 or Machakos Town, House 12"
+                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
+                            scheduleErrors.location ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                      </div>
+                      {scheduleErrors.location && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.location}</p>}
+                    </div>
+                  </div>
+                </div>
+
+                <hr className="border-gray-200" />
+
+                {/* Section: Visit Details */}
+                <div>
+                  <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5" /> Visit Details
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Visit Type <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="type"
+                        value={scheduleForm.type}
+                        onChange={handleScheduleChange}
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
+                          scheduleErrors.type ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      >
+                        <option value="">Select visit type</option>
+                        <option value="Follow-up Visit">Follow-up Visit</option>
+                        <option value="Initial Assessment">Initial Assessment</option>
+                        <option value="Prenatal Checkup">Prenatal Checkup</option>
+                        <option value="Postnatal Checkup">Postnatal Checkup</option>
+                        <option value="Medication Review">Medication Review</option>
+                        <option value="Nutrition Assessment">Nutrition Assessment</option>
+                        <option value="Mental Health Check">Mental Health Check</option>
+                        <option value="Chronic Disease Management">Chronic Disease Management</option>
+                        <option value="Emergency Visit">Emergency Visit</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      {scheduleErrors.type && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.type}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Priority</label>
+                      <div className="flex items-center gap-2 h-[50px]">
+                        {[
+                          { value: 'normal', label: 'Normal', active: 'bg-blue-600 text-white border-blue-600', idle: 'border-gray-300 text-gray-600 hover:border-blue-400' },
+                          { value: 'high',   label: 'High',   active: 'bg-blue-600 text-white border-blue-600', idle: 'border-gray-300 text-gray-600 hover:border-blue-400' },
+                          { value: 'urgent', label: 'Urgent', active: 'bg-blue-600 text-white border-blue-600',    idle: 'border-gray-300 text-gray-600 hover:border-blue-400' }
+                        ].map(opt => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setScheduleForm(prev => ({ ...prev, priority: opt.value }))}
+                            className={`flex-1 h-full border-2 rounded-xl text-sm font-semibold transition-colors ${
+                              scheduleForm.priority === opt.value ? opt.active : opt.idle
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Notes / Instructions</label>
+                      <textarea
+                        name="notes"
+                        rows={3}
+                        value={scheduleForm.notes}
+                        onChange={handleScheduleChange}
+                        placeholder="Any specific instructions or notes for this visit..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+
+            {/* Action Buttons — Fixed at Bottom */}
+            <div className="bg-gray-50 px-4 py-3 sm:px-8 sm:py-4 border-t border-gray-200 flex justify-between items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setScheduleModal({ open: false })}
+                className="px-6 py-2.5 border-2 border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-100 transition-colors flex items-center space-x-2"
+              >
+                <X className="w-4 h-4" />
+                <span>Cancel</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleScheduleSubmit}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
+              >
+                <Save className="w-4 h-4" />
+                <span>Schedule Visit</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
       )}
 
       {/* Complete Visit Modal */}
