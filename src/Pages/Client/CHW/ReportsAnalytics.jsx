@@ -3,7 +3,6 @@ import {
   TrendingUp,
   Users,
   Calendar,
-  Activity,
   Download,
   Filter,
   BarChart3,
@@ -12,10 +11,12 @@ import {
   FileText,
   CheckCircle,
   Clock,
-  AlertCircle
+  AlertCircle,
+  TrendingDown
 } from 'lucide-react';
 import {
-  LineChart as RechartsLineChart,
+  ComposedChart,
+  Area,
   Line,
   BarChart as RechartsBarChart,
   Bar,
@@ -24,7 +25,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Cell
 } from 'recharts';
 
 const ReportsAnalytics = () => {
@@ -133,266 +135,319 @@ const ReportsAnalytics = () => {
     { id: 'year', label: 'This Year' }
   ];
 
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'Performance':
-        return 'text-blue-800';
-      case 'Outcomes':
-        return 'text-green-800';
-      case 'Activity':
-        return 'text-purple-800';
-      case 'Assessment':
-        return 'text-yellow-800';
-      default:
-        return 'text-gray-800';
-    }
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Reports & Analytics</h1>
-          <p className="mt-2">
-            Track performance and analyze patient care data
-          </p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Reports &amp; Analytics</h1>
+          <p className="mt-1 text-sm text-gray-500">Track performance and analyze patient care data</p>
         </div>
-        <button className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-md">
-          <Download className="w-5 h-5" />
+        <button className="self-start sm:self-auto flex items-center gap-2 px-4 sm:px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors shadow-md text-sm">
+          <Download className="w-4 h-4" />
           <span>Export Report</span>
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="border-b border-gray-200">
-        <div className="flex space-x-8 overflow-x-auto">
-          <div className="flex items-center space-x-3">
-            <span className="text-sm font-semibold text-gray-700">Period:</span>
-            <div className="flex space-x-2">
-              {periods.map((period) => (
-                <button
-                  key={period.id}
-                  onClick={() => setSelectedPeriod(period.id)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                    selectedPeriod === period.id
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  {period.label}
-                </button>
-              ))}
-            </div>
+      {/* Period filter + Custom Filter */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-2 sm:px-4 py-1">
+        <div className="flex items-center gap-1 sm:gap-4">
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap shrink-0">Period:</span>
+          <div className="flex flex-1">
+            {periods.map((period) => (
+              <button
+                key={period.id}
+                onClick={() => setSelectedPeriod(period.id)}
+                className={`flex-1 py-3.5 px-1 sm:px-3 border-b-2 font-medium text-xs sm:text-sm text-center transition-colors ${
+                  selectedPeriod === period.id
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <span className="sm:hidden">{period.label.replace('This ', '')}</span>
+                <span className="hidden sm:inline">{period.label}</span>
+              </button>
+            ))}
           </div>
-          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <Filter className="w-5 h-5" />
-            <span>Custom Filter</span>
-          </button>
+          <div className="shrink-0">
+            <button className="flex items-center gap-2 px-2 sm:px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-gray-600 font-medium transition-colors">
+              <Filter className="w-4 h-4" />
+              <span className="hidden sm:inline">Custom Filter</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div key={stat.label} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
               <div className="flex items-center justify-between mb-3">
-                <Icon className={`w-8 h-8 text-${stat.color}-600`} />
-                <span className={`flex items-center text-sm font-semibold ${
+                <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 text-blue-600" />
+                </div>
+                <span className={`flex items-center gap-0.5 text-xs font-semibold ${
                   stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
                 }`}>
-                  {stat.trend === 'up' ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingUp className="w-4 h-4 mr-1 transform rotate-180" />}
+                  {stat.trend === 'up'
+                    ? <TrendingUp className="w-3.5 h-3.5" />
+                    : <TrendingDown className="w-3.5 h-3.5" />}
                   {stat.change}
                 </span>
               </div>
-              <p className={`text-3xl font-bold text-${stat.color}-600 mb-1`}>{stat.value}</p>
-              <p className="">{stat.label}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600 mb-0.5">{stat.value}</p>
+              <p className="text-xs sm:text-sm text-gray-500 leading-snug">{stat.label}</p>
             </div>
           );
         })}
       </div>
 
       {/* Report Type Tabs */}
-      <div className="border-b border-gray-200">
-        <div className="flex space-x-8 overflow-x-auto">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div className="flex w-full">
           {reportTypes.map((type) => {
             const Icon = type.icon;
             return (
               <button
                 key={type.id}
                 onClick={() => setSelectedReportType(type.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap  ${
+                className={`flex flex-1 items-center justify-center gap-1.5 py-3 px-2 sm:px-5 border-b-2 font-medium text-xs sm:text-sm transition-colors ${
                   selectedReportType === type.id
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <Icon className="w-5 h-5" />
-                <span>{type.label}</span>
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="hidden sm:inline">{type.label}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Charts and Visualizations */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Visit Trends Chart - Line Chart */}
-        <div className="bg-white shadow-md p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Visit & Assessment Trends</h2>
-            <LineChart className="w-6 h-6 text-blue-600" />
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        {/* Visit Trends — Area Chart */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Visit &amp; Assessment Trends</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Jan – Jun activity overview</p>
+            </div>
+            <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+              <LineChart className="w-5 h-5 text-blue-600" />
+            </div>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <RechartsLineChart data={visitStats}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis 
-                dataKey="month" 
-                tick={{ fill: '#6b7280', fontSize: 12 }}
-                tickLine={{ stroke: '#e5e7eb' }}
+          <ResponsiveContainer width="100%" height={260}>
+            <ComposedChart data={visitStats} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gradVisitsDark" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.55} />
+                  <stop offset="60%" stopColor="#1d4ed8" stopOpacity={0.18} />
+                  <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="4 4" stroke="#e8edf5" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
+                tickLine={false}
+                axisLine={{ stroke: '#e2e8f0' }}
               />
-              <YAxis 
-                tick={{ fill: '#6b7280', fontSize: 12 }}
-                tickLine={{ stroke: '#e5e7eb' }}
+              <YAxis
+                tick={{ fill: '#94a3b8', fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                domain={[0, 100]}
+                ticks={[0, 25, 50, 75, 100]}
               />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#fff', 
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '12px'
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#0f172a',
+                  border: 'none',
+                  borderRadius: '12px',
+                  boxShadow: '0 8px 24px -4px rgb(0 0 0 / 0.35)',
+                  fontSize: '12px',
+                  padding: '10px 14px'
                 }}
+                labelStyle={{ fontWeight: 700, color: '#e2e8f0', marginBottom: 4 }}
+                itemStyle={{ color: '#94a3b8' }}
+                cursor={{ stroke: '#334155', strokeWidth: 1, strokeDasharray: '4 4' }}
               />
-              <Legend 
-                wrapperStyle={{ fontSize: '14px', paddingTop: '10px' }}
+              <Legend
+                wrapperStyle={{ fontSize: '12px', paddingTop: '16px' }}
+                iconType="circle"
+                iconSize={8}
               />
-              <Line 
-                type="monotone" 
-                dataKey="visits" 
-                stroke="#2563eb" 
-                strokeWidth={3}
-                dot={{ fill: '#2563eb', r: 5 }}
-                activeDot={{ r: 7 }}
+              {/* Visits — dark blue filled area */}
+              <Area
+                type="monotone"
+                dataKey="visits"
+                stroke="#1d4ed8"
+                strokeWidth={2.5}
+                fill="url(#gradVisitsDark)"
+                dot={{ fill: '#1e3a8a', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 7, stroke: '#1d4ed8', strokeWidth: 2.5, fill: '#fff' }}
                 name="Visits"
               />
-              <Line 
-                type="monotone" 
-                dataKey="assessments" 
-                stroke="#9333ea" 
-                strokeWidth={3}
-                dot={{ fill: '#9333ea', r: 5 }}
-                activeDot={{ r: 7 }}
+              {/* Assessments — light sky-blue dashed line, no fill */}
+              <Line
+                type="monotone"
+                dataKey="assessments"
+                stroke="#38bdf8"
+                strokeWidth={2.5}
+                strokeDasharray="7 4"
+                dot={{ fill: '#38bdf8', r: 5, strokeWidth: 0 }}
+                activeDot={{ r: 7, stroke: '#38bdf8', strokeWidth: 2.5, fill: '#fff' }}
                 name="Assessments"
               />
-            </RechartsLineChart>
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Patient Categories Chart - Bar Chart */}
-        <div className="bg-white shadow-md p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Patient Categories</h2>
-            <PieChart className="w-6 h-6 text-blue-600" />
+        {/* Patient Categories — Horizontal Bar */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Patient Categories</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Distribution by condition</p>
+            </div>
+            <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+              <PieChart className="w-5 h-5 text-blue-600" />
+            </div>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <RechartsBarChart data={patientCategories} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis 
-                type="number" 
-                tick={{ fill: '#6b7280', fontSize: 12 }}
-                tickLine={{ stroke: '#e5e7eb' }}
-              />
-              <YAxis 
-                type="category" 
-                dataKey="category" 
-                tick={{ fill: '#6b7280', fontSize: 12 }}
-                tickLine={{ stroke: '#e5e7eb' }}
-                width={120}
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#fff', 
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '12px'
+          <ResponsiveContainer width="100%" height={260}>
+            <RechartsBarChart data={patientCategories} layout="vertical"
+              margin={{ top: 0, right: 16, left: 0, bottom: 0 }} barCategoryGap="28%">
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" horizontal={false} />
+              <XAxis type="number" tick={{ fill: '#9ca3af', fontSize: 11 }} tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }} domain={[0, 60]} ticks={[0, 15, 30, 45, 60]} />
+              <YAxis type="category" dataKey="category"
+                tick={{ fill: '#374151', fontSize: 11, fontWeight: 500 }}
+                tickLine={false} axisLine={false} width={110} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#fff', border: '1px solid #e5e7eb',
+                  borderRadius: '12px', boxShadow: '0 4px 12px -2px rgb(0 0 0 / 0.08)',
+                  fontSize: '12px', padding: '10px 14px'
                 }}
-                formatter={(value, name) => {
-                  if (name === 'count') return [`${value} patients`, 'Patients'];
-                  if (name === 'percentage') return [`${value}%`, 'Percentage'];
-                  return [value, name];
-                }}
+                cursor={{ fill: '#f9fafb' }}
+                formatter={(value) => [`${value} patients`, 'Patients']}
               />
-              <Legend 
-                wrapperStyle={{ fontSize: '14px', paddingTop: '10px' }}
-              />
-              <Bar 
-                dataKey="count" 
-                fill="#2563eb" 
-                radius={[0, 8, 8, 0]}
-                name="Patients"
-              />
+              <Bar dataKey="count" radius={[0, 8, 8, 0]} name="Patients" maxBarSize={20}>
+                {patientCategories.map((_, i) => (
+                  <Cell key={`cell-${i}`}
+                    fill={['#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd'][i]} />
+                ))}
+              </Bar>
             </RechartsBarChart>
           </ResponsiveContainer>
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-700">Total Active Patients</span>
-              <span className="text-2xl font-bold text-blue-600">142</span>
-            </div>
+          <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+            <span className="text-sm font-semibold text-gray-700">Total Active Patients</span>
+            <span className="text-2xl font-bold text-blue-600">142</span>
           </div>
         </div>
       </div>
 
-      {/* Performance Metrics */}
-      
-
       {/* Recent Reports */}
-      <div className="bg-white shadow-md p-6">
-        <h2 className="text-xl font-bold mb-6">Recent Reports</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {recentReports.map((report) => (
-            <div
-              key={report.id}
-              className="flex flex-col p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors max-w-md"
-            >
-              <div className="flex items-start space-x-3 mb-3">
-                <div className="p-2 flex-shrink-0">
-                  <FileText className="w-5 h-5 text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-gray-900 truncate">{report.title}</h3>
-                  <div className="flex flex-col space-y-1 mt-1">
-                    <span className="text-xs text-gray-600">{report.period}</span>
-                    <span className="text-xs text-gray-600">Generated: {new Date(report.generated).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full self-start ${getTypeColor(report.type)}`}>
-                      {report.type}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
+          <h2 className="text-base sm:text-lg font-bold text-gray-900">Recent Reports</h2>
+        </div>
+
+        {/* TABLE — large screens */}
+        <div className="hidden lg:block overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-100">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Report</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Period</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Generated</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {recentReports.map((report) => (
+                <tr key={report.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <span className="font-semibold text-gray-800">{report.title}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{report.period}</td>
+                  <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                    {new Date(report.generated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                      report.type === 'Performance' ? 'bg-blue-50 text-blue-700' :
+                      report.type === 'Outcomes'    ? 'bg-green-50 text-green-700' :
+                      report.type === 'Activity'    ? 'bg-purple-50 text-purple-700' :
+                                                      'bg-amber-50 text-amber-700'
+                    }`}>{report.type}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="flex items-center gap-1 text-xs font-semibold text-green-600">
+                      <CheckCircle className="w-3.5 h-3.5" />{report.status}
                     </span>
-                  </div>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <button className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-xs font-medium transition-colors">
+                      <Download className="w-3.5 h-3.5" /><span>Download</span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* CARDS — small/medium screens */}
+        <div className="lg:hidden divide-y divide-gray-100">
+          {recentReports.map((report) => (
+            <div key={report.id} className="flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors">
+              <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                <FileText className="w-4 h-4 text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-800 truncate">{report.title}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{report.period} &middot; Generated {new Date(report.generated).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    report.type === 'Performance' ? 'bg-blue-50 text-blue-700' :
+                    report.type === 'Outcomes'    ? 'bg-green-50 text-green-700' :
+                    report.type === 'Activity'    ? 'bg-purple-50 text-purple-700' :
+                                                    'bg-amber-50 text-amber-700'
+                  }`}>{report.type}</span>
+                  <span className="flex items-center gap-1 text-xs font-semibold text-green-600">
+                    <CheckCircle className="w-3 h-3" />{report.status}
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-3">
-                <span className="text-xs font-semibold text-green-600">{report.status}</span>
-                <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
-                  <Download className="w-3 h-3" />
-                  <span>Download</span>
-                </button>
-              </div>
+              <button className="shrink-0 self-center flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 rounded-lg text-xs font-medium text-gray-700 transition-colors">
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Download</span>
+              </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Generate New Report */}
-      <div className="shadow-md p-8">
-        <div className="flex items-center justify-between">
+      {/* Generate Custom Report */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Generate Custom Report</h2>
-            <p className="">
-              Create detailed reports with custom date ranges and specific metrics
-            </p>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">Generate Custom Report</h2>
+            <p className="text-sm text-gray-500">Create detailed reports with custom date ranges and specific metrics</p>
           </div>
-          <button className="px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-semibold transition-colors shadow-md">
+          <button className="self-start sm:self-auto px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 rounded-xl font-semibold transition-colors shadow-md text-sm whitespace-nowrap">
             Create Report
           </button>
         </div>
