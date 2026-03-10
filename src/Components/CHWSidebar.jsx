@@ -49,12 +49,12 @@ const sidebarLinks = [
   //   label: 'Health Assessments',
   //   icon: <Activity className="w-5 h-5 mr-3" />,
   // },
-  {
-    to: '/client/chw/messages',
-    label: 'Messages',
-    icon: <MessageSquare className="w-5 h-5 mr-3" />,
-    // badge: 4,
-  },
+  // {
+  //   to: '/client/chw/messages',
+  //   label: 'Messages',
+  //   icon: <MessageSquare className="w-5 h-5 mr-3" />,
+  // },
+
   {
     to: '/client/chw/reports',
     label: 'Reports & Analytics',
