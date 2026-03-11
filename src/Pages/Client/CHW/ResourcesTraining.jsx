@@ -214,7 +214,7 @@ const ResourcesTraining = () => {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
+            <div key={stat.label} className="bg-white shadow-sm p-4 sm:p-6 border border-gray-200">
               <Icon className={`w-6 h-6 sm:w-8 sm:h-8 text-${stat.color}-600 mb-2`} />
               <p className={`text-2xl sm:text-3xl font-bold text-${stat.color}-600 mb-1`}>{stat.value}</p>
               <p className="text-xs sm:text-sm text-gray-600">{stat.label}</p>
@@ -224,9 +224,9 @@ const ResourcesTraining = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1">
+      <div className="p-4 bg-white">
+        <div className="flex items-left gap-3">
+          <div className="relative flex items-center w-full max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -244,7 +244,7 @@ const ResourcesTraining = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto scrollbar-hide">
+      <div className="bg-white overflow-x-auto scrollbar-hide">
         <div className="flex min-w-max">
           {tabs.map((tab) => (
             <button
@@ -253,7 +253,7 @@ const ResourcesTraining = () => {
               className={`flex items-center gap-1 py-2.5 px-3 sm:px-5 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
                 activeTab === tab.id
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
+                  : 'border-transparent text-gray-800 hover:text-gray-900 hover:border-gray-300'
               }`}
             >
               <span className="sm:hidden">
@@ -274,7 +274,7 @@ const ResourcesTraining = () => {
       {activeTab === 'courses' && (
         <>
           {/* Table — large screens */}
-          <div className="hidden lg:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 shadow-sm overflow-x-auto">
             <table className="w-full min-w-[900px]">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -297,7 +297,7 @@ const ResourcesTraining = () => {
                       <p className="font-semibold text-gray-900 text-sm truncate">{course.title}</p>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="text-xs text-gray-500">{course.instructor}</span>
+                      <span className="text-sm text-gray-800">{course.instructor}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(course.category)}`}>
@@ -441,16 +441,16 @@ const ResourcesTraining = () => {
       {activeTab === 'resources' && (
         <>
           {/* Table — large screens */}
-          <div className="hidden lg:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 shadow-sm overflow-x-auto">
             <table className="w-full min-w-[640px]">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Resource</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Category</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Type</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Size</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Downloads</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Action</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Resource</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Category</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Type</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Size</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Downloads</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -540,7 +540,7 @@ const ResourcesTraining = () => {
       {activeTab === 'certificates' && (
         <>
           {/* Table — large screens */}
-          <div className="hidden lg:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 shadow-sm overflow-x-auto">
             <table className="w-full min-w-[640px]">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
