@@ -202,65 +202,66 @@ const ResourcesTraining = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Resources & Training</h1>
-          <p className="mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold">Resources &amp; Training</h1>
+          <p className="mt-1 text-sm sm:text-base text-gray-500">
             Access training materials and professional resources
           </p>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <Icon className={`w-8 h-8 text-${stat.color}-600`} />
-              </div>
-              <p className={`text-3xl font-bold text-${stat.color}-600 mb-1`}>{stat.value}</p>
-              <p className="">{stat.label}</p>
+            <div key={stat.label} className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-200">
+              <Icon className={`w-6 h-6 sm:w-8 sm:h-8 text-${stat.color}-600 mb-2`} />
+              <p className={`text-2xl sm:text-3xl font-bold text-${stat.color}-600 mb-1`}>{stat.value}</p>
+              <p className="text-xs sm:text-sm text-gray-600">{stat.label}</p>
             </div>
           );
         })}
       </div>
 
       {/* Search and Filter */}
-      <div className="p-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search courses and resources..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
-          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <Filter className="w-5 h-5" />
+          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-gray-700 whitespace-nowrap shrink-0">
+            <Filter className="w-4 h-4" />
             <span>Filter</span>
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <div className="flex space-x-8 overflow-x-auto">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto scrollbar-hide">
+        <div className="flex min-w-max">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              className={`flex items-center gap-1 py-2.5 px-3 sm:px-5 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
                 activeTab === tab.id
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
               }`}
             >
-              <span>{tab.label}</span>
-              <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                activeTab === tab.id ? 'bg-white/20' : 'bg-gray-200'
+              <span className="sm:hidden">
+                {tab.id === 'courses' ? 'Courses' : tab.id === 'certificates' ? 'Certs' : tab.label}
+              </span>
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-xs font-bold shrink-0 ${
+                activeTab === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
               }`}>
                 {tab.count}
               </span>
@@ -271,200 +272,358 @@ const ResourcesTraining = () => {
 
       {/* Training Courses */}
       {activeTab === 'courses' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {courses.map((course) => (
-            <div
-              key={course.id}
-              className="bg-white rounded-lg shadow-sm p-4 border-gray-200 hover:shadow-md transition-shadow max-w-md"
-            >
-              <div className="flex flex-col mb-3">
-                <div className="flex-1">
-                  <div className="mb-2">
-                    <h3 className="font-bold mb-2">{course.title}</h3>
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      <span className={`px-2 py-0.5 rounded-full font-semibold ${getStatusColor(course.status)}`}>
-                        {course.status.replace('-', ' ')}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full font-semibold ${getCategoryColor(course.category)}`}>
+        <>
+          {/* Table — large screens */}
+          <div className="hidden lg:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+            <table className="w-full min-w-[900px]">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Course</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Instructor</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Category</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Duration</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Modules</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Enrolled</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Rating</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide w-36">Progress</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {courses.map((course) => (
+                  <tr key={course.id} className="hover:bg-gray-50 transition-colors align-middle">
+                    <td className="px-4 py-3 max-w-[200px]">
+                      <p className="font-semibold text-gray-900 text-sm truncate">{course.title}</p>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-xs text-gray-500">{course.instructor}</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(course.category)}`}>
                         {course.category}
                       </span>
-                    </div>
-                  </div>
-                  <p className="mb-3">{course.description}</p>
-
-                  <div className="space-y-1 mb-3">
-                    <div className="flex items-center text-xs">
-                      <Clock className="w-3 h-3 mr-1 text-blue-600" />
-                      <span>{course.duration}</span>
-                    </div>
-                    <div className="flex items-center text-gray-700 text-xs">
-                      <BookOpen className="w-3 h-3 mr-1 text-blue-600" />
-                      <span>{course.modules} modules</span>
-                    </div>
-                    <div className="flex items-center text-gray-700 text-xs">
-                      <Users className="w-3 h-3 mr-1 text-blue-600" />
-                      <span>{course.enrolled} enrolled</span>
-                    </div>
-                    <div className="flex items-center text-xs">
-                      <Star className="w-3 h-3 mr-1 text-blue-500 fill-blue-500" />
-                      <span className="font-semibold">{course.rating}</span>
-                    </div>
-                    <div className="">
-                      <p>By {course.instructor}</p>
-                    </div>
-                  </div>
-
-                  {course.progress > 0 && (
-                    <div className="mb-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-semibold text-gray-700">Progress</span>
-                        <span className="text-xs font-semibold text-blue-600">{course.progress}%</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(course.status)}`}>
+                        {course.status.replace('-', ' ')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center text-xs text-gray-700">
+                        <Clock className="w-3 h-3 mr-1 text-blue-600 shrink-0" />{course.duration}
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all"
-                          style={{ width: `${course.progress}%` }}
-                        ></div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center text-xs text-gray-700">
+                        <BookOpen className="w-3 h-3 mr-1 text-blue-600 shrink-0" />{course.modules}
                       </div>
-                    </div>
-                  )}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center text-xs text-gray-700">
+                        <Users className="w-3 h-3 mr-1 text-blue-600 shrink-0" />{course.enrolled}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 text-blue-500 fill-blue-500 shrink-0" />
+                        <span className="text-sm font-semibold text-gray-800">{course.rating}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 w-36">
+                      {course.progress > 0 ? (
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-xs font-semibold text-blue-600">{course.progress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${course.progress}%` }} />
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {course.status === 'completed' ? (
+                        <div className="flex gap-1.5">
+                          <button className="flex items-center gap-1 px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors">
+                            <Award className="w-3 h-3" /><span>Certificate</span>
+                          </button>
+                          <button className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                            <Play className="w-3 h-3" /><span>Review</span>
+                          </button>
+                        </div>
+                      ) : course.status === 'in-progress' ? (
+                        <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                          <Play className="w-3 h-3" /><span>Continue</span>
+                        </button>
+                      ) : (
+                        <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                          <Play className="w-3 h-3" /><span>Start</span>
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-                  <div className="flex flex-wrap gap-2">
-                    {course.status === 'completed' ? (
-                      <>
-                        <button className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors">
-                          <Award className="w-3 h-3" />
-                          <span>Certificate</span>
-                        </button>
-                        <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
-                          <Play className="w-3 h-3" />
-                          <span>Review</span>
-                        </button>
-                      </>
-                    ) : course.status === 'in-progress' ? (
-                      <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
-                        <Play className="w-3 h-3" />
-                        <span>Continue Learning</span>
-                      </button>
-                    ) : (
-                      <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
-                        <Play className="w-3 h-3" />
-                        <span>Start Course</span>
-                      </button>
-                    )}
+          {/* Cards — small / medium screens */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {courses.map((course) => (
+              <div key={course.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow">
+                <div className="flex flex-wrap gap-1 mb-2">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(course.status)}`}>
+                    {course.status.replace('-', ' ')}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(course.category)}`}>
+                    {course.category}
+                  </span>
+                </div>
+                <h3 className="font-bold text-gray-900 text-sm mb-1">{course.title}</h3>
+                <p className="text-xs text-gray-500 mb-3">{course.description}</p>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-3">
+                  <div className="flex items-center text-xs text-gray-700">
+                    <Clock className="w-3 h-3 mr-1 text-blue-600" />{course.duration}
+                  </div>
+                  <div className="flex items-center text-xs text-gray-700">
+                    <BookOpen className="w-3 h-3 mr-1 text-blue-600" />{course.modules} modules
+                  </div>
+                  <div className="flex items-center text-xs text-gray-700">
+                    <Users className="w-3 h-3 mr-1 text-blue-600" />{course.enrolled} enrolled
+                  </div>
+                  <div className="flex items-center text-xs text-gray-700">
+                    <Star className="w-3 h-3 mr-1 text-blue-500 fill-blue-500" />
+                    <span className="font-semibold">{course.rating}</span>
                   </div>
                 </div>
+                <p className="text-xs text-gray-400 mb-3">By {course.instructor}</p>
+                {course.progress > 0 && (
+                  <div className="mb-3">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs font-medium text-gray-600">Progress</span>
+                      <span className="text-xs font-semibold text-blue-600">{course.progress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                      <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${course.progress}%` }} />
+                    </div>
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  {course.status === 'completed' ? (
+                    <>
+                      <button className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors">
+                        <Award className="w-3 h-3" /><span>Certificate</span>
+                      </button>
+                      <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                        <Play className="w-3 h-3" /><span>Review</span>
+                      </button>
+                    </>
+                  ) : course.status === 'in-progress' ? (
+                    <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                      <Play className="w-3 h-3" /><span>Continue Learning</span>
+                    </button>
+                  ) : (
+                    <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                      <Play className="w-3 h-3" /><span>Start Course</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Resources */}
       {activeTab === 'resources' && (
-        <div className="bg-white shadow-md">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold">Resource</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">Category</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">Type</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">Size</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">Downloads</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {resources.map((resource) => (
-                <tr key={resource.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center space-x-3">
-                      {resource.type === 'Video' ? (
-                        <Video className="w-8 h-8 text-blue-600" />
-                      ) : (
-                        <FileText className="w-8 h-8 text-blue-600" />
-                      )}
-                      <div>
-                        <p className="font-semibold text-gray-900">{resource.title}</p>
-                        <p className="text-sm text-gray-500">Added {new Date(resource.date).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(resource.category)}`}>
-                      {resource.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-gray-700">{resource.type}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-gray-700">{resource.size}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-gray-700">{resource.downloads.toLocaleString()}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                      <Download className="w-4 h-4" />
-                      <span>Download</span>
-                    </button>
-                  </td>
+        <>
+          {/* Table — large screens */}
+          <div className="hidden lg:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Resource</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Category</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Type</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Size</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Downloads</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {resources.map((resource) => (
+                  <tr key={resource.id} className="hover:bg-gray-50 transition-colors align-middle">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        {resource.type === 'Video' ? (
+                          <Video className="w-5 h-5 text-blue-600 shrink-0" />
+                        ) : (
+                          <FileText className="w-5 h-5 text-blue-600 shrink-0" />
+                        )}
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{resource.title}</p>
+                          <p className="text-xs text-gray-400">Added {new Date(resource.date).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor(resource.category)}`}>
+                        {resource.category}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-sm text-gray-700">{resource.type}</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-sm text-gray-700">{resource.size}</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-sm text-gray-700">{resource.downloads.toLocaleString()}</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                        <Download className="w-3 h-3" /><span>Download</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Cards — small / medium screens */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {resources.map((resource) => (
+              <div key={resource.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                <div className="flex items-start gap-3 mb-3">
+                  {resource.type === 'Video' ? (
+                    <Video className="w-8 h-8 text-blue-600 shrink-0 mt-0.5" />
+                  ) : (
+                    <FileText className="w-8 h-8 text-blue-600 shrink-0 mt-0.5" />
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900 text-sm">{resource.title}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Added {new Date(resource.date).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-3 text-xs">
+                  <div>
+                    <p className="text-gray-500">Category</p>
+                    <span className={`font-semibold ${getCategoryColor(resource.category)}`}>{resource.category}</span>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Type</p>
+                    <p className="font-semibold text-gray-800">{resource.type}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Size</p>
+                    <p className="font-semibold text-gray-800">{resource.size}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Downloads</p>
+                    <p className="font-semibold text-gray-800">{resource.downloads.toLocaleString()}</p>
+                  </div>
+                </div>
+                <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                  <Download className="w-3 h-3" /><span>Download</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Certificates */}
       {activeTab === 'certificates' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {certifications.map((cert) => (
-            <div
-              key={cert.id}
-              className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 max-w-md"
-            >
-              <div className="flex flex-col">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Award className="w-6 h-6 text-blue-600" />
-                    <h3 className="text-base font-bold text-gray-900">{cert.title}</h3>
-                  </div>
-                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold text-blue-800 mb-3">
-                    Active
-                  </span>
+        <>
+          {/* Table — large screens */}
+          <div className="hidden lg:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Certificate</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Issue Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Expiry Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Credential ID</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {certifications.map((cert) => (
+                  <tr key={cert.id} className="hover:bg-gray-50 transition-colors align-middle">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Award className="w-5 h-5 text-blue-600 shrink-0" />
+                        <span className="font-semibold text-gray-900 text-sm">{cert.title}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold text-blue-800 bg-blue-50">Active</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-sm text-gray-700">{new Date(cert.issueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-sm text-gray-700">{new Date(cert.expiryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-xs font-mono text-gray-600">{cert.credentialId}</span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex gap-1.5">
+                        <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                          <Download className="w-3 h-3" /><span>Download</span>
+                        </button>
+                        <button className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                          <FileText className="w-3 h-3" /><span>Verify</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-                  <div className="space-y-2 mb-3">
-                    <div>
-                      <p className="text-xs text-gray-600">Issue Date</p>
-                      <p className="text-sm font-semibold text-gray-900">{new Date(cert.issueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600">Expiry Date</p>
-                      <p className="text-sm font-semibold text-gray-900">{new Date(cert.expiryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600">Credential ID</p>
-                      <p className="text-sm font-semibold text-gray-900">{cert.credentialId}</p>
-                    </div>
+          {/* Cards — small / medium screens */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {certifications.map((cert) => (
+              <div key={cert.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Award className="w-5 h-5 text-blue-600 shrink-0" />
+                  <h3 className="font-bold text-gray-900 text-sm">{cert.title}</h3>
+                </div>
+                <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold text-blue-800 bg-blue-50 mb-3">Active</span>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Issue Date</p>
+                    <p className="text-sm font-semibold text-gray-900">{new Date(cert.issueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                   </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
-                      <Download className="w-3 h-3" />
-                      <span>Download</span>
-                    </button>
-                    <button className="flex items-center space-x-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
-                      <FileText className="w-3 h-3" />
-                      <span>Verify</span>
-                    </button>
+                  <div>
+                    <p className="text-xs text-gray-500">Expiry Date</p>
+                    <p className="text-sm font-semibold text-gray-900">{new Date(cert.expiryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-gray-500">Credential ID</p>
+                    <p className="text-xs font-mono font-semibold text-gray-900">{cert.credentialId}</p>
                   </div>
                 </div>
+                <div className="flex gap-2">
+                  <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                    <Download className="w-3 h-3" /><span>Download</span>
+                  </button>
+                  <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                    <FileText className="w-3 h-3" /><span>Verify</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
