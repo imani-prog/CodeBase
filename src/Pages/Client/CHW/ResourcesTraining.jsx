@@ -14,13 +14,14 @@ import {
   Users,
   TrendingUp
 } from 'lucide-react';
+import ConfirmationModal from '../../../Components/Admin/ConfirmationModal';
 
 const ResourcesTraining = () => {
   const [activeTab, setActiveTab] = useState('courses');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Sample training courses
-  const courses = [
+  const [courses, setCourses] = useState(() => [
     {
       id: 1,
       title: 'Community Health Worker Fundamentals',
@@ -73,10 +74,10 @@ const ResourcesTraining = () => {
       enrolled: 412,
       status: 'in-progress'
     }
-  ];
+  ]);
 
   // Sample resources
-  const resources = [
+  const [resources] = useState([
     {
       id: 1,
       title: 'WHO Community Health Worker Guidelines',
@@ -122,10 +123,10 @@ const ResourcesTraining = () => {
       downloads: 765,
       date: '2024-10-05'
     }
-  ];
+  ]);
 
   // Sample certifications
-  const certifications = [
+  const [certifications, setCertifications] = useState([
     {
       id: 1,
       title: 'Community Health Worker Certification',
@@ -150,13 +151,29 @@ const ResourcesTraining = () => {
       status: 'active',
       credentialId: 'MHS-2023-009012'
     }
-  ];
+  ]);
+
+  const [showActionModal, setShowActionModal] = useState(false);
+  const [actionModalConfig, setActionModalConfig] = useState({
+    title: '',
+    message: '',
+    type: 'warning',
+    onConfirm: null
+  });
+
+  const completedCourses = courses.filter((course) => course.status === 'completed').length;
+  const inProgressCourses = courses.filter((course) => course.status === 'in-progress').length;
+  const learningHours = courses.reduce((total, course) => {
+    const match = course.duration?.match(/(\d+)/);
+    if (!match) return total;
+    return total + parseInt(match[1], 10);
+  }, 0);
 
   const stats = [
-    { label: 'Courses Completed', value: '8', color: 'blue', icon: CheckCircle },
-    { label: 'In Progress', value: '3', color: 'blue', icon: Clock },
-    { label: 'Certificates Earned', value: '5', color: 'blue', icon: Award },
-    { label: 'Learning Hours', value: '42', color: 'blue', icon: TrendingUp }
+    { label: 'Courses Completed', value: completedCourses.toString(), color: 'blue', icon: CheckCircle },
+    { label: 'In Progress', value: inProgressCourses.toString(), color: 'blue', icon: Clock },
+    { label: 'Certificates Earned', value: certifications.length.toString(), color: 'blue', icon: Award },
+    { label: 'Learning Hours', value: learningHours.toString(), color: 'blue', icon: TrendingUp }
   ];
 
   const tabs = [
@@ -164,6 +181,98 @@ const ResourcesTraining = () => {
     { id: 'resources', label: 'Resources', count: resources.length },
     { id: 'certificates', label: 'My Certificates', count: certifications.length }
   ];
+
+  const openActionModal = ({ title, message, type = 'warning', onConfirm }) => {
+    setActionModalConfig({ title, message, type, onConfirm });
+    setShowActionModal(true);
+  };
+
+  const handleStartCourse = (course) => {
+    openActionModal({
+      title: 'Start Course',
+      message: `Start "${course.title}" and begin tracking your progress?`,
+      type: 'success',
+      onConfirm: () => {
+        setCourses((prevCourses) =>
+          prevCourses.map((item) =>
+            item.id === course.id
+              ? {
+                  ...item,
+                  status: 'in-progress',
+                  progress: item.progress && item.progress > 0 ? item.progress : 5
+                }
+              : item
+          )
+        );
+      }
+    });
+  };
+
+  const handleContinueCourse = (course) => {
+    const nextProgress = Math.min(100, (course.progress || 0) + 25);
+    const willComplete = nextProgress >= 100;
+
+    openActionModal({
+      title: willComplete ? 'Complete Course' : 'Continue Course',
+      message: willComplete
+        ? `Mark "${course.title}" as completed? This will update your certificates.`
+        : `Continue learning "${course.title}"? Your progress will be updated to ${nextProgress}%.`,
+      type: 'success',
+      onConfirm: () => {
+        setCourses((prevCourses) =>
+          prevCourses.map((item) =>
+            item.id === course.id
+              ? {
+                  ...item,
+                  status: willComplete ? 'completed' : 'in-progress',
+                  progress: nextProgress
+                }
+              : item
+          )
+        );
+
+        if (willComplete) {
+          setCertifications((prevCertifications) => {
+            const exists = prevCertifications.some((cert) => cert.title === course.title);
+            if (exists) return prevCertifications;
+
+            const issueDate = new Date();
+            const expiryDate = new Date(issueDate);
+            expiryDate.setFullYear(issueDate.getFullYear() + 2);
+
+            const newCertification = {
+              id: prevCertifications.length + 1,
+              title: course.title,
+              issueDate: issueDate.toISOString().slice(0, 10),
+              expiryDate: expiryDate.toISOString().slice(0, 10),
+              status: 'active',
+              credentialId: `CHW-${issueDate.getFullYear()}-${String(prevCertifications.length + 1).padStart(4, '0')}`
+            };
+
+            return [...prevCertifications, newCertification];
+          });
+        }
+      }
+    });
+  };
+
+  const handleViewCertificate = (course) => {
+    openActionModal({
+      title: 'View Certificate',
+      message:
+        `Your certificate for "${course.title}" is available under the "My Certificates" tab. You can download or verify it from there.`,
+      type: 'success'
+    });
+  };
+
+  const handleReviewCourse = (course) => {
+    openActionModal({
+      title: 'Review Course',
+      message:
+        `Course review for "${course.title}" will open in a dedicated learning view in a future update. Your completion status and certificates are already tracked here.`,
+      type: 'warning'
+    });
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -347,19 +456,31 @@ const ResourcesTraining = () => {
                     <td className="px-4 py-3 whitespace-nowrap">
                       {course.status === 'completed' ? (
                         <div className="flex gap-1.5">
-                          <button className="flex items-center gap-1 px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors">
+                          <button
+                            onClick={() => handleViewCertificate(course)}
+                            className="flex items-center gap-1 px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors"
+                          >
                             <Award className="w-3 h-3" /><span>Certificate</span>
                           </button>
-                          <button className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                          <button
+                            onClick={() => handleReviewCourse(course)}
+                            className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors"
+                          >
                             <Play className="w-3 h-3" /><span>Review</span>
                           </button>
                         </div>
                       ) : course.status === 'in-progress' ? (
-                        <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                        <button
+                          onClick={() => handleContinueCourse(course)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
+                        >
                           <Play className="w-3 h-3" /><span>Continue</span>
                         </button>
                       ) : (
-                        <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                        <button
+                          onClick={() => handleStartCourse(course)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
+                        >
                           <Play className="w-3 h-3" /><span>Start</span>
                         </button>
                       )}
@@ -414,19 +535,31 @@ const ResourcesTraining = () => {
                 <div className="flex flex-wrap gap-2">
                   {course.status === 'completed' ? (
                     <>
-                      <button className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors">
+                      <button
+                        onClick={() => handleViewCertificate(course)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors"
+                      >
                         <Award className="w-3 h-3" /><span>Certificate</span>
                       </button>
-                      <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                      <button
+                        onClick={() => handleReviewCourse(course)}
+                        className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors"
+                      >
                         <Play className="w-3 h-3" /><span>Review</span>
                       </button>
                     </>
                   ) : course.status === 'in-progress' ? (
-                    <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                    <button
+                      onClick={() => handleContinueCourse(course)}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
+                    >
                       <Play className="w-3 h-3" /><span>Continue Learning</span>
                     </button>
                   ) : (
-                    <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                    <button
+                      onClick={() => handleStartCourse(course)}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
+                    >
                       <Play className="w-3 h-3" /><span>Start Course</span>
                     </button>
                   )}
@@ -625,6 +758,15 @@ const ResourcesTraining = () => {
           </div>
         </>
       )}
+
+      <ConfirmationModal
+        showModal={showActionModal}
+        setShowModal={setShowActionModal}
+        title={actionModalConfig.title}
+        message={actionModalConfig.message}
+        onConfirm={actionModalConfig.onConfirm}
+        type={actionModalConfig.type}
+      />
     </div>
   );
 };
