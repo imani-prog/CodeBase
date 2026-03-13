@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth.jsx';
 import {
   Bell,
   Search,
@@ -20,18 +21,27 @@ import {
 } from 'lucide-react';
 
 const CHWNavbar = ({ onMenuClick }) => {
+  const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Sample CHW data - replace with actual auth context
+  const nameParts = (user?.name || user?.username || 'User').split(' ').filter(Boolean);
+  const computedAvatar =
+    user?.initials ||
+    nameParts
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('') ||
+    'U';
+
   const chw = {
-    name: 'Jane Kamau',
-    email: 'janekamau@medilink.org',
-    avatar: 'JK',
-    role: 'Community Health Worker',
-    employeeId: 'CHW-2023-001',
+    name: user?.name || user?.username || 'User',
+    email: user?.email || '',
+    avatar: computedAvatar,
+    role: user?.chwLevel || user?.title || 'Community Health Worker',
+    employeeId: user?.employeeId || user?.userId || '',
   };
 
   const notifications = [

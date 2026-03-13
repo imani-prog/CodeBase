@@ -2,6 +2,27 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 
+const toTitleCase = (value = '') =>
+  value
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+
+const formatNameFromUsername = (username = '') => {
+  const normalized = username.replace(/[._-]+/g, ' ').trim();
+  if (!normalized) return 'User';
+  return toTitleCase(normalized);
+};
+
+const computeInitials = (name = '') =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('') || 'U';
+
 const Login = () => {
   const [role, setRole] = useState('');
   const [username, setUsername] = useState('');
@@ -11,6 +32,50 @@ const Login = () => {
 
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const buildAuthenticatedUser = (foundUser, normalizedRole) => {
+    const usernameValue = foundUser.username?.trim() || username.trim();
+    const roleDefaults = {
+      admin: {
+        name: 'Dr. Timothy Imani',
+        title: 'Chief Administrator',
+        department: 'Healthcare Operations',
+        email: 'timothy.imani@medilink.com',
+        phone: '+254 700 123456',
+      },
+      chw: {
+        name: 'Jane Wanjiru',
+        title: 'Community Health Worker',
+        chwLevel: 'Level 2 Community Health Worker',
+        specialization: 'Maternal & Child Health',
+        email: 'jane.wanjiru@medilink.co.ke',
+        phone: '+254 712 345 678',
+      },
+      patient: {
+        name: formatNameFromUsername(usernameValue),
+        title: 'Patient',
+      },
+    };
+
+    const fallbackName = formatNameFromUsername(usernameValue);
+    const fallbackEmail = usernameValue ? `${usernameValue.toLowerCase()}@medilink.org` : '';
+    const defaults = roleDefaults[normalizedRole] || roleDefaults.patient;
+    const fullName = foundUser.name?.trim() || defaults.name || fallbackName;
+
+    return {
+      ...foundUser,
+      username: usernameValue,
+      role: normalizedRole,
+      name: fullName,
+      email: foundUser.email?.trim() || defaults.email || fallbackEmail,
+      phone: foundUser.phone?.trim() || defaults.phone || '',
+      title: foundUser.title?.trim() || defaults.title || '',
+      chwLevel: foundUser.chwLevel?.trim() || defaults.chwLevel || '',
+      specialization: foundUser.specialization?.trim() || defaults.specialization || '',
+      initials: computeInitials(fullName),
+    };
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -66,9 +131,9 @@ const Login = () => {
       return;
     }
     
-    // Set user with normalized role (always use 'patient' for client/patient)
+    // Set user with normalized role and profile fields used across the app.
     const finalRole = normalizeRole(found.role?.toString().trim().toLowerCase());
-    setUser({ username, role: finalRole });
+    setUser(buildAuthenticatedUser(found, finalRole));
     
     // Navigate based on the normalized role
     if (finalRole === 'admin') {
