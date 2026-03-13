@@ -274,6 +274,83 @@ const ResourcesTraining = () => {
     });
   };
 
+  const handleResourceAction = (resource) => {
+    const isPdf = resource.type?.toLowerCase() === 'pdf';
+
+    if (isPdf) {
+      openActionModal({
+        title: 'Confirm Download',
+        message: `Do you want to download "${resource.title}" to your device?`,
+        type: 'warning',
+        onConfirm: () => {
+          const safeFileName = resource.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '') || 'resource';
+
+          const pdfPlaceholderContent = `This is a placeholder download for: ${resource.title}\nCategory: ${resource.category}\nType: ${resource.type}\nDate Added: ${resource.date}`;
+          const blob = new Blob([pdfPlaceholderContent], { type: 'application/pdf' });
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+
+          link.href = downloadUrl;
+          link.download = `${safeFileName}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        }
+      });
+      return;
+    }
+
+    openActionModal({
+      title: 'Video Unavailable',
+      message: 'Video unavailable at the moment. Please contact your admin.',
+      type: 'warning'
+    });
+  };
+
+  const handleCertificateDownload = (cert) => {
+    openActionModal({
+      title: 'Confirm Certificate Download',
+      message: `Do you want to download "${cert.title}" to your device?`,
+      type: 'warning',
+      onConfirm: () => {
+        const safeFileName = cert.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '') || 'certificate';
+
+        const certificateContent = `Certificate: ${cert.title}\nCredential ID: ${cert.credentialId}\nIssue Date: ${cert.issueDate}\nExpiry Date: ${cert.expiryDate}\nStatus: ${cert.status}`;
+        const blob = new Blob([certificateContent], { type: 'application/pdf' });
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = downloadUrl;
+        link.download = `${safeFileName}-certificate.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+      }
+    });
+  };
+
+  const handleCertificateVerify = (cert) => {
+    const today = new Date();
+    const expiryDate = new Date(cert.expiryDate);
+    const isExpired = expiryDate < today;
+
+    openActionModal({
+      title: 'Certificate Verification',
+      message: isExpired
+        ? `"${cert.title}" with credential ID ${cert.credentialId} has expired on ${expiryDate.toLocaleDateString()}. Please contact your admin for renewal guidance.`
+        : `"${cert.title}" is valid. Credential ID ${cert.credentialId} is active until ${expiryDate.toLocaleDateString()}.`,
+      type: isExpired ? 'warning' : 'success'
+    });
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed':
@@ -617,8 +694,12 @@ const ResourcesTraining = () => {
                       <span className="text-sm text-gray-700">{resource.downloads.toLocaleString()}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
-                        <Download className="w-3 h-3" /><span>Download</span>
+                      <button
+                        onClick={() => handleResourceAction(resource)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
+                      >
+                        {resource.type === 'Video' ? <Play className="w-3 h-3" /> : <Download className="w-3 h-3" />}
+                        <span>{resource.type === 'Video' ? 'Watch' : 'Download'}</span>
                       </button>
                     </td>
                   </tr>
@@ -660,8 +741,12 @@ const ResourcesTraining = () => {
                     <p className="font-semibold text-gray-800">{resource.downloads.toLocaleString()}</p>
                   </div>
                 </div>
-                <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
-                  <Download className="w-3 h-3" /><span>Download</span>
+                <button
+                  onClick={() => handleResourceAction(resource)}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
+                >
+                  {resource.type === 'Video' ? <Play className="w-3 h-3" /> : <Download className="w-3 h-3" />}
+                  <span>{resource.type === 'Video' ? 'Watch' : 'Download'}</span>
                 </button>
               </div>
             ))}
@@ -695,7 +780,7 @@ const ResourcesTraining = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold text-blue-800 bg-blue-50">Active</span>
+                      <span className="px-2 py-0.5 text-xs font-semibold text-blue-800">Active</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className="text-sm text-gray-700">{new Date(cert.issueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
@@ -708,10 +793,16 @@ const ResourcesTraining = () => {
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex gap-1.5">
-                        <button className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                        <button
+                          onClick={() => handleCertificateDownload(cert)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
+                        >
                           <Download className="w-3 h-3" /><span>Download</span>
                         </button>
-                        <button className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                        <button
+                          onClick={() => handleCertificateVerify(cert)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors"
+                        >
                           <FileText className="w-3 h-3" /><span>Verify</span>
                         </button>
                       </div>
@@ -746,10 +837,16 @@ const ResourcesTraining = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
+                  <button
+                    onClick={() => handleCertificateDownload(cert)}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
+                  >
                     <Download className="w-3 h-3" /><span>Download</span>
                   </button>
-                  <button className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                  <button
+                    onClick={() => handleCertificateVerify(cert)}
+                    className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors"
+                  >
                     <FileText className="w-3 h-3" /><span>Verify</span>
                   </button>
                 </div>

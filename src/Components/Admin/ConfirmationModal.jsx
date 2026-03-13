@@ -13,23 +13,23 @@ const ConfirmationModal = ({ showModal, setShowModal, title, message, onConfirm,
     switch (type) {
       case 'danger':
         return {
-          bg: 'bg-red-50',
-          iconColor: 'text-red-600',
+          bg: '',
+          iconColor: 'text-blue-600',
           buttonBg: 'bg-red-600 hover:bg-red-700',
           icon: AlertCircle
         };
       case 'success':
         return {
-          bg: 'bg-green-50',
-          iconColor: 'text-green-600',
+          bg: '',
+          iconColor: 'text-blue-600',
           buttonBg: 'bg-green-600 hover:bg-green-700',
           icon: CheckCircle
         };
       case 'warning':
       default:
         return {
-          bg: 'bg-yellow-50',
-          iconColor: 'text-yellow-600',
+          bg: '',
+          iconColor: 'text-blue-600',
           buttonBg: 'bg-yellow-600 hover:bg-yellow-700',
           icon: AlertCircle
         };
@@ -44,7 +44,7 @@ const ConfirmationModal = ({ showModal, setShowModal, title, message, onConfirm,
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowModal(false)} />
       
       <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="relative bg-white shadow-2xl transform transition-all max-w-md w-full rounded-lg overflow-hidden">
+        <div className="relative bg-white shadow-2xl transform transition-all max-w-md w-full overflow-hidden">
           {/* Header */}
           <div className="relative px-6 py-4 border-b border-gray-200">
             <button
