@@ -203,7 +203,7 @@ const CHWProfile = () => {
                     <span className="text-xs text-gray-400">{profile.status}</span>
                   </div>
                 </div>
-                {/* ID — desktop only in avatar row */}
+                
                 <div className="text-right text-xs text-gray-500 flex-shrink-0 hidden sm:block">
                   <p className="font-mono font-medium text-gray-700">{profile.userId}</p>
                   <p className="mt-0.5">Joined {profile.memberSince}</p>
