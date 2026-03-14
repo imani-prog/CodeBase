@@ -1,6 +1,99 @@
 import { useEffect, useState } from 'react';
 import { Calendar, Clock, MapPin, Video, User, Plus, X, Phone, Mail, AlertCircle, CheckCircle, ExternalLink, Download } from 'lucide-react';
 
+const initialAppointments = {
+  upcoming: [
+    {
+      id: 1,
+      type: 'Clinic Visit',
+      doctor: 'Dr. Sarah Kamau',
+      specialty: 'General Practitioner',
+      date: '2025-10-22',
+      time: '10:00 AM',
+      location: 'Nairobi Health Center',
+      address: 'Kimathi Street, Nairobi CBD',
+      status: 'confirmed',
+      reason: 'Annual checkup',
+      phone: '+254 712 345 678',
+      email: 'info@nairobihealth.co.ke',
+      instructions: 'Please arrive 15 minutes early. Bring your NHIF card and ID.',
+      bookingRef: 'APT-2025-001234'
+    },
+    {
+      id: 2,
+      type: 'Telemedicine',
+      doctor: 'Dr. John Mwangi',
+      specialty: 'Cardiologist',
+      date: '2025-10-25',
+      time: '2:00 PM',
+      location: 'Video Consultation',
+      status: 'pending',
+      reason: 'Follow-up consultation',
+      phone: '+254 723 456 789',
+      email: 'dr.mwangi@medilink.co.ke',
+      meetingLink: 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1',
+      instructions: 'Ensure you have a stable internet connection. Have your recent test results ready.',
+      bookingRef: 'APT-2025-001235'
+    },
+    {
+      id: 3,
+      type: 'Home Visit',
+      doctor: 'Nurse Jane Ochieng',
+      specialty: 'Community Health Worker',
+      date: '2025-10-30',
+      time: '11:00 AM',
+      location: 'Patient Home',
+      address: '1234 Riverside Drive, Nairobi',
+      status: 'confirmed',
+      reason: 'Post-surgery care',
+      phone: '+254 734 567 890',
+      email: 'nurse.ochieng@medilink.co.ke',
+      instructions: 'Please ensure a family member is present during the visit. Have your medication list ready.',
+      bookingRef: 'APT-2025-001236'
+    }
+  ],
+  past: [
+    {
+      id: 31,
+      type: 'Home Visit',
+      doctor: 'Nurse Jane Ochieng',
+      specialty: 'Community Health Worker',
+      date: '2025-10-10',
+      time: '3:00 PM',
+      location: 'Patient Home',
+      status: 'completed',
+      reason: 'Post-surgery care',
+      bookingRef: 'APT-2025-001210'
+    },
+    {
+      id: 4,
+      type: 'Clinic Visit',
+      doctor: 'Dr. Emily Njoroge',
+      specialty: 'Dermatologist',
+      date: '2025-09-15',
+      time: '9:00 AM',
+      location: 'Mombasa Medical Clinic',
+      status: 'completed',
+      reason: 'Skin rash evaluation',
+      bookingRef: 'APT-2025-001211'
+    }
+  ],
+  cancelled: [
+    {
+      id: 5,
+      type: 'Telemedicine',
+      doctor: 'Dr. David Otieno',
+      specialty: 'Pediatrician',
+      date: '2025-10-05',
+      time: '4:00 PM',
+      location: 'Video Consultation',
+      status: 'cancelled',
+      reason: 'Child fever follow-up',
+      bookingRef: 'APT-2025-001212'
+    }
+  ]
+};
+
 const Appointments = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -9,6 +102,17 @@ const Appointments = () => {
   const [showJoinCallModal, setShowJoinCallModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [bookingType, setBookingType] = useState('clinic');
+  const [appointments, setAppointments] = useState(initialAppointments);
+  const [bookingError, setBookingError] = useState('');
+  const [bookingForm, setBookingForm] = useState({
+    specialty: 'General Practitioner',
+    date: new Date().toISOString().split('T')[0],
+    time: 'Morning (8AM - 12PM)',
+    location: 'Nairobi Health Center',
+    address: '',
+    reason: '',
+    insurance: 'NHIF'
+  });
 
   const isAnyModalOpen =
     showBookingModal || showDetailsModal || showCancelModal || showJoinCallModal;
@@ -23,102 +127,6 @@ const Appointments = () => {
       document.body.style.overflow = previousOverflow;
     };
   }, [isAnyModalOpen]);
-
-  const appointments = {
-    upcoming: [
-      {
-        id: 1,
-        type: 'Clinic Visit',
-        doctor: 'Dr. Sarah Kamau',
-        specialty: 'General Practitioner',
-        date: '2025-10-22',
-        time: '10:00 AM',
-        location: 'Nairobi Health Center',
-        address: 'Kimathi Street, Nairobi CBD',
-        status: 'confirmed',
-        reason: 'Annual checkup',
-        phone: '+254 712 345 678',
-        email: 'info@nairobihealth.co.ke',
-        instructions: 'Please arrive 15 minutes early. Bring your NHIF card and ID.',
-        bookingRef: 'APT-2025-001234'
-      },
-      {
-        id: 2,
-        type: 'Telemedicine',
-        doctor: 'Dr. John Mwangi',
-        specialty: 'Cardiologist',
-        date: '2025-10-25',
-        time: '2:00 PM',
-        location: 'Video Consultation',
-        status: 'pending',
-        reason: 'Follow-up consultation',
-        phone: '+254 723 456 789',
-        email: 'dr.mwangi@medilink.co.ke',
-        meetingLink: 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1',
-        instructions: 'Ensure you have a stable internet connection. Have your recent test results ready.',
-        bookingRef: 'APT-2025-001235'
-      },
-
-      {
-        id: 3,
-        type: 'Home Visit',
-        doctor: 'Nurse Jane Ochieng',
-        specialty: 'Community Health Worker',
-        date: '2025-10-30',
-        time: '11:00 AM',
-        location: 'Patient Home',
-        address: '1234 Riverside Drive, Nairobi',
-        status: 'confirmed',
-        reason: 'Post-surgery care',
-        phone: '+254 734 567 890',
-        email: 'nurse.ochieng@medilink.co.ke',
-        instructions: 'Please ensure a family member is present during the visit. Have your medication list ready.',
-        bookingRef: 'APT-2025-001236'
-      }
-    ],
-    past: [
-      {
-        id: 3,
-        type: 'Home Visit',
-        doctor: 'Nurse Jane Ochieng',
-        specialty: 'Community Health Worker',
-        date: '2025-10-10',
-        time: '3:00 PM',
-        location: 'Patient Home',
-        status: 'completed',
-        reason: 'Post-surgery care',
-        bookingRef: 'APT-2025-001210'
-      },
-      {
-        id: 4,
-        type: 'Clinic Visit',
-        doctor: 'Dr. Emily Njoroge',
-        specialty: 'Dermatologist',
-        date: '2025-09-15',
-        time: '9:00 AM',
-        location: 'Mombasa Medical Clinic',
-        status: 'completed',
-        reason: 'Skin rash evaluation',
-        bookingRef: 'APT-2025-001211'
-
-      }
-    ],
-    cancelled: [
-
-      {
-        id: 5,
-        type: 'Telemedicine',
-        doctor: 'Dr. David Otieno',
-        specialty: 'Pediatrician',
-        date: '2025-10-05',
-        time: '4:00 PM',
-        location: 'Video Consultation',
-        status: 'cancelled',
-        reason: 'Child fever follow-up',
-        bookingRef: 'APT-2025-001212'
-      }
-    ]
-  };
 
   const handleViewDetails = (appointment) => {
     setSelectedAppointment(appointment);
@@ -136,11 +144,23 @@ const Appointments = () => {
   };
 
   const confirmCancellation = () => {
-    // Here you would call your API to cancel the appointment
-    console.log('Cancelling appointment:', selectedAppointment.id);
+    if (!selectedAppointment) return;
+
+    setAppointments((prev) => {
+      const target = prev.upcoming.find((item) => item.id === selectedAppointment.id);
+      if (!target) return prev;
+
+      const updatedTarget = { ...target, status: 'cancelled' };
+      return {
+        ...prev,
+        upcoming: prev.upcoming.filter((item) => item.id !== selectedAppointment.id),
+        cancelled: [updatedTarget, ...prev.cancelled]
+      };
+    });
+
+    setSelectedAppointment((current) => (current ? { ...current, status: 'cancelled' } : null));
     setShowCancelModal(false);
-    setSelectedAppointment(null);
-    // Show success message or update appointments list
+    setActiveTab('cancelled');
   };
 
   const joinVideoCall = () => {
@@ -168,6 +188,85 @@ const Appointments = () => {
     if (type === 'Telemedicine') return 'telemedicine';
     if (type === 'Home Visit') return 'home';
     return 'clinic';
+  };
+
+  const mapBookingTypeToAppointmentType = (type) => {
+    if (type === 'telemedicine') return 'Telemedicine';
+    if (type === 'home') return 'Home Visit';
+    return 'Clinic Visit';
+  };
+
+  const resetBookingForm = (type = 'clinic') => {
+    setBookingForm({
+      specialty: 'General Practitioner',
+      date: new Date().toISOString().split('T')[0],
+      time: 'Morning (8AM - 12PM)',
+      location: type === 'telemedicine' ? 'Video Consultation' : 'Nairobi Health Center',
+      address: '',
+      reason: '',
+      insurance: 'NHIF'
+    });
+    setBookingError('');
+  };
+
+  const handleBookingTypeChange = (type) => {
+    setBookingType(type);
+    setBookingForm((prev) => ({
+      ...prev,
+      location: type === 'telemedicine' ? 'Video Consultation' : prev.location || 'Nairobi Health Center',
+      address: type === 'home' ? prev.address : ''
+    }));
+  };
+
+  const handleBookAppointment = () => {
+    if (!bookingForm.date || !bookingForm.reason.trim()) {
+      setBookingError('Please provide a date and reason for visit before booking.');
+      return;
+    }
+
+    setBookingError('');
+
+    const nowYear = new Date().getFullYear();
+    const generatedId = Date.now();
+    const bookingRef = `APT-${nowYear}-${String(generatedId).slice(-6)}`;
+    const appointmentType = mapBookingTypeToAppointmentType(bookingType);
+    const assignedDoctor =
+      bookingType === 'home'
+        ? 'Nurse On-Call'
+        : `Dr. ${bookingForm.specialty.split(' ')[0]} Specialist`;
+
+    const newAppointment = {
+      id: generatedId,
+      type: appointmentType,
+      doctor: assignedDoctor,
+      specialty: bookingForm.specialty,
+      date: bookingForm.date,
+      time: bookingForm.time,
+      location:
+        bookingType === 'telemedicine'
+          ? 'Video Consultation'
+          : bookingType === 'home'
+            ? bookingForm.address || 'Patient Home'
+            : bookingForm.location,
+      address: bookingType === 'home' ? bookingForm.address : undefined,
+      status: 'pending',
+      reason: bookingForm.reason,
+      bookingRef,
+      meetingLink:
+        bookingType === 'telemedicine'
+          ? 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1'
+          : undefined,
+      instructions: 'Please keep your phone nearby. You will receive confirmation shortly.'
+    };
+
+    setAppointments((prev) => ({
+      ...prev,
+      upcoming: [newAppointment, ...prev.upcoming]
+    }));
+
+    setShowBookingModal(false);
+    setActiveTab('upcoming');
+    resetBookingForm(bookingType);
   };
 
   const renderAppointmentActions = (appointment) => {
@@ -491,7 +590,7 @@ const Appointments = () => {
     </div>
   );
 
-  const BookingModal = () => (
+  const bookingModal = (
     <div className={modalOverlayClasses}>
       <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
@@ -518,7 +617,7 @@ const Appointments = () => {
               ].map((type) => (
                 <button
                   key={type.id}
-                  onClick={() => setBookingType(type.id)}
+                  onClick={() => handleBookingTypeChange(type.id)}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     bookingType === type.id
                       ? 'border-blue-600'
@@ -538,7 +637,11 @@ const Appointments = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Specialty
               </label>
-              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:ring-blue-500 focus:border-transparent">
+              <select
+                value={bookingForm.specialty}
+                onChange={(e) => setBookingForm((prev) => ({ ...prev, specialty: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:ring-blue-500 focus:border-transparent"
+              >
                 <option>General Practitioner</option>
                 <option>Cardiologist</option>
                 <option>Pediatrician</option>
@@ -554,6 +657,8 @@ const Appointments = () => {
                 </label>
                 <input
                   type="date"
+                  value={bookingForm.date}
+                  onChange={(e) => setBookingForm((prev) => ({ ...prev, date: e.target.value }))}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
                   min={new Date().toISOString().split('T')[0]}
                 />
@@ -562,7 +667,11 @@ const Appointments = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Preferred Time
                 </label>
-                <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent">
+                <select
+                  value={bookingForm.time}
+                  onChange={(e) => setBookingForm((prev) => ({ ...prev, time: e.target.value }))}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
+                >
                   <option>Morning (8AM - 12PM)</option>
                   <option>Afternoon (12PM - 5PM)</option>
                   <option>Evening (5PM - 8PM)</option>
@@ -576,7 +685,11 @@ const Appointments = () => {
                   {bookingType === 'clinic' ? 'Select Clinic' : 'Your Location'}
                 </label>
                 {bookingType === 'clinic' ? (
-                  <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent">
+                  <select
+                    value={bookingForm.location}
+                    onChange={(e) => setBookingForm((prev) => ({ ...prev, location: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
+                  >
                     <option>Nairobi Health Center</option>
                     <option>Mombasa Medical Clinic</option>
                     <option>Kisumu Health Facility</option>
@@ -585,6 +698,8 @@ const Appointments = () => {
                   <input
                     type="text"
                     placeholder="Enter your address"
+                    value={bookingForm.address}
+                    onChange={(e) => setBookingForm((prev) => ({ ...prev, address: e.target.value }))}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
                   />
                 )}
@@ -598,6 +713,8 @@ const Appointments = () => {
               <textarea
                 rows="3"
                 placeholder="Describe your symptoms or reason for appointment..."
+                value={bookingForm.reason}
+                onChange={(e) => setBookingForm((prev) => ({ ...prev, reason: e.target.value }))}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
               />
             </div>
@@ -606,7 +723,11 @@ const Appointments = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Insurance
               </label>
-              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent">
+              <select
+                value={bookingForm.insurance}
+                onChange={(e) => setBookingForm((prev) => ({ ...prev, insurance: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
+              >
                 <option>NHIF</option>
                 <option>SHA</option>
                 <option>Private Insurance</option>
@@ -618,15 +739,25 @@ const Appointments = () => {
           {/* Action Buttons */}
           <div className="flex gap-3 mt-6">
             <button
-              onClick={() => setShowBookingModal(false)}
+              onClick={() => {
+                setShowBookingModal(false);
+                resetBookingForm(bookingType);
+              }}
               className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
-            <button className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+              onClick={handleBookAppointment}
+              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Book Appointment
             </button>
           </div>
+
+          {bookingError && (
+            <p className="mt-3 text-sm text-red-600">{bookingError}</p>
+          )}
         </div>
       </div>
     </div>
@@ -642,7 +773,11 @@ const Appointments = () => {
             <p className="text-gray-600">Manage your healthcare appointments</p>
           </div>
           <button
-            onClick={() => setShowBookingModal(true)}
+            onClick={() => {
+              setBookingType('clinic');
+              resetBookingForm('clinic');
+              setShowBookingModal(true);
+            }}
             className="self-start sm:self-auto flex items-center justify-center gap-2 px-4 py-2.5 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -695,47 +830,45 @@ const Appointments = () => {
                       key={appointment.id}
                       className="border border-gray-200 rounded-xl p-3.5 sm:p-4 hover:border-blue-300 hover:bg-blue-50/40 transition-all"
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <TypeIcon className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <h3 className="font-semibold text-gray-900 text-base leading-tight">{appointment.doctor}</h3>
-                              <p className="text-sm text-gray-600">{appointment.specialty}</p>
-                            </div>
-                            <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusClasses(appointment.status)}`}>
-                              {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                            </span>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <div className="w-8 h-8 bg-blue-50 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <TypeIcon className="w-4 h-4 text-blue-600" />
                           </div>
-
-                          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-blue-600" />
-                              <span>{new Date(appointment.date).toLocaleDateString('en-KE', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-blue-600" />
-                              <span>{appointment.time}</span>
-                            </div>
-                            <div className="flex items-center gap-2 sm:col-span-2">
-                              <MapPin className="w-4 h-4 text-blue-600" />
-                              <span className="truncate">{appointment.location}</span>
-                            </div>
-                            <p className="sm:col-span-2 text-gray-700">
-                              <span className="text-gray-500">Reason: </span>
-                              {appointment.reason}
-                            </p>
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-gray-900 text-base leading-tight truncate">{appointment.doctor}</h3>
+                            <p className="text-sm text-gray-600 truncate">{appointment.specialty}</p>
                           </div>
-
-                          {renderAppointmentActions(appointment) && (
-                            <div className="mt-3 pt-3 border-t border-gray-100">
-                              {renderAppointmentActions(appointment)}
-                            </div>
-                          )}
                         </div>
+                        <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusClasses(appointment.status)}`}>
+                          {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                        </span>
                       </div>
+
+                      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-blue-600" />
+                          <span>{new Date(appointment.date).toLocaleDateString('en-KE', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-blue-600" />
+                          <span>{appointment.time}</span>
+                        </div>
+                        <div className="flex items-center gap-2 sm:col-span-2">
+                          <MapPin className="w-4 h-4 text-blue-600" />
+                          <span className="truncate">{appointment.location}</span>
+                        </div>
+                        <p className="sm:col-span-2 text-gray-700">
+                          <span className="text-gray-500">Reason: </span>
+                          {appointment.reason}
+                        </p>
+                      </div>
+
+                      {renderAppointmentActions(appointment) && (
+                        <div className="mt-3 pt-3 border-t border-gray-100">
+                          {renderAppointmentActions(appointment)}
+                        </div>
+                      )}
                     </article>
                   );
                 })}
@@ -810,7 +943,11 @@ const Appointments = () => {
               </p>
               {activeTab === 'upcoming' && (
                 <button
-                  onClick={() => setShowBookingModal(true)}
+                  onClick={() => {
+                    setBookingType('clinic');
+                    resetBookingForm('clinic');
+                    setShowBookingModal(true);
+                  }}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Plus className="w-5 h-5" />
@@ -823,7 +960,7 @@ const Appointments = () => {
       </div>
 
       {/* Booking Modal */}
-      {showBookingModal && <BookingModal />}
+      {showBookingModal && bookingModal}
       
       {/* Details Modal */}
       {showDetailsModal && selectedAppointment && <DetailsModal />}
