@@ -152,10 +152,10 @@ const Appointments = () => {
   };
 
   const getStatusClasses = (status) => {
-    if (status === 'confirmed' || status === 'completed') return 'bg-green-100 text-green-700';
-    if (status === 'pending') return 'bg-yellow-100 text-yellow-700';
-    if (status === 'cancelled') return 'bg-red-100 text-red-700';
-    return 'bg-gray-100 text-gray-700';
+    if (status === 'confirmed' || status === 'completed') return 'text-green-700';
+    if (status === 'pending') return 'text-yellow-700';
+    if (status === 'cancelled') return 'text-red-700';
+    return 'text-gray-700';
   };
 
   const getTypeIcon = (type) => {
@@ -190,7 +190,7 @@ const Appointments = () => {
 
   const DetailsModal = () => (
     <div className={modalOverlayClasses}>
-      <div className="bg-white w-full h-full sm:h-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[85vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white w-full h-full sm:h-auto  sm:max-w-2xl sm:max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Appointment Details</h2>
           <button
@@ -290,9 +290,9 @@ const Appointments = () => {
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Status</h3>
             <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
-              selectedAppointment?.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-              selectedAppointment?.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-              'bg-gray-100 text-gray-700'
+              selectedAppointment?.status === 'confirmed' ? ' text-green-700' :
+              selectedAppointment?.status === 'pending' ? ' text-yellow-700' :
+              'text-gray-700'
             }`}>
               <CheckCircle className="w-4 h-4" />
               {selectedAppointment?.status.charAt(0).toUpperCase() + selectedAppointment?.status.slice(1)}
@@ -438,7 +438,7 @@ const Appointments = () => {
 
   const BookingModal = () => (
     <div className={modalOverlayClasses}>
-      <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[85vh] sm:rounded-xl overflow-y-auto shadow-2xl">
+      <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Book New Appointment</h2>
           <button
@@ -687,51 +687,51 @@ const Appointments = () => {
               </div>
 
               {/* Desktop Table */}
-              <div className="hidden lg:block overflow-x-auto">
-                <table className="w-full min-w-[980px]">
+              <div className="hidden lg:block overflow-x-auto border border-gray-200 bg-white">
+                <table className="w-full min-w-[980px] border-collapse">
                   <thead>
-                    <tr className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 border-b border-gray-200">
-                      <th className="py-3 px-3">Provider</th>
-                      <th className="py-3 px-3">Type</th>
-                      <th className="py-3 px-3">Date & Time</th>
-                      <th className="py-3 px-3">Location</th>
-                      <th className="py-3 px-3">Reason</th>
-                      <th className="py-3 px-3">Status</th>
-                      <th className="py-3 px-3 text-right">Actions</th>
+                    <tr className="bg-gray-50 text-left text-[11px] font-semibold uppercase tracking-wide text-gray-800 border-b border-gray-200">
+                      <th className="py-3 px-3 ">Provider</th>
+                      <th className="py-3 px-3 ">Type</th>
+                      <th className="py-3 px-3 ">Date & Time</th>
+                      <th className="py-3 px-3 ">Location</th>
+                      <th className="py-3 px-3 ">Reason</th>
+                      <th className="py-3 px-3 ">Status</th>
+                      <th className="py-3 px-3">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {appointments[activeTab].map((appointment) => {
                       const TypeIcon = getTypeIcon(appointment.type);
                       return (
-                        <tr key={appointment.id} className="border-b border-gray-100 hover:bg-blue-50/40 transition-colors">
-                          <td className="py-4 px-3">
+                        <tr key={appointment.id} className="border-b border-gray-200 odd:bg-white even:bg-gray-50/40 hover:bg-blue-50/50 transition-colors">
+                          <td className="py-4 px-3  align-top">
                             <div className="font-semibold text-gray-900">{appointment.doctor}</div>
                             <div className="text-sm text-gray-600">{appointment.specialty}</div>
                           </td>
-                          <td className="py-4 px-3">
+                          <td className="py-4 px-3 align-top">
                             <div className="inline-flex items-center gap-2 text-sm text-gray-700">
                               <TypeIcon className="w-4 h-4 text-blue-600" />
                               <span>{appointment.type}</span>
                             </div>
                           </td>
-                          <td className="py-4 px-3 text-sm text-gray-700">
+                          <td className="py-4 px-3 text-sm text-gray-700 align-top">
                             <div>{new Date(appointment.date).toLocaleDateString('en-KE', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</div>
                             <div className="text-gray-500">{appointment.time}</div>
                           </td>
-                          <td className="py-4 px-3 text-sm text-gray-700 max-w-[180px]">
+                          <td className="py-4 px-3 text-sm text-gray-700 max-w-[180px] align-top">
                             <p className="truncate">{appointment.location}</p>
                           </td>
-                          <td className="py-4 px-3 text-sm text-gray-700 max-w-[220px]">
+                          <td className="py-4 px-3  text-sm text-gray-700 max-w-[220px] align-top">
                             <p className="truncate">{appointment.reason}</p>
                           </td>
-                          <td className="py-4 px-3">
+                          <td className="py-4 px-3 align-top">
                             <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusClasses(appointment.status)}`}>
                               {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                             </span>
                           </td>
-                          <td className="py-4 px-3">
-                            <div className="flex justify-end">
+                          <td className="py-4 px-3 align-top">
+                            <div className="flex justify-start">
                               {renderAppointmentActions(appointment)}
                             </div>
                           </td>
