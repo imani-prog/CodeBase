@@ -246,10 +246,10 @@ const Telemedicine = () => {
           <Calendar className="w-4 h-4" />
           <span>All Appointments</span>
         </Link>
-        <button className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors text-gray-700 hover:text-blue-600 text-sm">
+        {/* <button className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors text-gray-700 hover:text-blue-600 text-sm">
           <Settings className="w-4 h-4" />
           <span>Test Equipment</span>
-        </button>
+        </button> */}
       </div>
 
       {/* Tabs */}
@@ -298,10 +298,10 @@ const Telemedicine = () => {
                         <p className="text-sm text-gray-600 truncate">{consultation.specialty}</p>
                       </div>
                       <span
-                        className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                        className={`px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${
                           consultation.status === 'confirmed'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-yellow-100 text-yellow-700'
+                            ? 'text-green-700'
+                            : 'text-yellow-700'
                         }`}
                       >
                         {consultation.status.charAt(0).toUpperCase() + consultation.status.slice(1)}
@@ -459,10 +459,10 @@ const Telemedicine = () => {
 
       {/* Booking Modal */}
       {showBookingModal && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Book Video Consultation</h2>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-stretch sm:items-center sm:justify-center p-0 sm:p-4 overflow-y-auto">
+          <div className="bg-white w-full h-full sm:h-auto sm:rounded-lg sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Book Video Consultation</h2>
               <button
                 onClick={() => setShowBookingModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -470,13 +470,13 @@ const Telemedicine = () => {
                 <X className="w-6 h-6 text-gray-600" />
               </button>
             </div>
-            <form className="p-6 space-y-6" onSubmit={handleBookConsultation}>
+            <form className="p-4 sm:p-6 space-y-5 sm:space-y-6" onSubmit={handleBookConsultation}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Specialty
                 </label>
                 <select 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
                   value={bookingForm.specialty}
                   onChange={(e) => handleBookingFormChange('specialty', e.target.value)}
                   required
@@ -497,7 +497,7 @@ const Telemedicine = () => {
                   </label>
                   <input
                     type="date"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
                     value={bookingForm.date}
                     onChange={(e) => handleBookingFormChange('date', e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
@@ -509,7 +509,7 @@ const Telemedicine = () => {
                     Preferred Time
                   </label>
                   <select 
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
                     value={bookingForm.time}
                     onChange={(e) => handleBookingFormChange('time', e.target.value)}
                     required
@@ -554,7 +554,7 @@ const Telemedicine = () => {
                 <textarea
                   rows="4"
                   placeholder="Please describe your symptoms or reason for consultation..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
                   value={bookingForm.reason}
                   onChange={(e) => handleBookingFormChange('reason', e.target.value)}
                   required
@@ -566,7 +566,7 @@ const Telemedicine = () => {
                   Insurance Coverage
                 </label>
                 <select 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
                   value={bookingForm.insurance}
                   onChange={(e) => handleBookingFormChange('insurance', e.target.value)}
                   required
@@ -591,7 +591,7 @@ const Telemedicine = () => {
                 </div>
               </div>
 
-              <div className="flex space-x-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(false)}
@@ -613,8 +613,8 @@ const Telemedicine = () => {
 
       {/* Pre-Call Check Modal */}
       {showConsultationModal && selectedConsultation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white max-w-md w-full">
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">Pre-Call System Check</h2>
               <button
@@ -692,10 +692,10 @@ const Telemedicine = () => {
 
       {/* Details Modal */}
       {showDetailsModal && selectedConsultation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Consultation Details</h2>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-stretch sm:items-center sm:justify-center z-50 p-0 sm:p-4 overflow-y-auto">
+          <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[85vh] sm:rounded-lg overflow-y-auto shadow-2xl">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Consultation Details</h2>
               <button
                 onClick={() => setShowDetailsModal(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -704,7 +704,7 @@ const Telemedicine = () => {
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
               {/* Booking Reference */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-700 font-medium">Booking Reference</p>
@@ -735,7 +735,7 @@ const Telemedicine = () => {
               {/* Consultation Information */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Consultation Information</h3>
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-1">
                       <Calendar className="w-4 h-4 text-blue-600" />
@@ -790,10 +790,10 @@ const Telemedicine = () => {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Status</h3>
                 <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
-                  selectedConsultation?.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                  selectedConsultation?.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                  selectedConsultation?.status === 'completed' ? 'bg-gray-100 text-gray-700' :
-                  'bg-gray-100 text-gray-700'
+                  selectedConsultation?.status === 'confirmed' ? ' text-green-700' :
+                  selectedConsultation?.status === 'pending' ? 'text-yellow-700' :
+                  selectedConsultation?.status === 'completed' ? 'text-gray-700' :
+                  ' text-gray-700'
                 }`}>
                   <CheckCircle className="w-4 h-4" />
                   {selectedConsultation?.status.charAt(0).toUpperCase() + selectedConsultation?.status.slice(1)}
@@ -801,14 +801,14 @@ const Telemedicine = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                 {selectedConsultation?.status === 'confirmed' && selectedConsultation?.meetingLink && (
                   <button
                     onClick={() => {
                       setShowDetailsModal(false);
                       handleJoinCall(selectedConsultation);
                     }}
-                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                    className="w-full sm:flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                   >
                     <Video className="w-4 h-4" />
                     Join Video Call
@@ -817,14 +817,14 @@ const Telemedicine = () => {
                 {selectedConsultation?.prescription && (
                   <Link
                     to="/client/patient/prescriptions"
-                    className="flex-1 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                    className="w-full sm:flex-1 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
                     View Prescription
                   </Link>
                 )}
                 {selectedConsultation?.recording && (
-                  <button className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                  <button className="w-full sm:w-auto px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
                     <Download className="w-4 h-4" />
                     Download Recording
                   </button>
