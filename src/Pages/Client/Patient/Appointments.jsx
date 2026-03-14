@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Clock, MapPin, Video, User, Search, Filter, Plus, X, Phone, Mail, AlertCircle, CheckCircle, ExternalLink, Download } from 'lucide-react';
+import { Calendar, Clock, MapPin, Video, User, Plus, X, Phone, Mail, AlertCircle, CheckCircle, ExternalLink, Download } from 'lucide-react';
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -43,6 +43,23 @@ const Appointments = () => {
         meetingLink: 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1',
         instructions: 'Ensure you have a stable internet connection. Have your recent test results ready.',
         bookingRef: 'APT-2025-001235'
+      },
+
+      {
+        id: 3,
+        type: 'Home Visit',
+        doctor: 'Nurse Jane Ochieng',
+        specialty: 'Community Health Worker',
+        date: '2025-10-30',
+        time: '11:00 AM',
+        location: 'Patient Home',
+        address: '1234 Riverside Drive, Nairobi',
+        status: 'confirmed',
+        reason: 'Post-surgery care',
+        phone: '+254 734 567 890',
+        email: 'nurse.ochieng@medilink.co.ke',
+        instructions: 'Please ensure a family member is present during the visit. Have your medication list ready.',
+        bookingRef: 'APT-2025-001236'
       }
     ],
     past: [
@@ -57,9 +74,36 @@ const Appointments = () => {
         status: 'completed',
         reason: 'Post-surgery care',
         bookingRef: 'APT-2025-001210'
+      },
+      {
+        id: 4,
+        type: 'Clinic Visit',
+        doctor: 'Dr. Emily Njoroge',
+        specialty: 'Dermatologist',
+        date: '2025-09-15',
+        time: '9:00 AM',
+        location: 'Mombasa Medical Clinic',
+        status: 'completed',
+        reason: 'Skin rash evaluation',
+        bookingRef: 'APT-2025-001211'
+
       }
     ],
-    cancelled: []
+    cancelled: [
+
+      {
+        id: 5,
+        type: 'Telemedicine',
+        doctor: 'Dr. David Otieno',
+        specialty: 'Pediatrician',
+        date: '2025-10-05',
+        time: '4:00 PM',
+        location: 'Video Consultation',
+        status: 'cancelled',
+        reason: 'Child fever follow-up',
+        bookingRef: 'APT-2025-001212'
+      }
+    ]
   };
 
   const handleViewDetails = (appointment) => {
@@ -91,6 +135,40 @@ const Appointments = () => {
       window.open(selectedAppointment.meetingLink, '_blank');
       setShowJoinCallModal(false);
     }
+  };
+
+  const getStatusClasses = (status) => {
+    if (status === 'confirmed' || status === 'completed') return 'bg-green-100 text-green-700';
+    if (status === 'pending') return 'bg-yellow-100 text-yellow-700';
+    if (status === 'cancelled') return 'bg-red-100 text-red-700';
+    return 'bg-gray-100 text-gray-700';
+  };
+
+  const getTypeIcon = (type) => {
+    if (type === 'Telemedicine') return Video;
+    if (type === 'Home Visit') return User;
+    return MapPin;
+  };
+
+  const renderAppointmentActions = (appointment) => {
+    if (activeTab !== 'upcoming') return null;
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => appointment.type === 'Telemedicine' ? handleJoinCall(appointment) : handleViewDetails(appointment)}
+          className="px-3 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
+          {appointment.type === 'Telemedicine' ? 'Join Call' : 'Details'}
+        </button>
+        <button
+          onClick={() => handleCancelAppointment(appointment)}
+          className="px-3 py-1.5 text-xs sm:text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    );
   };
 
   const DetailsModal = () => (
@@ -483,7 +561,7 @@ const Appointments = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="w-full px-0.5 sm:px-0">
       {/* Header */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -493,7 +571,7 @@ const Appointments = () => {
           </div>
           <button
             onClick={() => setShowBookingModal(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             <span>Book Appointment</span>
@@ -502,8 +580,9 @@ const Appointments = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white shadow-sm border border-gray-100 mb-6">
-        <div className="flex border-b border-gray-200">
+      <div className="bg-white shadow-sm border border-gray-100 mb-6 overflow-hidden">
+        <div className="border-b border-gray-200 overflow-x-auto">
+          <div className="flex min-w-max sm:min-w-0">
           {[
             { id: 'upcoming', label: 'Upcoming', count: appointments.upcoming.length },
             { id: 'past', label: 'Past', count: appointments.past.length },
@@ -512,7 +591,7 @@ const Appointments = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 px-4 py-4 text-sm font-medium transition-colors ${
+              className={`flex-1 min-w-[120px] px-4 py-3.5 text-sm font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
@@ -528,82 +607,124 @@ const Appointments = () => {
               </span>
             </button>
           ))}
+          </div>
         </div>
 
         {/* Appointments List */}
-        <div className="p-6">
+        <div className="p-3 sm:p-4 lg:p-6">
           {appointments[activeTab].length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {appointments[activeTab].map((appointment) => (
-                <div
-                  key={appointment.id}
-                  className="border border-gray-200 rounded-lg p-3 hover:border-blue-300 hover:bg-blue-50 transition-all"
-                >
-                  <div className="flex flex-col gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-9 h-9 bg-blue-50 rounded flex items-center justify-center flex-shrink-0">
-                          {appointment.type === 'Telemedicine' ? (
-                            <Video className="w-5 h-5 text-blue-600" />
-                          ) : appointment.type === 'Home Visit' ? (
-                            <User className="w-5 h-5 text-blue-600" />
-                          ) : (
-                            <MapPin className="w-5 h-5 text-blue-600" />
-                          )}
+            <>
+              {/* Mobile/Tablet Cards */}
+              <div className="grid grid-cols-1 gap-3 lg:hidden">
+                {appointments[activeTab].map((appointment) => {
+                  const TypeIcon = getTypeIcon(appointment.type);
+                  return (
+                    <article
+                      key={appointment.id}
+                      className="border border-gray-200 rounded-xl p-3.5 sm:p-4 hover:border-blue-300 hover:bg-blue-50/40 transition-all"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <TypeIcon className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-base truncate">
-                            {appointment.doctor}
-                          </h3>
-                          <p className="text-sm text-gray-600 truncate">{appointment.specialty}</p>
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <h3 className="font-semibold text-gray-900 text-base leading-tight">{appointment.doctor}</h3>
+                              <p className="text-sm text-gray-600">{appointment.specialty}</p>
+                            </div>
+                            <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusClasses(appointment.status)}`}>
+                              {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                            </span>
+                          </div>
+
+                          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-4 h-4 text-blue-600" />
+                              <span>{new Date(appointment.date).toLocaleDateString('en-KE', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-blue-600" />
+                              <span>{appointment.time}</span>
+                            </div>
+                            <div className="flex items-center gap-2 sm:col-span-2">
+                              <MapPin className="w-4 h-4 text-blue-600" />
+                              <span className="truncate">{appointment.location}</span>
+                            </div>
+                            <p className="sm:col-span-2 text-gray-700">
+                              <span className="text-gray-500">Reason: </span>
+                              {appointment.reason}
+                            </p>
+                          </div>
+
+                          {activeTab === 'upcoming' && (
+                            <div className="mt-3 pt-3 border-t border-gray-100">
+                              {renderAppointmentActions(appointment)}
+                            </div>
+                          )}
                         </div>
                       </div>
+                    </article>
+                  );
+                })}
+              </div>
 
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-3.5 h-3.5 text-blue-600" />
-                          <span>{new Date(appointment.date).toLocaleDateString()}</span>
-                          <Clock className="w-3.5 h-3.5 ml-2 text-blue-600" />
-                          <span>{appointment.time}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                          <span className="truncate">{appointment.location}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Reason: </span>
-                          <span className="text-gray-900">{appointment.reason}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                        appointment.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                        appointment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                      </span>
-                      {activeTab === 'upcoming' && (
-                        <div className="flex gap-2">
-                          <button 
-                            onClick={() => appointment.type === 'Telemedicine' ? handleJoinCall(appointment) : handleViewDetails(appointment)}
-                            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                            {appointment.type === 'Telemedicine' ? 'Join Call' : 'Details'}
-                          </button>
-                          <button 
-                            onClick={() => handleCancelAppointment(appointment)}
-                            className="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors">
-                            Cancel
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+              {/* Desktop Table */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="w-full min-w-[980px]">
+                  <thead>
+                    <tr className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 border-b border-gray-200">
+                      <th className="py-3 px-3">Provider</th>
+                      <th className="py-3 px-3">Type</th>
+                      <th className="py-3 px-3">Date & Time</th>
+                      <th className="py-3 px-3">Location</th>
+                      <th className="py-3 px-3">Reason</th>
+                      <th className="py-3 px-3">Status</th>
+                      <th className="py-3 px-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appointments[activeTab].map((appointment) => {
+                      const TypeIcon = getTypeIcon(appointment.type);
+                      return (
+                        <tr key={appointment.id} className="border-b border-gray-100 hover:bg-blue-50/40 transition-colors">
+                          <td className="py-4 px-3">
+                            <div className="font-semibold text-gray-900">{appointment.doctor}</div>
+                            <div className="text-sm text-gray-600">{appointment.specialty}</div>
+                          </td>
+                          <td className="py-4 px-3">
+                            <div className="inline-flex items-center gap-2 text-sm text-gray-700">
+                              <TypeIcon className="w-4 h-4 text-blue-600" />
+                              <span>{appointment.type}</span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-3 text-sm text-gray-700">
+                            <div>{new Date(appointment.date).toLocaleDateString('en-KE', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                            <div className="text-gray-500">{appointment.time}</div>
+                          </td>
+                          <td className="py-4 px-3 text-sm text-gray-700 max-w-[180px]">
+                            <p className="truncate">{appointment.location}</p>
+                          </td>
+                          <td className="py-4 px-3 text-sm text-gray-700 max-w-[220px]">
+                            <p className="truncate">{appointment.reason}</p>
+                          </td>
+                          <td className="py-4 px-3">
+                            <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusClasses(appointment.status)}`}>
+                              {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                            </span>
+                          </td>
+                          <td className="py-4 px-3">
+                            <div className="flex justify-end">
+                              {renderAppointmentActions(appointment)}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           ) : (
             <div className="text-center py-12">
               <Calendar className="w-16 h-16 mx-auto mb-4 text-blue-600" />

@@ -24,7 +24,6 @@ const sidebarLinks = [
     to: '/client/patient/appointments',
     label: 'Appointments',
     icon: <Calendar className="w-5 h-5 mr-3" />,
-    badge: 2,
   },
   {
     to: '/client/patient/telemedicine',
@@ -35,13 +34,11 @@ const sidebarLinks = [
     to: '/client/patient/health-records',
     label: 'Health Records',
     icon: <FileText className="w-5 h-5 mr-3" />,
-    badge: 1,
   },
   {
     to: '/client/patient/prescriptions',
     label: 'Prescriptions',
     icon: <Pill className="w-5 h-5 mr-3" />,
-    badge: 3,
   },
   {
     to: '/client/patient/insurance',
