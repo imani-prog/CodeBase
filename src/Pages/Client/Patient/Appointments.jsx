@@ -186,11 +186,11 @@ const Appointments = () => {
   };
 
   const modalOverlayClasses =
-    'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto';
+    'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-stretch sm:items-center sm:justify-center p-0 sm:p-6 overflow-y-auto';
 
   const DetailsModal = () => (
     <div className={modalOverlayClasses}>
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white w-full h-full sm:h-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Appointment Details</h2>
           <button
@@ -334,7 +334,7 @@ const Appointments = () => {
 
   const CancelModal = () => (
     <div className={modalOverlayClasses}>
-      <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
+      <div className="bg-white w-full h-full sm:h-auto sm:rounded-xl sm:max-w-md overflow-y-auto shadow-2xl">
         <div className="p-6">
           <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mx-auto mb-4">
             <AlertCircle className="w-6 h-6 text-red-600" />
@@ -384,7 +384,7 @@ const Appointments = () => {
 
   const JoinCallModal = () => (
     <div className={modalOverlayClasses}>
-      <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
+      <div className="bg-white w-full h-full sm:h-auto sm:rounded-xl sm:max-w-md overflow-y-auto shadow-2xl">
         <div className="p-6">
           <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4">
             <Video className="w-6 h-6 text-blue-600" />
@@ -438,7 +438,7 @@ const Appointments = () => {
 
   const BookingModal = () => (
     <div className={modalOverlayClasses}>
-      <div className="bg-white max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[85vh] sm:rounded-xl overflow-y-auto shadow-2xl">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Book New Appointment</h2>
           <button
@@ -588,7 +588,7 @@ const Appointments = () => {
           </div>
           <button
             onClick={() => setShowBookingModal(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="self-start sm:self-auto flex items-center justify-center gap-2 px-4 py-2.5 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             <span>Book Appointment</span>
@@ -597,9 +597,9 @@ const Appointments = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white shadow-sm border border-gray-100 mb-6 overflow-hidden">
-        <div className="border-b border-gray-200 overflow-x-auto">
-          <div className="flex min-w-max sm:min-w-0">
+      <div className=" mb-6 overflow-hidden">
+        <div className="border-b border-gray-200">
+          <div className="flex items-center justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-3 pt-2">
           {[
             { id: 'upcoming', label: 'Upcoming', count: appointments.upcoming.length },
             { id: 'past', label: 'Past', count: appointments.past.length },
@@ -608,14 +608,14 @@ const Appointments = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 min-w-[120px] px-4 py-3.5 text-sm font-medium transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-2 text-[11px] sm:text-sm font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-800 border-transparent hover:text-gray-900'
               }`}
             >
-              {tab.label}
-              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+              <span>{tab.label}</span>
+              <span className={`inline-flex items-center justify-center min-w-4 h-4 px-1 text-[10px] rounded-full ${
                 activeTab === tab.id
                   ? 'bg-blue-100 text-blue-600'
                   : 'bg-gray-100 text-gray-600'
