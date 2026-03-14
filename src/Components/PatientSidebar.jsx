@@ -11,6 +11,7 @@ import {
   Heart,
   User,
   Settings,
+  X,
 } from 'lucide-react';
 
 const sidebarLinks = [
@@ -70,9 +71,28 @@ const sidebarLinks = [
   },
 ];
 
-const PatientSidebar = () => (
-  
-  <aside className="fixed top-0 left-0 w-64 bg-blue-950 text-white flex flex-col py-6 px-4 shadow-lg h-screen z-30">
+const PatientSidebar = ({ isOpen, onClose }) => (
+  <>
+    {isOpen && (
+      <div
+        className="fixed inset-0 bg-black/50 z-30 md:hidden"
+        onClick={onClose}
+      />
+    )}
+
+    <aside
+      className={`fixed top-0 left-0 w-64 bg-blue-950 text-white flex flex-col py-6 px-4 shadow-lg h-screen z-40
+        transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:translate-x-0`}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 p-1.5 rounded-lg text-blue-300 hover:text-white hover:bg-blue-800 transition-colors md:hidden"
+      >
+        <X className="w-5 h-5" />
+      </button>
+
     {/* Logo Section */}
     <div className="mb-6 flex items-center space-x-3 px-1">
       <img
@@ -92,6 +112,7 @@ const PatientSidebar = () => (
         <NavLink
           key={link.to}
           to={link.to}
+          onClick={onClose}
           className={({ isActive }) =>
             `flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 ${
               link.isEmergency
@@ -121,7 +142,8 @@ const PatientSidebar = () => (
       <p>&copy; {new Date().getFullYear()} MediLink</p>
       <p className="mt-1 opacity-75">Patient Portal</p>
     </div>
-  </aside>
+    </aside>
+  </>
 );
 
 export default PatientSidebar;

@@ -9,7 +9,8 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Phone
+  Phone,
+  Settings
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -86,10 +87,10 @@ const PatientDashboard = () => {
       hoverColor: 'hover:bg-blue-50'
     },
     {
-      title: 'Wellness',
-      description: 'Health tips & community',
-      icon: Heart,
-      link: '/client/patient/wellness',
+      title: 'Settings',
+      description: 'Manage your account & preferences',
+      icon: Settings,
+      link: '/client/patient/settings',
       iconColor: 'text-blue-600',
       hoverColor: 'hover:bg-blue-50'
     }
@@ -103,7 +104,7 @@ const PatientDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="w-full px-0.5 sm:px-0">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
@@ -115,7 +116,7 @@ const PatientDashboard = () => {
       </div>
 
       {/* Health Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         {healthStats.map((stat, index) => (
           <div
             key={index}
@@ -130,11 +131,11 @@ const PatientDashboard = () => {
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column - Quick Actions & Appointments */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Actions */}
-          <div className="bg-white p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="bg-white p-3.5 sm:p-6 shadow-sm border border-gray-100">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Quick Actions</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {quickActions.map((action, index) => (
@@ -158,7 +159,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Upcoming Appointments */}
-          <div className="bg-white not-odd:p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="bg-white p-3.5 sm:p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-bold">Upcoming Appointments</h2>
               <Link
@@ -234,7 +235,7 @@ const PatientDashboard = () => {
         {/* Right Column - Recent Activity & Health Alert */}
         <div className="space-y-6">
           {/* Health Alert */}
-          <div className="bg-blue-500 p-4 sm:p-6 text-white shadow-lg">
+          <div className="bg-blue-500 p-3.5 sm:p-6 text-white shadow-lg">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-white/20 p-2 rounded-lg">
                 <AlertCircle className="w-6 h-6" />
@@ -253,7 +254,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Recent Activity */}
-          <div className="p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="p-3.5 sm:p-6 shadow-sm border border-gray-100 bg-white">
             <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Recent Activity</h2>
             <div className="space-y-4">
               {recentActivities.map((activity) => (
@@ -271,7 +272,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Quick Contact */}
-          <div className="p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="p-3.5 sm:p-6 shadow-sm border border-gray-100 bg-white">
             <h3 className="font-semibold mb-4">Need Help?</h3>
             <div className="space-y-3">
               <button className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">

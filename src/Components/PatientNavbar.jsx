@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Bell,
   Search,
@@ -11,7 +11,6 @@ import {
   Sun,
   ChevronDown,
   Menu,
-  X,
   Phone,
   MessageSquare,
   HelpCircle,
@@ -19,11 +18,10 @@ import {
   FileText,
 } from 'lucide-react';
 
-const PatientNavbar = () => {
+const PatientNavbar = ({ onMenuClick }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Sample patient data
   const patient = {
@@ -96,17 +94,26 @@ const PatientNavbar = () => {
   };
 
   return (
-    // Fixed top navbar that starts after the sidebar (left-64)
     <nav
-      className={`fixed top-0 left-64 right-0 z-40 ${
+      className={`fixed top-0 left-0 right-0 z-40 md:left-64 ${
         darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'
       } shadow-md border-b border-gray-200 h-16`}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Welcome Message */}
-          <div className="hidden lg:block">
-            <h2 className="text-lg font-semibold text-gray-800">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onMenuClick}
+              className={`md:hidden p-2 rounded-lg ${
+                darkMode
+                  ? 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <h2 className="hidden lg:block text-lg font-semibold text-gray-800">
               Welcome back, <span className="text-blue-600">{patient.name}</span>! 👋
             </h2>
           </div>
@@ -310,71 +317,8 @@ const PatientNavbar = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`lg:hidden p-2 rounded-lg ${
-                darkMode
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-              }`}
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div
-            className={`lg:hidden border-t ${
-              darkMode ? 'border-gray-700' : 'border-gray-200'
-            } py-4`}
-          >
-            <div className="space-y-2">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                      link.isEmergency
-                        ? 'bg-red-600 text-white hover:bg-red-700'
-                        : darkMode
-                        ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 mr-3" />
-                    {link.name}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Mobile Search */}
-            <div className="mt-4 px-4">
-              <div className="relative">
-                <Search
-                  className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                    darkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`}
-                />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className={`w-full pl-10 pr-4 py-2 text-sm rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    darkMode
-                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
-                      : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );
