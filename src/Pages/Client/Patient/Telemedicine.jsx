@@ -290,7 +290,7 @@ const Telemedicine = () => {
                     className="bg-white shadow-sm border border-gray-200 p-3 hover:shadow-md transition-shadow rounded-lg"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-9 h-9 bg-blue-50 rounded flex items-center justify-center flex-shrink-0">
+                      <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                         <Video className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -366,7 +366,7 @@ const Telemedicine = () => {
                     className="bg-white shadow-sm border border-gray-200 p-3 rounded-lg"
                   >
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-9 h-9 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+                    <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                       <CheckCircle className="w-5 h-5 text-green-600" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -389,7 +389,7 @@ const Telemedicine = () => {
                         </span>
                       )}
                       {consultation.recording && (
-                        <span className="flex items-center space-x-1 text-sm text-purple-600">
+                        <span className="flex items-center space-x-1 text-sm text-blue-600">
                           <Video className="w-3.5 h-3.5" />
                           <span>Recording</span>
                         </span>
@@ -411,7 +411,8 @@ const Telemedicine = () => {
                     )}
                   </div>
                 </div>
-                ))}\n              </div>
+                ))} 
+              </div>
             ) : (
               <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                 <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -693,7 +694,7 @@ const Telemedicine = () => {
       {/* Details Modal */}
       {showDetailsModal && selectedConsultation && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-stretch sm:items-center sm:justify-center z-50 p-0 sm:p-4 overflow-y-auto">
-          <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[85vh] sm:rounded-lg overflow-y-auto shadow-2xl">
+          <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[85vh] overflow-y-auto shadow-2xl">
             <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Consultation Details</h2>
               <button
