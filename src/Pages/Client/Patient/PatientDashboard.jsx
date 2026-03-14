@@ -108,7 +108,7 @@ const PatientDashboard = () => {
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
-          Welcome Back, Patient!
+        Patient Dashboard
         </h1>
         <p className="text-sm sm:text-base">
           Here's an overview of your health journey
