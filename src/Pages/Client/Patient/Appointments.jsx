@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, Clock, MapPin, Video, User, Plus, X, Phone, Mail, AlertCircle, CheckCircle, ExternalLink, Download } from 'lucide-react';
 
 const Appointments = () => {
@@ -9,6 +9,20 @@ const Appointments = () => {
   const [showJoinCallModal, setShowJoinCallModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [bookingType, setBookingType] = useState('clinic');
+
+  const isAnyModalOpen =
+    showBookingModal || showDetailsModal || showCancelModal || showJoinCallModal;
+
+  useEffect(() => {
+    if (!isAnyModalOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isAnyModalOpen]);
 
   const appointments = {
     upcoming: [
@@ -171,8 +185,11 @@ const Appointments = () => {
     );
   };
 
+  const modalOverlayClasses =
+    'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto';
+
   const DetailsModal = () => (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4 pt-20">
+    <div className={modalOverlayClasses}>
       <div className="bg-white rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Appointment Details</h2>
@@ -316,7 +333,7 @@ const Appointments = () => {
   );
 
   const CancelModal = () => (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4 pt-20">
+    <div className={modalOverlayClasses}>
       <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
         <div className="p-6">
           <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mx-auto mb-4">
@@ -366,7 +383,7 @@ const Appointments = () => {
   );
 
   const JoinCallModal = () => (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4 pt-20">
+    <div className={modalOverlayClasses}>
       <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
         <div className="p-6">
           <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4">
@@ -420,8 +437,8 @@ const Appointments = () => {
   );
 
   const BookingModal = () => (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4 pt-20">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+    <div className={modalOverlayClasses}>
+      <div className="bg-white max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Book New Appointment</h2>
           <button
@@ -466,7 +483,7 @@ const Appointments = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Specialty
               </label>
-              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:ring-blue-500 focus:border-transparent">
                 <option>General Practitioner</option>
                 <option>Cardiologist</option>
                 <option>Pediatrician</option>
@@ -482,7 +499,7 @@ const Appointments = () => {
                 </label>
                 <input
                   type="date"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
                   min={new Date().toISOString().split('T')[0]}
                 />
               </div>
@@ -490,7 +507,7 @@ const Appointments = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Preferred Time
                 </label>
-                <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent">
                   <option>Morning (8AM - 12PM)</option>
                   <option>Afternoon (12PM - 5PM)</option>
                   <option>Evening (5PM - 8PM)</option>
@@ -504,7 +521,7 @@ const Appointments = () => {
                   {bookingType === 'clinic' ? 'Select Clinic' : 'Your Location'}
                 </label>
                 {bookingType === 'clinic' ? (
-                  <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent">
                     <option>Nairobi Health Center</option>
                     <option>Mombasa Medical Clinic</option>
                     <option>Kisumu Health Facility</option>
@@ -513,7 +530,7 @@ const Appointments = () => {
                   <input
                     type="text"
                     placeholder="Enter your address"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
                   />
                 )}
               </div>
@@ -526,7 +543,7 @@ const Appointments = () => {
               <textarea
                 rows="3"
                 placeholder="Describe your symptoms or reason for appointment..."
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent"
               />
             </div>
 
@@ -534,7 +551,7 @@ const Appointments = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Insurance
               </label>
-              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-transparent">
                 <option>NHIF</option>
                 <option>SHA</option>
                 <option>Private Insurance</option>
