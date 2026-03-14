@@ -164,7 +164,26 @@ const Appointments = () => {
     return MapPin;
   };
 
+  const mapAppointmentTypeToBookingType = (type) => {
+    if (type === 'Telemedicine') return 'telemedicine';
+    if (type === 'Home Visit') return 'home';
+    return 'clinic';
+  };
+
   const renderAppointmentActions = (appointment) => {
+    if (activeTab === 'past' || activeTab === 'cancelled') {
+      return (
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => handleViewDetails(appointment)}
+            className="px-3 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Details
+          </button>
+        </div>
+      );
+    }
+
     if (activeTab !== 'upcoming') return null;
 
     return (
@@ -188,9 +207,27 @@ const Appointments = () => {
   const modalOverlayClasses =
     'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-stretch sm:items-center sm:justify-center p-0 sm:p-6 overflow-y-auto';
 
-  const DetailsModal = () => (
+  const DetailsModal = () => {
+    const status = selectedAppointment?.status;
+    const isActiveAppointment = status === 'confirmed' || status === 'pending';
+    const isCompleted = status === 'completed';
+    const isCancelled = status === 'cancelled';
+    const canJoinCall = isActiveAppointment && selectedAppointment?.type === 'Telemedicine';
+    const canCancel = isActiveAppointment;
+    const canRebook = isCompleted || isCancelled;
+
+    const statusPillClass =
+      status === 'confirmed' || status === 'completed'
+        ? 'bg-green-50 text-green-700'
+        : status === 'pending'
+          ? 'bg-yellow-50 text-yellow-700'
+          : status === 'cancelled'
+            ? 'bg-red-50 text-red-700'
+            : 'bg-gray-50 text-gray-700';
+
+    return (
     <div className={modalOverlayClasses}>
-      <div className="bg-white w-full h-full sm:h-auto  sm:max-w-2xl sm:max-h-[85vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Appointment Details</h2>
           <button
@@ -289,39 +326,56 @@ const Appointments = () => {
           {/* Status */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Status</h3>
-            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
-              selectedAppointment?.status === 'confirmed' ? ' text-green-700' :
-              selectedAppointment?.status === 'pending' ? ' text-yellow-700' :
-              'text-gray-700'
-            }`}>
-              <CheckCircle className="w-4 h-4" />
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${statusPillClass}`}>
+              {status === 'cancelled' || status === 'pending' ? (
+                <AlertCircle className="w-4 h-4" />
+              ) : (
+                <CheckCircle className="w-4 h-4" />
+              )}
               {selectedAppointment?.status.charAt(0).toUpperCase() + selectedAppointment?.status.slice(1)}
             </span>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
-            {selectedAppointment?.type === 'Telemedicine' && (
+          <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+            {canJoinCall && (
               <button
                 onClick={() => {
                   setShowDetailsModal(false);
                   handleJoinCall(selectedAppointment);
                 }}
-                className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Video className="w-4 h-4" />
                 Join Video Call
               </button>
             )}
-            <button
-              onClick={() => {
-                setShowDetailsModal(false);
-                handleCancelAppointment(selectedAppointment);
-              }}
-              className="flex-1 px-4 py-3 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-            >
-              Cancel Appointment
-            </button>
+
+            {canCancel && (
+              <button
+                onClick={() => {
+                  setShowDetailsModal(false);
+                  handleCancelAppointment(selectedAppointment);
+                }}
+                className="px-4 py-3 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                Cancel Appointment
+              </button>
+            )}
+
+            {canRebook && (
+              <button
+                onClick={() => {
+                  setShowDetailsModal(false);
+                  setBookingType(mapAppointmentTypeToBookingType(selectedAppointment?.type));
+                  setShowBookingModal(true);
+                }}
+                className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Rebook Appointment
+              </button>
+            )}
+
             <button className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
               <Download className="w-4 h-4" />
               Download
@@ -330,7 +384,8 @@ const Appointments = () => {
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   const CancelModal = () => (
     <div className={modalOverlayClasses}>
@@ -674,7 +729,7 @@ const Appointments = () => {
                             </p>
                           </div>
 
-                          {activeTab === 'upcoming' && (
+                          {renderAppointmentActions(appointment) && (
                             <div className="mt-3 pt-3 border-t border-gray-100">
                               {renderAppointmentActions(appointment)}
                             </div>
