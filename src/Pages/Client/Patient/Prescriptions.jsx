@@ -310,21 +310,11 @@ const Prescriptions = () => {
             Manage your medications, refills, and delivery tracking
           </p>
         </div>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <MapPin className="w-4 h-4" />
-            <span className="hidden sm:inline">Pharmacies</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export All</span>
-          </button>
-        </div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="bg-white p-3 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600">Active Prescriptions</p>
@@ -333,7 +323,7 @@ const Prescriptions = () => {
             <Pill className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600">Refills Available</p>
@@ -344,7 +334,7 @@ const Prescriptions = () => {
             <Repeat className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600">Reminders Set</p>
@@ -355,7 +345,7 @@ const Prescriptions = () => {
             <Bell className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600">Nearby Pharmacies</p>
@@ -365,19 +355,6 @@ const Prescriptions = () => {
           </div>
         </div>
       </div>
-
-      {/* Important Alert */}
-      {/* <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-          <div>
-            <h3 className="text-sm font-semibold text-yellow-900">Medication Reminder</h3>
-            <p className="text-sm text-yellow-800 mt-1">
-              Your next dose of <strong>Amoxicillin</strong> is due today at 2:00 PM. Don't forget to take it with food.
-            </p>
-          </div>
-        </div>
-      </div> */}
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -389,7 +366,7 @@ const Prescriptions = () => {
               className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === tab
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-gray-800 hover:text-gray-900 hover:border-gray-300'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -402,21 +379,21 @@ const Prescriptions = () => {
       {activeTab === 'active' && (
         <div>
           <div className="flex items-center gap-4 mb-4">
-            <div className="flex-1 relative">
+            <div className="flex-1 relative lg:max-w-3xl">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search medications..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {prescriptions.active.map((prescription) => (
-            <div key={prescription.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div key={prescription.id} className="bg-white shadow-sm border border-gray-200 overflow-hidden">
               <div
                 className="p-3 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => togglePrescription(prescription.id)}
@@ -448,16 +425,16 @@ const Prescriptions = () => {
                         </div>
                       </div>
                       <div className="mt-2">
-                        <div className="flex items-center justify-between text-xs mb-1">
+                        {/* <div className="flex items-center justify-between text-xs mb-1">
                           <span className="text-gray-600">Treatment Progress</span>
                           <span className="font-medium text-gray-900">{prescription.progress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        </div> */}
+                        {/* <div className="w-full bg-gray-200 rounded-full h-1.5">
                           <div
                             className="bg-blue-600 h-1.5 rounded-full transition-all"
                             style={{ width: `${prescription.progress}%` }}
                           ></div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -555,7 +532,7 @@ const Prescriptions = () => {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {prescriptions.history.map((prescription) => (
-            <div key={prescription.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+            <div key={prescription.id} className="bg-white shadow-sm border border-gray-200 p-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded flex-shrink-0">
@@ -596,7 +573,7 @@ const Prescriptions = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {nearbyPharmacies.map((pharmacy) => (
-            <div key={pharmacy.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 hover:shadow-md transition-shadow">
+            <div key={pharmacy.id} className="bg-white shadow-sm border border-gray-200 p-3 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 text-base truncate">{pharmacy.name}</h3>
