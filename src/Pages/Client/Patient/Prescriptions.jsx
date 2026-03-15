@@ -3,7 +3,7 @@ import {
   Pill, Package, MapPin, Bell, 
   Clock, Download, Share2, Search,
   AlertCircle, CheckCircle, Phone, 
-  ChevronDown, ChevronUp, Calendar,
+  ChevronDown, ChevronUp, Calendar, X,
   ShoppingCart, AlertTriangle, Smartphone,
   Info, Repeat, TrendingUp, DollarSign
 } from 'lucide-react';
@@ -183,22 +183,23 @@ const Prescriptions = () => {
   };
 
   const RefillModal = () => (
-    <div className="fixed inset-0 bg-opacity-50 z-50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
+    <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4">
+      <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-2xl overflow-y-auto rounded-none sm:rounded-lg">
+        <div className="sticky top-0 z-10 bg-white p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">Request Refill</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Request Refill</h2>
             <button
               onClick={() => setShowRefillModal(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="h-9 w-9 inline-flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+              aria-label="Close refill modal"
             >
-              <ChevronUp className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {selectedMedication && (
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="border border-blue-200 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
                 <Pill className="w-6 h-6 text-blue-600 mt-1" />
@@ -283,7 +284,7 @@ const Prescriptions = () => {
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setShowRefillModal(false)}
                 className="flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
