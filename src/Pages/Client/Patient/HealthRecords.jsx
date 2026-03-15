@@ -14,7 +14,7 @@ import {
 } from 'docx';
 import { 
   FileText, Download, Share2, Calendar, Activity, 
-  File, Upload, Filter, Search, ChevronDown, ChevronUp,
+  File, Upload, Filter, Search, ChevronDown,
   AlertCircle, CheckCircle, Clock, Pill, Paperclip,
   Image, FileCheck, Folder, TrendingUp, Eye
 } from 'lucide-react';
@@ -22,8 +22,8 @@ import {
 const HealthRecords = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedRecord, setExpandedRecord] = useState(null);
-  const [filterType, setFilterType] = useState('all');
+  const [medicalHistoryFilter, setMedicalHistoryFilter] = useState('all');
+  const [openShareMenuRecordId, setOpenShareMenuRecordId] = useState(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [actionFeedback, setActionFeedback] = useState('');
   const fileInputRef = useRef(null);
@@ -200,6 +200,19 @@ const HealthRecords = () => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [showExportMenu]);
 
+  useEffect(() => {
+    if (openShareMenuRecordId === null) return undefined;
+
+    const handleOutsideClick = (event) => {
+      if (!event.target.closest('[data-share-menu-root]')) {
+        setOpenShareMenuRecordId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [openShareMenuRecordId]);
+
   const getDocumentCategory = (fileName) => {
     const lowerName = fileName.toLowerCase();
 
@@ -253,7 +266,8 @@ const HealthRecords = () => {
       size: formatFileSize(file.size),
       category: getDocumentCategory(file.name),
       icon: getDocumentIcon(file),
-      color: 'blue'
+      color: 'blue',
+      sourceFile: file
     }));
 
     setUploadedDocuments((prev) => [...mappedDocuments, ...prev]);
@@ -310,6 +324,77 @@ const HealthRecords = () => {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+  };
+
+  const saveBlobToFileSystem = async (blob, filename, mimeType) => {
+    if (!('showSaveFilePicker' in window)) {
+      downloadBlob(blob, filename);
+      return;
+    }
+
+    const fileHandle = await window.showSaveFilePicker({
+      suggestedName: filename,
+      types: [
+        {
+          description: 'Document file',
+          accept: {
+            [mimeType]: [`.${filename.split('.').pop()}`]
+          }
+        }
+      ]
+    });
+
+    const writable = await fileHandle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+  };
+
+  const getDownloadFileName = (name, extension = 'txt') => {
+    const trimmed = String(name || 'document').trim();
+    const hasExtension = /\.[A-Za-z0-9]+$/.test(trimmed);
+    const sanitized = trimmed.replace(/[^a-zA-Z0-9._-]+/g, '_');
+    return hasExtension ? sanitized : `${sanitized}.${extension}`;
+  };
+
+  const handleDocumentDownload = async (document) => {
+    const sourceFile = document?.sourceFile;
+
+    if (sourceFile && typeof sourceFile.arrayBuffer === 'function') {
+      const filename = getDownloadFileName(sourceFile.name || document.name);
+
+      try {
+        await saveBlobToFileSystem(sourceFile, filename, sourceFile.type || 'application/octet-stream');
+        setActionFeedback(`Downloaded ${document.name}.`);
+      } catch (error) {
+        if (error?.name !== 'AbortError') {
+          setActionFeedback('Download failed. Please try again.');
+        }
+      }
+
+      return;
+    }
+
+    const placeholderContent = [
+      'MediLink Document Export',
+      `Name: ${document.name}`,
+      `Type: ${document.type}`,
+      `Uploaded By: ${document.uploadedBy}`,
+      `Date: ${document.date}`,
+      `Size: ${document.size}`,
+      '',
+      'This is a generated placeholder for seeded demo records.'
+    ].join('\n');
+
+    const blob = new Blob([placeholderContent], { type: 'text/plain;charset=utf-8;' });
+
+    try {
+      await saveBlobToFileSystem(blob, getDownloadFileName(document.name, 'txt'), 'text/plain');
+      setActionFeedback(`Downloaded ${document.name}.`);
+    } catch (error) {
+      if (error?.name !== 'AbortError') {
+        setActionFeedback('Download failed. Please try again.');
+      }
+    }
   };
 
   const getDocumentExportRows = () => uploadedDocuments.map((document) => ({
@@ -483,6 +568,179 @@ const HealthRecords = () => {
     return Packer.toBlob(report);
   };
 
+  const buildMedicalHistorySummary = (record) => [
+    `Type: ${record.type}`,
+    `Provider: ${record.provider}${record.specialty ? ` - ${record.specialty}` : ''}`,
+    `Date: ${record.date}`,
+    record.diagnosis ? `Diagnosis: ${record.diagnosis}` : '',
+    record.vaccine ? `Vaccine: ${record.vaccine}` : '',
+    record.notes ? `Notes: ${record.notes}` : ''
+  ].filter(Boolean).join('\n');
+
+  const createMedicalHistoryPdfBlob = (record) => {
+    const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+    const lines = buildMedicalHistorySummary(record).split('\n');
+
+    pdf.setFontSize(16);
+    pdf.text('Medical History Record', 40, 44);
+    pdf.setFontSize(10);
+    pdf.text(`Generated: ${new Date().toLocaleString()}`, 40, 62);
+
+    let y = 88;
+    lines.forEach((line) => {
+      const wrapped = pdf.splitTextToSize(line, 500);
+      pdf.text(wrapped, 40, y);
+      y += wrapped.length * 14;
+    });
+
+    return pdf.output('blob');
+  };
+
+  const createMedicalHistoryTextBlob = (record) => new Blob([
+    'MediLink Medical History Record\n',
+    `${buildMedicalHistorySummary(record)}\n`
+  ], { type: 'text/plain;charset=utf-8;' });
+
+  const getMedicalHistoryFileBaseName = (record) => {
+    const safeType = String(record.type || 'record').replace(/[^a-zA-Z0-9_-]+/g, '-').toLowerCase();
+    return `medical-history-${record.id}-${safeType}`;
+  };
+
+  const copyTextToClipboard = async (text) => {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    textArea.remove();
+  };
+
+  const shareOrDownloadFile = async ({ blob, fileName, fallbackMessage }) => {
+    const ShareFile = globalThis.File;
+
+    if (
+      typeof navigator.share === 'function' &&
+      typeof navigator.canShare === 'function' &&
+      typeof ShareFile === 'function'
+    ) {
+      const file = new ShareFile([blob], fileName, { type: blob.type || 'application/octet-stream' });
+
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'MediLink Record',
+          text: 'Shared from MediLink Health Records',
+          files: [file]
+        });
+        setActionFeedback(`Shared ${fileName}.`);
+        return;
+      }
+    }
+
+    await saveBlobToFileSystem(blob, fileName, blob.type || 'application/octet-stream');
+    setActionFeedback(fallbackMessage);
+  };
+
+  const handleMedicalHistoryDownload = async (record) => {
+    try {
+      const blob = createMedicalHistoryPdfBlob(record);
+      const fileName = `${getMedicalHistoryFileBaseName(record)}.pdf`;
+      await saveBlobToFileSystem(blob, fileName, 'application/pdf');
+      setActionFeedback(`Downloaded ${record.type} record.`);
+    } catch (error) {
+      if (error?.name !== 'AbortError') {
+        setActionFeedback('Download failed. Please try again.');
+      }
+    }
+  };
+
+  const handleShareMedicalHistoryPdf = async (record) => {
+    try {
+      const blob = createMedicalHistoryPdfBlob(record);
+      const fileName = `${getMedicalHistoryFileBaseName(record)}.pdf`;
+      await shareOrDownloadFile({
+        blob,
+        fileName,
+        fallbackMessage: 'Sharing is not supported on this browser. PDF was downloaded instead.'
+      });
+    } catch (error) {
+      if (error?.name !== 'AbortError') {
+        setActionFeedback('Unable to share this record.');
+      }
+    } finally {
+      setOpenShareMenuRecordId(null);
+    }
+  };
+
+  const handleShareMedicalHistoryText = async (record) => {
+    try {
+      const blob = createMedicalHistoryTextBlob(record);
+      const fileName = `${getMedicalHistoryFileBaseName(record)}.txt`;
+      await shareOrDownloadFile({
+        blob,
+        fileName,
+        fallbackMessage: 'Sharing is not supported on this browser. Text file was downloaded instead.'
+      });
+    } catch (error) {
+      if (error?.name !== 'AbortError') {
+        setActionFeedback('Unable to share this record.');
+      }
+    } finally {
+      setOpenShareMenuRecordId(null);
+    }
+  };
+
+  const handleCopyMedicalHistoryLink = async (record) => {
+    try {
+      const link = `${window.location.origin}${window.location.pathname}?record=${record.id}`;
+      await copyTextToClipboard(link);
+      setActionFeedback('Record link copied to clipboard.');
+    } catch {
+      setActionFeedback('Unable to copy link.');
+    } finally {
+      setOpenShareMenuRecordId(null);
+    }
+  };
+
+  const handleCopyMedicalHistorySummary = async (record) => {
+    try {
+      await copyTextToClipboard(buildMedicalHistorySummary(record));
+      setActionFeedback('Record summary copied to clipboard.');
+    } catch {
+      setActionFeedback('Unable to copy summary.');
+    } finally {
+      setOpenShareMenuRecordId(null);
+    }
+  };
+
+  const normalizedMedicalSearchQuery = searchQuery.trim().toLowerCase();
+  const filteredMedicalHistory = medicalHistory.filter((record) => {
+    const matchesCategory = medicalHistoryFilter === 'all' || record.type === medicalHistoryFilter;
+
+    if (!matchesCategory) return false;
+    if (!normalizedMedicalSearchQuery) return true;
+
+    const searchableText = [
+      record.type,
+      record.provider,
+      record.specialty,
+      record.diagnosis,
+      record.vaccine,
+      record.notes,
+      record.date,
+      record.status
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    return searchableText.includes(normalizedMedicalSearchQuery);
+  });
+
   const exportConfig = {
     csv: {
       extension: 'csv',
@@ -564,10 +822,6 @@ const HealthRecords = () => {
     }
   };
 
-  const toggleRecord = (id) => {
-    setExpandedRecord(expandedRecord === id ? null : id);
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -602,13 +856,13 @@ const HealthRecords = () => {
               </button>
 
               {showExportMenu && (
-                <div className="absolute right-0 mt-2 w-40 rounded-lg border border-gray-200 bg-white shadow-lg z-20 overflow-hidden">
+                <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-44 max-w-[calc(100vw-2rem)] rounded-lg border border-gray-200 bg-white shadow-lg z-20 overflow-hidden">
                   {Object.entries(exportConfig).map(([key, config]) => (
                     <button
                       key={key}
                       type="button"
                       onClick={() => handleExportByFormat(key)}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      className="w-full text-left px-4 py-3 text-sm whitespace-nowrap text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       {config.label}
                     </button>
@@ -630,8 +884,8 @@ const HealthRecords = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="bg-white p-3 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600">Total Records</p>
@@ -640,7 +894,7 @@ const HealthRecords = () => {
             <FileText className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600">Active Prescriptions</p>
@@ -649,7 +903,7 @@ const HealthRecords = () => {
             <Pill className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600">Upcoming Vaccinations</p>
@@ -658,7 +912,7 @@ const HealthRecords = () => {
             <Calendar className="w-7 h-7 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-3 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600">Last Checkup</p>
@@ -672,8 +926,8 @@ const HealthRecords = () => {
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="flex space-x-8 overflow-x-auto">
-          {['overview', '', '', ''].map((tab) => (
-            /* Add prescriptions medical-history documents*/
+          {['overview', 'prescriptions', 'medical-history'].map((tab) => (
+            
 
             <button
               key={tab}
@@ -694,7 +948,7 @@ const HealthRecords = () => {
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Recent Documents */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Folder className="w-4 h-4 text-blue-600" />
               Recent Documents
@@ -715,7 +969,14 @@ const HealthRecords = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-gray-500">{doc.size}</span>
-                      <Download className="w-3.5 h-3.5 text-gray-400 hover:text-blue-600" />
+                      <button
+                        type="button"
+                        onClick={() => handleDocumentDownload(doc)}
+                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        aria-label={`Download ${doc.name}`}
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
                 );
@@ -724,7 +985,7 @@ const HealthRecords = () => {
           </div>
 
           {/* Health Summary */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-blue-600" />
               Health Summary
@@ -757,7 +1018,7 @@ const HealthRecords = () => {
           </div>
 
           {/* Active Prescriptions */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Pill className="w-4 h-4 text-blue-600" />
               Active Prescriptions
@@ -781,7 +1042,7 @@ const HealthRecords = () => {
           </div>
 
           {/* Upcoming Vaccinations */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-blue-600" />
               Upcoming Vaccinations
@@ -800,7 +1061,7 @@ const HealthRecords = () => {
           </div>
 
           {/* Recent Medical History */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white shadow-sm border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <FileText className="w-4 h-4 text-blue-600" />
               Recent Medical History
@@ -825,92 +1086,9 @@ const HealthRecords = () => {
         </div>
       )}
 
-      {/* Documents Tab */}
-      {activeTab === 'documents' && (
-        <div className="">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">My Documents</h3>
-              <button
-                type="button"
-                onClick={handleUploadClick}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Upload className="w-4 h-4" />
-                Upload Document
-              </button>
-            </div>
-            
-            {/* Filter by category */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-              {['all', 'report', 'prescription', 'vaccination', 'insurance'].map((category) => (
-                <button
-                  key={category}
-                  className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                    filterType === category
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                  onClick={() => setFilterType(category)}
-                >
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {uploadedDocuments
-                .filter(doc => filterType === 'all' || doc.category === filterType)
-                .map((doc) => {
-                const Icon = doc.icon;
-                return (
-                  <div key={doc.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow bg-white">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className={`p-2 ${doc.color} rounded`}>
-                        <Icon className={`w-4 h-4 text-${doc.color}-600`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm text-gray-900 truncate">{doc.name}</h4>
-                        <p className="text-xs text-gray-500">{doc.type}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-1 mb-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">By:</span>
-                        <span className="font-medium text-gray-700 truncate ml-2">{doc.uploadedBy}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Date:</span>
-                        <span className="text-gray-700">{doc.date}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Size:</span>
-                        <span className="text-gray-700">{doc.size}</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-1 pt-2 border-t border-gray-100">
-                      <button className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                        <Eye className="w-3 h-3" />
-                        View
-                      </button>
-                      <button className="flex items-center justify-center px-2 py-1.5 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
-                        <Download className="w-3 h-3" />
-                      </button>
-                      <button className="flex items-center justify-center px-2 py-1.5 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
-                        <Share2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Medical History Tab */}
       {activeTab === 'medical-history' && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white shadow-sm border border-gray-200">
           <div className="p-6">
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="flex-1 relative">
@@ -920,13 +1098,13 @@ const HealthRecords = () => {
                   placeholder="Search medical records..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
                 />
               </div>
               <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={medicalHistoryFilter}
+                onChange={(e) => setMedicalHistoryFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
               >
                 <option value="all">All Records</option>
                 <option value="Consultation">Consultations</option>
@@ -936,12 +1114,9 @@ const HealthRecords = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {medicalHistory.map((record) => (
-                <div key={record.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                  <div
-                    className="p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                    onClick={() => toggleRecord(record.id)}
-                  >
+              {filteredMedicalHistory.map((record) => (
+                <div key={record.id} className="border border-gray-200 overflow-hidden">
+                  <div className="p-3 bg-gray-50">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="p-1.5 rounded flex-shrink-0">
@@ -950,52 +1125,96 @@ const HealthRecords = () => {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-900 truncate">{record.type}</p>
                         </div>
-                        {expandedRecord === record.id ? (
-                          <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                        )}
                       </div>
                       <div className="text-xs text-gray-600 truncate">{record.provider} {record.specialty && `- ${record.specialty}`}</div>
                       <div className="text-xs text-gray-500 mt-0.5">{record.date}</div>
                     </div>
                   </div>
-                  {expandedRecord === record.id && (
-                    <div className="p-3 bg-white border-t border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                        {record.diagnosis && (
-                          <div>
-                            <p className="text-xs font-medium text-gray-700">Diagnosis</p>
-                            <p className="text-sm text-gray-900">{record.diagnosis}</p>
-                          </div>
-                        )}
-                        {record.vaccine && (
-                          <div>
-                            <p className="text-xs font-medium text-gray-700">Vaccine</p>
-                            <p className="text-sm text-gray-900">{record.vaccine}</p>
-                          </div>
-                        )}
-                      </div>
-                      {record.notes && (
-                        <div className="mb-3">
-                          <p className="text-xs font-medium text-gray-700 mb-1">Notes</p>
-                          <p className="text-sm text-gray-600">{record.notes}</p>
+                  <div className="p-3 bg-white border-t border-gray-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                      {record.diagnosis && (
+                        <div>
+                          <p className="text-xs font-medium text-gray-700">Diagnosis</p>
+                          <p className="text-sm text-gray-900">{record.diagnosis}</p>
                         </div>
                       )}
-                      <div className="flex gap-2">
-                        <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                          <Download className="w-3.5 h-3.5" />
-                          Download
-                        </button>
-                        <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                      {record.vaccine && (
+                        <div>
+                          <p className="text-xs font-medium text-gray-700">Vaccine</p>
+                          <p className="text-sm text-gray-900">{record.vaccine}</p>
+                        </div>
+                      )}
+                    </div>
+                    {record.notes && (
+                      <div className="mb-3">
+                        <p className="text-xs font-medium text-gray-700 mb-1">Notes</p>
+                        <p className="text-sm text-gray-600">{record.notes}</p>
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleMedicalHistoryDownload(record)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Download
+                      </button>
+                      <div className="relative" data-share-menu-root>
+                        <button
+                          type="button"
+                          onClick={() => setOpenShareMenuRecordId((prev) => (prev === record.id ? null : record.id))}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                          aria-haspopup="menu"
+                          aria-expanded={openShareMenuRecordId === record.id}
+                        >
                           <Share2 className="w-3.5 h-3.5" />
                           Share
                         </button>
+
+                        {openShareMenuRecordId === record.id && (
+                          <div className="absolute left-0 bottom-full mb-2 w-52 max-w-[calc(100vw-2rem)] bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                            <button
+                              type="button"
+                              onClick={() => handleShareMedicalHistoryPdf(record)}
+                              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Share as PDF
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleShareMedicalHistoryText(record)}
+                              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Share as Text
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyMedicalHistoryLink(record)}
+                              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Copy Record Link
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyMedicalHistorySummary(record)}
+                              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Copy Summary
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
+
+              {filteredMedicalHistory.length === 0 && (
+                <div className="col-span-full border border-gray-200 bg-white p-6 text-sm text-gray-600">
+                  No medical records match your current search and filter.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1003,12 +1222,12 @@ const HealthRecords = () => {
 
       {/* Prescriptions Tab */}
       {activeTab === 'prescriptions' && (
-        <div className="rounded-lg border border-gray-200">
+        <div className="border border-gray-200">
           <div className="p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-4">Current Prescriptions</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {prescriptions.map((prescription) => (
-                <div key={prescription.id} className="border border-gray-200 rounded-lg p-3">
+                <div key={prescription.id} className="border border-gray-200 p-3">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-start gap-2 flex-1 min-w-0">
                       <div className="p-1.5 rounded flex-shrink-0">

@@ -287,7 +287,7 @@ const Telemedicine = () => {
                 {consultations.upcoming.map((consultation) => (
                   <div
                     key={consultation.id}
-                    className="bg-white shadow-sm border border-gray-200 p-3 hover:shadow-md transition-shadow rounded-lg"
+                    className="bg-white shadow-sm border border-gray-200 p-3 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
@@ -363,7 +363,7 @@ const Telemedicine = () => {
                 {consultations.past.map((consultation) => (
                   <div
                     key={consultation.id}
-                    className="bg-white shadow-sm border border-gray-200 p-3 rounded-lg"
+                    className="bg-white shadow-sm border border-gray-200 p-3"
                   >
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
