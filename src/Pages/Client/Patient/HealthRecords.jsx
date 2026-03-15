@@ -240,7 +240,9 @@ const HealthRecords = () => {
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="flex space-x-8 overflow-x-auto">
-          {['overview', 'documents', 'medical-history', 'prescriptions'].map((tab) => (
+          {['overview', '', '', ''].map((tab) => (
+            /* Add prescriptions medical-history documents*/
+
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -615,6 +617,7 @@ const HealthRecords = () => {
           </div>
         </div>
       )}
+      
     </div>
   );
 };
