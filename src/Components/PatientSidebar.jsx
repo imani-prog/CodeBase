@@ -20,6 +20,13 @@ const sidebarLinks = [
     label: 'Dashboard',
     icon: <LayoutDashboard className="w-5 h-5 mr-3" />,
   },
+
+  {
+    to: '/client/patient/emergency',
+    label: 'Emergency Services',
+    icon: <AlertCircle className="w-5 h-5 mr-3" />,
+    isEmergency: true,
+  },
   {
     to: '/client/patient/appointments',
     label: 'Appointments',
@@ -45,12 +52,7 @@ const sidebarLinks = [
     label: 'Insurance & Billing',
     icon: <Shield className="w-5 h-5 mr-3" />,
   },
-  {
-    to: '/client/patient/emergency',
-    label: 'Emergency Services',
-    icon: <AlertCircle className="w-5 h-5 mr-3" />,
-    isEmergency: true,
-  },
+
   // {
   //   to: '/client/patient/wellness',
   //   label: 'Health & Wellness',

@@ -141,7 +141,7 @@ const Login = () => {
     } else if (finalRole === 'chw') {
       navigate('/client/chw/dashboard');
     } else if (finalRole === 'patient') {
-      navigate('/client/patient/dashboard');
+      navigate('/client/patient/emergency');
     } else {
       setError('Invalid role detected. Please contact support.');
     }

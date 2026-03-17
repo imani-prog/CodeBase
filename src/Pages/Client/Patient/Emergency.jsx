@@ -160,9 +160,9 @@ const Emergency = () => {
   };
 
   const tabs = [
-    { id: 'hotline', label: 'Emergency Hotlines', icon: Phone },
-    { id: 'chw', label: 'Community Health Workers', icon: Users },
-    { id: 'ambulance', label: 'Order Ambulance', icon: Ambulance }
+      { id: 'ambulance', label: 'Order Ambulance', icon: Ambulance },
+      { id: 'chw', label: 'Community Health Workers', icon: Users },
+      { id: 'hotline', label: 'Emergency Hotlines', icon: Phone }
   ];
 
   return (
