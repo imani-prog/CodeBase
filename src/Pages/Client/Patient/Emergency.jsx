@@ -20,7 +20,9 @@ import { Link } from 'react-router-dom';
 import EmergencyFeatures from '../../../Components/Client/EmergencyFeatures';
 
 const Emergency = () => {
-  const [activeTab, setActiveTab] = useState('hotline');
+  const [activeTab, setActiveTab] = useState('ambulance');
+  const [showMap, setShowMap] = useState(false);
+  const [mapView, setMapView] = useState('chw');
   const [selectedCHW, setSelectedCHW] = useState(null);
   const [selectedAmbulance, setSelectedAmbulance] = useState(null);
   const [showCHWModal, setShowCHWModal] = useState(false);
@@ -80,47 +82,47 @@ const Emergency = () => {
   const ambulances = [
     {
       id: 1,
-      name: 'MediLink Ambulance A1',
+      name: 'MediLink Ambulance KDH 556H',
       type: 'Advanced Life Support',
       distance: '2.3 km',
       eta: '8 minutes',
       available: true,
       location: { lat: -1.289389, lng: 36.818223 },
       equipment: ['Defibrillator', 'Oxygen', 'ECG Monitor'],
-      cost: 'KES 5,000'
+      cost: 'Ksh 300'
     },
     {
       id: 2,
-      name: 'MediLink Ambulance B2',
+      name: 'MediLink Ambulance KDE 223E',
       type: 'Basic Life Support',
       distance: '3.5 km',
       eta: '12 minutes',
       available: true,
       location: { lat: -1.292389, lng: 36.822223 },
       equipment: ['First Aid Kit', 'Oxygen', 'Stretcher'],
-      cost: 'KES 3,000'
+      cost: 'Ksh 350'
     },
     {
       id: 3,
-      name: 'City Hospital Ambulance',
+      name: 'City Hospital KDB 456B',
       type: 'Critical Care',
       distance: '4.2 km',
       eta: '15 minutes',
       available: false,
       location: { lat: -1.296389, lng: 36.826223 },
       equipment: ['Ventilator', 'Defibrillator', 'IV Equipment'],
-      cost: 'KES 8,000'
+      cost: 'Ksh 400'
     },
     {
       id: 4,
-      name: 'Rescue Unit R5',
+      name: 'Rescue Unit KBX 456B',
       type: 'Advanced Life Support',
       distance: '1.8 km',
       eta: '6 minutes',
       available: true,
       location: { lat: -1.287389, lng: 36.816223 },
       equipment: ['Defibrillator', 'Oxygen', 'Trauma Kit'],
-      cost: 'KES 5,500'
+      cost: 'Ksh 150'
     }
   ];
 
@@ -161,45 +163,74 @@ const Emergency = () => {
 
   const tabs = [
       { id: 'ambulance', label: 'Order Ambulance', icon: Ambulance },
-      { id: 'chw', label: 'Community Health Workers', icon: Users },
-      { id: 'hotline', label: 'Emergency Hotlines', icon: Phone }
+      { id: 'chw', label: 'Community Health Workers', icon: Users }
   ];
+
+  const openMapOverlay = (view) => {
+    setMapView(view);
+    setShowMap(true);
+  };
+
+  const mapMeta = {
+    chw: {
+      title: 'Nearby CHW Coverage Map',
+      subtitle: 'Showing Community Health Workers around your area',
+      badgeLabel: 'CHW Live View'
+    },
+    ambulance: {
+      title: 'Live Ambulance Coverage Map',
+      subtitle: 'Showing available ambulance coverage around your area',
+      badgeLabel: 'Ambulance Live View'
+    }
+  };
 
   return (
     <div className="space-y-4">
-      {/* Header and Notice */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-        {/* Header */}
-        <div className="rounded-lg p-2.5">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
-              <AlertCircle className="w-4 h-4 text-red-600" />
-            </div>
-            <div>
-              <h1 className="text-base font-bold text-gray-900">Emergency Services</h1>
-              <p className="text-gray-600 text-xs">
-                24/7 Emergency support
-              </p>
-            </div>
+      {/* Header */}
+      <div className="rounded-lg p-2.5">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+            <AlertCircle className="w-4 h-4 text-red-600" />
           </div>
-        </div>
-
-        {/* Important Notice */}
-        <div className=" border-yellow-400 p-2.5 rounded-lg">
-          <div className="flex items-start space-x-2">
-            <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <h3 className="text-sm font-semibold ">Life-Threatening Emergency?</h3>
-              <p className="text-xs mt-0.5">
-                Call <strong>999</strong> or <strong>0700 000 000</strong>
-              </p>
-            </div>
+          <div className="min-w-0">
+            <h1 className="text-base font-bold text-gray-900">Emergency Services</h1>
+            <p className="text-xs text-gray-600">24/7 Emergency support</p>
           </div>
         </div>
       </div>
 
-      {/* Emergency Features Component */}
-      <EmergencyFeatures />
+      {/* Hotline summary */}
+      <div className="px-2 w-full max-w-full overflow-hidden">
+        <h2 className="text-base font-bold text-gray-900 mb-1.5 flex items-center">
+          <Phone className="w-4 h-4 mr-2 text-blue-600" />
+          Emergency Hotlines
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2">
+          <a href="tel:999" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-red-300 transition-colors">
+            <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">National Emergency</p>
+            <p className="text-sm sm:text-base font-bold text-red-600 break-all">999</p>
+          </a>
+          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+            <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">MediLink Emergency</p>
+            <p className="text-sm sm:text-base font-bold text-blue-600 break-all">0743669252</p>
+          </a>
+          <a href="tel:911" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+            <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Ambulance</p>
+            <p className="text-sm sm:text-base font-bold text-gray-900 break-all">911</p>
+          </a>
+          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+            <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Poison Control</p>
+            <p className="text-sm sm:text-base font-bold text-gray-900 break-all">0743669252</p>
+          </a>
+          <a href="tel:1195" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+            <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Mental Health</p>
+            <p className="text-sm sm:text-base font-bold text-gray-900 break-all">1195</p>
+          </a>
+        </div>
+      </div>
+
+      
+
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -213,7 +244,7 @@ const Emergency = () => {
                 className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-800 hover:text-gray-900 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -226,111 +257,46 @@ const Emergency = () => {
 
       {/* Content Sections */}
       <div className="space-y-4">
-        {/* Emergency Hotlines Tab */}
-        {activeTab === 'hotline' && (
-          <div className="space-y-2">
-            {/* Primary Emergency Numbers */}
-            <div className="p-2">
-              <h2 className="text-base font-bold text-gray-900 mb-1.5 flex items-center">
-                <Phone className="w-4 h-4 mr-2 text-blue-600" />
-                Primary Emergency Contacts
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                <a
-                  href="tel:999"
-                  className="group flex flex-col items-center p-2"
-                >
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mb-1">
-                    <Phone className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold">National</div>
-                    <div className="text-base font-bold text-red-600">999</div>
-                  </div>
-                </a>
-
-                <a
-                  href="tel:+254700000000"
-                  className="group flex flex-col items-center p-2"
-                >
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mb-1">
-                    <Shield className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-gray-600">MediLink</div>
-                    <div className="text-sm font-bold text-blue-600">0743669252</div>
-                  </div>
-                </a>
-              </div>
-            </div>
-
-            {/* Additional Emergency Numbers */}
-            <div className="p-2">
-              <h2 className="text-base font-bold text-gray-900 mb-1.5">Additional Emergency Services</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                <a
-                  href="tel:911"
-                  className="flex items-center space-x-2 p-2  group"
-                >
-                  <Ambulance className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">Ambulance</div>
-                    <div className="text-base font-bold text-gray-700">911</div>
-                  </div>
-                </a>
-
-                <a
-                  href="tel:+254743669252"
-                  className="flex items-center space-x-2 p-2  group"
-                >
-                  <Heart className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">Poison Control</div>
-                    <div className="text-base font-bold text-gray-700">0743669252</div>
-                  </div>
-                </a>
-
-                <a
-                  href="tel:1195"
-                  className="flex items-center space-x-2 p-2  group"
-                >
-                  <Activity className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">Mental Health</div>
-                    <div className="text-base font-bold text-gray-700">1195</div>
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Community Health Workers Tab */}
         {activeTab === 'chw' && (
           <div className="space-y-4">
-            {/* Map Placeholder */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="h-64 flex items-center justify-center relative">
-                <MapIcon className="w-16 h-16 text-blue-600 opacity-50" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-2" />
-                    <p className="text-blue-600 font-semibold">Google Maps Integration</p>
-                    <p className="text-sm text-blue-600 mt-1">Showing CHWs near your location</p>
+            <div className="flex items-center justify-end lg:hidden">
+              <button
+                onClick={() => openMapOverlay('chw')}
+                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm"
+              >
+                <MapIcon className="w-4 h-4 text-blue-600" />
+                <span>Open Live Map</span>
+              </button>
+            </div>
+
+            {/* Live map view — desktop only (lg+) */}
+            <div className="hidden lg:block border border-gray-200 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-blue-600" />
+                      {mapMeta.chw.title}
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-0.5">{mapMeta.chw.subtitle}</p>
                   </div>
+                  <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+                    {mapMeta.chw.badgeLabel}
+                  </span>
                 </div>
-                {/* Simulated markers */}
-                {communityHealthWorkers.filter(chw => chw.available).map((chw, index) => (
-                  <div
-                    key={chw.id}
-                    className="absolute w-8 h-8 bg-green-500 border-4 border-white rounded-full shadow-lg animate-pulse"
-                    style={{
-                      top: `${30 + index * 20}%`,
-                      left: `${25 + index * 15}%`
-                    }}
-                  />
-                ))}
               </div>
+              <iframe
+                src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
+                width="100%"
+                height="460"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="CHW Coverage Map"
+                className="w-full h-[420px] xl:h-[500px]"
+              />
             </div>
 
             {/* CHW List */}
@@ -339,13 +305,13 @@ const Emergency = () => {
                 <Users className="w-4 h-4 mr-2 text-blue-600" />
                 Available Community Health Workers Near You
               </h2>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
                 {communityHealthWorkers.map((chw) => (
                   <div
                     key={chw.id}
                     className={`p-2 border-2 rounded-lg transition-all ${
                       chw.available
-                        ? 'border-blue-200 hover:border-blue-400'
+                        ? 'border-gray-200 hover:border-gray-300'
                         : 'border-gray-200 bg-gray-50 opacity-60'
                     }`}
                   >
@@ -376,7 +342,7 @@ const Emergency = () => {
                       <div className="mt-2">
                         {chw.available ? (
                           <div className="flex flex-col space-y-1 items-center">
-                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                            <span className="px-2 py-0.5 text-green-800 text-xs font-bold">
                               Available
                             </span>
                             <a
@@ -405,36 +371,43 @@ const Emergency = () => {
         {/* Order Ambulance Tab */}
         {activeTab === 'ambulance' && (
           <div className="space-y-4">
-            {/* Map Placeholder */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="bg-gradient-to-br from-red-100 to-red-200 h-64 flex items-center justify-center relative">
-                <MapIcon className="w-16 h-16 text-red-600 opacity-50" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <Ambulance className="w-12 h-12 text-red-600 mx-auto mb-2" />
-                    <p className="text-red-900 font-semibold">Real-Time Ambulance Tracking</p>
-                    <p className="text-sm text-red-700 mt-1">Showing available ambulances near you</p>
+            <div className="flex items-center justify-end lg:hidden">
+              <button
+                onClick={() => openMapOverlay('ambulance')}
+                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm"
+              >
+                <MapIcon className="w-4 h-4 text-blue-600" />
+                <span>Open Live Map</span>
+              </button>
+            </div>
+
+            {/* Live map view — desktop only (lg+) */}
+            <div className="hidden lg:block border border-gray-200 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-blue-600" />
+                      {mapMeta.ambulance.title}
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-0.5">{mapMeta.ambulance.subtitle}</p>
                   </div>
+                  <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+                    {mapMeta.ambulance.badgeLabel}
+                  </span>
                 </div>
-                {/* Simulated ambulance markers */}
-                {ambulances.filter(amb => amb.available).map((amb, index) => (
-                  <div
-                    key={amb.id}
-                    className="absolute"
-                    style={{
-                      top: `${25 + index * 18}%`,
-                      left: `${30 + index * 20}%`
-                    }}
-                  >
-                    <div className="relative">
-                      <div className="w-10 h-10 bg-red-500 border-4 border-white rounded-lg shadow-lg flex items-center justify-center animate-bounce">
-                        <Ambulance className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
-                    </div>
-                  </div>
-                ))}
               </div>
+              <iframe
+                src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
+                width="100%"
+                height="460"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Ambulance Coverage Map"
+                className="w-full h-[420px] xl:h-[500px]"
+              />
             </div>
 
             {/* Ambulance List */}
@@ -443,13 +416,13 @@ const Emergency = () => {
                 <Ambulance className="w-4 h-4 mr-2 text-blue-600" />
                 Available Ambulances Near You
               </h2>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
                 {ambulances.map((ambulance) => (
                   <div
                     key={ambulance.id}
                     className={`p-2 border-2 rounded-lg transition-all ${
                       ambulance.available
-                        ? 'border-blue-200 hover:border-blue-400 hover:shadow-lg'
+                        ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
                         : 'border-gray-200 bg-gray-50 opacity-60'
                     }`}
                   >
@@ -485,7 +458,7 @@ const Emergency = () => {
                         {ambulance.equipment.map((item, index) => (
                           <span
                             key={index}
-                            className="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full"
+                            className="px-1.5 py-0.5  text-blue-600 text-xs"
                           >
                             {item}
                           </span>
@@ -513,7 +486,7 @@ const Emergency = () => {
             </div>
 
             {/* Emergency Tips */}
-            <div className="bg-yellow-50 w-1/4 border border-yellow-200 rounded-lg p-3">
+            <div className="bg-yellow-50 w-full lg:w-3/4 xl:w-1/2 border border-yellow-200 rounded-lg p-3">
               <h3 className="text-sm font-bold text-yellow-900 mb-1.5 flex items-center">
                 <AlertCircle className="w-3 h-3 mr-1.5" />
                 While waiting for the ambulance:
@@ -541,10 +514,56 @@ const Emergency = () => {
         )}
       </div>
 
+      {/* Emergency Features Component */}
+      <EmergencyFeatures />
+
+      {/* Full-screen map overlay — mobile/tablet only */}
+      {showMap && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col bg-white">
+          <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm shrink-0">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-blue-600" />
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">{mapMeta[mapView].title}</h2>
+                <p className="text-xs text-gray-500">{mapMeta[mapView].subtitle}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowMap(false)}
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Close map"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+          <div className="flex items-center gap-4 px-4 py-2 bg-white border-b border-gray-100 text-xs text-gray-500 shrink-0">
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+              Your location
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+              Active responders
+            </span>
+          </div>
+          <iframe
+            src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
+            width="100%"
+            height="100%"
+            style={{ border: 0, flex: 1, display: 'block' }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Emergency Live Map"
+            className="flex-1 w-full"
+          />
+        </div>
+      )}
+
       {/* CHW Call Modal */}
       {showCHWModal && selectedCHW && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white shadow-2xl max-w-md w-full p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-bold text-gray-900">Calling CHW</h3>
               <button
@@ -582,8 +601,8 @@ const Emergency = () => {
 
       {/* Ambulance Order Modal */}
       {showAmbulanceModal && selectedAmbulance && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white shadow-2xl max-w-lg w-full p-4">
             {!orderConfirmed ? (
               <>
                 <div className="flex items-center justify-between mb-4">
@@ -646,7 +665,7 @@ const Emergency = () => {
               </>
             ) : (
               <div className="text-center py-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Order Confirmed!</h3>

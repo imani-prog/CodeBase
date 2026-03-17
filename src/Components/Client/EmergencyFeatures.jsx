@@ -24,6 +24,16 @@ import {
   Droplet
 } from 'lucide-react';
 
+const EMERGENCY_TIPS = [
+  'In case of severe bleeding, apply direct pressure and elevate the wound above the heart.',
+  'For burns, cool the area with running water for at least 10 minutes. Do not apply ice.',
+  'If someone is choking and cannot speak or cough, perform the Heimlich maneuver immediately.',
+  'For cardiac arrest, start CPR immediately: 30 chest compressions followed by 2 rescue breaths.',
+  'Keep emergency numbers saved in your phone and share them with family members.',
+  'Always inform emergency responders about any allergies or medical conditions.',
+  'For poisoning, call poison control immediately. Do not induce vomiting unless instructed.'
+];
+
 const EmergencyFeatures = () => {
   // State management
   const [showSOSCountdown, setShowSOSCountdown] = useState(false);
@@ -40,14 +50,15 @@ const EmergencyFeatures = () => {
   const [rating, setRating] = useState(0);
   const [autoNotify, setAutoNotify] = useState(false);
   const [locationCopied, setLocationCopied] = useState(false);
-  const [emergencyTip, setEmergencyTip] = useState('');
+  // const [emergencyTip, setEmergencyTip] = useState('');
+  // const [showEmergencyTip, setShowEmergencyTip] = useState(true);
   const [ambulanceOrdered, setAmbulanceOrdered] = useState(false);
 
   // Sample data
-  const emergencyContacts = [
-    { name: 'John Doe (Father)', phone: '+254712345678' },
-    { name: 'Jane Doe (Mother)', phone: '+254723456789' }
-  ];
+  // const emergencyContacts = [
+  //   { name: 'John Doe (Father)', phone: '+254712345678' },
+  //   { name: 'Jane Doe (Mother)', phone: '+254723456789' }
+  // ];
 
   const medicalInfo = {
     bloodType: 'O+',
@@ -98,16 +109,6 @@ const EmergencyFeatures = () => {
     status: 'En Route'
   };
 
-  const emergencyTips = [
-    'In case of severe bleeding, apply direct pressure and elevate the wound above the heart.',
-    'For burns, cool the area with running water for at least 10 minutes. Do not apply ice.',
-    'If someone is choking and cannot speak or cough, perform the Heimlich maneuver immediately.',
-    'For cardiac arrest, start CPR immediately: 30 chest compressions followed by 2 rescue breaths.',
-    'Keep emergency numbers saved in your phone and share them with family members.',
-    'Always inform emergency responders about any allergies or medical conditions.',
-    'For poisoning, call poison control immediately. Do not induce vomiting unless instructed.'
-  ];
-
   // Get user location
   const [userLocation, setUserLocation] = useState({ lat: -1.286389, lng: 36.817223 });
 
@@ -125,10 +126,16 @@ const EmergencyFeatures = () => {
   }, []);
 
   // Random emergency tip on load
-  useEffect(() => {
-    const randomTip = emergencyTips[Math.floor(Math.random() * emergencyTips.length)];
-    setEmergencyTip(randomTip);
-  }, []);
+  // useEffect(() => {
+  //   const randomTip = EMERGENCY_TIPS[Math.floor(Math.random() * EMERGENCY_TIPS.length)];
+  //   setEmergencyTip(randomTip);
+
+  //   const tipTimer = setTimeout(() => {
+  //     setShowEmergencyTip(false);
+  //   }, 5000);
+
+  //   return () => clearTimeout(tipTimer);
+  // }, []);
 
   // SOS Countdown logic
   useEffect(() => {
@@ -167,9 +174,9 @@ const EmergencyFeatures = () => {
     }
   };
 
-  const handleBroadcastToAllCHWs = () => {
-    alert('Emergency broadcast sent to all nearby Community Health Workers!');
-  };
+  // const handleBroadcastToAllCHWs = () => {
+  //   alert('Emergency broadcast sent to all nearby Community Health Workers!');
+  // };
 
   const handleSendMessage = () => {
     if (chatInput.trim()) {
@@ -211,18 +218,20 @@ const EmergencyFeatures = () => {
       {/* Compact Horizontal Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-4">
         {/* Emergency Tip Banner */}
-        <div className="border-l-4 border-blue-400 p-2.5 rounded-lg sm:col-span-2 lg:col-span-3 xl:col-span-4">
-          <div className="flex items-start space-x-2">
-            <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <h3 className="text-sm font-semibold text-blue-800">Emergency Tip</h3>
-              <p className="text-xs text-blue-700 mt-0.5">{emergencyTip}</p>
+        {/* {showEmergencyTip && (
+          <div className="border-l-4 border-blue-400 p-2.5 rounded-lg sm:col-span-2 lg:col-span-3 xl:col-span-4">
+            <div className="flex items-start space-x-2">
+              <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="text-sm font-semibold text-blue-800">Emergency Tip</h3>
+                <p className="text-xs text-blue-700 mt-0.5">{emergencyTip}</p>
+              </div>
             </div>
           </div>
-        </div>
+        )} */}
 
         {/* Quick Medical Summary Card */}
-        <div className="bg-white rounded-lg shadow-md p-2 text-center">
+        {/* <div className="bg-white rounded-lg shadow-md p-2 text-center">
             <button
               onClick={() => setShowMedicalSummary(true)}
               className="w-full flex items-center justify-between text-left hover:bg-gray-50 transition-colors p-1.5 rounded cursor-pointer"
@@ -233,7 +242,7 @@ const EmergencyFeatures = () => {
               </div>
               <ChevronDown className="w-6 h-6 font-bold" />
             </button>
-          </div>
+          </div> */}
 
 
           {/* Cost Calculator */}
@@ -277,7 +286,7 @@ const EmergencyFeatures = () => {
           )}
 
           {/* Auto-Notify Emergency Contacts Toggle */}
-          <div className="bg-white rounded-lg shadow-md p-2">
+          {/* <div className="bg-white rounded-lg shadow-md p-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Bell className="w-6 h-6 text-blue-600" />
@@ -297,7 +306,7 @@ const EmergencyFeatures = () => {
                 }`} />
               </button>
             </div>
-          </div>
+          </div> */}
 
         {/* Emergency Request History */}
         <div className="bg-white rounded-lg shadow-md p-2">
@@ -359,7 +368,7 @@ const EmergencyFeatures = () => {
           )}
 
           {/* Broadcast to All CHWs */}
-          <div className="bg-white rounded-lg shadow-md p-2">
+          {/* <div className="bg-white rounded-lg shadow-md p-2">
             <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center">
               <Users className="w-6 h-6 mr-2 text-blue-600" />
               Emergency Broadcast
@@ -372,12 +381,12 @@ const EmergencyFeatures = () => {
               <span>Alert ALL Nearby CHWs</span>
             </button>
             <p className="text-xs text-gray-500 mt-2">Send emergency alert to all community health workers in your area</p>
-          </div>
+          </div> */}
       </div>
 
       {/* Medical Summary Modal */}
       {showMedicalSummary && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-lg w-full p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-bold text-gray-900 flex items-center">
@@ -420,7 +429,7 @@ const EmergencyFeatures = () => {
 
       {/* Emergency History Modal */}
       {showHistory && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-lg w-full p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-bold text-gray-900 flex items-center">
@@ -463,7 +472,7 @@ const EmergencyFeatures = () => {
 
       {/* Share Location Modal */}
       {showLocationShare && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-bold text-gray-900">Share Your Location</h3>
@@ -507,7 +516,7 @@ const EmergencyFeatures = () => {
 
       {/* Chat Modal */}
       {showChat && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-bold text-gray-900">Chat with {activeEmergency.driver}</h3>
@@ -551,7 +560,7 @@ const EmergencyFeatures = () => {
 
       {/* Rating Modal */}
       {showRating && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-bold text-gray-900">Rate Your Experience</h3>
@@ -607,22 +616,22 @@ const EmergencyFeatures = () => {
       )}
 
       {/* Floating SOS Button */}
-      <button
+      {/* <button
         onClick={handleSOSActivate}
         className="fixed bottom-6 right-6 w-16 h-16 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-2xl flex items-center justify-center z-40 animate-pulse transition-transform hover:scale-110"
         title="Emergency SOS - Calls 999"
       >
         <Siren className="w-8 h-8" />
-      </button>
+      </button> */}
 
       {/* Floating Share Location Button */}
-      <button
+      {/* <button
         onClick={() => setShowLocationShare(true)}
         className="fixed bottom-6 right-24 w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center z-40 transition-transform hover:scale-110"
         title="Share Location"
       >
         <Share2 className="w-5 h-5" />
-      </button>
+      </button> */}
 
       {/* Test buttons for demos - Remove in production */}
       {/* <div className="fixed top-20 left-1/2 transform -translate-x-1/2 space-x-2 z-50 flex bg-white p-2 rounded-lg shadow-lg border-2 border-gray-200">
