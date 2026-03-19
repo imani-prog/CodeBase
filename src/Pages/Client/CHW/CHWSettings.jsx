@@ -7,7 +7,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 /* ── Section header ── */
-const SectionHeader = ({ icon: Icon, title, subtitle }) => (
+const SectionHeader = ({ icon:  title, subtitle }) => (
   <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-gray-200 bg-white">
     <Icon className="w-4 h-4 text-blue-600 flex-shrink-0" />
     <div className="min-w-0">
