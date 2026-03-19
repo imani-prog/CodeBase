@@ -6,7 +6,6 @@ import {
   Settings,
   User,
   LogOut,
-  Shield,
   Moon,
   Sun,
   ChevronDown,
@@ -17,19 +16,23 @@ import {
   CreditCard,
   FileText,
 } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const PatientNavbar = ({ onMenuClick }) => {
+  const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
-  // Sample patient data
-  const patient = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    avatar: 'JD',
-    memberSince: '2023',
-  };
+  // Derive display values from auth user, with sensible fallbacks
+  const baseName = user?.name || user?.username || 'John Doe';
+  const patientEmail = user?.email || 'patient@example.com';
+  const patientInitials = baseName
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase())
+    .join('')
+    .slice(0, 2);
 
   const notifications = [
     {
@@ -78,11 +81,6 @@ const PatientNavbar = ({ onMenuClick }) => {
     { name: 'Sign Out', icon: LogOut, path: '/', isDanger: true },
   ];
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    // Add dark mode logic here
-  };
-
   const handleProfileClick = () => {
     setProfileDropdownOpen(!profileDropdownOpen);
     if (notificationsOpen) setNotificationsOpen(false);
@@ -101,6 +99,8 @@ const PatientNavbar = ({ onMenuClick }) => {
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+
+          {/* Left — menu toggle + welcome */}
           <div className="flex items-center gap-3">
             <button
               onClick={onMenuClick}
@@ -112,13 +112,12 @@ const PatientNavbar = ({ onMenuClick }) => {
             >
               <Menu className="w-5 h-5" />
             </button>
-
             <h2 className="hidden lg:block text-lg font-semibold text-gray-800">
-              Welcome back, <span className="text-blue-600">{patient.name}</span>! 👋
+              Welcome back, <span className="text-blue-600">{baseName}</span>! 👋
             </h2>
           </div>
 
-          {/* Desktop Navigation Links */}
+          {/* Center — nav links */}
           <div className="hidden lg:flex items-center space-x-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
@@ -141,12 +140,13 @@ const PatientNavbar = ({ onMenuClick }) => {
             })}
           </div>
 
-          {/* Right side controls */}
-          <div className="flex items-center space-x-4">
-            {/* Search Bar */}
+          {/* Right — search, dark mode, notifications, profile */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+
+            {/* Search */}
             <div className="hidden md:flex items-center">
               <div className={`relative ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Search appointments, doctors..."
@@ -159,15 +159,14 @@ const PatientNavbar = ({ onMenuClick }) => {
               </div>
             </div>
 
-            {/* Dark Mode Toggle */}
+            {/* Dark mode toggle */}
             <button
-              onClick={toggleDarkMode}
+              onClick={() => setDarkMode(!darkMode)}
               className={`p-2 rounded-lg transition-all duration-200 ${
                 darkMode
                   ? 'text-yellow-400 hover:bg-gray-800'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
-              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -190,7 +189,6 @@ const PatientNavbar = ({ onMenuClick }) => {
                 )}
               </button>
 
-              {/* Notifications Dropdown */}
               {notificationsOpen && (
                 <div
                   className={`absolute right-0 mt-2 w-80 rounded-xl shadow-xl border ${
@@ -208,20 +206,14 @@ const PatientNavbar = ({ onMenuClick }) => {
                       <div
                         key={notification.id}
                         className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          notification.unread ? (darkMode ? 'bg-gray-750' : 'bg-blue-50') : ''
+                          notification.unread ? 'bg-blue-50' : ''
                         }`}
                       >
                         <div className="flex items-start">
-                          <div
-                            className={`w-2 h-2 rounded-full mt-2 mr-3 ${
-                              notification.unread ? 'bg-blue-500' : 'bg-gray-300'
-                            }`}
-                          ></div>
-                          <div className="flex-1">
+                          <div className={`w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 ${notification.unread ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                          <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium">{notification.message}</p>
-                            <p
-                              className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
-                            >
+                            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                               {notification.time}
                             </p>
                           </div>
@@ -238,59 +230,58 @@ const PatientNavbar = ({ onMenuClick }) => {
               )}
             </div>
 
-            {/* Profile Dropdown */}
+            {/* Profile dropdown */}
             <div className="relative">
               <button
                 onClick={handleProfileClick}
-                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                className={`flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-lg transition-all duration-200 ${
                   darkMode
                     ? 'text-gray-300 hover:text-white hover:bg-gray-800'
                     : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                  {patient.avatar}
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                  {patientInitials}
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold">{patient.name}</p>
-                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <p className="text-sm font-semibold leading-tight">{baseName}</p>
+                  <p className={`text-xs leading-tight ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     Patient
                   </p>
                 </div>
                 <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-200 ${
+                  className={`w-4 h-4 transition-transform duration-200 flex-shrink-0 ${
                     profileDropdownOpen ? 'rotate-180' : ''
                   }`}
                 />
               </button>
 
-              {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
                 <div
                   className={`absolute right-0 mt-2 w-64 rounded-xl shadow-xl border ${
                     darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                   } z-50`}
                 >
-                  {/* Profile Header */}
+                  {/* Profile header */}
                   <div className="p-4 border-b border-gray-200">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                        {patient.avatar}
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                        {patientInitials}
                       </div>
-                      <div>
-                        <p className="font-semibold">{patient.name}</p>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {patient.email}
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm leading-tight truncate">{baseName}</p>
+                        <p className={`text-xs truncate mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {patientEmail}
                         </p>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 mt-1">
-                          <div className="w-2 h-2 bg-green-400 rounded-full mr-1"></div>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800 mt-1">
+                          <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
                           Active Patient
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Menu Items */}
+                  {/* Menu items */}
                   <div className="py-2">
                     {profileMenuItems.map((item) => {
                       const Icon = item.icon;
@@ -299,15 +290,15 @@ const PatientNavbar = ({ onMenuClick }) => {
                           key={item.name}
                           to={item.path}
                           onClick={() => setProfileDropdownOpen(false)}
-                          className={`flex items-center px-4 py-3 text-sm transition-colors ${
+                          className={`flex items-center px-4 py-2.5 text-sm transition-colors ${
                             item.isDanger
                               ? 'text-red-600 hover:text-red-700 hover:bg-red-50'
                               : darkMode
                               ? 'text-gray-300 hover:text-white hover:bg-gray-700'
-                              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
                           }`}
                         >
-                          <Icon className="w-4 h-4 mr-3" />
+                          <Icon className="w-4 h-4 mr-3 flex-shrink-0" />
                           {item.name}
                         </Link>
                       );

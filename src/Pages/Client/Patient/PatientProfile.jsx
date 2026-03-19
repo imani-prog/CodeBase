@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  User, Mail, Phone, MapPin, Calendar, Shield,
-  Heart, Droplet, Weight, Ruler, AlertCircle,
+  User, Mail, Phone, MapPin, Shield,
+  Heart, AlertCircle,
   Edit3, Save, X, Camera, Check, LogOut,
 } from 'lucide-react';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
 /* ── Section header ── */
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
-  <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-200 bg-white">
+  <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-200">
     {Icon && <Icon className="w-4 h-4 text-blue-600 flex-shrink-0" />}
     <div className="min-w-0">
       <h2 className="text-sm font-semibold text-gray-800 leading-tight">{title}</h2>
@@ -64,58 +65,76 @@ const Note = ({ type = 'info', title, message }) => {
   );
 };
 
+/* ── Defaults ── */
+const defaultProfile = {
+  firstName: 'Timothy', lastName: 'Imani',
+  email: 'timothy.imani@gmail.com', phone: '+25443669252',
+  dateOfBirth: '2003-06-15', gender: 'Male', bloodType: 'O+',
+  street: '123 Health Street', city: 'Machakos',
+  state: 'Machakos County', zipCode: '02101', country: 'Kenya',
+  emergencyName: 'Sarah Imani', emergencyRelation: 'Spouse',
+  emergencyPhone: '+25443669252',
+  height: "5'10\"", weight: '175 lbs',
+  allergies: 'Penicillin, Peanuts',
+  medications: 'Lisinopril 10mg daily',
+  conditions: 'Hypertension',
+  insuranceProvider: 'Social Health Insurance Fund',
+  policyNumber: 'BCBS-123456789', groupNumber: 'GRP-987654',
+  memberSince: 'January 15, 2023',
+  userId: 'PT-2023-001234', status: 'Active',
+};
+
+const mapUserToProfile = (user = {}) => {
+  const baseName = user.name || user.username || '';
+  const [firstName = defaultProfile.firstName, ...rest] = baseName.split(' ').filter(Boolean);
+  return {
+    ...defaultProfile,
+    firstName,
+    lastName: rest.join(' ') || defaultProfile.lastName,
+    email: user.email || defaultProfile.email,
+    phone: user.phone || defaultProfile.phone,
+    userId: user.patientId || user.userId || defaultProfile.userId,
+  };
+};
+
 /* ── Main Component ── */
 const PatientProfile = () => {
-  const [profile, setProfile] = useState({
-    firstName: 'Timothy',
-    lastName: 'Imani',
-    email: 'timothy.imani@gmail.com',
-    phone: '+25443669252',
-    dateOfBirth: '2003-06-15',
-    gender: 'Male',
-    bloodType: 'O+',
-    street: '123 Health Street',
-    city: 'Machakos',
-    state: 'Machakos County',
-    zipCode: '02101',
-    country: 'Kenya',
-    emergencyName: 'Sarah Imani',
-    emergencyRelation: 'Spouse',
-    emergencyPhone: '+25443669252',
-    height: "5'10\"",
-    weight: '175 lbs',
-    allergies: 'Penicillin, Peanuts',
-    medications: 'Lisinopril 10mg daily',
-    conditions: 'Hypertension',
-    insuranceProvider: 'Social Health Insurance Fund',
-    policyNumber: 'BCBS-123456789',
-    groupNumber: 'GRP-987654',
-    memberSince: 'January 15, 2023',
-    userId: 'PT-2023-001234',
-    status: 'Active',
-  });
-
+  const { user, setUser } = useAuth();
+  const [profile, setProfile] = useState(() => mapUserToProfile(user));
   const [editMode, setEditMode] = useState(false);
+
+  useEffect(() => { setProfile(mapUserToProfile(user)); }, [user]);
 
   const set = (key, val) => setProfile((p) => ({ ...p, [key]: val }));
 
   const handleSave = () => {
-    console.log('Saving patient profile:', profile);
+    const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim();
+    // Sync back to auth context → navbar updates instantly
+    setUser((prev) => ({
+      ...prev,
+      name: fullName || prev?.name,
+      email: profile.email,
+      phone: profile.phone,
+      userId: profile.userId,
+      patientId: profile.userId,
+      initials: [profile.firstName, profile.lastName]
+        .filter(Boolean)
+        .map((w) => w[0].toUpperCase())
+        .join('') || prev?.initials,
+    }));
     setEditMode(false);
   };
 
   const initials = [profile.firstName, profile.lastName]
-    .filter(Boolean)
-    .map((w) => w[0].toUpperCase())
-    .join('');
+    .filter(Boolean).map((w) => w[0].toUpperCase()).join('');
   const fullName = `${profile.firstName} ${profile.lastName}`;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full  sm:px-6 py-4 sm:py-6">
+      <div className="w-full px-0 sm:px-4 py-4 sm:py-6">
 
         {/* ── Page Header ── */}
-        <div className="flex items-start justify-between gap-2 mb-4">
+        <div className="flex items-start justify-between gap-2 mb-4 px-4 sm:px-0">
           <div className="min-w-0">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">My Profile</h1>
             <p className="text-xs sm:text-sm text-gray-500 mt-0.5 hidden sm:block">
@@ -156,13 +175,12 @@ const PatientProfile = () => {
           </div>
         </div>
 
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-2 sm:space-y-4">
 
           {/* ── Personal Information ── */}
-          <div className="border border-gray-200 overflow-hidden ">
+          <div className="border-y sm:border border-gray-200 overflow-hidden">
             <SectionHeader icon={User} title="Personal Information" subtitle="Your personal contact details" />
             <div className="p-4">
-
               {/* Avatar row */}
               <div className="flex items-start gap-3 pb-4 mb-4 border-b border-gray-100">
                 <div className="relative flex-shrink-0">
@@ -206,7 +224,7 @@ const PatientProfile = () => {
           </div>
 
           {/* ── Address ── */}
-          <div className="border border-gray-200 overflow-hidden bg-white rounded-lg">
+          <div className="border-y sm:border border-gray-200 overflow-hidden">
             <SectionHeader icon={MapPin} title="Address" subtitle="Your residential address" />
             <div className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -214,15 +232,15 @@ const PatientProfile = () => {
                   <EditableField label="Street Address" icon={MapPin} value={profile.street} onChange={(v) => set('street', v)} editMode={editMode} />
                 </div>
                 <EditableField label="City" value={profile.city} onChange={(v) => set('city', v)} editMode={editMode} />
-                <EditableField label="State" value={profile.state} onChange={(v) => set('state', v)} editMode={editMode} />
-                <EditableField label="Zip Code" value={profile.zipCode} onChange={(v) => set('zipCode', v)} editMode={editMode} />
+                <EditableField label="State / County" value={profile.state} onChange={(v) => set('state', v)} editMode={editMode} />
+                <EditableField label="Postal Code" value={profile.zipCode} onChange={(v) => set('zipCode', v)} editMode={editMode} />
                 <Field label="Country" value={profile.country} />
               </div>
             </div>
           </div>
 
           {/* ── Medical Information ── */}
-          <div className="border border-gray-200 overflow-hidden bg-white rounded-lg">
+          <div className="border-y sm:border border-gray-200 overflow-hidden">
             <SectionHeader icon={Heart} title="Medical Information" subtitle="Your health and medical details" />
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -238,16 +256,13 @@ const PatientProfile = () => {
                   <EditableField label="Medical Conditions" value={profile.conditions} onChange={(v) => set('conditions', v)} editMode={editMode} />
                 </div>
               </div>
-              <Note
-                type="info"
-                title="Keep Information Current"
-                message="Accurate medical information helps healthcare providers deliver better care. Please update any changes to your medications or conditions."
-              />
+              <Note type="info" title="Keep Information Current"
+                message="Accurate medical information helps healthcare providers deliver better care. Please update any changes to your medications or conditions." />
             </div>
           </div>
 
           {/* ── Emergency Contact ── */}
-          <div className="border border-gray-200 overflow-hidden">
+          <div className="border-y sm:border border-gray-200 overflow-hidden">
             <SectionHeader icon={AlertCircle} title="Emergency Contact" subtitle="This person will be contacted in a medical emergency" />
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -257,16 +272,13 @@ const PatientProfile = () => {
                   <EditableField label="Phone Number" icon={Phone} type="tel" value={profile.emergencyPhone} onChange={(v) => set('emergencyPhone', v)} editMode={editMode} />
                 </div>
               </div>
-              <Note
-                type="warning"
-                title="Important"
-                message="Make sure your emergency contact is always up to date. This person should be able to make medical decisions on your behalf if needed."
-              />
+              <Note type="warning" title="Important"
+                message="Make sure your emergency contact is always up to date. This person should be able to make medical decisions on your behalf if needed." />
             </div>
           </div>
 
           {/* ── Insurance ── */}
-          <div className="border border-gray-200 overflow-hidden ">
+          <div className="border-y sm:border border-gray-200 overflow-hidden">
             <SectionHeader icon={Shield} title="Insurance" subtitle="Your insurance coverage details" />
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -276,11 +288,8 @@ const PatientProfile = () => {
                 <EditableField label="Policy Number" value={profile.policyNumber} onChange={(v) => set('policyNumber', v)} editMode={editMode} />
                 <EditableField label="Group Number" value={profile.groupNumber} onChange={(v) => set('groupNumber', v)} editMode={editMode} />
               </div>
-              <Note
-                type="info"
-                title="Insurance Coverage"
-                message="Your insurance information is securely stored and encrypted. Please verify this with your insurance provider to ensure accuracy."
-              />
+              <Note type="info" title="Insurance Coverage"
+                message="Your insurance information is securely stored and encrypted. Please verify this with your insurance provider to ensure accuracy." />
             </div>
           </div>
 
