@@ -9,7 +9,7 @@ import {
   Copy, Check, RefreshCw, X, Smartphone, Building2, Eye, EyeOff
 } from 'lucide-react';
 
-// ─── PDF Generation Utility (client-side via jsPDF CDN) ─────────────────────
+// ─── PDF Generation Utility (client-side via jsPDF CDN)
 const loadJsPDF = () => {
   return new Promise((resolve) => {
     if (window.jspdf) { resolve(window.jspdf.jsPDF); return; }
@@ -223,10 +223,8 @@ const generateInvoicePDF = async (bill) => {
   doc.save(`Invoice-${bill.invoiceNumber}.pdf`);
 };
 
-// ─── Modal Components ────────────────────────────────────────────────────────
-
 const ModalOverlay = ({ children, onClose }) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur" onClick={onClose}>
     <div className="relative bg-white rounded-lg shadow-xl w-full max-w-sm" onClick={e => e.stopPropagation()}>
       {children}
     </div>
@@ -235,7 +233,7 @@ const ModalOverlay = ({ children, onClose }) => (
 
 // M-Pesa STK Push Modal
 const MpesaPayModal = ({ bill, onClose, onSuccess }) => {
-  const [step, setStep] = useState('confirm'); // confirm | processing | success | failed
+  const [step, setStep] = useState('confirm');
   const [phone, setPhone] = useState('+254 712 345 678');
   const [countdown, setCountdown] = useState(60);
 
@@ -464,16 +462,16 @@ const AddPaymentModal = ({ onClose, onAdd }) => {
             { key: 'mpesa', label: 'M-Pesa', Icon: Phone },
             { key: 'card', label: 'Card', Icon: CreditCard },
             { key: 'bank', label: 'Bank', Icon: Building2 },
-          ].map(({ key, label, Icon }) => (
+          ].map((option) => (
             <button
-              key={key}
-              onClick={() => setType(key)}
+              key={option.key}
+              onClick={() => setType(option.key)}
               className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                type === key ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                type === option.key ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <Icon className="w-3 h-3" />
-              {label}
+              <option.Icon className="w-3 h-3" />
+              {option.label}
             </button>
           ))}
         </div>
@@ -778,9 +776,6 @@ const Insurance = () => {
     setCopiedText(label);
     setTimeout(() => setCopiedText(''), 2000);
   };
-
-  // Find pending bill for overview "Pay Now"
-  const pendingBill = billingHistory.find(b => b.status === 'pending');
 
   return (
     <div className="space-y-6">
