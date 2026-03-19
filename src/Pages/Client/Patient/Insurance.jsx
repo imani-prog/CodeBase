@@ -5,14 +5,13 @@ import {
   Download, Plus, Edit, Trash2, 
   Calendar, Receipt, TrendingUp, Wallet,
   Phone, Mail, MapPin, Info, 
-  ChevronDown, ChevronUp, ExternalLink,
+  ExternalLink,
   Copy, Check, RefreshCw
 } from 'lucide-react';
 
 const Insurance = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [expandedClaim, setExpandedClaim] = useState(null);
-  const [showAddCard, setShowAddCard] = useState(false);
+  const [, setShowAddCard] = useState(false);
   const [copiedText, setCopiedText] = useState('');
 
   // Insurance coverage data
@@ -98,7 +97,7 @@ const Insurance = () => {
   ];
 
   // Payment methods
-  const [paymentMethods, setPaymentMethods] = useState([
+  const [paymentMethods] = useState([
     {
       id: 1,
       type: 'M-Pesa',
@@ -161,15 +160,15 @@ const Insurance = () => {
       case 'approved':
       case 'paid':
       case 'Active':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-green-700';
       case 'processing':
       case 'pending':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+        return 'text-yellow-700';
       case 'rejected':
       case 'overdue':
-        return 'text-red-600 bg-red-50 border-red-200';
+        return 'text-red-700';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'text-gray-700';
     }
   };
 
@@ -194,10 +193,6 @@ const Insurance = () => {
     setTimeout(() => setCopiedText(''), 2000);
   };
 
-  const toggleClaim = (id) => {
-    setExpandedClaim(expandedClaim === id ? null : id);
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -208,7 +203,7 @@ const Insurance = () => {
             Manage your insurance coverage, claims, and payment information
           </p>
         </div>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Submit Claim</span>
@@ -217,52 +212,51 @@ const Insurance = () => {
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Download Statement</span>
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Active Claims</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">
-                {claims.filter(c => c.status === 'processing').length}
-              </p>
-            </div>
-            <FileText className="w-7 h-7 text-blue-600" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+            {[
+              {
+                label: "Active Claims",
+                value: claims.filter(c => c.status === 'processing').length,
+                icon: <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+                valueClass: "text-lg sm:text-xl font-bold text-gray-900",
+              },
+              {
+                label: "Pending Payments",
+                value: `KSh ${billingHistory.filter(b => b.status === 'pending').reduce((sum, b) => sum + parseInt(b.balance.replace(/[^0-9]/g, '')), 0).toLocaleString()}`,
+                icon: <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+                valueClass: "text-base sm:text-lg font-bold text-gray-900 truncate",
+              },
+              {
+                label: "Coverage Status",
+                value: insuranceInfo.status,
+                icon: <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+                valueClass: "text-base sm:text-lg font-bold text-green-600",
+              },
+              {
+                label: "Payment Methods",
+                value: paymentMethods.length,
+                icon: <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+                valueClass: "text-lg sm:text-xl font-bold text-gray-900",
+              },
+            ].map(({ label, value, icon, valueClass }) => (
+              <div
+                key={label}
+                className="bg-white p-3 sm:p-4 shadow-sm border border-gray-200 rounded-sm"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] sm:text-xs text-gray-500 leading-tight">{label}</p>
+                    <p className={`${valueClass} mt-1 leading-tight`}>{value}</p>
+                  </div>
+                  <div className="shrink-0 mt-0.5">{icon}</div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Pending Payments</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">
-                KSh {billingHistory.filter(b => b.status === 'pending').reduce((sum, b) => sum + parseInt(b.balance.replace(/[^0-9]/g, '')), 0).toLocaleString()}
-              </p>
-            </div>
-            <DollarSign className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Coverage Status</p>
-              <p className="text-base font-bold text-green-600 mt-0.5">{insuranceInfo.status}</p>
-            </div>
-            <Shield className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Payment Methods</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">{paymentMethods.length}</p>
-            </div>
-            <Wallet className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
-      </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -293,7 +287,7 @@ const Insurance = () => {
                 <Shield className="w-4 h-4 text-blue-600" />
                 NHIF Coverage
               </h3>
-              <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(insuranceInfo.status)}`}>
+              <span className={`text-sm font-semibold px-2 py-0.5  ${getStatusColor(insuranceInfo.status)}`}>
                 {insuranceInfo.status}
               </span>
             </div>
@@ -339,7 +333,7 @@ const Insurance = () => {
                 <p className="text-xs font-medium text-gray-700 mb-1.5">Covered Services</p>
                 <div className="flex flex-wrap gap-1.5">
                   {insuranceInfo.coverageServices.slice(0, 4).map((service, index) => (
-                    <span key={index} className="text-xs px-2 py-0.5 bg-green-50 text-blue-700 rounded-full border border-blue-200">
+                    <span key={index} className="text-sm px-2 py-0.5  text-blue-700 ">
                       {service}
                     </span>
                   ))}
@@ -358,7 +352,7 @@ const Insurance = () => {
                 <Shield className="w-4 h-4 text-blue-600" />
                 SHA Coverage
               </h3>
-              <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(shaInfo.status)}`}>
+              <span className={`text-sm font-semibold px-2 py-0.5 ${getStatusColor(shaInfo.status)}`}>
                 {shaInfo.status}
               </span>
             </div>
@@ -427,8 +421,8 @@ const Insurance = () => {
                         <p className="text-sm font-medium text-gray-900">{claim.service}</p>
                         <p className="text-xs text-gray-600">{claim.provider}</p>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-0.5 ${getStatusColor(claim.status)}`}>
-                        <StatusIcon className="w-3 h-3" />
+                      <span className={`text-sm font-semibold px-2 py-0.5 flex items-center gap-0.5 ${getStatusColor(claim.status)}`}>
+                        
                         {claim.status}
                       </span>
                     </div>
@@ -495,10 +489,7 @@ const Insurance = () => {
               const StatusIcon = getStatusIcon(claim.status);
               return (
                 <div key={claim.id} className="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
-                  <div
-                    className="p-2 cursor-pointer hover:bg-gray-50 transition-colors"
-                    onClick={() => toggleClaim(claim.id)}
-                  >
+                  <div className="p-2">
                     <div className="flex items-start justify-between gap-1.5 mb-1.5">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-gray-900 text-sm truncate">{claim.service}</h3>
@@ -528,36 +519,14 @@ const Insurance = () => {
                       </div>
                     </div>
 
-                    <button 
-                      className="w-full flex items-center justify-center gap-0.5 text-sm text-blue-600 hover:text-blue-700 py-0.5"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleClaim(claim.id);
-                      }}
-                    >
-                      {expandedClaim === claim.id ? (
-                        <>
-                          <ChevronUp className="w-3 h-3" />
-                          <span>Less</span>
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="w-3 h-3" />
-                          <span>More</span>
-                        </>
+                    <div className="">
+                    <div className="space-y-1 text-sm mb-2">
+                      {claim.submittedDate && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Submitted:</span>
+                          <span className="font-semibold">{claim.submittedDate}</span>
+                        </div>
                       )}
-                    </button>
-                  </div>
-
-                  {expandedClaim === claim.id && (
-                    <div className="p-2 bg-gray-50 border-t border-gray-200">
-                      <div className="space-y-1 text-sm mb-2">
-                        {claim.submittedDate && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Submitted:</span>
-                            <span className="font-semibold">{claim.submittedDate}</span>
-                          </div>
-                        )}
                       {claim.processedDate && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Processed:</span>
@@ -611,7 +580,7 @@ const Insurance = () => {
                       </button>
                     </div>
                   </div>
-                )}
+                  </div>
               </div>
             );
           })}
@@ -635,7 +604,7 @@ const Insurance = () => {
                     <p className="text-xs text-gray-600">{bill.date}</p>
                   </div>
                 </div>
-                <span className={`text-xs px-1.5 py-0.5 rounded-full border flex-shrink-0 ml-2 ${getStatusColor(bill.status)}`}>
+                <span className={`text-sm font-semibold px-1.5 py-0.5  flex-shrink-0 ml-2 ${getStatusColor(bill.status)}`}>
                   {bill.status}
                 </span>
               </div>
@@ -714,7 +683,7 @@ const Insurance = () => {
                       </div>
                     </div>
                     {method.primary && (
-                      <span className="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200 flex-shrink-0">
+                      <span className="text-sm font-semibold px-1.5 py-0.5  text-blue-700 flex-shrink-0">
                         Primary
                       </span>
                     )}

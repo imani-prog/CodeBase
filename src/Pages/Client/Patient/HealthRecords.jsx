@@ -884,44 +884,47 @@ const HealthRecords = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <div className="bg-white p-3 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Total Records</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">24</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+          {[
+            {
+              label: "Total Records",
+              value: "24",
+              icon: <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+              valueClass: "text-lg sm:text-xl font-bold text-gray-900",
+            },
+            {
+              label: "Active Prescriptions",
+              value: prescriptions.filter(p => p.status === 'active').length,
+              icon: <Pill className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+              valueClass: "text-lg sm:text-xl font-bold text-gray-900",
+            },
+            {
+              label: "Upcoming Vaccinations",
+              value: upcomingVaccinations.length,
+              icon: <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+              valueClass: "text-lg sm:text-xl font-bold text-gray-900",
+            },
+            {
+              label: "Last Checkup",
+              value: "Oct 15, 2025",
+              icon: <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+              valueClass: "text-xs sm:text-sm font-semibold text-gray-900",
+            },
+          ].map(({ label, value, icon, valueClass }) => (
+            <div
+              key={label}
+              className="bg-white p-3 sm:p-4 shadow-sm border border-gray-200 rounded-sm"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">{label}</p>
+                  <p className={`${valueClass} mt-1 leading-tight`}>{value}</p>
+                </div>
+                <div className="shrink-0 mt-0.5">{icon}</div>
+              </div>
             </div>
-            <FileText className="w-7 h-7 text-blue-600" />
-          </div>
+          ))}
         </div>
-        <div className="bg-white p-3 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Active Prescriptions</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">{prescriptions.filter(p => p.status === 'active').length}</p>
-            </div>
-            <Pill className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
-        <div className="bg-white p-3 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Upcoming Vaccinations</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">{upcomingVaccinations.length}</p>
-            </div>
-            <Calendar className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
-        <div className="bg-white p-3 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Last Checkup</p>
-              <p className="text-xs font-semibold text-gray-900 mt-0.5">Oct 15, 2025</p>
-            </div>
-            <CheckCircle className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
-      </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">

@@ -314,47 +314,42 @@ const Prescriptions = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <div className="bg-white p-3 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Active Prescriptions</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">{prescriptions.active.length}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+        {[
+          {
+            label: "Active Prescriptions",
+            value: prescriptions.active.length,
+            icon: <Pill className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+          },
+          {
+            label: "Refills Available",
+            value: prescriptions.active.reduce((sum, p) => sum + p.refillsRemaining, 0),
+            icon: <Repeat className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+          },
+          {
+            label: "Reminders Set",
+            value: prescriptions.active.filter(p => p.reminderSet).length,
+            icon: <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+          },
+          {
+            label: "Nearby Pharmacies",
+            value: nearbyPharmacies.length,
+            icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />,
+          },
+        ].map(({ label, value, icon }) => (
+          <div
+            key={label}
+            className="bg-white p-3 sm:p-4 shadow-sm border border-gray-200 rounded-sm"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">{label}</p>
+                <p className="text-lg sm:text-xl font-bold text-gray-900 mt-1 leading-tight">{value}</p>
+              </div>
+              <div className="shrink-0 mt-0.5">{icon}</div>
             </div>
-            <Pill className="w-7 h-7 text-blue-600" />
           </div>
-        </div>
-        <div className="bg-white p-3 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Refills Available</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">
-                {prescriptions.active.reduce((sum, p) => sum + p.refillsRemaining, 0)}
-              </p>
-            </div>
-            <Repeat className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
-        <div className="bg-white p-3 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Reminders Set</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">
-                {prescriptions.active.filter(p => p.reminderSet).length}
-              </p>
-            </div>
-            <Bell className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
-        <div className="bg-white p-3 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600">Nearby Pharmacies</p>
-              <p className="text-xl font-bold text-gray-900 mt-0.5">{nearbyPharmacies.length}</p>
-            </div>
-            <MapPin className="w-7 h-7 text-blue-600" />
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Tabs */}
