@@ -77,23 +77,23 @@ const PatientSettings = () => {
         },
       ],
     },
-    {
-      icon: Heart,
-      title: 'Health & Wellness',
-      description: 'Manage health tracking preferences',
-      toggles: [
-        {
-          label: 'Track Health Metrics',
-          defaultChecked: true,
-          onChange: (e) => console.log('Track metrics:', e.target.checked),
-        },
-        {
-          label: 'Share Health Data with Providers',
-          defaultChecked: true,
-          onChange: (e) => console.log('Share data:', e.target.checked),
-        },
-      ],
-    },
+    // {
+    //   icon: Heart,
+    //   title: 'Health & Wellness',
+    //   description: 'Manage health tracking preferences',
+    //   toggles: [
+    //     {
+    //       label: 'Track Health Metrics',
+    //       defaultChecked: true,
+    //       onChange: (e) => console.log('Track metrics:', e.target.checked),
+    //     },
+    //     {
+    //       label: 'Share Health Data with Providers',
+    //       defaultChecked: true,
+    //       onChange: (e) => console.log('Share data:', e.target.checked),
+    //     },
+    //   ],
+    // },
     {
       icon: Lock,
       title: 'Security & Privacy',
@@ -120,42 +120,42 @@ const PatientSettings = () => {
         },
       ],
     },
-    {
-      icon: Globe,
-      title: 'Language & Region',
-      description: 'Language and timezone settings',
-      selects: [
-        {
-          label: 'Language',
-          defaultValue: 'en',
-          onChange: (e) => console.log('Language:', e.target.value),
-          options: [
-            { value: 'en', label: 'English' },
-            { value: 'sw', label: 'Swahili' },
-          ],
-        },
-        {
-          label: 'Timezone',
-          defaultValue: 'eat',
-          onChange: (e) => console.log('Timezone:', e.target.value),
-          options: [
-            { value: 'eat', label: 'East Africa Time (EAT)' },
-          ],
-        },
-      ],
-    },
-    {
-      icon: Moon,
-      title: 'Appearance',
-      description: 'Customize your display preferences',
-      toggles: [
-        {
-          label: 'Dark Mode',
-          defaultChecked: false,
-          onChange: (e) => console.log('Dark mode:', e.target.checked),
-        },
-      ],
-    },
+    // {
+    //   icon: Globe,
+    //   title: 'Language & Region',
+    //   description: 'Language and timezone settings',
+    //   selects: [
+    //     {
+    //       label: 'Language',
+    //       defaultValue: 'en',
+    //       onChange: (e) => console.log('Language:', e.target.value),
+    //       options: [
+    //         { value: 'en', label: 'English' },
+    //         { value: 'sw', label: 'Swahili' },
+    //       ],
+    //     },
+    //     {
+    //       label: 'Timezone',
+    //       defaultValue: 'eat',
+    //       onChange: (e) => console.log('Timezone:', e.target.value),
+    //       options: [
+    //         { value: 'eat', label: 'East Africa Time (EAT)' },
+    //       ],
+    //     },
+    //   ],
+    // },
+    // {
+    //   icon: Moon,
+    //   title: 'Appearance',
+    //   description: 'Customize your display preferences',
+    //   toggles: [
+    //     {
+    //       label: 'Dark Mode',
+    //       defaultChecked: false,
+    //       onChange: (e) => console.log('Dark mode:', e.target.checked),
+    //     },
+    //   ],
+    // },
     {
       icon: Shield,
       title: 'Legal & Privacy',

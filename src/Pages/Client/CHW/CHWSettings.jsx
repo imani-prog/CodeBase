@@ -244,49 +244,6 @@ const CHWSettings = () => {
             <ActionRow label="Two-Factor Authentication" onClick={() => console.log('2FA')} />
           </Section>
 
-          {/* ── Device & App Settings ── */}
-          {/* <Section>
-            <SectionHeader icon={Smartphone} title="Device & App Settings" subtitle="Manage device preferences" />
-            <ToggleRow label="Enable Biometric Login" checked={state.biometricLogin} onChange={(v) => set('biometricLogin', v)} />
-            <ToggleRow label="Auto-Sync Data" checked={state.autoSync} onChange={(v) => set('autoSync', v)} />
-            <SelectRow
-              label="Data Usage"
-              value={state.dataUsage}
-              onChange={(v) => set('dataUsage', v)}
-              options={[
-                { value: 'wifi', label: 'Wi-Fi Only' },
-                { value: 'mobile', label: 'Mobile Data' },
-                { value: 'both', label: 'Wi-Fi & Mobile Data' },
-              ]}
-            />
-          </Section> */}
-
-          {/* ── Language & Region ── */}
-          {/* <Section>
-            <SectionHeader icon={Globe} title="Language & Region" subtitle="Language and timezone settings" />
-            <SelectRow
-              label="Language"
-              value={state.language}
-              onChange={(v) => set('language', v)}
-              options={[
-                { value: 'en', label: 'English' },
-                { value: 'sw', label: 'Swahili' },
-              ]}
-            />
-            <SelectRow
-              label="Timezone"
-              value={state.timezone}
-              onChange={(v) => set('timezone', v)}
-              options={[{ value: 'eat', label: 'East Africa Time (EAT)' }]}
-            />
-          </Section> */}
-
-          {/* ── Appearance ── */}
-          {/* <Section>
-            <SectionHeader icon={Moon} title="Appearance" subtitle="Customize your display preferences" />
-            <ToggleRow label="Dark Mode" checked={state.darkMode} onChange={(v) => set('darkMode', v)} />
-          </Section> */}
-
           {/* ── Legal & Privacy ── */}
           <Section>
             <SectionHeader icon={Shield} title="Legal & Privacy" subtitle="Terms and privacy information" />
