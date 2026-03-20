@@ -29,7 +29,11 @@ const AddCHWModal = ({ showModal, setShowModal, onSaveCHW }) => {
     // Hospital Assignment
     hospitalId: '',
     hospitalName: '',
-    region: ''
+    region: '',
+    coverageArea: '',
+    assignedFacility: '',
+    supervisorName: '',
+    supervisorPhone: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -104,7 +108,9 @@ const AddCHWModal = ({ showModal, setShowModal, onSaveCHW }) => {
       responseTime: '0hrs',
       rating: 0,
       lastActivity: new Date().toISOString().split('T')[0],
-      lastStatusUpdate: new Date().toISOString().split('T')[0]
+      lastStatusUpdate: new Date().toISOString().split('T')[0],
+      coverageArea: formData.coverageArea || formData.region,
+      assignedFacility: formData.assignedFacility || formData.hospitalName,
     };
 
     onSaveCHW?.(newCHW);
@@ -130,7 +136,11 @@ const AddCHWModal = ({ showModal, setShowModal, onSaveCHW }) => {
       status: 'AVAILABLE',
       hospitalId: '',
       hospitalName: '',
-      region: ''
+      region: '',
+      coverageArea: '',
+      assignedFacility: '',
+      supervisorName: '',
+      supervisorPhone: ''
     });
     setCurrentStep(1);
     setErrors({});
@@ -534,6 +544,62 @@ const AddCHWModal = ({ showModal, setShowModal, onSaveCHW }) => {
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                         placeholder="Enter hospital name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Coverage Area
+                      </label>
+                      <input
+                        type="text"
+                        name="coverageArea"
+                        value={formData.coverageArea}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                        placeholder="e.g. Kibera Sub-County"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Assigned Facility
+                      </label>
+                      <input
+                        type="text"
+                        name="assignedFacility"
+                        value={formData.assignedFacility}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                        placeholder="e.g. Kibera Health Centre"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Supervisor Name
+                      </label>
+                      <input
+                        type="text"
+                        name="supervisorName"
+                        value={formData.supervisorName}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                        placeholder="Enter supervisor name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Supervisor Phone
+                      </label>
+                      <input
+                        type="tel"
+                        name="supervisorPhone"
+                        value={formData.supervisorPhone}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                        placeholder="+254 7XX XXX XXX"
                       />
                     </div>
                   </div>

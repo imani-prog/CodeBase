@@ -6,6 +6,37 @@ import EditCHWModal from '../../Components/Admin/EditCHWModal';
 import AddCHWModal from '../../Components/Admin/AddCHWModal';
 import Pagination from '../../Components/Admin/Pagination';
 
+const CHW_DIRECTORY_STORAGE_KEY = 'medilink_admin_chw_directory_v1';
+
+const normalizeCHWStatus = (status) => {
+  if (status === 'ON_LEAVE' || status === 'INACTIVE') return 'OFFLINE';
+  if (status === 'Active') return 'AVAILABLE';
+  if (status === 'On Leave') return 'OFFLINE';
+  return status || 'AVAILABLE';
+};
+
+const normalizeCHWRecord = (record) => {
+  const firstName = String(record.firstName || '').trim();
+  const middleName = String(record.middleName || '').trim();
+  const lastName = String(record.lastName || '').trim();
+  const name = [firstName, middleName, lastName].filter(Boolean).join(' ').trim() || record.name;
+  const avatar = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase() || record.avatar || 'CH';
+
+  return {
+    ...record,
+    firstName,
+    middleName,
+    lastName,
+    name,
+    avatar,
+    status: normalizeCHWStatus(record.status),
+    coverageArea: record.coverageArea || record.region || 'Unassigned Coverage Area',
+    assignedFacility: record.assignedFacility || record.hospitalName || 'Unassigned Facility',
+    supervisorName: record.supervisorName || 'Not Assigned',
+    supervisorPhone: record.supervisorPhone || 'N/A',
+  };
+};
+
 const dummyCHWs = [
   { 
     id: 1,
@@ -193,7 +224,23 @@ const ActiveCHW = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [chws, setCHWs] = useState(dummyCHWs);
+  const [chws, setCHWs] = useState(() => {
+    if (typeof window === 'undefined') return dummyCHWs.map(normalizeCHWRecord);
+    try {
+      const raw = window.localStorage.getItem(CHW_DIRECTORY_STORAGE_KEY);
+      if (!raw) return dummyCHWs.map(normalizeCHWRecord);
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed) || parsed.length === 0) return dummyCHWs.map(normalizeCHWRecord);
+      return parsed.map(normalizeCHWRecord);
+    } catch {
+      return dummyCHWs.map(normalizeCHWRecord);
+    }
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(CHW_DIRECTORY_STORAGE_KEY, JSON.stringify(chws));
+  }, [chws]);
 
   useEffect(() => {
     if (location.state?.openAddModal) {
@@ -324,11 +371,22 @@ const ActiveCHW = () => {
   };
 
   const handleSaveCHW = (updatedCHW) => {
-    setCHWs(prev => prev.map(c => c.id === updatedCHW.id ? updatedCHW : c));
+    const normalized = normalizeCHWRecord({
+      ...updatedCHW,
+      updatedAt: new Date().toISOString(),
+      lastStatusUpdate: new Date().toISOString().split('T')[0],
+    });
+    setCHWs(prev => prev.map(c => c.id === normalized.id ? normalized : c));
   };
 
   const handleAddNewCHW = (newCHW) => {
-    setCHWs(prev => [...prev, newCHW]);
+    const normalized = normalizeCHWRecord({
+      ...newCHW,
+      createdAt: newCHW.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lastStatusUpdate: new Date().toISOString().split('T')[0],
+    });
+    setCHWs(prev => [...prev, normalized]);
     setShowAddModal(false);
   };
 

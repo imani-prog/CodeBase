@@ -242,6 +242,40 @@ const CHWDetailsModal = ({ chw, isOpen, onClose }) => {
                   )}
                 </div>
               )}
+
+              {(chw.coverageArea || chw.assignedFacility || chw.supervisorName || chw.supervisorPhone) && (
+                <div className="shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow bg-white">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Users className="w-6 h-6 text-blue-600 mr-3" /> CHW Governance Details
+                  </h3>
+                  <div className="space-y-3">
+                    {chw.coverageArea && (
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Coverage Area</label>
+                        <p className="mt-1 text-sm text-gray-900">{chw.coverageArea}</p>
+                      </div>
+                    )}
+                    {chw.assignedFacility && (
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Facility</label>
+                        <p className="mt-1 text-sm text-gray-900">{chw.assignedFacility}</p>
+                      </div>
+                    )}
+                    {chw.supervisorName && (
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Supervisor Name</label>
+                        <p className="mt-1 text-sm text-gray-900">{chw.supervisorName}</p>
+                      </div>
+                    )}
+                    {chw.supervisorPhone && (
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Supervisor Phone</label>
+                        <p className="mt-1 text-sm text-gray-900">{chw.supervisorPhone}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right Column */}

@@ -32,7 +32,11 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
       specialization: chw.specialization || "",
       region: chw.region || "",
       patients: chw.patients || "",
-      startDate: chw.startDate || ""
+      startDate: chw.startDate || "",
+      coverageArea: chw.coverageArea || "",
+      assignedFacility: chw.assignedFacility || "",
+      supervisorName: chw.supervisorName || "",
+      supervisorPhone: chw.supervisorPhone || ""
     });
   }, [chw]);
 
@@ -54,7 +58,14 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
     if (!validateForm()) return;
     setIsSaving(true);
     setTimeout(() => {
-      onSave({ ...chw, ...formData, patients: parseInt(formData.patients) || 0 });
+      const name = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(' ').trim();
+      onSave({
+        ...chw,
+        ...formData,
+        name,
+        patients: parseInt(formData.patients) || 0,
+        status: formData.status === 'ON_LEAVE' ? 'OFFLINE' : formData.status,
+      });
       setIsSaving(false);
       onClose();
     }, 1000);
@@ -184,6 +195,10 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
                   options: ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika", "Machakos"]
                 })}
                 {renderField({ label: "Start Date", name: "startDate", icon: Calendar, type: "date" })}
+                {renderField({ label: "Coverage Area", name: "coverageArea", icon: MapPin })}
+                {renderField({ label: "Assigned Facility", name: "assignedFacility", icon: Building2 })}
+                {renderField({ label: "Supervisor Name", name: "supervisorName", icon: User })}
+                {renderField({ label: "Supervisor Phone", name: "supervisorPhone", icon: Phone, type: "tel" })}
               </div>
             </Section>
           </div>
