@@ -159,7 +159,7 @@ const CHWAssignments = () => {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">CHW Assignments</h1>
         <p className="text-gray-600">
-          Unified oversight for CHW TASK and HOME_VISIT work items.
+          Unified oversight for CHW taks and Home visits work items.
         </p>
       </div>
 
@@ -167,7 +167,7 @@ const CHWAssignments = () => {
         <div className="bg-white shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total Work Items</p>
+              <p className="text-sm text-gray-800">Total Work Items</p>
               <p className="text-2xl font-bold">{metrics.total}</p>
             </div>
             <ClipboardList className="w-6 h-6 text-blue-600" />
@@ -176,7 +176,7 @@ const CHWAssignments = () => {
         <div className="bg-white shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Tasks</p>
+              <p className="text-sm text-gray-800">Tasks</p>
               <p className="text-2xl font-bold">{metrics.tasks}</p>
             </div>
             <CheckCircle className="w-6 h-6 text-blue-600" />
@@ -185,7 +185,7 @@ const CHWAssignments = () => {
         <div className="bg-white shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Home Visits</p>
+              <p className="text-sm text-gray-800">Home Visits</p>
               <p className="text-2xl font-bold">{metrics.visits}</p>
             </div>
             <Home className="w-6 h-6 text-indigo-600" />
@@ -194,7 +194,7 @@ const CHWAssignments = () => {
         <div className="bg-white shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Overdue</p>
+              <p className="text-sm text-gray-800">Overdue</p>
               <p className="text-2xl font-bold">{metrics.overdue}</p>
             </div>
             <AlertTriangle className="w-6 h-6 text-red-600" />

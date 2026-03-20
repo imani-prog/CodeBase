@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Calendar, Clock, MapPin, Video, User, Plus, X, Phone, Mail, AlertCircle, CheckCircle, ExternalLink, Download } from 'lucide-react';
+import { syncPatientAppointments } from '../../../Services/appointmentGovernanceStore';
+
+const PATIENT_APPOINTMENT_META = {
+  patientId: 'PT-SELF-001',
+  patientName: 'Patient User',
+};
 
 const initialAppointments = {
   upcoming: [
@@ -127,6 +133,10 @@ const Appointments = () => {
       document.body.style.overflow = previousOverflow;
     };
   }, [isAnyModalOpen]);
+
+  useEffect(() => {
+    syncPatientAppointments(appointments, PATIENT_APPOINTMENT_META);
+  }, [appointments]);
 
   const handleViewDetails = (appointment) => {
     setSelectedAppointment(appointment);

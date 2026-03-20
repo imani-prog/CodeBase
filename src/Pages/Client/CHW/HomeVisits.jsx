@@ -18,12 +18,45 @@ import {
   Save
 } from 'lucide-react';
 import { syncHomeVisitWorkItems } from '../../../Services/chwAssignmentsStore';
+import { syncHomeVisitGovernance } from '../../../Services/homeVisitGovernanceStore';
+
+const CHW_META = {
+  chwId: 'CHW-001',
+  chwName: 'Grace Akinyi Achieng',
+  serviceZone: 'Machakos',
+};
+
+function calculateNotesQuality(outcomeText) {
+  const words = String(outcomeText || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (words.length >= 20) return 100;
+  if (words.length >= 12) return 80;
+  if (words.length >= 8) return 60;
+  if (words.length >= 4) return 40;
+  return words.length > 0 ? 20 : 0;
+}
 
 const HomeVisits = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showMap, setShowMap] = useState(false);
-  const [completeModal, setCompleteModal] = useState({ open: false, visit: null, outcome: '' });
-  const [rescheduleModal, setRescheduleModal] = useState({ open: false, visit: null, date: '', time: '' });
+  const [completeModal, setCompleteModal] = useState({
+    open: false,
+    visit: null,
+    outcome: '',
+    geoCheckPassed: false,
+  });
+  const [rescheduleModal, setRescheduleModal] = useState({
+    open: false,
+    visit: null,
+    date: '',
+    time: '',
+    reason: '',
+    mode: 'UPCOMING',
+  });
+  const [noShowModal, setNoShowModal] = useState({ open: false, visit: null, reason: '' });
 
   const emptyScheduleForm = {
     patientName: '',
@@ -193,6 +226,7 @@ const HomeVisits = () => {
 
   useEffect(() => {
     syncHomeVisitWorkItems(visits);
+    syncHomeVisitGovernance(visits, CHW_META);
   }, [visits]);
 
   const handleDirections = (visit) => {
@@ -208,37 +242,105 @@ const HomeVisits = () => {
     window.location.href = `tel:${phone}`;
   };
 
-  const openCompleteModal = (visit) => setCompleteModal({ open: true, visit, outcome: '' });
+  const openCompleteModal = (visit) =>
+    setCompleteModal({ open: true, visit, outcome: '', geoCheckPassed: false });
 
   const handleCompleteSubmit = () => {
-    const { visit, outcome } = completeModal;
+    const { visit, outcome, geoCheckPassed } = completeModal;
+    const completedAt = new Date().toISOString();
+    const qualityScore = calculateNotesQuality(outcome);
+
     setVisits(prev => ({
       ...prev,
       upcoming: prev.upcoming.filter(v => v.id !== visit.id),
       completed: [
-        { ...visit, status: 'completed', outcome: outcome.trim() || 'Visit completed successfully' },
+        {
+          ...visit,
+          status: 'completed',
+          outcome: outcome.trim() || 'Visit completed successfully',
+          completionEvidence: {
+            completedAt,
+            notesQualityScore: qualityScore,
+            geoCheckPassed,
+          },
+        },
         ...prev.completed
       ]
     }));
-    setCompleteModal({ open: false, visit: null, outcome: '' });
+    setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false });
   };
 
-  const openRescheduleModal = (visit) =>
-    setRescheduleModal({ open: true, visit, date: visit.date || '', time: '' });
+  const openRescheduleModal = (visit, mode = 'UPCOMING') =>
+    setRescheduleModal({
+      open: true,
+      visit,
+      date: visit.date || '',
+      time: '',
+      reason: '',
+      mode,
+    });
+
+  const openNoShowModal = (visit) =>
+    setNoShowModal({ open: true, visit, reason: 'Patient unavailable at scheduled time' });
 
   const handleRescheduleSubmit = () => {
-    const { visit, date, time } = rescheduleModal;
+    const { visit, date, time, reason, mode } = rescheduleModal;
     const [h, m] = time.split(':');
     const hour = parseInt(h, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const formattedTime = `${hour % 12 || 12}:${m} ${ampm}`;
-    const { reason: _r, status: _s, ...rest } = visit;
+
+    if (mode === 'CANCELLED') {
+      const { reason: _r, reasonType: _rt, status: _s, ...rest } = visit;
+      setVisits(prev => ({
+        ...prev,
+        cancelled: prev.cancelled.filter(v => v.id !== visit.id),
+        upcoming: [...prev.upcoming, { ...rest, date, time: formattedTime }]
+      }));
+    } else {
+      setVisits(prev => ({
+        ...prev,
+        upcoming: prev.upcoming.map(v => {
+          if (v.id !== visit.id) return v;
+          const nextHistory = Array.isArray(v.rescheduleHistory) ? [...v.rescheduleHistory] : [];
+          nextHistory.push({
+            previousDate: v.date,
+            previousTime: v.time,
+            newDate: date,
+            newTime: formattedTime,
+            reason: reason.trim() || 'Schedule conflict',
+            changedAt: new Date().toISOString(),
+          });
+
+          return {
+            ...v,
+            date,
+            time: formattedTime,
+            rescheduleHistory: nextHistory,
+          };
+        }),
+      }));
+    }
+
+    setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' });
+  };
+
+  const handleNoShowSubmit = () => {
+    const { visit, reason } = noShowModal;
     setVisits(prev => ({
       ...prev,
-      cancelled: prev.cancelled.filter(v => v.id !== visit.id),
-      upcoming: [...prev.upcoming, { ...rest, date, time: formattedTime }]
+      upcoming: prev.upcoming.filter(v => v.id !== visit.id),
+      cancelled: [
+        {
+          ...visit,
+          status: 'cancelled',
+          reason: reason.trim() || 'Patient unavailable at scheduled time',
+          reasonType: 'NO_SHOW',
+        },
+        ...prev.cancelled,
+      ],
     }));
-    setRescheduleModal({ open: false, visit: null, date: '', time: '' });
+    setNoShowModal({ open: false, visit: null, reason: '' });
   };
 
   const tabs = [
@@ -480,6 +582,20 @@ const HomeVisits = () => {
                             <CheckCircle className="w-3.5 h-3.5" />
                             <span>Complete</span>
                           </button>
+                          <button
+                            onClick={() => openRescheduleModal(visit, 'UPCOMING')}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 border border-amber-300 rounded-lg text-xs font-semibold transition-all"
+                          >
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>Reschedule</span>
+                          </button>
+                          <button
+                            onClick={() => openNoShowModal(visit)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 active:scale-95 text-red-700 border border-red-300 rounded-lg text-xs font-semibold transition-all"
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>No-Show</span>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -544,6 +660,20 @@ const HomeVisits = () => {
                   >
                     <CheckCircle className="w-3.5 h-3.5" />
                     <span>Complete</span>
+                  </button>
+                  <button
+                    onClick={() => openRescheduleModal(visit, 'UPCOMING')}
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 border border-amber-300 rounded-lg text-xs font-semibold transition-all"
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>Reschedule</span>
+                  </button>
+                  <button
+                    onClick={() => openNoShowModal(visit)}
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-red-50 hover:bg-red-100 active:scale-95 text-red-700 border border-red-300 rounded-lg text-xs font-semibold transition-all"
+                  >
+                    <XCircle className="w-3.5 h-3.5" />
+                    <span>No-Show</span>
                   </button>
                 </div>
               </div>
@@ -676,7 +806,7 @@ const HomeVisits = () => {
                       <td className="px-4 py-3 text-sm text-gray-600">{visit.reason}</td>
                       <td className="px-4 py-3 text-right">
                         <button
-                          onClick={() => openRescheduleModal(visit)}
+                          onClick={() => openRescheduleModal(visit, 'CANCELLED')}
                           className="flex items-center gap-1.5 ml-auto px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 border border-amber-300 rounded-lg text-xs font-semibold transition-all"
                         >
                           <Calendar className="w-3.5 h-3.5" />
@@ -717,7 +847,7 @@ const HomeVisits = () => {
                   <span className="font-semibold">Reason:</span> {visit.reason}
                 </p>
                 <button
-                  onClick={() => openRescheduleModal(visit)}
+                  onClick={() => openRescheduleModal(visit, 'CANCELLED')}
                   className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 border border-amber-300 rounded-lg text-xs font-semibold transition-all"
                 >
                   <Calendar className="w-3.5 h-3.5" />
@@ -982,7 +1112,7 @@ const HomeVisits = () => {
                 Complete Visit
               </h3>
               <button
-                onClick={() => setCompleteModal({ open: false, visit: null, outcome: '' })}
+                onClick={() => setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false })}
                 className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
               >
                 <X className="w-4 h-4 text-gray-500" />
@@ -1000,9 +1130,17 @@ const HomeVisits = () => {
               onChange={e => setCompleteModal(prev => ({ ...prev, outcome: e.target.value }))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-yes"
             />
+            <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={completeModal.geoCheckPassed}
+                onChange={e => setCompleteModal(prev => ({ ...prev, geoCheckPassed: e.target.checked }))}
+              />
+              Optional geo-check confirmed at patient location
+            </label>
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setCompleteModal({ open: false, visit: null, outcome: '' })}
+                onClick={() => setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false })}
                 className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Cancel
@@ -1029,7 +1167,7 @@ const HomeVisits = () => {
                 Reschedule Visit
               </h3>
               <button
-                onClick={() => setRescheduleModal({ open: false, visit: null, date: '', time: '' })}
+                onClick={() => setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' })}
                 className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
               >
                 <X className="w-4 h-4 text-gray-500" />
@@ -1058,10 +1196,22 @@ const HomeVisits = () => {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
+              {rescheduleModal.mode === 'UPCOMING' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Reason</label>
+                  <input
+                    type="text"
+                    value={rescheduleModal.reason}
+                    onChange={e => setRescheduleModal(prev => ({ ...prev, reason: e.target.value }))}
+                    placeholder="e.g. Patient requested later timing"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setRescheduleModal({ open: false, visit: null, date: '', time: '' })}
+                onClick={() => setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' })}
                 className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Cancel
@@ -1073,6 +1223,53 @@ const HomeVisits = () => {
               >
                 <Calendar className="w-4 h-4" />
                 Confirm Reschedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No-Show Modal */}
+      {noShowModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-red-600" />
+                Mark No-Show
+              </h3>
+              <button
+                onClick={() => setNoShowModal({ open: false, visit: null, reason: '' })}
+                className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-0.5">
+              Patient <span className="font-semibold text-gray-800">{noShowModal.visit?.patientName}</span> did not attend scheduled visit.
+            </p>
+            <p className="text-xs text-gray-400 mb-4">Capture reason for supervisor analytics.</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">No-show reason</label>
+            <input
+              type="text"
+              value={noShowModal.reason}
+              onChange={e => setNoShowModal(prev => ({ ...prev, reason: e.target.value }))}
+              placeholder="e.g. Phone unreachable"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setNoShowModal({ open: false, visit: null, reason: '' })}
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleNoShowSubmit}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
+                <XCircle className="w-4 h-4" />
+                Confirm No-Show
               </button>
             </div>
           </div>

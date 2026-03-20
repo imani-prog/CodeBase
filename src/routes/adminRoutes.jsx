@@ -18,6 +18,7 @@ import ReportsAnalytics from '../Pages/Admin/ReportsAnalytics';
 import HospitalManagement from '../Pages/Admin/HospitalManagement';
 import CHWAssignments from '../Pages/Admin/CHWAssignments';
 import AdminAppointments from '../Pages/Admin/AdminAppointments';
+import HomeVisitGovernance from '../Pages/Admin/HomeVisitGovernance';
 import { Outlet } from 'react-router-dom';
 
 export const adminRoutes = [
@@ -40,8 +41,10 @@ export const adminRoutes = [
       { path: 'training-management', element: <TrainingManagement /> },
       { path: 'insurance-management', element: <InsuranceManagement /> },
       { path: 'notifications', element: <NotificationManagement /> },
-      { path: 'reports', element: <ReportsAnalytics /> },      { path: 'hospital-management', element: <HospitalManagement /> },
-      { path: 'chw-assignments', element: <CHWAssignments /> },      // add more admin routes here
+      { path: 'reports', element: <ReportsAnalytics /> },
+      { path: 'hospital-management', element: <HospitalManagement /> },
+      { path: 'chw-assignments', element: <CHWAssignments /> },
+      { path: 'home-visit-governance', element: <HomeVisitGovernance /> },
     ],
   },
 ];

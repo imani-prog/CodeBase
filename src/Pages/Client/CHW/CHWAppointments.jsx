@@ -19,6 +19,12 @@ import {
 import AddAppointmentModal from '../../../Components/CHW/AddAppointmentModal';
 import EditAppointmentModal from '../../../Components/CHW/EditAppointmentModal';
 import CancelAppointmentModal from '../../../Components/CHW/CancelAppointmentModal';
+import { syncChwAppointments } from '../../../Services/appointmentGovernanceStore';
+
+const CHW_APPOINTMENT_META = {
+  chwId: 'CHW-001',
+  chwName: 'Jane Wanjiru',
+};
 
 const CHWAppointments = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -125,6 +131,10 @@ const CHWAppointments = () => {
       }
     ]
   });
+
+  useEffect(() => {
+    syncChwAppointments(appointmentData, CHW_APPOINTMENT_META);
+  }, [appointmentData]);
 
   const handleAddSave = (newAppt) => {
     try {
