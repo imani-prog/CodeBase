@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   MapPin,
   Calendar,
@@ -17,6 +17,7 @@ import {
   FileText,
   Save
 } from 'lucide-react';
+import { syncHomeVisitWorkItems } from '../../../Services/chwAssignmentsStore';
 
 const HomeVisits = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -189,6 +190,10 @@ const HomeVisits = () => {
       }
     ]
   });
+
+  useEffect(() => {
+    syncHomeVisitWorkItems(visits);
+  }, [visits]);
 
   const handleDirections = (visit) => {
     if (!visit.location) return;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   CheckCircle,
   Clock,
@@ -14,6 +14,7 @@ import {
   X,
   Save
 } from 'lucide-react';
+import { syncTaskWorkItems } from '../../../Services/chwAssignmentsStore';
 
 const CATEGORIES = ['Medical Follow-up', 'Medication', 'Education', 'Assessment', 'Other'];
 const PRIORITIES = ['normal', 'high', 'urgent'];
@@ -137,6 +138,10 @@ const TasksFollowups = () => {
       }
     ]
   });
+
+  useEffect(() => {
+    syncTaskWorkItems(tasks);
+  }, [tasks]);
 
   //  Modal states
   const [newTaskModal, setNewTaskModal] = useState({ open: false, form: emptyForm, errors: {} });
