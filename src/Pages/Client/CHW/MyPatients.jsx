@@ -161,7 +161,7 @@ const MyPatients = () => {
       {/* ── Stats ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {stats.map((s) => (
-          <div key={s.label} className="bg-white shadow-sm border border-gray-200 px-4 py-4 sm:px-5">
+          <div key={s.label} className="bg-white border border-gray-200 px-4 py-4 sm:px-5">
             <p className="text-xs text-gray-500 mb-1">{s.label}</p>
             <p className="text-2xl font-bold text-blue-600">{s.value}</p>
           </div>
@@ -286,10 +286,10 @@ const MyPatients = () => {
       </div>
 
       {/* ── Desktop Table (≥ md) ── */}
-      <div className="hidden md:block bg-white shadow-sm border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-800">
+            <thead className="bg-gray-100 border-b border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-800">
               <tr>
                 <th className="px-4 py-3 text-left">#</th>
                 <th className="px-4 py-3 text-left">Name</th>

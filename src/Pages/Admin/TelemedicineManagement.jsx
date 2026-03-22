@@ -545,7 +545,7 @@ const TelemedicineManagement = () => {
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold  mb-1">Active Sessions</p>
@@ -561,7 +561,7 @@ const TelemedicineManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold mb-1">Online Doctors</p>
@@ -577,7 +577,7 @@ const TelemedicineManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold mb-1">Today's Revenue</p>
@@ -593,7 +593,7 @@ const TelemedicineManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold mb-1">Avg Session Time</p>
@@ -612,7 +612,7 @@ const TelemedicineManagement = () => {
 
       {/* Platform Usage Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <h3 className="text-lg font-semibold mb-4">Platform Usage Distribution</h3>
           <div className="space-y-4">
             {Object.entries(platformStats).map(([platform, stats]) => (
@@ -637,7 +637,7 @@ const TelemedicineManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3">
@@ -1003,12 +1003,12 @@ const TelemedicineManagement = () => {
         </div>
       </div>
 
-      <div className="border border-gray-200 p-6">
+      <div className="border bg-white border-gray-200 p-6">
 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200">
+              <tr className="border-b border-gray-200 bg-gray-100">
                 <th className="text-left py-3 px-4 font-bold">Session</th>
                 <th className="text-left py-3 px-4 font-bold">Patient</th>
                 <th className="text-left py-3 px-4 font-bold">Doctor</th>
@@ -1084,7 +1084,7 @@ const TelemedicineManagement = () => {
   const renderRevenue = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm mb-1">Daily Revenue</p>
@@ -1096,7 +1096,7 @@ const TelemedicineManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm  mb-1">Weekly Revenue</p>
@@ -1108,7 +1108,7 @@ const TelemedicineManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm mb-1">Monthly Revenue</p>
@@ -1124,10 +1124,10 @@ const TelemedicineManagement = () => {
       <div className="p-6">
         <h3 className="text-lg font-semibold  mb-6">Revenue by Specialty</h3>
         <div className="grid grid-cols-2 gap-6">
-          {/* Table on the left */}
+          
           <div className="bg-white border border-gray-200 overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50  uppercase text-xs">
+              <thead className="bg-gray-100  uppercase text-xs">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold">Specialty</th>
                   <th className="px-4 py-3 text-center font-semibold">Sessions</th>
@@ -1152,7 +1152,7 @@ const TelemedicineManagement = () => {
             </table>
           </div>
 
-          {/* Bar Chart on the right */}
+         
           <div className="bg-white border border-gray-200 p-6">
             <h4 className="font-semibold mb-4">Revenue Analytics</h4>
             <ResponsiveContainer width="100%" height={300}>

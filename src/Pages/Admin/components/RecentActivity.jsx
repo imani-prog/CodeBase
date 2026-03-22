@@ -28,7 +28,7 @@ const RecentActivity = () => {
 
   return (
     <div className="lg:col-span-2">
-      <div className="bg-white shadow-sm border border-gray-100">
+      <div className="bg-white border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Recent Activity</h2>

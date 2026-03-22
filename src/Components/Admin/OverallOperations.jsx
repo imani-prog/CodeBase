@@ -171,7 +171,7 @@ const OverallOperations = () => {
         {performanceMetrics.map((category) => {
           const Icon = category.icon;
           return (
-            <div key={category.id} className="shadow-sm border border-gray-200 p-6 bg-white">
+            <div key={category.id} className="border border-gray-200 p-6 bg-white">
               <div className="flex items-center mb-4">
                 <Icon className={`w-8 h-8 text-${category.color}-600 mr-3`} />
                 <h4 className="font-semibold">{category.category}</h4>

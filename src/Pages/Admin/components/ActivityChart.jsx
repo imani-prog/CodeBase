@@ -36,7 +36,7 @@ const ActivityChart = () => {
   );
 
   return (
-    <div className="bg-white shadow-sm p-6 border border-gray-100">
+    <div className="bg-white p-6 border border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Daily Activity Overview</h2>
         <select className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">

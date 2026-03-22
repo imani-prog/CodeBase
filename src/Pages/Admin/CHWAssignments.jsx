@@ -164,7 +164,7 @@ const CHWAssignments = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white shadow-sm border border-gray-200 p-4">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-800">Total Work Items</p>
@@ -173,7 +173,7 @@ const CHWAssignments = () => {
             <ClipboardList className="w-6 h-6 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white shadow-sm border border-gray-200 p-4">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-800">Tasks</p>
@@ -182,7 +182,7 @@ const CHWAssignments = () => {
             <CheckCircle className="w-6 h-6 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white shadow-sm border border-gray-200 p-4">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-800">Home Visits</p>
@@ -191,7 +191,7 @@ const CHWAssignments = () => {
             <Home className="w-6 h-6 text-indigo-600" />
           </div>
         </div>
-        <div className="bg-white shadow-sm border border-gray-200 p-4">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-800">Overdue</p>
@@ -251,7 +251,7 @@ const CHWAssignments = () => {
         </div>
       </div>
 
-      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">

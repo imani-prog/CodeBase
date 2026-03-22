@@ -32,7 +32,7 @@ const SidePanel = () => {
   return (
     <div className="space-y-6">
       {/* System Status */}
-      <div className="bg-white shadow-sm p-6 border border-gray-100">
+      <div className="bg-white p-6 border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -60,7 +60,7 @@ const SidePanel = () => {
       </div>
 
       {/* Today's Overview with Pie Chart */}
-      <div className="bg-white shadow-sm p-4 border border-gray-100">
+      <div className="bg-white p-4 border border-gray-200">
         <h3 className="text-lg font-semibold mb-2">Today's Overview</h3>
         
         {/* Pie Chart */}

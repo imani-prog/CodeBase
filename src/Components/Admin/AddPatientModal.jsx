@@ -195,7 +195,7 @@ const AddPatientModal = ({ showModal, setShowModal, onSavePatient }) => {
         </div>
 
         {/* Progress Steps */}
-        {/* Desktop: full step bar */}
+        
         <div className="hidden sm:block px-8 py-3 bg-gray-50 border-b overflow-x-auto">
           <div className="flex items-center justify-between min-w-max">
             {steps.map((step, index) => (

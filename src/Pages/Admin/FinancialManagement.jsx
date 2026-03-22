@@ -334,7 +334,7 @@ const FinancialManagement = () => {
     <div className="space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm mb-1">Total Revenue</p>
@@ -352,7 +352,7 @@ const FinancialManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm mb-1">Total Expenses</p>
@@ -370,7 +370,7 @@ const FinancialManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm mb-1">Net Profit</p>
@@ -388,7 +388,7 @@ const FinancialManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm mb-1">Pending Payments</p>
@@ -408,26 +408,26 @@ const FinancialManagement = () => {
       </div>
 
       {/* Quick Actions */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
+        <div className="border border-gray-200 p-6 bg-white">
           <h4 className="font-semibold text-gray-900 mb-4">Quick Actions</h4>
           <div className="space-y-3">
-            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-blue-100 rounded-lg transition-colors">
+            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-gray-100 rounded-lg transition-colors">
               <Plus className="w-4 h-4 text-blue-600 mr-3" />
               <span className="text-blue-700">Add New Transaction</span>
             </button>
-            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-blue-100 rounded-lg transition-colors">
+            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-gray-100 rounded-lg transition-colors">
               <Download className="w-4 h-4 text-blue-600 mr-3" />
               <span className="text-blue-700">Export Financial Report</span>
             </button>
-            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-blue-100 rounded-lg transition-colors">
+            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-gray-100 rounded-lg transition-colors">
               <Users className="w-4 h-4 text-blue-600 mr-3" />
               <span className="text-blue-700">Process CHW Payments</span>
             </button>
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="border border-gray-200 p-6 bg-white ">
           <h4 className="font-semibold text-gray-900 mb-4">Recent Transactions</h4>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -454,7 +454,7 @@ const FinancialManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <h4 className="font-semibold text-gray-900 mb-4">Financial Alerts</h4>
           <div className="space-y-3">
             <div className="flex items-start">
@@ -480,10 +480,10 @@ const FinancialManagement = () => {
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
 
       {/* Revenue vs Expenses Chart */}
-      <div className="shadow-sm border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6 bg-white">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Monthly Financial Trend</h3>
           <select
@@ -647,7 +647,7 @@ const FinancialManagement = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <div className="border border-gray-200 overflow-hidden flex flex-col">
+          <div className="border border-gray-200 bg-white overflow-hidden flex flex-col">
             <div className="overflow-x-auto flex-1">
               <table className="min-w-full divide-y divide-gray-200 h-full">
                 <thead className="bg-gray-50">
@@ -794,7 +794,7 @@ const FinancialManagement = () => {
         </button>
       </div>
 
-      <div className="border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -919,7 +919,7 @@ const FinancialManagement = () => {
         </div>
       </div>
 
-      <div className="border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -998,7 +998,7 @@ const FinancialManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10 max-w-4xl mx-auto">
-        <div className="border border-gray-100 shadow-md p-8">
+        <div className="border border-gray-200 bg-white p-8">
           <div className="flex items-center">
             <Users className="w-10 h-10 text-blue-600 mr-3" />
             <div>
@@ -1007,7 +1007,7 @@ const FinancialManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md p-8">
+        <div className="border border-gray-200 bg-white p-8">
           <div className="flex items-center">
             <CheckCircle className="w-10 h-10 text-blue-600 mr-3" />
             <div>
@@ -1016,7 +1016,7 @@ const FinancialManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md p-8">
+        <div className="border border-gray-200 bg-white p-8">
           <div className="flex items-center">
             <Clock className="w-10 h-10 text-blue-600 mr-3" />
             <div>
@@ -1027,7 +1027,7 @@ const FinancialManagement = () => {
         </div>
       </div>
 
-      <div className="border border-gray-200 p-6">
+      <div className="border border-gray-200 bg-white p-6">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -1112,7 +1112,7 @@ const FinancialManagement = () => {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 max-w-6xl mx-auto">
-        <div className="border border-gray-100 shadow-md p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <div className="flex items-center">
             <Smartphone className="w-10 h-10 text-blue-600 mr-3" />
             <div>
@@ -1121,7 +1121,7 @@ const FinancialManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <div className="flex items-center">
             <CreditCard className="w-10 h-10 text-blue-600 mr-3" />
             <div>
@@ -1130,7 +1130,7 @@ const FinancialManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <div className="flex items-center">
             <Banknote className="w-10 h-10 text-blue-600 mr-3" />
             <div>
@@ -1139,7 +1139,7 @@ const FinancialManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-100 shadow-md p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <div className="flex items-center">
             <Receipt className="w-10 h-10 text-blue-600 mr-3" />
             <div>
@@ -1150,7 +1150,7 @@ const FinancialManagement = () => {
         </div>
       </div>
 
-      <div className="border border-gray-200 p-6">
+      <div className="border border-gray-200 bg-white p-6">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -1217,7 +1217,7 @@ const FinancialManagement = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Financial Reports & Analytics</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div className="border border-gray-200 bg-white p-6">
             <div className="flex items-center mb-4">
               <BarChart3 className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -1225,13 +1225,13 @@ const FinancialManagement = () => {
                 <p className="text-sm text-gray-600">Monthly revenue breakdown</p>
               </div>
             </div>
-            <button className="w-full flex items-center shadow-md justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+            <button className="w-full flex items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-gray-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div className="border border-gray-200 bg-white p-6">
             <div className="flex items-center mb-4">
               <TrendingDown className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -1239,13 +1239,13 @@ const FinancialManagement = () => {
                 <p className="text-sm text-gray-600">Detailed expense analysis</p>
               </div>
             </div>
-            <button className="w-full flex items-center shadow-md justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+            <button className="w-full flex items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-gray-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div className="border border-gray-200 bg-white p-6">
             <div className="flex items-center mb-4">
               <Truck className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -1253,13 +1253,13 @@ const FinancialManagement = () => {
                 <p className="text-sm text-gray-600">Profit & loss per ambulance</p>
               </div>
             </div>
-            <button className="w-full flex items-center shadow-md justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+            <button className="w-full flex items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-gray-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div className="border border-gray-200 bg-white p-6">
             <div className="flex items-center mb-4">
               <UserCheck className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -1267,13 +1267,13 @@ const FinancialManagement = () => {
                 <p className="text-sm text-gray-600">Payment summary for CHWs</p>
               </div>
             </div>
-            <button className="w-full flex shadow-md items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+            <button className="w-full flex items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-gray-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div className="border border-gray-200 bg-white p-6">
             <div className="flex items-center mb-4">
               <PieChart className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -1281,13 +1281,13 @@ const FinancialManagement = () => {
                 <p className="text-sm text-gray-600">Complete financial overview</p>
               </div>
             </div>
-            <button className="w-full flex shadow-md items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+            <button className="w-full flex items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-gray-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div className="border border-gray-200 bg-white p-6">
             <div className="flex items-center mb-4">
               <Activity className="w-8 h-8 text-blue-600 mr-3" />
               <div>
@@ -1295,7 +1295,7 @@ const FinancialManagement = () => {
                 <p className="text-sm text-gray-600">Budget vs actual comparison</p>
               </div>
             </div>
-            <button className="w-full flex items-center justify-center border border-gray-100 shadow-md px-4 py-2  text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+            <button className="w-full flex items-center justify-center border border-gray-100 px-4 py-2  text-blue-700 rounded-lg hover:bg-gray-100 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Generate Report
             </button>

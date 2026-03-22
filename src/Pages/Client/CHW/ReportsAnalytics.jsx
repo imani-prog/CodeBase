@@ -262,7 +262,7 @@ const ReportsAnalytics = () => {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="bg-white shadow-sm border border-gray-200 p-4 sm:p-5">
+            <div key={stat.label} className="bg-white border border-gray-200 p-4 sm:p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="h-9 w-9 flex items-center justify-center shrink-0">
                   <Icon className="w-5 h-5 text-blue-600" />
@@ -309,7 +309,7 @@ const ReportsAnalytics = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Visit Trends — Area Chart */}
-        <div className="shadow-sm border border-gray-100 p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-gray-900">Visit &amp; Assessment Trends</h2>
@@ -387,7 +387,7 @@ const ReportsAnalytics = () => {
         </div>
 
         {/* Patient Categories — Vertical Bar */}
-        <div className="shadow-sm border border-gray-100 p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-gray-900">Patient Categories</h2>
@@ -438,7 +438,7 @@ const ReportsAnalytics = () => {
               </Bar>
             </RechartsBarChart>
           </ResponsiveContainer>
-          <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+          <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
             <span className="text-sm font-semibold text-gray-700">Total Active Patients</span>
             <span className="text-2xl font-bold text-blue-600">142</span>
           </div>
@@ -446,7 +446,7 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* Recent Reports */}
-      <div className="bg-white shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white border border-gray-200 overflow-hidden">
         <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
           <h2 className="text-base sm:text-lg font-bold text-gray-900">Recent Reports</h2>
         </div>

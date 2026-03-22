@@ -724,7 +724,7 @@ const InsuranceManagement = () => {
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Total Providers</p>
@@ -737,7 +737,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className=" mb-1">Covered Patients</p>
@@ -750,7 +750,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className=" mb-1">Total Coverage</p>
@@ -763,7 +763,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className=" mb-1">Claims Processed</p>
@@ -779,7 +779,7 @@ const InsuranceManagement = () => {
 
       {/* Charts and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <h3 className="text-lg font-semibold mb-4">Claims by Provider</h3>
           <div className="space-y-4">
             {insuranceProviders.slice(0, 4).map((provider) => (
@@ -800,7 +800,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
             <button
@@ -837,7 +837,7 @@ const InsuranceManagement = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="shadow-sm border border-gray-200 p-6">
+      <div className="bg-white border border-gray-200 p-6">
         <h3 className="text-lg font-semibold mb-4">Recent Insurance Activity</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 ">
@@ -889,7 +889,7 @@ const InsuranceManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <Shield className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -898,7 +898,7 @@ const InsuranceManagement = () => {
             </div>
           </div>
         </div>
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <Users className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -909,7 +909,7 @@ const InsuranceManagement = () => {
             </div>
           </div>
         </div>
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <FileText className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -920,7 +920,7 @@ const InsuranceManagement = () => {
             </div>
           </div>
         </div>
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -935,7 +935,7 @@ const InsuranceManagement = () => {
 
       <div className="bg-white border border-gray-200 overflow-hidden overflow-x-auto">
         <table className="w-full text-xs">
-          <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
+          <thead className="bg-gray-100 uppercase text-xs tracking-wide border-b border-gray-200">
             <tr>
               <th className="px-3 py-2 text-left font-semibold">Provider</th>
               <th className="px-3 py-2 text-center font-semibold">Type</th>
@@ -1072,9 +1072,9 @@ const InsuranceManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden overflow-x-auto">
+      <div className="bg-white border border-gray-200 overflow-hidden overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
+            <thead className="bg-gray-100 uppercase text-xs tracking-wide border-b border-gray-200">
               <tr>
                 <th className="px-3 py-2 text-left font-semibold">Patient</th>
                 <th className="px-3 py-2 text-center font-semibold">Provider</th>
@@ -1185,7 +1185,7 @@ const InsuranceManagement = () => {
 
       {/* Claims Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white  shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <div className="w-12 h-12  flex items-center justify-center mr-4">
               <CheckCircle className="w-10 h-10 text-blue-600" />
@@ -1197,7 +1197,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <div className="w-12 h-12  flex items-center justify-center mr-4">
               <Clock className="w-10 h-10 text-blue-600" />
@@ -1209,7 +1209,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <div className="w-12 h-12  flex items-center justify-center mr-4">
               <XCircle className="w-10 h-10 text-blue-600" />
@@ -1221,7 +1221,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <div className="w-12 h-12  flex items-center justify-center mr-4">
               <DollarSign className="w-10 h-10 text-blue-600" />
@@ -1237,7 +1237,7 @@ const InsuranceManagement = () => {
       {/* Claims Table */}
       <div className="bg-white shadow-sm border border-gray-200 overflow-hidden overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
+            <thead className="bg-gray-100 uppercase text-xs tracking-wide border-b border-gray-200">
               <tr>
                 <th className="px-3 py-2 text-left font-semibold">Claim No.</th>
                 <th className="px-3 py-2 text-center font-semibold">Type</th>
@@ -1310,8 +1310,8 @@ const InsuranceManagement = () => {
       </div>
 
       {/* Ambulance Insurance Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="shadow-md border border-gray-200 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <Truck className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1321,7 +1321,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <Shield className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1331,7 +1331,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1347,7 +1347,7 @@ const InsuranceManagement = () => {
       {/* Ambulance Insurance Table */}
       <div className="bg-white border border-gray-200 overflow-hidden overflow-x-auto">
         <table className="w-full text-xs">
-          <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
+          <thead className="bg-gray-100 uppercase text-xs tracking-wide border-b border-gray-200">
             <tr>
               <th className="px-3 py-2 text-left font-semibold">Vehicle</th>
               <th className="px-3 py-2 text-left font-semibold">Provider</th>
@@ -1434,7 +1434,7 @@ const InsuranceManagement = () => {
     </div>
   );
 
-  // ---------- Ambulance Policy Modals ----------
+  
 
   const renderAddPolicyModal = () => {
     if (!showAddPolicyModal) return null;
@@ -1938,11 +1938,11 @@ const InsuranceManagement = () => {
       <h3 className="text-lg font-semibold">Insurance Analytics & Reports</h3>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <h4 className="text-lg font-semibold mb-4">Coverage Distribution</h4>
           <div className="overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 uppercase text-xs">
+              <thead className="bg-gray-100 uppercase text-xs">
                 <tr>
                   <th className="px-3 py-2 text-left">Provider</th>
                   <th className="px-3 py-2 text-center">Patients</th>
@@ -1983,7 +1983,7 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <h4 className="text-lg font-semibold mb-4">Monthly Trends</h4>
           <div className="space-y-2">
             {/* Chart Legend */}
@@ -2602,7 +2602,7 @@ const InsuranceManagement = () => {
             };
             
             return (
-              <div key={index} className="bg-white shadow-sm border border-gray-200 p-4">
+              <div key={index} className="bg-white border border-gray-200 p-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="mb-1">{stat.label}</p>
@@ -2661,7 +2661,7 @@ const InsuranceManagement = () => {
         {/* Policies Table */}
         <div className="bg-white border border-gray-200 overflow-hidden overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="bg-gray-50 uppercase text-xs tracking-wide border-b border-gray-200">
+            <thead className="bg-gray-100 uppercase text-xs tracking-wide border-b border-gray-200">
               <tr>
                 <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Holder</th>
                 <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Policy No.</th>
@@ -2780,7 +2780,7 @@ const InsuranceManagement = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* General Settings */}
-          <div className="shadow-sm border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-6">
             <div className="flex items-center mb-6">
               <div className="p-2  mr-3">
                 <Settings className="w-8 h-8 text-blue-600" />
@@ -2870,7 +2870,7 @@ const InsuranceManagement = () => {
           </div>
 
           {/* Notification Settings */}
-          <div className="shadow-sm border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-6">
             <div className="flex items-center mb-6">
               <div className="p-2 mr-3">
                 <Bell className="w-8 h-8 text-blue-600" />
@@ -2976,7 +2976,7 @@ const InsuranceManagement = () => {
 
 
           {/* Integration & API Settings */}
-          <div className="shadow-sm border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-6">
             <div className="flex items-center mb-6">
               <div className="p-2 mr-3">
                 <Truck className="w-5 h-5 text-blue-600" />

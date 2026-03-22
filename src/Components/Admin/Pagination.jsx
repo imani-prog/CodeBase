@@ -15,7 +15,7 @@ const Pagination = ({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="mt-6 flex items-center justify-between shadow-sm border border-gray-200 px-6 py-4 bg-white">
+    <div className="mt-6 flex items-center justify-between border border-gray-200 px-6 py-4 bg-white">
       <div className="text-sm text-gray-600">
         Showing <span className="font-medium">{startItem}</span> to{' '}
         <span className="font-medium">{endItem}</span> of{' '}

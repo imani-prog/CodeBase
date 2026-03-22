@@ -510,7 +510,7 @@ const TasksFollowups = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white shadow-sm p-4 sm:p-6 border border-gray-200">
+          <div key={stat.label} className="bg-white p-4 sm:p-6 border border-gray-200">
             <p className="text-xs sm:text-sm text-gray-500 mb-1">{stat.label}</p>
             <p className="text-2xl sm:text-3xl font-bold text-blue-600">{stat.value}</p>
           </div>
@@ -563,7 +563,7 @@ const TasksFollowups = () => {
       {activeTab === 'pending' && (
         <>
           {/* ── TABLE (lg+) ── */}
-          <div className="hidden lg:block bg-white shadow-sm border border-gray-200 overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 text-sm">
               <thead className="bg-gray-50">
                 <tr>
@@ -622,13 +622,13 @@ const TasksFollowups = () => {
                     <td className="px-5 py-4 whitespace-nowrap text-gray-700">{task.dueTime}</td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                        <button onClick={() => openCompleteModal(task, 'pending')} className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded text-xs font-medium transition-colors">
+                        <button onClick={() => openCompleteModal(task, 'pending')} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-900 text-white border border-gray-300 rounded text-xs font-medium transition-colors">
                           <CheckCircle className="w-3 h-3" /><span>Complete</span>
                         </button>
                         <button onClick={() => openStartModal(task)} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
                           <ChevronRight className="w-3 h-3" /><span>Start</span>
                         </button>
-                        <button onClick={() => openEditModal(task, 'pending')} className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                        <button onClick={() => openEditModal(task, 'pending')} className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-950 rounded text-xs font-medium transition-colors">
                           <Edit className="w-3 h-3" /><span>Edit</span>
                         </button>
                         <button onClick={() => openDeleteModal(task, 'pending')} className="p-1.5 border border-red-300 hover:bg-red-50 text-red-600 rounded transition-colors">
@@ -662,7 +662,7 @@ const TasksFollowups = () => {
               </div>
             )}
             {filteredList(tasks.pending).map((task) => (
-              <div key={task.id} className="bg-white shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow flex flex-col gap-3">
+              <div key={task.id} className="bg-white border border-gray-200 p-4 hover:shadow-md transition-shadow flex flex-col gap-3">
                 <div>
                   <h3 className="font-bold text-gray-800 leading-snug mb-1">{task.title}</h3>
                   <div className="flex flex-wrap gap-1.5">
@@ -701,13 +701,13 @@ const TasksFollowups = () => {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1 border-t border-gray-100">
-                  <button onClick={() => openCompleteModal(task, 'pending')} className="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded text-xs font-medium transition-colors">
+                  <button onClick={() => openCompleteModal(task, 'pending')} className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-900 text-white border border-gray-300 rounded text-xs font-medium transition-colors">
                     <CheckCircle className="w-3 h-3" /><span>Complete</span>
                   </button>
                   <button onClick={() => openStartModal(task)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors">
                     <ChevronRight className="w-3 h-3" /><span>Start</span>
                   </button>
-                  <button onClick={() => openEditModal(task, 'pending')} className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                  <button onClick={() => openEditModal(task, 'pending')} className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-950 rounded text-xs font-medium transition-colors">
                     <Edit className="w-3 h-3" /><span>Edit</span>
                   </button>
                   <button onClick={() => openDeleteModal(task, 'pending')} className="p-1.5 border border-red-300 hover:bg-red-50 text-red-600 rounded transition-colors">
@@ -725,9 +725,9 @@ const TasksFollowups = () => {
       {activeTab === 'inProgress' && (
         <>
           {/* ── TABLE (lg+) ── */}
-          <div className="hidden lg:block bg-white shadow-sm border border-gray-200 overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-100">
                 <tr>
                   <th className="px-5 py-3 text-left font-semibold text-gray-600 uppercase tracking-wide text-xs">Task</th>
                   <th className="px-5 py-3 text-left font-semibold text-gray-600 uppercase tracking-wide text-xs">Patient</th>
@@ -796,10 +796,10 @@ const TasksFollowups = () => {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                        <button onClick={() => openCompleteModal(task, 'inProgress')} className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded text-xs font-medium transition-colors">
+                        <button onClick={() => openCompleteModal(task, 'inProgress')} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-900 text-white border border-gray-300 rounded text-xs font-medium transition-colors">
                           <CheckCircle className="w-3 h-3" /><span>Complete</span>
                         </button>
-                        <button onClick={() => openEditModal(task, 'inProgress')} className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                        <button onClick={() => openEditModal(task, 'inProgress')} className="flex items-center gap-1 px-2.5 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-950 rounded text-xs font-medium transition-colors">
                           <Edit className="w-3 h-3" /><span>Update</span>
                         </button>
                         <button onClick={() => openDeleteModal(task, 'inProgress')} className="p-1.5 border border-red-300 hover:bg-red-50 text-red-600 rounded transition-colors">
@@ -833,7 +833,7 @@ const TasksFollowups = () => {
               </div>
             )}
             {filteredList(tasks.inProgress).map((task) => (
-              <div key={task.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow flex flex-col gap-3">
+              <div key={task.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow flex flex-col gap-3">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
                   <div>
@@ -871,10 +871,10 @@ const TasksFollowups = () => {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1 border-t border-gray-100">
-                  <button onClick={() => openCompleteModal(task, 'inProgress')} className="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded text-xs font-medium transition-colors">
+                  <button onClick={() => openCompleteModal(task, 'inProgress')} className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-900 text-white border border-gray-300 rounded text-xs font-medium transition-colors">
                     <CheckCircle className="w-3 h-3" /><span>Complete</span>
                   </button>
-                  <button onClick={() => openEditModal(task, 'inProgress')} className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded text-xs font-medium transition-colors">
+                  <button onClick={() => openEditModal(task, 'inProgress')} className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 hover:bg-gray-50 text-gray-950 rounded text-xs font-medium transition-colors">
                     <Edit className="w-3 h-3" /><span>Update</span>
                   </button>
                   <button onClick={() => openDeleteModal(task, 'inProgress')} className="p-1.5 border border-red-300 hover:bg-red-50 text-red-600 rounded transition-colors">
@@ -892,16 +892,16 @@ const TasksFollowups = () => {
       {activeTab === 'completed' && (
         <>
           {/* ── TABLE (lg+) ── */}
-          <div className="hidden lg:block bg-white shadow-sm border border-gray-200 overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-5 py-3 text-left font-semibold text-gray-600 uppercase tracking-wide text-xs">Task</th>
-                  <th className="px-5 py-3 text-left font-semibold text-gray-600 uppercase tracking-wide text-xs">Patient</th>
-                  <th className="px-5 py-3 text-left font-semibold text-gray-600 uppercase tracking-wide text-xs">Category</th>
-                  <th className="px-5 py-3 text-left font-semibold text-gray-600 uppercase tracking-wide text-xs">Completed</th>
-                  <th className="px-5 py-3 text-left font-semibold text-gray-600 uppercase tracking-wide text-xs">Notes</th>
-                  <th className="px-5 py-3 text-center font-semibold text-gray-600 uppercase tracking-wide text-xs">Actions</th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-800 uppercase tracking-wide text-xs">Task</th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-800 uppercase tracking-wide text-xs">Patient</th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-800 uppercase tracking-wide text-xs">Category</th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-800 uppercase tracking-wide text-xs">Completed</th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-800 uppercase tracking-wide text-xs">Notes</th>
+                  <th className="px-5 py-3 text-center font-semibold text-gray-800 uppercase tracking-wide text-xs">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -979,9 +979,9 @@ const TasksFollowups = () => {
               </div>
             )}
             {filteredList(tasks.completed).map((task) => (
-              <div key={task.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow flex flex-col gap-3">
+              <div key={task.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow flex flex-col gap-3">
                 <div className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-bold text-gray-800 leading-snug">{task.title}</h3>
                     <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold ${getCategoryColor()}`}>

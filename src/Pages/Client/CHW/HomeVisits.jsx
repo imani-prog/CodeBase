@@ -389,10 +389,10 @@ const HomeVisits = () => {
         </div>
       </div>
 
-      {/* Map View — desktop only (lg+), hidden on smaller screens */}
+      {/* Map View — desktop only */}
       <div className="hidden lg:block border border-gray-200 overflow-hidden">
         {/* Map Header */}
-        <div className="px-5 py-4 border-b border-gray-100">
+        <div className="px-5 py-4 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
@@ -436,7 +436,7 @@ const HomeVisits = () => {
       {showMap && (
         <div className="lg:hidden fixed inset-0 z-50 flex flex-col bg-white">
           {/* Overlay header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm shrink-0">
+          <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shrink-0">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-blue-600" />
               <div>
@@ -515,10 +515,10 @@ const HomeVisits = () => {
       {activeTab === 'upcoming' && (
         <>
           {/* Desktop Table — lg and above */}
-          <div className="hidden lg:block bg-white shadow-sm border border-gray-200 overflow-hidden">
+          <div className="hidden lg:block bg-white border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-100 border-b border-gray-200">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Patient</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Date &amp; Time</th>
@@ -577,21 +577,21 @@ const HomeVisits = () => {
                           </button>
                           <button
                             onClick={() => openCompleteModal(visit)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-700 border border-emerald-300 rounded-lg text-xs font-semibold transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
                           >
                             <CheckCircle className="w-3.5 h-3.5" />
                             <span>Complete</span>
                           </button>
                           <button
                             onClick={() => openRescheduleModal(visit, 'UPCOMING')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 border border-amber-300 rounded-lg text-xs font-semibold transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 active:scale-95 text-gray-900 border border-gray-300 rounded-lg text-xs font-semibold transition-all"
                           >
                             <Calendar className="w-3.5 h-3.5" />
                             <span>Reschedule</span>
                           </button>
                           <button
                             onClick={() => openNoShowModal(visit)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 active:scale-95 text-red-700 border border-red-300 rounded-lg text-xs font-semibold transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
                           >
                             <XCircle className="w-3.5 h-3.5" />
                             <span>No-Show</span>
@@ -608,7 +608,7 @@ const HomeVisits = () => {
           {/* Mobile / Tablet Cards — below lg */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {visits.upcoming.map((visit) => (
-              <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div key={visit.id} className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-base font-bold text-gray-900">{visit.patientName}</h3>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getPriorityColor(visit.priority)}`}>
@@ -656,21 +656,21 @@ const HomeVisits = () => {
                   </button>
                   <button
                     onClick={() => openCompleteModal(visit)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-green-50 hover:bg-green-100 active:scale-95 text-green-700 border border-green-300 rounded-lg text-xs font-semibold transition-all"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
                   >
                     <CheckCircle className="w-3.5 h-3.5" />
                     <span>Complete</span>
                   </button>
                   <button
                     onClick={() => openRescheduleModal(visit, 'UPCOMING')}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 border border-amber-300 rounded-lg text-xs font-semibold transition-all"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 hover:bg-amber-100 active:scale-95 text-gray-900 border border-gray-300 rounded-lg text-xs font-semibold transition-all"
                   >
                     <Calendar className="w-3.5 h-3.5" />
                     <span>Reschedule</span>
                   </button>
                   <button
                     onClick={() => openNoShowModal(visit)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-red-50 hover:bg-red-100 active:scale-95 text-red-700 border border-red-300 rounded-lg text-xs font-semibold transition-all"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                     <span>No-Show</span>
@@ -686,10 +686,10 @@ const HomeVisits = () => {
       {activeTab === 'completed' && (
         <>
           {/* Desktop Table */}
-          <div className="hidden lg:block bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-100 border-b border-gray-200">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Patient</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Date &amp; Time</th>
@@ -703,7 +703,7 @@ const HomeVisits = () => {
                     <tr key={visit.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
                           <div>
                             <p className="font-semibold text-gray-900">{visit.patientName}</p>
                             <p className="text-xs text-gray-500">{visit.patientId}</p>
@@ -733,9 +733,9 @@ const HomeVisits = () => {
           {/* Mobile / Tablet Cards */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {visits.completed.map((visit) => (
-              <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div key={visit.id} className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
                   <h3 className="text-base font-bold text-gray-900">{visit.patientName}</h3>
                 </div>
                 <p className="text-xs text-gray-500 mb-3">{visit.patientId}</p>
@@ -753,7 +753,7 @@ const HomeVisits = () => {
                     <span>{visit.type}</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 bg-green-50 rounded p-2">
+                <p className="text-xs text-gray-600 bg-blue-50 rounded p-2">
                   <span className="font-semibold">Outcome:</span> {visit.outcome}
                 </p>
               </div>
@@ -766,10 +766,10 @@ const HomeVisits = () => {
       {activeTab === 'cancelled' && (
         <>
           {/* Desktop Table */}
-          <div className="hidden lg:block bg-white shadow-sm border border-gray-200 overflow-hidden">
+          <div className="hidden lg:block bg-white border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-100 border-b border-gray-200">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Patient</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Date &amp; Time</th>
@@ -784,7 +784,7 @@ const HomeVisits = () => {
                     <tr key={visit.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                          <XCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
                           <div>
                             <p className="font-semibold text-gray-900">{visit.patientName}</p>
                             <p className="text-xs text-gray-500">{visit.patientId}</p>
@@ -807,7 +807,7 @@ const HomeVisits = () => {
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={() => openRescheduleModal(visit, 'CANCELLED')}
-                          className="flex items-center gap-1.5 ml-auto px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 border border-amber-300 rounded-lg text-xs font-semibold transition-all"
+                          className="flex items-center gap-1.5 ml-auto px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
                         >
                           <Calendar className="w-3.5 h-3.5" />
                           <span>Reschedule</span>
@@ -823,9 +823,9 @@ const HomeVisits = () => {
           {/* Mobile / Tablet Cards */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {visits.cancelled.map((visit) => (
-              <div key={visit.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div key={visit.id} className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                  <XCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
                   <h3 className="text-base font-bold text-gray-900">{visit.patientName}</h3>
                 </div>
                 <p className="text-xs text-gray-500 mb-3">{visit.patientId}</p>
@@ -843,12 +843,12 @@ const HomeVisits = () => {
                     <span>{visit.type}</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 bg-red-50 rounded p-2 mb-3">
+                <p className="text-xs text-gray-600 bg-blue-50 rounded p-2 mb-3">
                   <span className="font-semibold">Reason:</span> {visit.reason}
                 </p>
                 <button
                   onClick={() => openRescheduleModal(visit, 'CANCELLED')}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 border border-amber-300 rounded-lg text-xs font-semibold transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
                 >
                   <Calendar className="w-3.5 h-3.5" />
                   <span>Reschedule Visit</span>
@@ -1147,7 +1147,7 @@ const HomeVisits = () => {
               </button>
               <button
                 onClick={handleCompleteSubmit}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 <CheckCircle className="w-4 h-4" />
                 Mark as Completed
@@ -1160,10 +1160,10 @@ const HomeVisits = () => {
       {/* Reschedule Visit Modal */}
       {rescheduleModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+          <div className="bg-white rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-amber-600" />
+                <Calendar className="w-5 h-5 text-blue-600" />
                 Reschedule Visit
               </h3>
               <button
@@ -1184,7 +1184,7 @@ const HomeVisits = () => {
                   type="date"
                   value={rescheduleModal.date}
                   onChange={e => setRescheduleModal(prev => ({ ...prev, date: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
@@ -1193,7 +1193,7 @@ const HomeVisits = () => {
                   type="time"
                   value={rescheduleModal.time}
                   onChange={e => setRescheduleModal(prev => ({ ...prev, time: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               {rescheduleModal.mode === 'UPCOMING' && (
@@ -1204,7 +1204,7 @@ const HomeVisits = () => {
                     value={rescheduleModal.reason}
                     onChange={e => setRescheduleModal(prev => ({ ...prev, reason: e.target.value }))}
                     placeholder="e.g. Patient requested later timing"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
@@ -1219,7 +1219,7 @@ const HomeVisits = () => {
               <button
                 onClick={handleRescheduleSubmit}
                 disabled={!rescheduleModal.date || !rescheduleModal.time}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
               >
                 <Calendar className="w-4 h-4" />
                 Confirm Reschedule
@@ -1232,10 +1232,10 @@ const HomeVisits = () => {
       {/* No-Show Modal */}
       {noShowModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+          <div className="bg-white rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-red-600" />
+                <XCircle className="w-5 h-5 text-blue-600" />
                 Mark No-Show
               </h3>
               <button
@@ -1266,7 +1266,7 @@ const HomeVisits = () => {
               </button>
               <button
                 onClick={handleNoShowSubmit}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 <XCircle className="w-4 h-4" />
                 Confirm No-Show

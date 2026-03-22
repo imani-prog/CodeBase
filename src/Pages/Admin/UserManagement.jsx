@@ -268,7 +268,7 @@ const UserManagement = () => {
            {/* Summary Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
 
-            <div className="shadow-sm border border-gray-200 p-6">
+            <div className="bg-white border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold">Total Users</p>
@@ -281,7 +281,7 @@ const UserManagement = () => {
               </div>
             </div>
 
-            <div className="shadow-sm border border-gray-200 p-6">
+            <div className="bg-white border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold">Healthcare Staff</p>
@@ -296,7 +296,7 @@ const UserManagement = () => {
               </div>
             </div>
 
-            <div className="shadow-sm border border-gray-200 p-6">
+            <div className="bg-white border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold">Patients Managed</p>
@@ -311,7 +311,7 @@ const UserManagement = () => {
               </div>
             </div>
 
-            <div className="shadow-sm border border-gray-200 p-6">
+            <div className="bg-white border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold">Pending Approvals</p>
@@ -337,7 +337,7 @@ const UserManagement = () => {
                   <input
                     type="text"
                     placeholder="Search users, emails, or departments..."
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -348,7 +348,7 @@ const UserManagement = () => {
                   <select
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value)}
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                   >
                     {roleOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -361,7 +361,7 @@ const UserManagement = () => {
                   <select
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent"
+                    className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                   >
                     {statusOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -415,7 +415,7 @@ const UserManagement = () => {
           </div>
 
           {/* Users Table */}
-          <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">

@@ -68,7 +68,7 @@ const AdminFeatures = () => {
           return (
             <div 
               key={index}
-              className="bg-white shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
+              className="bg-white p-6 border border-gray-200"
             >
               <div className="flex items-center mb-4">
                 <div className={`w-10 h-10 ${feature.iconBg} rounded-lg flex items-center justify-center`}>

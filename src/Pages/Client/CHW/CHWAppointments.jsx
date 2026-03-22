@@ -262,7 +262,7 @@ const CHWAppointments = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white shadow-md p-4 sm:p-6 border border-gray-200">
+          <div key={stat.label} className="bg-white p-4 sm:p-6 border border-gray-200">
             <p className="text-xs sm:text-sm mb-1 text-gray-600">{stat.label}</p>
             <p className={`text-2xl sm:text-3xl font-bold text-${stat.color}-600`}>{stat.value}</p>
           </div>
@@ -329,7 +329,7 @@ const CHWAppointments = () => {
       {activeTab === 'upcoming' && (
         <>
           {/* Desktop Table */}
-          <div className="hidden md:block bg-white shadow-sm border border-gray-200 overflow-x-auto">
+          <div className="hidden md:block bg-white border border-gray-200 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-left">
@@ -407,7 +407,7 @@ const CHWAppointments = () => {
           {/* Mobile Cards */}
           <div className="md:hidden space-y-3">
             {filteredUpcoming.map((appt) => (
-              <div key={appt.id} className={`bg-white rounded-xl shadow-sm border p-4 ${
+              <div key={appt.id} className={`bg-white rounded-xl border p-4 ${
                 appt.status === 'pending' ? 'border-yellow-200 bg-yellow-50/30' : 'border-gray-200'
               }`}>
                 <div className="flex items-start justify-between mb-3">
@@ -468,7 +468,7 @@ const CHWAppointments = () => {
       {activeTab === 'completed' && (
         <>
           {/* Desktop Table */}
-          <div className="hidden md:block bg-white shadow-sm border border-gray-200 overflow-x-auto">
+          <div className="hidden md:block bg-white border border-gray-200 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-left">
@@ -485,7 +485,7 @@ const CHWAppointments = () => {
                   <tr key={appt.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
                         <div>
                           <p className="font-semibold text-gray-900">{appt.patientName}</p>
                           <p className="text-xs text-gray-500">{appt.patientId}</p>
@@ -522,9 +522,9 @@ const CHWAppointments = () => {
           {/* Mobile Cards */}
           <div className="md:hidden space-y-3">
             {filteredCompleted.map((appt) => (
-              <div key={appt.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div key={appt.id} className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-gray-900">{appt.patientName}</h3>
                     <p className="text-xs text-gray-500">{appt.patientId}</p>
@@ -560,7 +560,7 @@ const CHWAppointments = () => {
       {activeTab === 'cancelled' && (
         <>
           {/* Desktop Table */}
-          <div className="hidden md:block bg-white shadow-sm border border-gray-200 overflow-x-auto">
+          <div className="hidden md:block bg-white border border-gray-200 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-left">
@@ -620,7 +620,7 @@ const CHWAppointments = () => {
           {/* Mobile Cards */}
           <div className="md:hidden space-y-3">
             {filteredCancelled.map((appt) => (
-              <div key={appt.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div key={appt.id} className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
                   <div>

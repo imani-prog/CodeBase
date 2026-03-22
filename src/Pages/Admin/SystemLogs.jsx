@@ -567,7 +567,7 @@ const SystemLogs = () => {
 
           {/* Statistics */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-6">
-            <div className="border border-gray-200 shadow-md p-4">
+            <div className="border border-gray-200 bg-white p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <Activity className="w-5 h-5 text-blue-600" />
                 <span className="font-medium">Total Events</span>
@@ -575,35 +575,35 @@ const SystemLogs = () => {
               <p className="text-2xl font-bold">{stats.total}</p>
             </div>
 
-            <div className="border border-gray-200 shadow-md p-4">
+            <div className="border border-gray-200 bg-white p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <CheckCircle className="w-5 h-5 text-blue-600" />
                 <span className="font-medium">Success</span>
               </div>
               <p className="text-2xl font-bold">{stats.success}</p>
             </div>
-            <div className="border border-gray-200 shadow-md p-4">
+            <div className="border border-gray-200 bg-white p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <XCircle className="w-5 h-5 text-blue-600" />
                 <span className="font-medium">Failures</span>
               </div>
               <p className="text-2xl font-bold">{stats.failure}</p>
             </div>
-            <div className="border border-gray-200 shadow-md p-4">
+            <div className="border border-gray-200 bg-white p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <LogIn className="w-5 h-5 text-blue-600" />
                 <span className="font-medium">Logins</span>
               </div>
               <p className="text-2xl font-bold">{stats.loginAttempts}</p>
             </div>
-            <div className="border border-gray-200 shadow-md p-4">
+            <div className="border border-gray-200 bg-white p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <Download className="w-5 h-5 text-blue-600" />
                 <span className="font-medium">Exports</span>
               </div>
               <p className="text-2xl font-bold">{stats.dataExports}</p>
             </div>
-            <div className="border border-gray-200 shadow-md p-4">
+            <div className="border border-gray-200 bg-white p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <User className="w-5 h-5 text-blue-600" />
                 <span className="font-medium">Active Users</span>
@@ -626,7 +626,7 @@ const SystemLogs = () => {
                 placeholder="Search by user, event type, entity, IP address, or failure reason..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 "
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent "
               />
             </div>
 
@@ -637,7 +637,7 @@ const SystemLogs = () => {
                 <select
                   value={selectedEventType}
                   onChange={(e) => setSelectedEventType(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                 >
                   <option value="all">All Events ({auditLogs.length})</option>
                   {eventTypes.map(type => (
@@ -651,7 +651,7 @@ const SystemLogs = () => {
               <select
                 value={selectedEntityType}
                 onChange={(e) => setSelectedEntityType(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparentfocus:outline-none focus:ring-2"
               >
                 <option value="all">All Entities</option>
                 {entityTypes.map(type => (
@@ -664,7 +664,7 @@ const SystemLogs = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
               >
                 <option value="all">All Status</option>
                 {statusTypes.map(status => (
@@ -712,10 +712,10 @@ const SystemLogs = () => {
         </div>
 
         {/* Audit Logs Table */}
-        <div className="shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-100 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase">
                     Event

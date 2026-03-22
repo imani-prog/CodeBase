@@ -78,7 +78,7 @@ const StatsCards = () => {
         return (
           <div 
             key={index} 
-            className={`bg-white shadow-sm p-4 border border-gray-100 cursor-pointer 
+            className={`bg-white p-4 border border-gray-200 cursor-pointer 
               transition-all duration-300 hover:shadow-lg hover:-translate-y-1 
               ${hoveredCard === index ? 'border-blue-300 shadow-blue-100' : ''}
               relative overflow-hidden group`}

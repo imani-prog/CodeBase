@@ -35,7 +35,7 @@ const UserGrowthBarChart = () => {
     .reduce((a, b) => a + b, 0);
 
   return (
-    <div className="bg-white shadow-sm p-6 border border-gray-100">
+    <div className="bg-white p-6 border border-gray-200">
       <h2 className="text-lg font-semibold mb-4">
         Monthly User Growth Comparison
       </h2>

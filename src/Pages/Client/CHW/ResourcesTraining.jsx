@@ -400,7 +400,7 @@ const ResourcesTraining = () => {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="bg-white shadow-sm p-4 sm:p-6 border border-gray-200">
+            <div key={stat.label} className="bg-white p-4 sm:p-6 border border-gray-200">
               <Icon className={`w-6 h-6 sm:w-8 sm:h-8 text-${stat.color}-600 mb-2`} />
               <p className={`text-2xl sm:text-3xl font-bold text-${stat.color}-600 mb-1`}>{stat.value}</p>
               <p className="text-xs sm:text-sm text-gray-600">{stat.label}</p>
@@ -460,9 +460,9 @@ const ResourcesTraining = () => {
       {activeTab === 'courses' && (
         <>
           {/* Table — large screens */}
-          <div className="hidden lg:block bg-white border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 overflow-x-auto">
             <table className="w-full min-w-[900px]">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-100 border-b border-gray-200">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Course</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Instructor</th>
@@ -571,7 +571,7 @@ const ResourcesTraining = () => {
           {/* Cards — small / medium screens */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {courses.map((course) => (
-              <div key={course.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow">
+              <div key={course.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
                 <div className="flex flex-wrap gap-1 mb-2">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(course.status)}`}>
                     {course.status.replace('-', ' ')}
@@ -651,9 +651,9 @@ const ResourcesTraining = () => {
       {activeTab === 'resources' && (
         <>
           {/* Table — large screens */}
-          <div className="hidden lg:block bg-white border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 overflow-x-auto">
             <table className="w-full min-w-[640px]">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-200 border-b border-gray-200">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Resource</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Category</th>
@@ -711,7 +711,7 @@ const ResourcesTraining = () => {
           {/* Cards — small / medium screens */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {resources.map((resource) => (
-              <div key={resource.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+              <div key={resource.id} className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex items-start gap-3 mb-3">
                   {resource.type === 'Video' ? (
                     <Video className="w-8 h-8 text-blue-600 shrink-0 mt-0.5" />
@@ -758,9 +758,9 @@ const ResourcesTraining = () => {
       {activeTab === 'certificates' && (
         <>
           {/* Table — large screens */}
-          <div className="hidden lg:block bg-white border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="hidden lg:block bg-white border border-gray-200 overflow-x-auto">
             <table className="w-full min-w-[640px]">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-100 border-b border-gray-200">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Certificate</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
@@ -816,7 +816,7 @@ const ResourcesTraining = () => {
           {/* Cards — small / medium screens */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {certifications.map((cert) => (
-              <div key={cert.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+              <div key={cert.id} className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Award className="w-5 h-5 text-blue-600 shrink-0" />
                   <h3 className="font-bold text-gray-900 text-sm">{cert.title}</h3>

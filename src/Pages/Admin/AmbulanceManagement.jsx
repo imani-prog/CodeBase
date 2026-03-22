@@ -661,56 +661,56 @@ const AmbulanceManagement = () => {
   const getStatusIcon = (status) => {
     const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : status;
     switch (normalizedStatus) {
-      case 'AVAILABLE': return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'AVAILABLE': return <CheckCircle className="w-4 h-4 text-blue-500" />;
       case 'BUSY': 
       case 'IN_TRANSIT': 
       case 'TRANSPORTING':
       case 'EN_ROUTE':
       case 'ON_SCENE': return <Navigation className="w-4 h-4 text-blue-500" />;
-      case 'MAINTENANCE': return <Settings className="w-4 h-4 text-yellow-500" />;
-      case 'OUT_OF_SERVICE': return <XCircle className="w-4 h-4 text-red-500" />;
-      case 'ON_DUTY': return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'MAINTENANCE': return <Settings className="w-4 h-4 text-blue-500" />;
+      case 'OUT_OF_SERVICE': return <XCircle className="w-4 h-4 text-blue-500" />;
+      case 'ON_DUTY': return <CheckCircle className="w-4 h-4 text-blue-500" />;
       case 'ON_TRIP': return <Navigation className="w-4 h-4 text-blue-500" />;
-      case 'OFF_DUTY': return <XCircle className="w-4 h-4 text-gray-500" />;
-      case 'CRITICAL': return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      case 'HIGH': return <AlertTriangle className="w-4 h-4 text-orange-500" />;
-      case 'MEDIUM': return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+      case 'OFF_DUTY': return <XCircle className="w-4 h-4 text-blue-500" />;
+      case 'CRITICAL': return <AlertTriangle className="w-4 h-4 text-blue-500" />;
+      case 'HIGH': return <AlertTriangle className="w-4 h-4 text-blue-500" />;
+      case 'MEDIUM': return <AlertTriangle className="w-4 h-4 text-blue-500" />;
       case 'LOW': return <Info className="w-4 h-4 text-blue-500" />;
       case 'IN_PROGRESS':
       case 'REQUESTED':
       case 'DISPATCHED': return <Timer className="w-4 h-4 text-blue-500" />;
       case 'COMPLETED':
-      case 'AT_HOSPITAL': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'CANCELED': return <XCircle className="w-4 h-4 text-red-500" />;
-      default: return <Activity className="w-4 h-4 text-gray-500" />;
+      case 'AT_HOSPITAL': return <CheckCircle className="w-4 h-4 text-blue-500" />;
+      case 'CANCELED': return <XCircle className="w-4 h-4 text-blue-500" />;
+      default: return <Activity className="w-4 h-4 text-blue-500" />;
     }
   };
 
   const getStatusColor = (status) => {
     const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : status;
     switch (normalizedStatus) {
-      case 'AVAILABLE': return 'text-green-800 border-green-200';
+      case 'AVAILABLE': return 'text-green-800';
       case 'BUSY':
       case 'IN_TRANSIT':
       case 'TRANSPORTING':
       case 'EN_ROUTE':
-      case 'ON_SCENE': return 'text-blue-800 border-blue-200';
-      case 'MAINTENANCE': return 'text-yellow-800 border-yellow-200';
-      case 'OUT_OF_SERVICE': return 'text-red-800 border-red-200';
-      case 'ON_DUTY': return 'text-green-800 border-green-200';
-      case 'ON_TRIP': return 'text-blue-800 border-blue-200';
-      case 'OFF_DUTY': return 'text-gray-800 border-gray-200';
-      case 'CRITICAL': return 'text-red-800 border-red-200';
-      case 'HIGH': return 'text-orange-800 border-orange-200';
-      case 'MEDIUM': return 'text-yellow-800 border-yellow-200';
-      case 'LOW': return 'text-blue-800 border-blue-200';
+      case 'ON_SCENE': return 'text-blue-800';
+      case 'MAINTENANCE': return 'text-yellow-800';
+      case 'OUT_OF_SERVICE': return 'text-red-800';
+      case 'ON_DUTY': return 'text-green-800';
+      case 'ON_TRIP': return 'text-blue-800';
+      case 'OFF_DUTY': return 'text-gray-800';
+      case 'CRITICAL': return 'text-red-800';
+      case 'HIGH': return 'text-orange-800';
+      case 'MEDIUM': return 'text-yellow-800';
+      case 'LOW': return 'text-blue-800';
       case 'IN_PROGRESS':
       case 'REQUESTED':
-      case 'DISPATCHED': return 'text-blue-800 border-blue-200';
+      case 'DISPATCHED': return 'text-blue-800';
       case 'COMPLETED':
-      case 'AT_HOSPITAL': return 'text-green-800 border-green-200';
-      case 'CANCELED': return 'text-red-800 border-red-200';
-      default: return 'text-gray-800 border-gray-200';
+      case 'AT_HOSPITAL': return 'text-green-800';
+      case 'CANCELED': return 'text-red-800';
+      default: return 'text-gray-800';
     }
   };
 
@@ -856,7 +856,7 @@ const AmbulanceManagement = () => {
     
     
     setTimeout(() => {
-      alert('✅ Ambulance updated successfully!');
+      alert(' Ambulance updated successfully!');
     }, 100);
   };
 
@@ -865,55 +865,49 @@ const AmbulanceManagement = () => {
     console.log('Adding new ambulance:', newAmbulance);
     
     setShowAddModal(false);
-    
-    // Show success message after modal closes
+ 
     setTimeout(() => {
-      alert('✅ Ambulance added successfully!');
+      alert(' Ambulance added successfully!');
     }, 100);
   };
 
   const handleAddDriverSave = (newDriver) => {
-    // TODO: Implement API call to add new driver
+
     console.log('Adding new driver:', newDriver);
-    
-    // Close modal first
+  
     setShowAddDriverModal(false);
-    
-    // Show success message after modal closes
+  
     setTimeout(() => {
-      alert('✅ Driver added successfully!');
+      alert(' Driver added successfully!');
     }, 100);
   };
 
   const handleAddTrackingSave = (newTrackingData) => {
     console.log('Adding unit to tracking:', newTrackingData);
     
-    // Close modal first
+  
     setShowAddTrackingModal(false);
-    
-    // Add the tracking data to the trackingData state
+  
     setTrackingData(prev => ({
       ...prev,
       [newTrackingData.vehicleId]: newTrackingData
     }));
-    
-    // Show success message after modal closes
+   
     setTimeout(() => {
-      alert(`✅ ${newTrackingData.vehicleId} added to live tracking!`);
+      alert(` ${newTrackingData.vehicleId} added to live tracking!`);
     }, 100);
   };
 
   const handleEditDriverSave = (updatedDriver) => {
-    // TODO: Implement API call to update driver
-    console.log('Updating driver:', updatedDriver);
     
-    // Close modal first
+    console.log('Updating driver:', updatedDriver);
+  
     setShowEditDriverModal(false);
     setCurrentDriver(null);
     
-    // Show success message after modal closes
+   
     setTimeout(() => {
-      alert('✅ Driver updated successfully!');
+      alert('Driver updated successfully!');
     }, 100);
   };
 
@@ -945,7 +939,7 @@ const AmbulanceManagement = () => {
         break;
       case 'delete':
         if (confirm(`Are you sure you want to permanently delete ${driver.name}? This action cannot be undone and all data will be lost.`)) {
-          // TODO: Implement API call to delete driver
+          
           alert(`${driver.name} has been deleted from the system.`);
           console.log('Deleting driver:', driver);
         }
@@ -954,7 +948,7 @@ const AmbulanceManagement = () => {
         alert(`Action ${action} not implemented yet.`);
     }
     
-    // Close the more options modal
+    
     setShowMoreDriverModal(false);
     setCurrentDriver(null);
   };
@@ -964,38 +958,38 @@ const AmbulanceManagement = () => {
     
     switch(action) {
       case 'track':
-        // TODO: Implement tracking functionality
+        
         alert(`Tracking ${ambulance.vehiclePlate}...`);
         break;
       case 'schedule':
-        // TODO: Open maintenance scheduling
+       
         alert(`Opening maintenance schedule for ${ambulance.vehiclePlate}...`);
         break;
       case 'history':
-        // TODO: Show service history
+        
         alert(`Loading service history for ${ambulance.vehiclePlate}...`);
         break;
       case 'export':
-        // TODO: Export ambulance details
+        
         alert(`Exporting details for ${ambulance.vehiclePlate}...`);
         break;
       case 'print':
-        // TODO: Print report
+        
         alert(`Printing report for ${ambulance.vehiclePlate}...`);
         break;
       case 'refresh':
-        // TODO: Refresh ambulance status
+        
         alert(`Refreshing status for ${ambulance.vehiclePlate}...`);
         break;
       case 'archive':
         if (confirm(`Are you sure you want to archive ${ambulance.vehiclePlate}?`)) {
-          // TODO: Archive ambulance
+          
           alert(`${ambulance.vehiclePlate} archived successfully`);
         }
         break;
       case 'delete':
         if (confirm(`Are you sure you want to delete ${ambulance.vehiclePlate}? This action cannot be undone.`)) {
-          // TODO: Delete ambulance
+         
           alert(`${ambulance.vehiclePlate} deleted successfully`);
         }
         break;
@@ -1230,7 +1224,7 @@ const AmbulanceManagement = () => {
           {/* Ambulances Tab */}
               {activeTab === 'ambulances' && (
               <>
-              <div className="bg-white shadow overflow-x-auto">
+              <div className="bg-white border border-gray-200 overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-100 uppercase text-xs font-semibold">
               <tr>
@@ -1251,27 +1245,19 @@ const AmbulanceManagement = () => {
             <tbody>
               {paginatedAmbulances.map((a) => (
                 <tr key={a.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                  {/* Vehicle Plate */}
+                  
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-sm font-medium text-gray-900">{a.vehiclePlate}</p>
                   </td>
-
-                  {/* Registration Number */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-sm text-gray-700">{a.registrationNumber}</p>
                   </td>
-
-                  {/* Year */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-sm text-gray-700">{a.year}</p>
                   </td>
-
-                  {/* Type */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-sm text-gray-700 capitalize">{a.type.replace("_", " ")}</p>
                   </td>
-
-                  {/* Status */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
@@ -1281,33 +1267,21 @@ const AmbulanceManagement = () => {
                       {a.status.replace("_", " ").toUpperCase()}
                     </span>
                   </td>
-
-                  {/* Driver */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-sm font-medium text-gray-900">{a.driverName}</p>
                   </td>
-
-                  {/* Medic */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-sm text-gray-700">{a.medicName}</p>
                   </td>
-
-                  {/* Total Trips */}
                   <td className="px-3 py-3 text-center whitespace-nowrap">
                     <p className="text-sm font-semibold text-gray-900">{a.totalDispatches}</p>
                   </td>
-
-                  {/* Avg Response */}
                   <td className="px-3 py-3 text-center whitespace-nowrap">
                     <p className="text-sm text-gray-700">{a.averageResponseTime}</p>
                   </td>
-
-                  {/* Insurance Provider */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-sm font-medium text-gray-900">{a.insuranceProvider}</p>
                   </td>
-
-                  {/* Policy Number */}
                   <td className="px-3 py-3 whitespace-nowrap">
                     <p className="text-xs text-gray-600">{a.insurancePolicyNumber}</p>
                   </td>
@@ -1373,10 +1347,10 @@ const AmbulanceManagement = () => {
 
           {/* Drivers Tab */}
           {activeTab === 'drivers' && (
-            <div className="shadow-sm border border-gray-200 overflow-hidden">
+            <div className="border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-100 border-b border-gray-200">
                     <tr>
                       <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Driver</th>
                       <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Email</th>
@@ -1416,7 +1390,7 @@ const AmbulanceManagement = () => {
                         <td className="px-3 py-3 whitespace-nowrap">
                           <div className="flex items-center">
                             {getStatusIcon(driver.status)}
-                            <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(driver.status)}`}>
+                            <span className={`ml-2 px-2 py-1 text-xs font-medium ${getStatusColor(driver.status)}`}>
                               {driver.status.replace('_', ' ').toUpperCase()}
                             </span>
                           </div>
@@ -1496,10 +1470,10 @@ const AmbulanceManagement = () => {
 
           {/* Emergency Dispatch Tab */}
           {activeTab === 'dispatch' && (
-            <div className="bg-white shadow overflow-x-auto">
+            <div className="bg-white border border-gray-200 overflow-x-auto">
               {emergencyCalls.length === 0 ? (
                 <div className="p-12 text-center">
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                  <CheckCircle className="w-16 h-16 text-blue-500 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No Emergency Calls</h3>
                   <p className="text-gray-500">All emergency calls have been handled. Great work!</p>
                 </div>
@@ -1521,12 +1495,9 @@ const AmbulanceManagement = () => {
                   <tbody>
                     {emergencyCalls.map((call) => (
                       <tr key={call.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        {/* Call ID */}
                         <td className="px-4 py-4">
                           <div className="font-semibold text-gray-900">{call.id}</div>
                         </td>
-
-                        {/* Priority */}
                         <td className="px-4 py-4">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${
                             call.priority === 'critical' ? 'text-red-800 bg-red-50 border-red-200' :
@@ -1536,31 +1507,23 @@ const AmbulanceManagement = () => {
                             {call.priority.toUpperCase()}
                           </span>
                         </td>
-
-                        {/* Status */}
                         <td className="px-4 py-4">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(call.status)}`}>
                             {call.status.toUpperCase()}
                           </span>
                         </td>
-
-                        {/* Patient Info */}
                         <td className="px-4 py-4">
                           <div className="space-y-1">
                             <div className="font-medium text-gray-900">{call.patientName}</div>
                             <div className="text-xs text-gray-600">{call.condition}</div>
                           </div>
                         </td>
-
-                        {/* Location */}
                         <td className="px-4 py-4">
                           <div className="flex items-start max-w-xs">
                             <MapPin className="w-4 h-4 mr-1 mt-0.5 text-gray-400 flex-shrink-0" />
                             <span className="text-gray-700">{call.location}</span>
                           </div>
                         </td>
-
-                        {/* Caller Details */}
                         <td className="px-4 py-4">
                           <div className="space-y-1">
                             <div className="text-gray-900">{call.callerName}</div>
@@ -1570,8 +1533,6 @@ const AmbulanceManagement = () => {
                             </div>
                           </div>
                         </td>
-
-                        {/* Time Info */}
                         <td className="px-4 py-4">
                           <div className="space-y-1">
                             <div className="flex items-center text-xs text-gray-600">
@@ -1586,8 +1547,6 @@ const AmbulanceManagement = () => {
                             </div>
                           </div>
                         </td>
-
-                        {/* Nearest Units */}
                         <td className="px-4 py-4">
                           <div className="space-y-1">
                             {call.nearestAmbulances.slice(0, 2).map((ambulanceId) => {

@@ -191,7 +191,7 @@ const CHWDashboard = () => {
           return (
             <div
               key={stat.label}
-              className="bg-white shadow-md p-3 sm:p-4 border border-gray-200 hover:shadow-lg transition-shadow"
+              className="bg-white p-3 sm:p-4 border border-gray-200 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${colorClasses[stat.color]}`}>
@@ -212,7 +212,7 @@ const CHWDashboard = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upcoming Visits */}
-        <div className="lg:col-span-2 bg-white shadow-md p-4 sm:p-6">
+        <div className="lg:col-span-2 bg-white p-4 border border-gray-200 sm:p-6">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h2 className="text-lg sm:text-xl font-bold flex items-center">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" />
@@ -267,7 +267,7 @@ const CHWDashboard = () => {
         </div>
 
         {/* Recent Activities */}
-        <div className="bg-white shadow-md p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 p-4 sm:p-6">
           <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center">
             <Activity className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" />
             Recent Activity
@@ -305,28 +305,28 @@ const CHWDashboard = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Link
             to="/client/chw/patients"
-            className="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+            className="flex items-center space-x-3 bg-white p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
           >
             <Users className="w-6 h-6 text-gray-600 group-hover:text-blue-600" />
             <span className="font-semibold text-gray-700 group-hover:text-blue-700">View Patients</span>
           </Link>
           <Link
             to="/client/chw/tasks"
-            className="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+            className="flex items-center space-x-3 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
           >
             <ClipboardList className="w-6 h-6 text-gray-600 group-hover:text-blue-600" />
             <span className="font-semibold text-gray-700 group-hover:text-blue-700">Add Task</span>
           </Link>
           <Link
             to="/client/chw/health-assessments"
-            className="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+            className="flex items-center space-x-3 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
           >
             <Heart className="w-6 h-6 text-gray-600 group-hover:text-blue-600" />
             <span className="font-semibold text-gray-700 group-hover:text-blue-700">New Assessment</span>
           </Link>
           <Link
             to="/client/chw/reports"
-            className="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+            className="flex items-center space-x-3 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
           >
             <TrendingUp className="w-6 h-6 text-gray-600 group-hover:text-blue-600" />
             <span className="font-semibold text-gray-700 group-hover:text-blue-700">View Reports</span>

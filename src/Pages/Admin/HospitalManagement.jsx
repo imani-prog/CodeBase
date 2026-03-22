@@ -455,7 +455,7 @@ const HospitalManagement = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
 
 
-          <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm mb-1">Total Hospitals</p>
@@ -471,7 +471,7 @@ const HospitalManagement = () => {
             </div>
           </div>
 
-          <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm mb-1">Total Beds</p>
@@ -484,7 +484,7 @@ const HospitalManagement = () => {
             </div>
           </div>
 
-          <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm mb-1">Ambulances</p>
@@ -497,7 +497,7 @@ const HospitalManagement = () => {
             </div>
           </div>
 
-          <div className="bg-white shadow-sm border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm mb-1">Hospital Types</p>
@@ -571,7 +571,7 @@ const HospitalManagement = () => {
         </div>
 
         {/* Hospitals Table */}
-        <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">

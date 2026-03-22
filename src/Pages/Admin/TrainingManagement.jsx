@@ -713,7 +713,7 @@ const TrainingManagement = () => {
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Total Courses</p>
@@ -729,7 +729,7 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Total Students</p>
@@ -745,7 +745,7 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Total Revenue</p>
@@ -761,7 +761,7 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Certificates Issued</p>
@@ -780,7 +780,7 @@ const TrainingManagement = () => {
 
       {/* Charts and Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <h3 className="text-lg font-semibold mb-4">Enrollment Trends</h3>
           <div className="space-y-4">
             {enrollmentTrends.map((trend, index) => (
@@ -798,7 +798,7 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-sm border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <h3 className="text-lg font-semibold mb-4">Revenue by Category</h3>
           <div className="space-y-3">
             {revenueByCategory.slice(0, 5).map((category, index) => (
@@ -856,7 +856,7 @@ const TrainingManagement = () => {
 
       <div className="bg-white border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 uppercase text-xs">
+          <thead className="bg-gray-100 uppercase text-xs">
             <tr>
               <th className="px-4 py-3 text-left">Course Title</th>
               <th className="px-4 py-3 text-center">Duration</th>
@@ -993,7 +993,7 @@ const TrainingManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="border border-gray-200 shadow-md p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <div className="flex items-center">
             <Users className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1002,7 +1002,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 shadow-md p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <div className="flex items-center">
             <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1011,7 +1011,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 shadow-md  p-6">
+        <div className="border border-gray-200 bg-white p-6">
           <div className="flex items-center">
             <Award className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1124,7 +1124,7 @@ const TrainingManagement = () => {
   const renderRevenue = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Total Revenue</p>
@@ -1136,7 +1136,7 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Avg Revenue per Course</p>
@@ -1150,7 +1150,7 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Avg Revenue per Student</p>
@@ -1164,7 +1164,7 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1">Monthly Growth</p>
@@ -1249,7 +1249,7 @@ const TrainingManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <Award className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1258,7 +1258,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1269,7 +1269,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <Star className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1368,7 +1368,7 @@ const TrainingManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <Users className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1377,7 +1377,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <BookOpen className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1388,7 +1388,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <Star className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1399,7 +1399,7 @@ const TrainingManagement = () => {
             </div>
           </div>
         </div>
-        <div className="shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
             <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
             <div>
@@ -1414,7 +1414,7 @@ const TrainingManagement = () => {
 
       <div className="bg-white border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 uppercase text-xs">
+          <thead className="bg-gray-100 uppercase text-xs">
             <tr>
               <th className="px-4 py-3 text-left">Instructor</th>
               <th className="px-4 py-3 text-left">Specialization</th>
