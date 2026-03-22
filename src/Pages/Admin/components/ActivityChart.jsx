@@ -15,7 +15,7 @@ const COLORS = {
   reports: '#7dd3fc'       // sky-300
 };
 
-const ActivityChart = () => {
+const ActivityChart = ({ compact = false }) => {
   const dailyActivityData = [
     { day: 'Mon', logins: 145, appointments: 89, reports: 23 },
     { day: 'Tue', logins: 167, appointments: 102, reports: 31 },
@@ -36,16 +36,16 @@ const ActivityChart = () => {
   );
 
   return (
-    <div className="bg-white p-6 border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Daily Activity Overview</h2>
-        <select className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+    <div className={`bg-white border border-gray-200 ${compact ? 'p-3' : 'p-6'}`}>
+      <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-4'}`}>
+        <h2 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold`}>Daily Activity Overview</h2>
+        <select className={`${compact ? 'text-xs px-2 py-1' : 'text-sm px-3 py-1'} border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}>
           <option value="week">This Week</option>
           <option value="month">This Month</option>
         </select>
       </div>
 
-      <div className="h-80">
+      <div className={compact ? 'h-48' : 'h-80'}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={dailyActivityData} barGap={6}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -84,23 +84,23 @@ const ActivityChart = () => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-6">
+      <div className={`flex items-center justify-center flex-wrap ${compact ? 'gap-3 mt-3' : 'gap-6 mt-6'}`}>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded" style={{ backgroundColor: COLORS.logins }}></div>
-          <span className="text-sm text-gray-600">Logins</span>
+          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.logins }}></div>
+          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Logins</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded" style={{ backgroundColor: COLORS.appointments }}></div>
-          <span className="text-sm text-gray-600">Appointments</span>
+          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.appointments }}></div>
+          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Appointments</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded" style={{ backgroundColor: COLORS.reports }}></div>
-          <span className="text-sm text-gray-600">Reports</span>
+          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.reports }}></div>
+          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Reports</span>
         </div>
       </div>
 
       {/* Totals Summary */}
-      <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+      <div className={`${compact ? 'mt-2 pt-2' : 'mt-4 pt-4'} border-t border-gray-100 text-center`}>
         <p className="text-xs text-gray-500">
           Week Total: <span className="font-semibold text-gray-700">{totals.logins}</span> Logins • <span className="font-semibold text-gray-700">{totals.appointments}</span> Appointments • <span className="font-semibold text-gray-700">{totals.reports}</span> Reports
         </p>

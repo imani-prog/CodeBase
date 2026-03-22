@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Info, XCircle, CheckCircle } from 'lucide-react';
 
-const SystemAlerts = () => {
+const SystemAlerts = ({ compact = false }) => {
   const systemAlerts = [
     { id: 1, type: 'warning', message: 'High server load detected', time: '5 min ago' },
     { id: 2, type: 'info', message: 'Scheduled maintenance in 2 hours', time: '1 hour ago' },
@@ -26,23 +26,25 @@ const SystemAlerts = () => {
     }
   };
 
+  const alerts = compact ? systemAlerts.slice(0, 4) : systemAlerts;
+
   return (
     <div className="bg-white border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">System Alerts</h3>
+      <div className={`${compact ? 'px-3 py-2' : 'px-6 py-4'} border-b border-gray-200`}>
+        <h3 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold text-gray-900`}>System Alerts</h3>
       </div>
-      <div className="p-6">
-        <div className="space-y-4">
-          {systemAlerts.map((alert) => (
+      <div className={compact ? 'p-3' : 'p-6'}>
+        <div className={compact ? 'space-y-2' : 'space-y-4'}>
+          {alerts.map((alert) => (
             <div 
               key={alert.id} 
-              className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              className={`flex items-start space-x-3 rounded-lg hover:bg-gray-50 transition-colors ${compact ? 'p-2' : 'p-3'}`}
             >
               <div className="flex-shrink-0 mt-0.5">
                 {getAlertIcon(alert.type)}
               </div>
               <div className="flex-1">
-                <p className="text-sm ">{alert.message}</p>
+                <p className={compact ? 'text-xs leading-tight' : 'text-sm'}>{alert.message}</p>
                 <p className="text-xs text-gray-500 mt-1">{alert.time}</p>
               </div>
             </div>

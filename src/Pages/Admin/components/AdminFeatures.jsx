@@ -5,7 +5,7 @@ import AnalyticsModal from '../../../Components/Admin/AnalyticsModal';
 import SystemConfigModal from '../../../Components/Admin/SystemConfigModal';
 import CommunicationsModal from '../../../Components/Admin/CommunicationsModal';
 
-const AdminFeatures = () => {
+const AdminFeatures = ({ compact = false }) => {
   const [activeModal, setActiveModal] = useState({ type: null, action: null });
 
   const openModal = (type, action) => {
@@ -62,30 +62,31 @@ const AdminFeatures = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 ${compact ? 'gap-3 mt-3' : 'gap-6 mt-8'}`}>
         {features.map((feature, index) => {
           const MainIcon = feature.icon;
+          const items = compact ? feature.items.slice(0, 2) : feature.items;
           return (
             <div 
               key={index}
-              className="bg-white p-6 border border-gray-200"
+              className={`bg-white border border-gray-200 ${compact ? 'p-3' : 'p-6'}`}
             >
-              <div className="flex items-center mb-4">
-                <div className={`w-10 h-10 ${feature.iconBg} rounded-lg flex items-center justify-center`}>
-                  <MainIcon className={`w-5 h-5 ${feature.iconColor}`} />
+              <div className={`flex items-center ${compact ? 'mb-2' : 'mb-4'}`}>
+                <div className={`${compact ? 'w-8 h-8' : 'w-10 h-10'} rounded-lg flex items-center justify-center`}>
+                  <MainIcon className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} ${feature.iconColor}`} />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 ml-3">{feature.title}</h3>
+                <h3 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 ml-3`}>{feature.title}</h3>
               </div>
-              <ul className="space-y-3">
-                {feature.items.map((item, idx) => {
+              <ul className={compact ? 'space-y-1.5' : 'space-y-3'}>
+                {items.map((item, idx) => {
                   const ItemIcon = item.icon;
                   return (
                     <li key={idx}>
                       <button
                         onClick={item.action}
-                        className="w-full flex items-center text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors text-left"
+                        className={`w-full flex items-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-left ${compact ? 'text-xs p-1.5' : 'text-sm p-2'}`}
                       >
-                        <ItemIcon className={`w-4 h-4 mr-2 ${item.color}`} />
+                        <ItemIcon className={`${compact ? 'w-3.5 h-3.5 mr-1.5' : 'w-4 h-4 mr-2'} ${item.color}`} />
                         <span className="flex-1">{item.text}</span>
                       </button>
                     </li>
