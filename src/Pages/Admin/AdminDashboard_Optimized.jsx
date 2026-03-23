@@ -47,9 +47,9 @@ const serviceMix = [
 ];
 
 const patientCarePipeline = [
-  { stage: 'Pending Registrations', count: 240, progress: 100, tone: 'bg-blue-600' },
-  { stage: 'Patient Onboardings', count: 180, progress: 75, tone: 'bg-blue-600' },
-  { stage: 'CHW Work Items', count: 300, progress: 51, tone: 'bg-blue-600' },
+  { stage: 'Pending Registrations', count: 24, progress: 100, tone: 'bg-blue-600' },
+  { stage: 'Patient Onboardings', count: 18, progress: 75, tone: 'bg-blue-600' },
+  { stage: 'CHW Work Items', count: 62, progress: 51, tone: 'bg-blue-600' },
   { stage: 'Confirmed Appointments', count: 107, progress: 72, tone: 'bg-blue-600' },
   { stage: 'Claims Under Review', count: 557, progress: 62, tone: 'bg-blue-600' },
 ];
@@ -76,10 +76,18 @@ const financeBasics = [
 ];
 
 const financeMonthly = [
+  { month: 'Jan', revenue: 2.1, expenses: 1.5 },
+  { month: 'Feb', revenue: 2.2, expenses: 1.6 },
   { month: 'Mar', revenue: 2.4, expenses: 1.8 },
   { month: 'Apr', revenue: 2.6, expenses: 1.9 },
   { month: 'May', revenue: 2.8, expenses: 2.0 },
   { month: 'Jun', revenue: 3.0, expenses: 2.2 },
+  { month: 'Jul', revenue: 2.9, expenses: 2.1 },
+  { month: 'Aug', revenue: 4.1, expenses: 2.3 },
+  { month: 'Sep', revenue: 3.3, expenses: 2.4 },
+  { month: 'Oct', revenue: 5.5, expenses: 2.5 },
+  { month: 'Nov', revenue: 3.7, expenses: 2.6 },
+  { month: 'Dec', revenue: 3.0, expenses: 2.4 },
 ];
 
 const insuranceClaimStatus = [
@@ -187,6 +195,7 @@ const AdminDashboard = () => {
   const appointmentSlaCanvasRef = useRef(null);
   const insurancePayerChartRef = useRef(null);
   const patientOpsChartRef = useRef(null);
+  const financeChartRef = useRef(null);
 
   useEffect(() => {
     const labels = monthLabels;
@@ -262,12 +271,69 @@ const AdminDashboard = () => {
         })
       : null;
 
+    const financeChart = financeChartRef.current
+      ? new Chart(financeChartRef.current, {
+          type: 'bar',
+          data: {
+            labels: financeMonthly.map((i) => i.month),
+            datasets: [
+              {
+                label: 'Revenue',
+                data: financeMonthly.map((i) => i.revenue),
+                backgroundColor: '#16A34A',
+                borderRadius: 2,
+                borderSkipped: false,
+                barThickness: 6,
+              },
+              {
+                label: 'Expenses',
+                data: financeMonthly.map((i) => i.expenses),
+                backgroundColor: '#e11d48',
+                borderRadius: 2,
+                borderSkipped: false,
+                barThickness: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => `  Ksh ${ctx.parsed.y.toFixed(2)}M`,
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: '#64748b', font: { size: 10 } },
+                border: { display: false },
+              },
+              y: {
+                grid: { color: 'rgba(148,163,184,0.15)' },
+                ticks: {
+                  color: '#64748b',
+                  font: { size: 10 },
+                  maxTicksLimit: 4,
+                  callback: (v) => `${v}M`,
+                },
+                border: { display: false },
+              },
+            },
+          },
+        })
+      : null;
+
     return () => {
       if (donutChart) donutChart.destroy();
       if (insurancePayerChart) insurancePayerChart.destroy();
       if (patientChart) patientChart.destroy();
       if (appointmentChart) appointmentChart.destroy();
       if (patientOpsChart) patientOpsChart.destroy();
+      if (financeChart) financeChart.destroy();
     };
   }, []);
 
@@ -402,7 +468,7 @@ const AdminDashboard = () => {
             <h2 className="text-sm font-semibold text-gray-900">Finances Overview</h2>
             <CreditCard className="w-4 h-4 text-blue-700" />
           </div>
-          <div className="grid grid-cols-2 gap-2 mb-2">
+          <div className="grid grid-cols-2 gap-2 mb-3">
             {financeBasics.map((item) => (
               <div key={item.label} className="border border-gray-300 p-2">
                 <p className="text-[10px] text-gray-500">{item.label}</p>
@@ -410,22 +476,12 @@ const AdminDashboard = () => {
               </div>
             ))}
           </div>
-          <div className="space-y-2">
-            {financeMonthly.map((item) => (
-              <div key={item.month} className="grid grid-cols-[28px_1fr_1fr] gap-1 items-center">
-                <span className="text-[10px] text-gray-500">{item.month}</span>
-                <div className="h-2 bg-emerald-100">
-                  <div className="h-2 bg-emerald-600" style={{ width: `${(item.revenue / 3.2) * 100}%` }} />
-                </div>
-                <div className="h-2 bg-rose-100">
-                  <div className="h-2 bg-rose-600" style={{ width: `${(item.expenses / 3.2) * 100}%` }} />
-                </div>
-              </div>
-            ))}
+          <div className="relative w-full h-36">
+            <canvas ref={financeChartRef} />
           </div>
           <div className="flex items-center justify-end gap-4 mt-2 text-[10px] text-gray-500">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 bg-emerald-600" />Revenue</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 bg-rose-600" />Expenses</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-600 inline-block" />Revenue</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 bg-red-600 inline-block" />Expenses</span>
           </div>
         </article>
 
