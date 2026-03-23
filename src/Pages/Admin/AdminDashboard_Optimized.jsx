@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import ActivityChart from './components/ActivityChart';
 import AdminFeatures from './components/AdminFeatures';
-
 import RecentActivity from './components/RecentActivity';
 import RecentRegistrations from './components/RecentRegistrations';
 import SystemAlerts from './components/SystemAlerts';
@@ -63,8 +62,8 @@ const overdueQueues = [
 ];
 
 const insurancePayerMix = [
-  { label: 'SHA', value: 38, color: '#1d4ed8' },
-  { label: 'NHIF', value: 29, color: '#0f766e' },
+  { label: 'Social Health Authority', value: 38, color: '#1d4ed8' },
+  { label: 'National Health Insurance Fund', value: 29, color: '#059669' },
   { label: 'Private Insurance', value: 21, color: '#f59e0b' },
   { label: 'Corporate Plans', value: 12, color: '#dc2626' },
 ];
@@ -98,10 +97,6 @@ const quickActions = [
   'Audit Telemedicine Sessions',
 ];
 
-const insurancePayerGradient = insurancePayerMix
-  .map((segment) => segment.color)
-  .join(', ');
-
 const axisTickStyle = { color: '#64748b', font: { size: 9 } };
 
 const chartBaseOptions = {
@@ -133,7 +128,6 @@ const chartBaseOptions = {
 
 const createMiniLineChart = (canvas, labels, values, color, fillColor) => {
   if (!canvas) return null;
-
   return new Chart(canvas, {
     type: 'line',
     data: {
@@ -157,43 +151,56 @@ const createMiniLineChart = (canvas, labels, values, color, fillColor) => {
   });
 };
 
+const createDoughnutChart = (canvas, data, colors) => {
+  if (!canvas) return null;
+  return new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: data.map((s) => s.label),
+      datasets: [
+        {
+          data: data.map((s) => s.value),
+          backgroundColor: colors,
+          borderWidth: 2,
+          borderColor: '#ffffff',
+          hoverOffset: 4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: (ctx) => ` ${ctx.parsed}%` },
+        },
+      },
+    },
+  });
+};
+
 const AdminDashboard = () => {
   const donutChartRef = useRef(null);
   const patientTrendCanvasRef = useRef(null);
   const appointmentSlaCanvasRef = useRef(null);
+  const insurancePayerChartRef = useRef(null);
 
   useEffect(() => {
     const labels = monthLabels;
 
-    const donutChart = donutChartRef.current
-      ? new Chart(donutChartRef.current, {
-          type: 'doughnut',
-          data: {
-            labels: serviceMix.map((segment) => segment.label),
-            datasets: [
-              {
-                data: serviceMix.map((segment) => segment.value),
-                backgroundColor: serviceMix.map((segment) => segment.color),
-                borderWidth: 0,
-                hoverOffset: 4,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: (ctx) => ` ${ctx.parsed}%`,
-                },
-              },
-            },
-          },
-        })
-      : null;
+    const donutChart = createDoughnutChart(
+      donutChartRef.current,
+      serviceMix,
+      serviceMix.map((s) => s.color)
+    );
+
+    const insurancePayerChart = createDoughnutChart(
+      insurancePayerChartRef.current,
+      insurancePayerMix,
+      insurancePayerMix.map((s) => s.color)
+    );
 
     const patientChart = createMiniLineChart(
       patientTrendCanvasRef.current,
@@ -213,6 +220,7 @@ const AdminDashboard = () => {
 
     return () => {
       if (donutChart) donutChart.destroy();
+      if (insurancePayerChart) insurancePayerChart.destroy();
       if (patientChart) patientChart.destroy();
       if (appointmentChart) appointmentChart.destroy();
     };
@@ -220,6 +228,8 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-5 space-y-4">
+
+      {/* ── KPI Strip ── */}
       <section className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
@@ -236,6 +246,7 @@ const AdminDashboard = () => {
         })}
       </section>
 
+      {/* ── Charts Row 1 ── */}
       <section className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         <article className="xl:col-span-4 bg-white border border-gray-200 p-3">
           <div className="flex items-center justify-between mb-2">
@@ -290,6 +301,7 @@ const AdminDashboard = () => {
         </article>
       </section>
 
+      {/* ── Operations Row ── */}
       <section className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         <article className="xl:col-span-5 bg-white border border-gray-200 p-3">
           <h2 className="text-sm font-semibold text-gray-900 mb-2">Patient Operations</h2>
@@ -315,7 +327,15 @@ const AdminDashboard = () => {
               <div key={queue.queue} className="p-2 border border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-700 leading-tight pr-2">{queue.queue}</p>
-                  <span className={`text-xs font-semibold ${queue.severity === 'high' ? 'text-red-700' : queue.severity === 'medium' ? 'text-amber-700' : 'text-green-700'}`}>
+                  <span
+                    className={`text-xs font-semibold ${
+                      queue.severity === 'high'
+                        ? 'text-red-700'
+                        : queue.severity === 'medium'
+                        ? 'text-amber-700'
+                        : 'text-green-700'
+                    }`}
+                  >
                     {queue.count}
                   </span>
                 </div>
@@ -340,6 +360,7 @@ const AdminDashboard = () => {
         </article>
       </section>
 
+      {/* ── Finance Row ── */}
       <section className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         <article className="xl:col-span-5 bg-white border border-gray-200 p-3">
           <div className="flex items-center justify-between mb-2">
@@ -373,21 +394,21 @@ const AdminDashboard = () => {
           </div>
         </article>
 
-        <article className="xl:col-span-3 bg-white border border-gray-200 p-3">
+        {/* ── Insurance Providers — now Chart.js doughnut ── */}
+        <article className="xl:col-span-3 bg-white border border-gray-200 p-3 flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-gray-900">Insurance Providers</h2>
             <ShieldCheck className="w-4 h-4 text-indigo-700" />
           </div>
-          <div className="flex items-center gap-3">
-            <div
-              className="w-20 h-20 rounded-full"
-              style={{ backgroundImage: `radial-gradient(circle, #fff 0 38%, transparent 39%), conic-gradient(${insurancePayerGradient})` }}
-            />
-            <div className="flex-1 space-y-1.5">
+          <div className="flex flex-col items-center flex-1">
+            <div className="relative w-36 h-36">
+              <canvas ref={insurancePayerChartRef} />
+            </div>
+            <div className="w-full mt-3 space-y-1.5">
               {insurancePayerMix.map((item) => (
                 <div key={item.label} className="flex items-center justify-between text-xs">
                   <span className="text-gray-600 flex items-center gap-1.5">
-                    <span className="w-2 h-2" style={{ backgroundColor: item.color }} />
+                    <span className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: item.color }} />
                     {item.label}
                   </span>
                   <span className="font-semibold text-gray-900">{item.value}%</span>
@@ -418,6 +439,7 @@ const AdminDashboard = () => {
         </article>
       </section>
 
+      {/* ── Alerts & Health ── */}
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <article className="bg-white border border-gray-200 p-3">
           <h2 className="text-sm font-semibold text-gray-900 mb-2">Live Alerts</h2>
@@ -450,33 +472,30 @@ const AdminDashboard = () => {
             ].map((metric) => (
               <div key={metric.label} className="p-2.5 border border-gray-200 bg-gray-50">
                 <p className="text-[11px] text-gray-500">{metric.label}</p>
-                <p className={`text-sm font-bold mt-0.5 ${metric.ok ? 'text-green-700' : 'text-red-700'}`}>{metric.value}</p>
+                <p className={`text-sm font-bold mt-0.5 ${metric.ok ? 'text-green-700' : 'text-red-700'}`}>
+                  {metric.value}
+                </p>
               </div>
             ))}
           </div>
         </article>
       </section>
 
+      {/* ── Sub-components ── */}
       <section className="space-y-3">
-        
-
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 items-start">
           <div className="xl:col-span-7 space-y-3">
             <ActivityChart compact />
-            {/* <RecentActivity compact /> */}
-            
             <AdminFeatures compact />
             <SystemAlerts compact />
           </div>
-
           <div className="xl:col-span-5 space-y-3">
             <UserGrowthBarChart compact />
-            {/* <RecentRegistrations compact /> */}
             <TopPerformers compact />
-            
           </div>
         </div>
       </section>
+
     </div>
   );
 };
