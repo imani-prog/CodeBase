@@ -236,7 +236,7 @@ const AdminDashboard = () => {
             datasets: [{
               data: patientCarePipeline.map((i) => i.count),
               backgroundColor: '#2563eb',
-              borderRadius: 3,
+              borderRadius: 0,
               borderSkipped: false,
               barThickness: 16,
             }],

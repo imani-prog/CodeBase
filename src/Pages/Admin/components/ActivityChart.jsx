@@ -9,12 +9,6 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const COLORS = {
-  logins: '#1e40af', // blue-800
-  appointments: '#2563eb', // blue-600
-  reports: '#7dd3fc'       // sky-300
-};
-
 const ActivityChart = ({ compact = false }) => {
   const dailyActivityData = [
     { day: 'Mon', logins: 145, appointments: 89, reports: 23 },
@@ -37,47 +31,61 @@ const ActivityChart = ({ compact = false }) => {
 
   return (
     <div className={`bg-white border border-gray-200 ${compact ? 'p-3' : 'p-6'}`}>
+      
+      {/* Header */}
       <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-4'}`}>
-        <h2 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold`}>Daily Activity Overview</h2>
-        <select className={`${compact ? 'text-xs px-2 py-1' : 'text-sm px-3 py-1'} border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}>
+        <h2 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold`}>
+          Daily Activity Overview
+        </h2>
+        <select className={`${compact ? 'text-xs px-2 py-1' : 'text-sm px-3 py-1'} border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}>
           <option value="week">This Week</option>
           <option value="month">This Month</option>
         </select>
       </div>
 
+      {/* Chart */}
       <div className={compact ? 'h-48' : 'h-80'}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={dailyActivityData} barGap={6}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            
+            {/* Grid */}
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            
+            {/* Axes */}
             <XAxis dataKey="day" stroke="#64748b" fontSize={12} />
             <YAxis stroke="#64748b" fontSize={12} />
+
+            {/* Tooltip */}
             <Tooltip
               cursor={{ fill: '#eff6ff' }}
               contentStyle={{
                 backgroundColor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #e5e7eb',
                 borderRadius: '8px',
                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
               }}
             />
 
+            
             <Bar
               dataKey="logins"
               name="Logins"
-              fill={COLORS.logins}
-              radius={[6, 6, 0, 0]}
+              fill="#1e3a8a"      
+              radius={[0, 0, 0, 0]}
             />
             <Bar
               dataKey="appointments"
               name="Appointments"
-              fill={COLORS.appointments}
-              radius={[6, 6, 0, 0]}
+              fill="#2563eb"      
+              fillOpacity={0.9}
+              radius={[0, 0, 0, 0]}
             />
             <Bar
               dataKey="reports"
               name="Reports"
-              fill={COLORS.reports}
-              radius={[6, 6, 0, 0]}
+              fill="#93c5fd"      
+              fillOpacity={0.95}
+              radius={[0, 0, 0, 0]}
             />
           </BarChart>
         </ResponsiveContainer>
@@ -85,24 +93,31 @@ const ActivityChart = ({ compact = false }) => {
 
       {/* Legend */}
       <div className={`flex items-center justify-center flex-wrap ${compact ? 'gap-3 mt-3' : 'gap-6 mt-6'}`}>
+        
         <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.logins }}></div>
+          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: '#1e3a8a' }}></div>
           <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Logins</span>
         </div>
+
         <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.appointments }}></div>
+          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: '#2563eb', opacity: 0.9 }}></div>
           <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Appointments</span>
         </div>
+
         <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.reports }}></div>
+          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: '#93c5fd', opacity: 0.95 }}></div>
           <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Reports</span>
         </div>
+
       </div>
 
-      {/* Totals Summary */}
+      {/* Totals */}
       <div className={`${compact ? 'mt-2 pt-2' : 'mt-4 pt-4'} border-t border-gray-100 text-center`}>
         <p className="text-xs text-gray-500">
-          Week Total: <span className="font-semibold text-gray-700">{totals.logins}</span> Logins • <span className="font-semibold text-gray-700">{totals.appointments}</span> Appointments • <span className="font-semibold text-gray-700">{totals.reports}</span> Reports
+          Week Total: 
+          <span className="font-semibold text-gray-700"> {totals.logins}</span> Logins • 
+          <span className="font-semibold text-gray-700"> {totals.appointments}</span> Appointments • 
+          <span className="font-semibold text-gray-700"> {totals.reports}</span> Reports
         </p>
       </div>
     </div>

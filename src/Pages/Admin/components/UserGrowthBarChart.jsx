@@ -9,15 +9,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const COLORS = {
-  chws: '#1e40af',      // blue-800
-  admins: '#1d4ed8',    // blue-700
-  doctors: '#2563eb',   // blue-600
-  patients: '#3b82f6',  // blue-500
-  drivers: '#0ea5e9',   // blue-500 
-  hospitals: '#60a5fa'  // blue-400 
-};
-
+const BASE_BLUE = '#2563eb';
 
 const UserGrowthBarChart = ({ compact = false }) => {
   const data = [
@@ -43,47 +35,46 @@ const UserGrowthBarChart = ({ compact = false }) => {
       <div className={compact ? 'h-48' : 'h-80'}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} barGap={4}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="month" stroke="#64748b" />
             <YAxis stroke="#64748b" />
-            <Tooltip />
+            <Tooltip
+              contentStyle={{
+                borderRadius: '8px',
+                border: '1px solid #e5e7eb'
+              }}
+            />
 
-            <Bar dataKey="patients" fill={COLORS.patients} radius={[6, 6, 0, 0]} />
-            <Bar dataKey="chws" fill={COLORS.chws} radius={[6, 6, 0, 0]} />
-            <Bar dataKey="doctors" fill={COLORS.doctors} radius={[6, 6, 0, 0]} />
-            <Bar dataKey="admins" fill={COLORS.admins} radius={[6, 6, 0, 0]} />
-            <Bar dataKey="hospitals" fill={COLORS.hospitals} radius={[6, 6, 0, 0]} />
-            <Bar dataKey="drivers" fill={COLORS.drivers} radius={[6, 6, 0, 0]} />
+            <Bar dataKey="patients" fill="#1e3a8a" />
+<Bar dataKey="doctors" fill="#1d4ed8" />
+<Bar dataKey="admins" fill="#2563eb" fillOpacity={0.9} />
+<Bar dataKey="chws" fill="#3b82f6" fillOpacity={0.85} />
+<Bar dataKey="hospitals" fill="#60a5fa" fillOpacity={0.8} />
+<Bar dataKey="drivers" fill="#bfdbfe" fillOpacity={0.9} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Legend */}
       <div className={`flex items-center justify-center flex-wrap ${compact ? 'gap-3 mt-3' : 'gap-6 mt-6'}`}>
-        <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.patients }}></div>
-          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Patients</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.chws }}></div>
-          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>CHWs</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.doctors }}></div>
-          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Doctors</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.admins }}></div>
-          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Admins</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.hospitals }}></div>
-          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Hospitals</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`} style={{ backgroundColor: COLORS.drivers }}></div>
-          <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>Drivers</span>
-        </div>
+        {[
+          { name: 'Patients', opacity: 1 },
+          { name: 'Doctors', opacity: 0.85 },
+          { name: 'Admins', opacity: 0.7 },
+          { name: 'CHWs', opacity: 0.6 },
+          { name: 'Hospitals', opacity: 0.5 },
+          { name: 'Drivers', opacity: 0.4 }
+        ].map((item) => (
+          <div key={item.name} className="flex items-center gap-2">
+            <div
+              className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded`}
+              style={{ backgroundColor: BASE_BLUE, opacity: item.opacity }}
+            ></div>
+            <span className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600`}>
+              {item.name}
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* Totals Summary */}
