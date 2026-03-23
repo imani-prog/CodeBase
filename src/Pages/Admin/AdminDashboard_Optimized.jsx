@@ -47,11 +47,11 @@ const serviceMix = [
 ];
 
 const patientCarePipeline = [
-  { stage: 'Patient registration requests (pending)', count: 24, progress: 100, tone: 'bg-blue-600' },
-  { stage: 'Approved patient onboardings', count: 18, progress: 75, tone: 'bg-blue-600' },
-  { stage: 'CHW work items in progress', count: 62, progress: 51, tone: 'bg-blue-600' },
-  { stage: 'Appointments confirmed/booked', count: 107, progress: 72, tone: 'bg-blue-600' },
-  { stage: 'Insurance claims under review', count: 557, progress: 62, tone: 'bg-blue-600' },
+  { stage: 'Pending Registrations', count: 240, progress: 100, tone: 'bg-blue-600' },
+  { stage: 'Patient Onboardings', count: 180, progress: 75, tone: 'bg-blue-600' },
+  { stage: 'CHW Work Items', count: 300, progress: 51, tone: 'bg-blue-600' },
+  { stage: 'Confirmed Appointments', count: 107, progress: 72, tone: 'bg-blue-600' },
+  { stage: 'Claims Under Review', count: 557, progress: 62, tone: 'bg-blue-600' },
 ];
 
 const overdueQueues = [
@@ -62,8 +62,8 @@ const overdueQueues = [
 ];
 
 const insurancePayerMix = [
-  { label: 'Social Health Authority', value: 38, color: '#1d4ed8' },
-  { label: 'National Health Insurance Fund', value: 29, color: '#059669' },
+  { label: 'SHA', value: 38, color: '#1d4ed8' },
+  { label: 'NHIF', value: 29, color: '#0f766e' },
   { label: 'Private Insurance', value: 21, color: '#f59e0b' },
   { label: 'Corporate Plans', value: 12, color: '#dc2626' },
 ];
@@ -186,6 +186,7 @@ const AdminDashboard = () => {
   const patientTrendCanvasRef = useRef(null);
   const appointmentSlaCanvasRef = useRef(null);
   const insurancePayerChartRef = useRef(null);
+  const patientOpsChartRef = useRef(null);
 
   useEffect(() => {
     const labels = monthLabels;
@@ -218,11 +219,55 @@ const AdminDashboard = () => {
       'rgba(37, 99, 235, 0.16)'
     );
 
+    const patientOpsChart = patientOpsChartRef.current
+      ? new Chart(patientOpsChartRef.current, {
+          type: 'bar',
+          data: {
+            labels: patientCarePipeline.map((i) => i.stage),
+            datasets: [{
+              data: patientCarePipeline.map((i) => i.count),
+              backgroundColor: '#2563eb',
+              borderRadius: 3,
+              borderSkipped: false,
+              barThickness: 16,
+            }],
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: (ctx) => `  ${ctx.parsed.x.toLocaleString()} items` },
+              },
+            },
+            scales: {
+              x: {
+                grid: { color: 'rgba(148,163,184,0.15)' },
+                ticks: { color: '#64748b', font: { size: 9 }, maxTicksLimit: 5 },
+                border: { display: false },
+              },
+              y: {
+                grid: { display: false },
+                ticks: {
+                  color: '#374151',
+                  font: { size: 11 },
+                  callback: (val, i) => patientCarePipeline[i].stage,
+                },
+                border: { display: false },
+              },
+            },
+          },
+        })
+      : null;
+
     return () => {
       if (donutChart) donutChart.destroy();
       if (insurancePayerChart) insurancePayerChart.destroy();
       if (patientChart) patientChart.destroy();
       if (appointmentChart) appointmentChart.destroy();
+      if (patientOpsChart) patientOpsChart.destroy();
     };
   }, []);
 
@@ -305,18 +350,8 @@ const AdminDashboard = () => {
       <section className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         <article className="xl:col-span-5 bg-white border border-gray-200 p-3">
           <h2 className="text-sm font-semibold text-gray-900 mb-2">Patient Operations</h2>
-          <div className="space-y-2.5">
-            {patientCarePipeline.map((item) => (
-              <div key={item.stage}>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-gray-700 truncate pr-3">{item.stage}</span>
-                  <span className="font-semibold text-gray-900">{item.count.toLocaleString()}</span>
-                </div>
-                <div className="w-full bg-gray-100 h-2">
-                  <div className={`h-2 ${item.tone}`} style={{ width: `${item.progress}%` }} />
-                </div>
-              </div>
-            ))}
+          <div className="relative w-full h-44">
+            <canvas ref={patientOpsChartRef} />
           </div>
         </article>
 
