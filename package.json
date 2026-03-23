@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.8",
     "@tailwindcss/vite": "^4.1.11",
+    "chart.js": "^4.5.1",
     "docx": "^9.6.1",
     "file-saver": "^2.0.5",
     "jspdf": "^4.2.0",
