@@ -65,11 +65,9 @@ const PatientDashboard = () => {
       {/* Header */}
       <div className="mb-5 sm:mb-8">
         <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
-          Patient Dashboard
+          Dashboard
         </h1>
-        <p className="text-xs sm:text-base text-gray-500">
-          Here's an overview of your health journey
-        </p>
+        
       </div>
 
       {/* Health Stats — 2-col on mobile, 4-col on desktop */}
@@ -77,7 +75,7 @@ const PatientDashboard = () => {
         {healthStats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white p-3 sm:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            className="bg-white p-3 sm:p-5 border border-gray-200 hover:shadow-md transition-shadow"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
@@ -97,7 +95,7 @@ const PatientDashboard = () => {
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
 
           {/* Quick Actions */}
-          <div className="bg-white p-3 sm:p-6 shadow-sm border border-gray-100">
+          <div className="bg-white p-3 sm:p-6 border border-gray-200">
             <h2 className="text-base sm:text-xl font-bold text-gray-900 mb-3 sm:mb-6">Quick Actions</h2>
             <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
               {quickActions.map((action, index) => (
@@ -121,7 +119,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Upcoming Appointments */}
-          <div className="bg-white p-3 sm:p-6 shadow-sm border border-gray-100">
+          <div className="bg-white p-3 sm:p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-3 sm:mb-6">
               <h2 className="text-base sm:text-xl font-bold">Upcoming Appointments</h2>
               <Link
@@ -198,7 +196,7 @@ const PatientDashboard = () => {
         <div className="space-y-4 sm:space-y-6">
 
           {/* Health Alert */}
-          <div className="bg-blue-500 p-3 sm:p-6 text-white shadow-lg">
+          <div className="bg-blue-500 p-3 sm:p-6 text-white">
             <div className="flex items-center gap-2.5 mb-2 sm:mb-3">
               <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg shrink-0">
                 <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -217,7 +215,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Recent Activity */}
-          <div className="p-3 sm:p-6 shadow-sm border border-gray-100 bg-white">
+          <div className="p-3 sm:p-6 border border-gray-200 bg-white">
             <h2 className="text-base sm:text-xl font-bold mb-3 sm:mb-6">Recent Activity</h2>
             <div className="space-y-3 sm:space-y-4">
               {recentActivities.map((activity) => (
@@ -235,7 +233,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Quick Contact */}
-          <div className="p-3 sm:p-6 shadow-sm border border-gray-100 bg-white">
+          <div className="p-3 sm:p-6 border border-gray-200 bg-white">
             <h3 className="font-semibold text-sm sm:text-base mb-3 sm:mb-4">Need Help?</h3>
             <div className="space-y-2 sm:space-y-3">
               <button className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center justify-center gap-2">

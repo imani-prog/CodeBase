@@ -247,9 +247,7 @@ const CHWAppointments = () => {
       <div className="flex items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Appointments</h1>
-          <p className="mt-1 text-sm sm:text-base">
-            Manage patient appointments and consultations
-          </p>
+         
         </div>
         <button
           onClick={() => setShowAddModal(true)}

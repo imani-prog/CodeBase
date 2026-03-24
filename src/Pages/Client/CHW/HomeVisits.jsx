@@ -366,9 +366,7 @@ const HomeVisits = () => {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Home Visits</h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">
-            Manage and track scheduled home visits
-          </p>
+          
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {/* Mobile-only: open map overlay */}

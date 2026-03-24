@@ -4444,7 +4444,7 @@ const InsuranceManagement = () => {
             {/* Header */}
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Insurance Management</h1>
-              <p className="text-gray-600">Manage insurance providers, patient coverage, claims processing, and ambulance insurance policies</p>
+              
             </div>
 
             {/* Tab Navigation */}

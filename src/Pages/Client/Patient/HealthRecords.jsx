@@ -828,9 +828,7 @@ const HealthRecords = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Health Records</h1>
-          <p className="mt-2">
-            Comprehensive view of your medical history, lab results, and vital signs
-          </p>
+          
         </div>
         <div className="flex flex-col items-stretch sm:items-end gap-2">
           <div className="flex gap-2">
@@ -951,7 +949,7 @@ const HealthRecords = () => {
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Recent Documents */}
-          <div className="bg-white shadow-sm border border-gray-200 p-4">
+          <div className="bg-white border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Folder className="w-4 h-4 text-blue-600" />
               Recent Documents
@@ -988,7 +986,7 @@ const HealthRecords = () => {
           </div>
 
           {/* Health Summary */}
-          <div className="bg-white shadow-sm border border-gray-200 p-4">
+          <div className="bg-white border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-blue-600" />
               Health Summary
@@ -1021,7 +1019,7 @@ const HealthRecords = () => {
           </div>
 
           {/* Active Prescriptions */}
-          <div className="bg-white shadow-sm border border-gray-200 p-4">
+          <div className="bg-white border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Pill className="w-4 h-4 text-blue-600" />
               Active Prescriptions
@@ -1045,7 +1043,7 @@ const HealthRecords = () => {
           </div>
 
           {/* Upcoming Vaccinations */}
-          <div className="bg-white shadow-sm border border-gray-200 p-4">
+          <div className="bg-white border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-blue-600" />
               Upcoming Vaccinations
@@ -1064,7 +1062,7 @@ const HealthRecords = () => {
           </div>
 
           {/* Recent Medical History */}
-          <div className="bg-white shadow-sm border border-gray-200 p-4">
+          <div className="bg-white border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <FileText className="w-4 h-4 text-blue-600" />
               Recent Medical History
@@ -1091,7 +1089,7 @@ const HealthRecords = () => {
 
       {/* Medical History Tab */}
       {activeTab === 'medical-history' && (
-        <div className="bg-white shadow-sm border border-gray-200">
+        <div className="bg-white border border-gray-200">
           <div className="p-6">
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="flex-1 relative">

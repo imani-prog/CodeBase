@@ -818,7 +818,7 @@ const Insurance = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Insurance & Billing</h1>
-          <p className="text-gray-600 mt-2">Manage your insurance coverage, claims, and payment information</p>
+          
         </div>
       </div>
 
@@ -830,7 +830,7 @@ const Insurance = () => {
           { label: "Coverage Status", value: insuranceInfo.status, icon: <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />, valueClass: "text-base sm:text-lg font-bold text-green-600" },
           { label: "Payment Methods", value: paymentMethods.length, icon: <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />, valueClass: "text-lg sm:text-xl font-bold text-gray-900" },
         ].map(({ label, value, icon, valueClass }) => (
-          <div key={label} className="bg-white p-3 sm:p-4 shadow-sm border border-gray-200 rounded-sm">
+          <div key={label} className="bg-white p-3 sm:p-4 border border-gray-200 rounded-sm">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] sm:text-xs text-gray-500 leading-tight">{label}</p>
@@ -860,7 +860,7 @@ const Insurance = () => {
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* NHIF Coverage */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-blue-600" /> NHIF Coverage
@@ -898,7 +898,7 @@ const Insurance = () => {
           </div>
 
           {/* SHA Coverage */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-blue-600" /> SHA Coverage
@@ -931,7 +931,7 @@ const Insurance = () => {
           </div>
 
           {/* Recent Claims Summary */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <FileText className="w-4 h-4 text-blue-600" /> Recent Claims
             </h3>
@@ -955,7 +955,7 @@ const Insurance = () => {
           </div>
 
           {/* Pending Payments */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-blue-600" /> Pending Payments
             </h3>
@@ -1007,7 +1007,7 @@ const Insurance = () => {
               const StatusIcon = getStatusIcon(claim.status);
               const isDownloading = downloadingReceipt === claim.id;
               return (
-                <div key={claim.id} className="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+                <div key={claim.id} className="bg-white rounded border border-gray-200 overflow-hidden">
                   <div className="p-2">
                     <div className="flex items-start justify-between gap-1.5 mb-1.5">
                       <div className="flex-1 min-w-0">
@@ -1067,7 +1067,7 @@ const Insurance = () => {
           {billingHistory.map((bill) => {
             const isDownloading = downloadingInvoice === bill.id;
             return (
-              <div key={bill.id} className="bg-white rounded shadow-sm border border-gray-200 p-2.5">
+              <div key={bill.id} className="bg-white rounded border border-gray-200 p-2.5">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-start gap-2 flex-1 min-w-0">
                     <div className="p-1.5 rounded flex-shrink-0">
@@ -1143,7 +1143,7 @@ const Insurance = () => {
             {paymentMethods.map((method) => {
               const Icon = method.icon;
               return (
-                <div key={method.id} className="bg-white rounded shadow-sm border border-gray-200 p-2.5">
+                <div key={method.id} className="bg-white rounded border border-gray-200 p-2.5">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="p-1 rounded">
@@ -1198,7 +1198,7 @@ const Insurance = () => {
             {/* Add Payment Method Card */}
             <button
               onClick={() => setShowAddPayment(true)}
-              className="bg-white rounded shadow-sm border-2 border-dashed border-gray-300 p-3 hover:border-blue-400 hover:bg-blue-50 transition-all group"
+              className="bg-white rounded border-2 border-dashed border-gray-300 p-3 hover:border-blue-400 hover:bg-blue-50 transition-all group"
             >
               <div className="text-center">
                 <Plus className="w-6 h-6 text-gray-400 group-hover:text-blue-600 mx-auto mb-1" />

@@ -827,7 +827,7 @@ const SystemSettings = () => {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-1">System Settings</h1>
-          <p className="text-gray-500">Configure and manage all aspects of the MediLink healthcare system</p>
+          
         </div>
 
         <div className="space-y-8">

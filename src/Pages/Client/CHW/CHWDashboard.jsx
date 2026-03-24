@@ -135,10 +135,8 @@ const CHWDashboard = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">CHW Dashboard</h1>
-        <p className="mt-1 sm:mt-2 text-sm sm:text-base">
-          Community Health Worker overview and daily activities
-        </p>
+        <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+        
       </div>
 
       {/* Alerts Section */}

@@ -436,7 +436,7 @@ const HospitalManagement = () => {
               
               <div>
                 <h1 className="text-3xl font-bold">Hospital Management</h1>
-                <p className="mt-1">Manage healthcare facilities and hospital information</p>
+               
               </div>
             </div>
             <button 

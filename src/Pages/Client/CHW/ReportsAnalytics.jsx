@@ -220,7 +220,7 @@ const ReportsAnalytics = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Reports &amp; Analytics</h1>
-          <p className="mt-1 text-sm text-gray-500">Track performance and analyze patient care data</p>
+          
         </div>
         <button onClick={() => setShowExportModal(true)} className="self-start sm:self-auto flex items-center gap-2 px-4 sm:px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors shadow-md text-sm">
           <Download className="w-4 h-4" />

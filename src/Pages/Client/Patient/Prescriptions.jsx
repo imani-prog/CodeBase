@@ -307,9 +307,7 @@ const Prescriptions = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Prescriptions</h1>
-          <p className="text-gray-600 mt-2">
-            Manage your medications, refills, and delivery tracking
-          </p>
+          
         </div>
       </div>
 

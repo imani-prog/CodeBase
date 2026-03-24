@@ -1819,9 +1819,7 @@ const TrainingManagement = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl font-bold mb-2">Training Management</h1>
-                  <p className=" text-lg">
-                    Comprehensive management of healthcare training programs and certifications
-                  </p>
+                  
                 </div>
               </div>
             </div>

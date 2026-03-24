@@ -255,9 +255,7 @@ const UserManagement = () => {
           <div className="flex justify-between items-center mb-4">
             <div className="items-center space-x-4">
               <h1 className="text-4xl font-bold mb-2">User Management</h1>
-              <p className=" text-lg">
-                Manage user accounts, roles, permissions, and access control across MediLink
-              </p>
+              
               <div className="">
                   </div>
                 </div>

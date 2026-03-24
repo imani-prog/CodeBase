@@ -84,7 +84,7 @@ const AdminProfile = () => {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Admin Profile</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Manage your account settings and preferences</p>
+           
           </div>
           <div className="flex items-center gap-2">
             {editMode ? (

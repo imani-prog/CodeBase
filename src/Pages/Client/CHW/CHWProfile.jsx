@@ -144,7 +144,7 @@ const CHWProfile = () => {
         <div className="flex items-start justify-between gap-2 mb-4">
           <div className="min-w-0">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">My Profile</h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 hidden sm:block">Manage your account settings and preferences</p>
+            
           </div>
           {/* Buttons — compact on mobile */}
           <div className="flex items-center gap-1.5 flex-shrink-0">

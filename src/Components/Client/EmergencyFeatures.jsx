@@ -309,7 +309,7 @@ const EmergencyFeatures = () => {
           </div> */}
 
         {/* Emergency Request History */}
-        <div className="bg-white rounded-lg shadow-md p-2">
+        <div className="bg-white rounded-lg  p-2">
             <button
               onClick={() => setShowHistory(true)}
               className="w-full flex items-center justify-between text-left hover:bg-gray-50 transition-colors p-1.5 rounded cursor-pointer"
@@ -325,7 +325,7 @@ const EmergencyFeatures = () => {
 
           {/* Active Emergency Tracking - Shows when emergency is active */}
           {showActiveTracking && (
-            <div className="bg-white rounded-lg shadow-md p-2 border-2 border-red-500 animate-pulse">
+            <div className="bg-white rounded-lg p-2 border-2 border-red-500 animate-pulse">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />

@@ -560,7 +560,7 @@ const SystemLogs = () => {
              
               <div>
                 <h1 className="text-3xl font-bold">Audit Logs</h1>
-                <p className="mt-1">Comprehensive system audit trail and activity monitoring</p>
+                
               </div>
             </div>
           </div>

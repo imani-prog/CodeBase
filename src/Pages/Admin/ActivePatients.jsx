@@ -279,7 +279,7 @@ const ActivePatients = () => {
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-3xl font-bold">Active Patients</h1>
-            <p className="mt-1">Manage and monitor your active patient base</p>
+            
           </div>
 
           <div className="flex space-x-3">

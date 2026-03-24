@@ -158,9 +158,7 @@ const HealthAssessments = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Health Assessments</h1>
-          <p className="mt-2">
-            Track patient health assessments and screenings
-          </p>
+       
         </div>
         <button className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-md">
           <Plus className="w-5 h-5" />

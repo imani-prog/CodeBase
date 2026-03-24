@@ -183,9 +183,7 @@ const HomeVisitGovernance = () => {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Home Visit Governance</h1>
-          <p className="text-gray-600 mt-1">
-            Supervisor oversight for completion evidence, no-show/reschedule reasons, and coverage-route efficiency.
-          </p>
+          
         </div>
         <button
           type="button"

@@ -158,9 +158,7 @@ const CHWAssignments = () => {
     <div className="p-6 bg-gray-50 min-h-screen space-y-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">CHW Assignments</h1>
-        <p className="text-gray-600">
-          Unified oversight for CHW taks and Home visits work items.
-        </p>
+        
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

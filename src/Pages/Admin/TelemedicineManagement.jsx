@@ -1600,9 +1600,7 @@ const TelemedicineManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-xl font-bold mb-0.5">Telemedicine Management</h1>
-                <p className="text-sm text-gray-500">
-                  Comprehensive oversight of telemedicine services and virtual healthcare delivery
-                </p>
+               
               </div>
             </div>
           </div>
