@@ -46,11 +46,11 @@ const UserGrowthBarChart = ({ compact = false }) => {
             />
 
             <Bar dataKey="patients" fill="#1e3a8a" />
-<Bar dataKey="doctors" fill="#1d4ed8" />
-<Bar dataKey="admins" fill="#2563eb" fillOpacity={0.9} />
-<Bar dataKey="chws" fill="#3b82f6" fillOpacity={0.85} />
-<Bar dataKey="hospitals" fill="#60a5fa" fillOpacity={0.8} />
-<Bar dataKey="drivers" fill="#bfdbfe" fillOpacity={0.9} />
+            <Bar dataKey="doctors" fill="#1d4ed8" />
+            <Bar dataKey="admins" fill="#2563eb" fillOpacity={0.9} />
+            <Bar dataKey="chws" fill="#3b82f6" fillOpacity={0.85} />
+            <Bar dataKey="hospitals" fill="#60a5fa" fillOpacity={0.8} />
+            <Bar dataKey="drivers" fill="#bfdbfe" fillOpacity={0.9} />
           </BarChart>
         </ResponsiveContainer>
       </div>
