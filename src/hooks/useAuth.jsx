@@ -1,27 +1,37 @@
-import { useContext, createContext, useState } from 'react';
+import { useContext, createContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext();
 
-const defaultAdmin = {
-  role: 'admin',
-  name: 'Dr. Timothy Imani',
-  email: 'timothy.imani@medilink.com',
-  phone: '+254 700 123456',
-  title: 'Chief Administrator',
-  department: 'Healthcare Operations',
-  employeeId: 'HCA-2024-001',
-  joinDate: 'January 15, 2023',
-  location: 'Nairobi, Kenya',
-  timezone: 'EAT (UTC+3)',
-  language: 'English',
-  status: 'Active',
-  initials: 'TI',
+const AUTH_USER_KEY = 'authUser';
+
+const readStoredAuthUser = () => {
+  try {
+    const raw = window.localStorage.getItem(AUTH_USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(defaultAdmin);
+  const [user, setUser] = useState(() => readStoredAuthUser());
+
+  useEffect(() => {
+    try {
+      if (user) {
+        window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+      } else {
+        window.localStorage.removeItem(AUTH_USER_KEY);
+      }
+    } catch {
+      // Ignore localStorage write errors in restricted environments.
+    }
+  }, [user]);
+
+  const logout = () => setUser(null);
+
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

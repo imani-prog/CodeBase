@@ -58,13 +58,13 @@ const InfoNote = ({ title, message }) => (
 );
 
 const defaultProfile = {
-  firstName: 'Jane', lastName: 'Wanjiru',
-  email: 'jane.wanjiru@medilink.co.ke', phone: '+254 712 345 678',
+  firstName: '', lastName: '',
+  email: '', phone: '',
   dateOfBirth: '1988-03-20', gender: 'Female',
   street: '45 Kenyatta Avenue', city: 'Nairobi',
   county: 'Nairobi County', postalCode: '00100', country: 'Kenya',
-  userId: 'CHW-2023-001856', chwLevel: 'Level 2 CHW',
-  specialization: 'Maternal & Child Health', yearsOfExperience: '5 years',
+  userId: '', chwLevel: 'Community Health Worker',
+  specialization: '', yearsOfExperience: '',
   coverageArea: 'Kibera Sub-County', assignedFacility: 'Kibera Health Centre',
   certifications: 'Basic Life Support (BLS), First Aid, Maternal Health',
   trainingCompleted: '15 courses', lastTraining: '2024-11-15',
@@ -76,15 +76,16 @@ const defaultProfile = {
 
 const mapUserToProfile = (user = {}) => {
   const baseName = user.name || user.username || '';
-  const [firstName = defaultProfile.firstName, ...rest] = baseName.split(' ').filter(Boolean);
+  const [firstName = '', ...rest] = baseName.split(' ').filter(Boolean);
   return {
-    ...defaultProfile, firstName,
-    lastName: rest.join(' ') || defaultProfile.lastName,
-    email: user.email || defaultProfile.email,
-    phone: user.phone || defaultProfile.phone,
-    userId: user.employeeId || user.userId || defaultProfile.userId,
-    chwLevel: user.chwLevel || defaultProfile.chwLevel,
-    specialization: user.specialization || defaultProfile.specialization,
+    ...defaultProfile,
+    firstName,
+    lastName: rest.join(' '),
+    email: user.email || '',
+    phone: user.phone || '',
+    userId: user.employeeId || user.userId || '',
+    chwLevel: user.chwLevel || user.title || 'Community Health Worker',
+    specialization: user.specialization || '',
   };
 };
 
@@ -138,7 +139,7 @@ const CHWProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full -mx-4 sm:-mx-6 px-0 py-4 sm:py-6">
+      <div className="w-full px-0 sm:px-4 py-4 sm:py-6">
 
         {/* ── Page Header ── */}
         <div className="flex items-start justify-between gap-2 mb-4">

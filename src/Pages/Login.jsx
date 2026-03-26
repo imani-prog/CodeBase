@@ -35,43 +35,20 @@ const Login = () => {
 
   const buildAuthenticatedUser = (foundUser, normalizedRole) => {
     const usernameValue = foundUser.username?.trim() || username.trim();
-    const roleDefaults = {
-      admin: {
-        name: 'Dr. Timothy Imani',
-        title: 'Chief Administrator',
-        department: 'Healthcare Operations',
-        email: 'timothy.imani@medilink.com',
-        phone: '+254 700 123456',
-      },
-      chw: {
-        name: 'Jane Wanjiru',
-        title: 'Community Health Worker',
-        chwLevel: 'Level 2 Community Health Worker',
-        specialization: 'Maternal & Child Health',
-        email: 'jane.wanjiru@medilink.co.ke',
-        phone: '+254 712 345 678',
-      },
-      patient: {
-        name: formatNameFromUsername(usernameValue),
-        title: 'Patient',
-      },
-    };
-
     const fallbackName = formatNameFromUsername(usernameValue);
     const fallbackEmail = usernameValue ? `${usernameValue.toLowerCase()}@medilink.org` : '';
-    const defaults = roleDefaults[normalizedRole] || roleDefaults.patient;
-    const fullName = foundUser.name?.trim() || defaults.name || fallbackName;
+    const fullName = foundUser.name?.trim() || fallbackName;
 
     return {
       ...foundUser,
       username: usernameValue,
       role: normalizedRole,
       name: fullName,
-      email: foundUser.email?.trim() || defaults.email || fallbackEmail,
-      phone: foundUser.phone?.trim() || defaults.phone || '',
-      title: foundUser.title?.trim() || defaults.title || '',
-      chwLevel: foundUser.chwLevel?.trim() || defaults.chwLevel || '',
-      specialization: foundUser.specialization?.trim() || defaults.specialization || '',
+      email: foundUser.email?.trim() || fallbackEmail,
+      phone: foundUser.phone?.trim() || '',
+      title: foundUser.title?.trim() || (normalizedRole === 'admin' ? 'Administrator' : normalizedRole === 'chw' ? 'Community Health Worker' : 'Patient'),
+      chwLevel: foundUser.chwLevel?.trim() || '',
+      specialization: foundUser.specialization?.trim() || '',
       initials: computeInitials(fullName),
     };
   };

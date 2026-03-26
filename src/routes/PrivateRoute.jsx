@@ -7,9 +7,9 @@ const PrivateRoute = ({ children, role }) => {
   if (!user) return <Navigate to="/login" />;
   if (role) {
     if (Array.isArray(role)) {
-      if (!role.includes(user.role)) return <Navigate to="/unauthorized" />;
+      if (!role.includes(user.role)) return <Navigate to="/login" />;
     } else {
-      if (user.role !== role) return <Navigate to="/unauthorized" />;
+      if (user.role !== role) return <Navigate to="/login" />;
     }
   }
   return children;

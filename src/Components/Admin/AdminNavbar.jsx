@@ -1,76 +1,91 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useGreeting } from '../../hooks/Usegreeting.js';
 import { 
-  Bell, 
-  Search, 
-  Settings, 
-  User, 
-  LogOut, 
-  Shield, 
-  Moon, 
-  Sun, 
-  ChevronDown,
-  Menu,
-  X,
-  HelpCircle
+  Bell, Search, Settings, User, LogOut, Shield,
+  Moon, Sun, ChevronDown, Menu, X, HelpCircle
 } from 'lucide-react';
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const greeting = useGreeting();            
+
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleSignOut = () => {
-    // Clear auth data
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/');
-  };
+  const handleSignOut = () => { logout(); navigate('/'); };
 
   const notifications = [
-    { id: 1, type: 'user', message: 'New user registration pending approval', time: '5 min ago', unread: true },
-    { id: 2, type: 'system', message: 'System backup completed successfully', time: '1 hour ago', unread: true },
-    { id: 3, type: 'security', message: 'Failed login attempt detected', time: '2 hours ago', unread: false },
-    { id: 4, type: 'report', message: 'Weekly report is ready for review', time: '1 day ago', unread: false }
+    { id: 1, type: 'user',     message: 'New user registration pending approval', time: '5 min ago',  unread: true  },
+    { id: 2, type: 'system',   message: 'System backup completed successfully',   time: '1 hour ago', unread: true  },
+    { id: 3, type: 'security', message: 'Failed login attempt detected',          time: '2 hours ago',unread: false },
+    { id: 4, type: 'report',   message: 'Weekly report is ready for review',      time: '1 day ago',  unread: false },
   ];
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
   const profileMenuItems = [
-    { name: 'My Profile', icon: User, path: '/admin/profile' },
-    { name: 'System Settings', icon: Settings, path: '/admin/system-settings' },
-    { name: 'User Management', icon: Shield, path: '/admin/user-management' },
-    { name: 'System Logs', icon: HelpCircle, path: '/admin/system-logs' },
-    { name: 'Sign Out', icon: LogOut, path: '/', isDanger: true }
+    { name: 'My Profile',      icon: User,       path: '/admin/profile'         },
+    { name: 'System Settings', icon: Settings,   path: '/admin/system-settings' },
+    { name: 'User Management', icon: Shield,     path: '/admin/user-management' },
+    { name: 'System Logs',     icon: HelpCircle, path: '/admin/system-logs'     },
+    { name: 'Sign Out',        icon: LogOut,     path: '/', isDanger: true      },
   ];
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    // Add your dark mode logic here
-  };
-
   const handleProfileClick = () => {
-    setProfileDropdownOpen(!profileDropdownOpen);
+    setProfileDropdownOpen(prev => !prev);<button
+              onClick={() => setDarkMode(p => !p)}
+              className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 ${
+                darkMode ? 'text-yellow-400 hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
     if (notificationsOpen) setNotificationsOpen(false);
   };
 
   const handleNotificationsClick = () => {
-    setNotificationsOpen(!notificationsOpen);
+    setNotificationsOpen(prev => !prev);
     if (profileDropdownOpen) setProfileDropdownOpen(false);
   };
 
+  const displayInitials = user?.initials || user?.name?.slice(0, 2).toUpperCase() || '?';
+  const displayName     = user?.name     || 'User';
+  const displayTitle    = user?.title    || user?.role  || '';
+  const displayEmail    = user?.email    || '';
+
+  
+  const firstName = displayName.split(' ')[0];
+
   return (
-    // fixed top navbar that starts after the sidebar (left-64) so it doesn't touch the left edge
-    <nav className={`fixed top-0 left-64 right-0 z-40 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'} border-b border-gray-200 h-16`}> 
+    <nav className={`fixed top-0 left-64 right-0 z-40 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'} border-b border-gray-200 h-16`}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-end h-16">
-          {/* Right side controls */}
+        <div className="flex items-center justify-between h-16">
+
+         
+          <div className="flex items-center gap-1.5 select-none min-w-0 max-w-[46vw] md:max-w-none md:gap-2">
+            <span className="text-sm md:text-lg leading-none" aria-hidden="true"></span>
+              <p
+                className={`text-xs sm:text-sm font-semibold truncate ${
+                  darkMode ? 'text-gray-200' : 'text-gray-900'
+                }`}
+              >
+                {greeting.text},{' '}
+                <span className="font-semibold text-blue-600">
+                  {firstName}
+                </span>
+              </p>
+            </div>
+
+          
           <div className="flex items-center space-x-4">
-            {/* Search Bar */}
+
+            {/* Search */}
             <div className="hidden md:flex items-center">
               <div className={`relative ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
@@ -78,35 +93,31 @@ const AdminNavbar = () => {
                   type="text"
                   placeholder="Search..."
                   className={`pl-10 pr-4 py-2 w-64 text-sm rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    darkMode 
-                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+                    darkMode
+                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
                       : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
                   }`}
                 />
               </div>
             </div>
 
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={toggleDarkMode}
+            {/* Dark Mode */}
+            {/* <button
+              onClick={() => setDarkMode(p => !p)}
               className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 ${
-                darkMode 
-                  ? 'text-yellow-400 hover:bg-gray-800' 
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                darkMode ? 'text-yellow-400 hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
               title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
+            </button> */}
 
             {/* Notifications */}
             <div className="relative">
               <button
                 onClick={handleNotificationsClick}
                 className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 relative ${
-                  darkMode 
-                    ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  darkMode ? 'text-gray-300 hover:text-white hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 <Bell className="w-5 h-5" />
@@ -117,7 +128,6 @@ const AdminNavbar = () => {
                 )}
               </button>
 
-              {/* Notifications Dropdown */}
               {notificationsOpen && (
                 <div className={`absolute right-0 mt-2 w-80 rounded-xl shadow-xl border ${
                   darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -129,22 +139,15 @@ const AdminNavbar = () => {
                     </p>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                          notification.unread ? (darkMode ? 'bg-gray-750' : 'bg-blue-50') : ''
-                        }`}
-                      >
+                    {notifications.map(n => (
+                      <div key={n.id} className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
+                        n.unread ? (darkMode ? 'bg-gray-750' : 'bg-blue-50') : ''
+                      }`}>
                         <div className="flex items-start">
-                          <div className={`w-2 h-2 rounded-full mt-2 mr-3 ${
-                            notification.unread ? 'bg-blue-500' : 'bg-gray-300'
-                          }`}></div>
+                          <div className={`w-2 h-2 rounded-full mt-2 mr-3 ${n.unread ? 'bg-blue-500' : 'bg-gray-300'}`} />
                           <div className="flex-1">
-                            <p className="text-sm font-medium">{notification.message}</p>
-                            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                              {notification.time}
-                            </p>
+                            <p className="text-sm font-medium">{n.message}</p>
+                            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{n.time}</p>
                           </div>
                         </div>
                       </div>
@@ -159,83 +162,58 @@ const AdminNavbar = () => {
               )}
             </div>
 
-            {/* Profile Dropdown */}
+            {/* Profile */}
             <div className="relative">
               <button
                 onClick={handleProfileClick}
                 className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${
-                  darkMode 
-                    ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                  darkMode ? 'text-gray-300 hover:text-white hover:bg-gray-800' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold border-2 border-blue-200 shadow-sm select-none">
-                  {user?.initials ?? 'AD'}
+                  {displayInitials}
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold">{user?.name ?? 'Admin'}</p>
-                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {user?.title ?? 'Administrator'}
-                  </p>
+                  <p className="text-sm font-semibold">{displayName}</p>
+                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{displayTitle}</p>
                 </div>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
-                  profileDropdownOpen ? 'rotate-180' : ''
-                }`} />
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
                 <div className={`absolute right-0 mt-2 w-64 rounded-xl shadow-xl border ${
                   darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                 } z-50`}>
-                  {/* Profile Header */}
                   <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold border-2 border-blue-200 select-none flex-shrink-0">
-                        {user?.initials ?? 'AD'}
+                        {displayInitials}
                       </div>
                       <div>
-                        <p className="font-semibold">{user?.name ?? 'Admin'}</p>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {user?.email ?? ''}
-                        </p>
+                        <p className="font-semibold">{displayName}</p>
+                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{displayEmail}</p>
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 mt-1">
-                          <div className="w-2 h-2 bg-green-400 rounded-full mr-1"></div>
-                          Active
+                          <div className="w-2 h-2 bg-green-400 rounded-full mr-1" />
+                          {user?.status || 'Active'}
                         </span>
                       </div>
                     </div>
                   </div>
-
-                  {/* Menu Items */}
                   <div className="py-2">
-                    {profileMenuItems.map((item) => {
+                    {profileMenuItems.map(item => {
                       const Icon = item.icon;
-                      if (item.isDanger) {
-                        return (
-                          <button
-                            key={item.name}
-                            onClick={handleSignOut}
-                            className={`flex items-center w-full px-4 py-3 text-sm transition-colors text-red-600 hover:text-red-700 hover:bg-red-50`}
-                          >
-                            <Icon className="w-4 h-4 mr-3" />
-                            {item.name}
-                          </button>
-                        );
-                      }
+                      if (item.isDanger) return (
+                        <button key={item.name} onClick={handleSignOut}
+                          className="flex items-center w-full px-4 py-3 text-sm transition-colors text-red-600 hover:text-red-700 hover:bg-red-50">
+                          <Icon className="w-4 h-4 mr-3" />{item.name}
+                        </button>
+                      );
                       return (
-                        <Link
-                          key={item.name}
-                          to={item.path}
-                          onClick={() => setProfileDropdownOpen(false)}
+                        <Link key={item.name} to={item.path} onClick={() => setProfileDropdownOpen(false)}
                           className={`flex items-center px-4 py-3 text-sm transition-colors ${
-                            darkMode
-                              ? 'text-gray-300 hover:text-white hover:bg-gray-700'
-                              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                          }`}
-                        >
-                          <Icon className="w-4 h-4 mr-3" />
-                          {item.name}
+                            darkMode ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                          }`}>
+                          <Icon className="w-4 h-4 mr-3" />{item.name}
                         </Link>
                       );
                     })}
@@ -244,36 +222,25 @@ const AdminNavbar = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            {/* Mobile toggle */}
+            <button onClick={() => setMobileMenuOpen(p => !p)}
               className={`lg:hidden p-2 rounded-lg ${
-                darkMode 
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-              }`}
-            >
+                darkMode ? 'text-gray-300 hover:text-white hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}>
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Search */}
         {mobileMenuOpen && (
           <div className={`lg:hidden border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} py-4`}>
-            {/* Mobile Search */}
             <div className="mt-4 px-4">
               <div className="relative">
-                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                  darkMode ? 'text-gray-400' : 'text-gray-500'
-                }`} />
-                <input
-                  type="text"
-                  placeholder="Search..."
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                <input type="text" placeholder="Search..."
                   className={`w-full pl-10 pr-4 py-2 text-sm rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    darkMode 
-                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
-                      : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
+                    darkMode ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
                   }`}
                 />
               </div>

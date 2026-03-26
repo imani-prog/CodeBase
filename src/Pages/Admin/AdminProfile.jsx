@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import {
   User, Mail, Phone, Shield, Settings, Activity, Bell, Key,
@@ -6,7 +6,7 @@ import {
   Globe, Download, LogOut, Plus, Eye, EyeOff
 } from "lucide-react";
 
-/* ── Compact section header ── */
+
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-200 bg-white rounded-t-xl">
     <div className="p-1.5 ">
@@ -19,7 +19,7 @@ const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   </div>
 );
 
-/* ── Read-only display field ── */
+
 const Field = ({ label, value }) => (
   <div>
     <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
@@ -30,18 +30,34 @@ const Field = ({ label, value }) => (
 const AdminProfile = () => {
   const { user, setUser } = useAuth();
   const [profile, setProfile] = useState({
-    name: user?.name ?? "Dr. Timothy Imani",
-    email: user?.email ?? "timothy.imani@medilink.com",
-    phone: user?.phone ?? "+254 700 123456",
-    role: user?.title ?? "Chief Administrator",
-    department: user?.department ?? "Healthcare Operations",
-    employeeId: user?.employeeId ?? "HCA-2024-001",
-    joinDate: user?.joinDate ?? "January 15, 2023",
-    location: user?.location ?? "Nairobi, Kenya",
-    timezone: user?.timezone ?? "EAT (UTC+3)",
-    language: user?.language ?? "English",
-    status: user?.status ?? "Active",
+    name: user?.name ?? "",
+    email: user?.email ?? "",
+    phone: user?.phone ?? "",
+    role: user?.title ?? "",
+    department: user?.department ?? "",
+    employeeId: user?.employeeId ?? "",
+    joinDate: user?.joinDate ?? "",
+    location: user?.location ?? "",
+    timezone: user?.timezone ?? "",
+    language: user?.language ?? "",
+    status: user?.status ?? "",
   });
+
+  useEffect(() => {
+    setProfile({
+      name: user?.name ?? "",
+      email: user?.email ?? "",
+      phone: user?.phone ?? "",
+      role: user?.title ?? "",
+      department: user?.department ?? "",
+      employeeId: user?.employeeId ?? "",
+      joinDate: user?.joinDate ?? "",
+      location: user?.location ?? "",
+      timezone: user?.timezone ?? "",
+      language: user?.language ?? "",
+      status: user?.status ?? "",
+    });
+  }, [user]);
 
   const [editMode, setEditMode] = useState(false);
   const [darkMode, setDarkMode] = useState(false);

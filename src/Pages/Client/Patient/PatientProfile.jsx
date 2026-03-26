@@ -67,8 +67,8 @@ const Note = ({ type = 'info', title, message }) => {
 
 /* ── Defaults ── */
 const defaultProfile = {
-  firstName: 'Timothy', lastName: 'Imani',
-  email: 'timothy.imani@gmail.com', phone: '+25443669252',
+  firstName: '', lastName: '',
+  email: '', phone: '',
   dateOfBirth: '2003-06-15', gender: 'Male', bloodType: 'O+',
   street: '123 Health Street', city: 'Machakos',
   state: 'Machakos County', zipCode: '02101', country: 'Kenya',
@@ -81,19 +81,19 @@ const defaultProfile = {
   insuranceProvider: 'Social Health Insurance Fund',
   policyNumber: 'BCBS-123456789', groupNumber: 'GRP-987654',
   memberSince: 'January 15, 2023',
-  userId: 'PT-2023-001234', status: 'Active',
+  userId: '', status: 'Active',
 };
 
 const mapUserToProfile = (user = {}) => {
   const baseName = user.name || user.username || '';
-  const [firstName = defaultProfile.firstName, ...rest] = baseName.split(' ').filter(Boolean);
+  const [firstName = '', ...rest] = baseName.split(' ').filter(Boolean);
   return {
     ...defaultProfile,
     firstName,
-    lastName: rest.join(' ') || defaultProfile.lastName,
-    email: user.email || defaultProfile.email,
-    phone: user.phone || defaultProfile.phone,
-    userId: user.patientId || user.userId || defaultProfile.userId,
+    lastName: rest.join(' '),
+    email: user.email || '',
+    phone: user.phone || '',
+    userId: user.patientId || user.userId || '',
   };
 };
 
@@ -109,7 +109,7 @@ const PatientProfile = () => {
 
   const handleSave = () => {
     const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim();
-    // Sync back to auth context → navbar updates instantly
+
     setUser((prev) => ({
       ...prev,
       name: fullName || prev?.name,
@@ -137,9 +137,7 @@ const PatientProfile = () => {
         <div className="flex items-start justify-between gap-2 mb-4 px-4 sm:px-0">
           <div className="min-w-0">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">My Profile</h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 hidden sm:block">
-              Manage your personal and medical information
-            </p>
+            
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {editMode ? (

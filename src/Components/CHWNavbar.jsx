@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useGreeting } from '../hooks/Usegreeting.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import {
   Bell,
@@ -21,11 +22,13 @@ import {
 } from 'lucide-react';
 
 const CHWNavbar = ({ onMenuClick }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const greeting = useGreeting();  
 
   const nameParts = (user?.name || user?.username || 'User').split(' ').filter(Boolean);
   const computedAvatar =
@@ -106,15 +109,22 @@ const CHWNavbar = ({ onMenuClick }) => {
     if (profileDropdownOpen) setProfileDropdownOpen(false);
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    logout();
+    navigate('/login');
+  };
+
   return (
     // Fixed top navbar that starts after the sidebar (left-64)
     <nav
       className={`fixed top-0 left-0 right-0 z-40 md:left-64 ${
         darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'
-      } border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} shadow-sm`}
+      } border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} shadow-sm h-16`}
     >
-      <div className="px-4 md:px-6 py-3">
-        <div className="flex items-center justify-between">
+      <div className="px-3 md:px-6 h-full">
+        <div className="flex items-center justify-between h-full">
 
           {/* Left: hamburger (mobile) + welcome (desktop) */}
           <div className="flex items-center gap-3">
@@ -130,12 +140,20 @@ const CHWNavbar = ({ onMenuClick }) => {
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Welcome Message — desktop */}
-            <div className="hidden md:block">
-              <h2 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Welcome back, <span className="text-blue-600">{chw.name}</span>
-              </h2>
+            <div className="flex items-center gap-1.5 select-none min-w-0 max-w-[46vw] md:max-w-none md:gap-2">
+            <span className="text-sm md:text-lg leading-none" aria-hidden="true"></span>
+              <p
+                className={`text-xs sm:text-sm font-semibold truncate ${
+                  darkMode ? 'text-gray-200' : 'text-gray-900'
+                }`}
+              >
+                {greeting.text},{' '}
+                <span className="font-semibold text-blue-600">
+                  {chw.name}
+                </span>
+              </p>
             </div>
+
           </div>
 
           {/* Centre: Desktop Navigation Links */}
@@ -178,7 +196,7 @@ const CHWNavbar = ({ onMenuClick }) => {
             </div>
 
             {/* Dark Mode Toggle */}
-            <button
+            {/* <button
               onClick={toggleDarkMode}
               className={`p-2 rounded-lg transition-all duration-200 ${
                 darkMode
@@ -187,7 +205,7 @@ const CHWNavbar = ({ onMenuClick }) => {
               }`}
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
+            </button> */}
 
             {/* Notifications */}
             <div className="relative">
@@ -271,7 +289,7 @@ const CHWNavbar = ({ onMenuClick }) => {
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-semibold">{chw.name}</p>
                   <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    CHW
+                    {chw.role}
                   </p>
                 </div>
                 <ChevronDown
@@ -311,6 +329,18 @@ const CHWNavbar = ({ onMenuClick }) => {
                   <div className="py-2">
                     {profileMenuItems.map((item) => {
                       const Icon = item.icon;
+                      if (item.isDanger) {
+                        return (
+                          <button
+                            key={item.name}
+                            onClick={handleSignOut}
+                            className="flex items-center w-full px-4 py-3 text-sm transition-colors text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Icon className="w-4 h-4 mr-3" />
+                            {item.name}
+                          </button>
+                        );
+                      }
                       return (
                         <Link
                           key={item.name}

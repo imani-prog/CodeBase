@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useGreeting } from '../hooks/Usegreeting.js';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Bell,
   Search,
@@ -19,14 +20,17 @@ import {
 import { useAuth } from '../hooks/useAuth.jsx';
 
 const PatientNavbar = ({ onMenuClick }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
+  const greeting = useGreeting();  
+
   // Derive display values from auth user, with sensible fallbacks
-  const baseName = user?.name || user?.username || 'John Doe';
-  const patientEmail = user?.email || 'patient@example.com';
+  const baseName = user?.name || user?.username || 'User';
+  const patientEmail = user?.email || '';
   const patientInitials = baseName
     .split(' ')
     .filter(Boolean)
@@ -91,6 +95,13 @@ const PatientNavbar = ({ onMenuClick }) => {
     if (profileDropdownOpen) setProfileDropdownOpen(false);
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    logout();
+    navigate('/login');
+  };
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-40 md:left-64 ${
@@ -112,9 +123,21 @@ const PatientNavbar = ({ onMenuClick }) => {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <h2 className="hidden lg:block text-lg font-semibold text-gray-800">
-              Welcome back, <span className="text-blue-600">{baseName}</span>! 👋
-            </h2>
+
+           <div className="flex items-center gap-1.5 select-none min-w-0 max-w-[46vw] md:max-w-none md:gap-2">
+            <span className="text-sm md:text-lg leading-none" aria-hidden="true"></span>
+              <p
+                className={`text-xs sm:text-sm font-semibold truncate ${
+                  darkMode ? 'text-gray-200' : 'text-gray-900'
+                }`}
+              >
+                {greeting.text},{' '}
+                <span className="font-semibold text-blue-600">
+                  {baseName}
+                </span>
+              </p>
+            </div>
+
           </div>
 
           {/* Center — nav links */}
@@ -160,7 +183,7 @@ const PatientNavbar = ({ onMenuClick }) => {
             </div>
 
             {/* Dark mode toggle */}
-            <button
+            {/* <button
               onClick={() => setDarkMode(!darkMode)}
               className={`p-2 rounded-lg transition-all duration-200 ${
                 darkMode
@@ -169,7 +192,7 @@ const PatientNavbar = ({ onMenuClick }) => {
               }`}
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
+            </button> */}
 
             {/* Notifications */}
             <div className="relative">
@@ -285,6 +308,18 @@ const PatientNavbar = ({ onMenuClick }) => {
                   <div className="py-2">
                     {profileMenuItems.map((item) => {
                       const Icon = item.icon;
+                      if (item.isDanger) {
+                        return (
+                          <button
+                            key={item.name}
+                            onClick={handleSignOut}
+                            className="flex items-center w-full px-4 py-2.5 text-sm transition-colors text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Icon className="w-4 h-4 mr-3 flex-shrink-0" />
+                            {item.name}
+                          </button>
+                        );
+                      }
                       return (
                         <Link
                           key={item.name}
