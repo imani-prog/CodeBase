@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix MediLink Login - Client/Patient Issue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .success { color: #28a745; background-color: #d4edda; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .info { color: #17a2b8; background-color: #d1ecf1; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .warning { color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .user-list { background-color: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Fix MediLink Login Issue</h1>
+        <p>This tool will fix the "client vs patient" role mismatch issue.</p>
+
+        <div class="info">
+            <strong>Issue:</strong> Some users were registered as "client" but the login form expects "patient". This tool makes them work as the same thing.
+        </div>
+
+        <h3>Current Users:</h3>
+        <div id="usersList" class="user-list">Loading...</div>
+
+        <h3>Quick Fix:</h3>
+        <button onclick="fixClientPatientIssue()">🔄 Fix Client/Patient Issue</button>
+        <button onclick="clearAllData()">🗑️ Clear All Data (Start Fresh)</button>
+        <button onclick="addTestPatient()">👤 Add Test Patient</button>
+        <button onclick="refreshDisplay()">🔄 Refresh</button>
+
+        <div id="results"></div>
+
+        <h3>Manual Test:</h3>
+        <p>After fixing, try these credentials:</p>
+        <div class="info">
+            <strong>Username:</strong> patient<br>
+            <strong>Password:</strong> password123<br>
+            <strong>Role:</strong> Patient/Client
+        </div>
+    </div>
+
+    <script>
+        function displayUsers() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const usersList = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                usersList.innerHTML = '<em>No users found</em>';
+                return;
+            }
+            
+            usersList.innerHTML = users.map((user, index) => 
+                `<div style="margin: 5px 0; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+                    <strong>${user.username}</strong> - Role: "<strong>${user.role}</strong>" | Password: ${user.password}
+                </div>`
+            ).join('');
+        }
+
+        function fixClientPatientIssue() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            let fixed = 0;
+            
+            const fixedUsers = users.map(user => {
+                if (user.role && (user.role.toLowerCase().trim() === 'client')) {
+                    fixed++;
+                    return { ...user, role: 'patient' };
+                }
+                return user;
+            });
+            
+            localStorage.setItem('users', JSON.stringify(fixedUsers));
+            
+            const results = document.getElementById('results');
+            if (fixed > 0) {
+                results.innerHTML = `<div class="success">✅ Fixed ${fixed} user(s)! Changed "client" roles to "patient".</div>`;
+            } else {
+                results.innerHTML = `<div class="info">ℹ️ No "client" roles found. All users already have correct roles.</div>`;
+            }
+            
+            displayUsers();
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to delete all user data?')) {
+                localStorage.removeItem('users');
+                document.getElementById('results').innerHTML = '<div class="warning">🗑️ All user data cleared!</div>';
+                displayUsers();
+            }
+        }
+
+        function addTestPatient() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            // Remove existing test user if any
+            const filteredUsers = users.filter(u => u.username !== 'patient');
+            
+            // Add new test user
+            filteredUsers.push({
+                username: 'patient',
+                password: 'password123',
+                role: 'patient'
+            });
+            
+            localStorage.setItem('users', JSON.stringify(filteredUsers));
+            document.getElementById('results').innerHTML = '<div class="success">✅ Test patient added! Use: patient/password123</div>';
+            displayUsers();
+        }
+
+        function refreshDisplay() {
+            displayUsers();
+            document.getElementById('results').innerHTML = '<div class="info">🔄 Display refreshed</div>';
+        }
+
+        // Initialize
+        displayUsers();
+    </script>
+</body>
+</html>

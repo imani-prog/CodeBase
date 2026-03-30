@@ -313,10 +313,10 @@ const Navbar = () => {
       ))}
     </div>
 
-    {/* Auth Buttons */}
+       {/* Auth Buttons */}
     <div className="hidden md:flex gap-3 items-center">
       <Link
-        to=""
+        to="/login"
         className="flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg border-2 border-blue-400 hover:bg-blue-800 hover:border-yellow-300 transition-all duration-200 shadow-sm hover:shadow-md"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,7 +325,7 @@ const Navbar = () => {
         Login
       </Link>
       <Link
-        to=""
+        to="/register"
         className="flex items-center gap-2 px-4 py-2 bg-yellow-400 text-blue-950 text-sm font-semibold rounded-lg hover:bg-yellow-300 transition-all duration-200 shadow-sm hover:shadow-md"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,7 +352,7 @@ const Navbar = () => {
     </button>
   </div>
 
-  {/* Mobile Menu */}
+   {/* Mobile Menu */}
   {mobileOpen && (
     <>
       {/* Backdrop - blocks content behind */}
@@ -408,7 +408,7 @@ const Navbar = () => {
           ))}
           <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-blue-200">
             <Link
-              to=""
+              to="/login"
               className="flex items-center justify-center gap-2 w-full text-blue-900 text-sm font-semibold py-2.5 rounded-lg border-2 border-blue-400 hover:bg-blue-100 transition duration-200"
               onClick={() => setMobileOpen(false)}
             >
@@ -418,7 +418,7 @@ const Navbar = () => {
               Login
             </Link>
             <Link
-              to=""
+              to="/register"
               className="flex items-center justify-center gap-2 w-full text-white bg-yellow-400 text-sm font-semibold py-2.5 rounded-lg hover:bg-yellow-300 transition duration-200"
               onClick={() => setMobileOpen(false)}
             >
