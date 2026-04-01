@@ -482,6 +482,8 @@ const FinancialManagement = () => {
         </div>
       </div>
 
+
+
       {/* Revenue vs Expenses Chart */}
       <div className="border border-gray-200 p-6 bg-white">
         <div className="flex items-center justify-between mb-6">
@@ -504,19 +506,19 @@ const FinancialManagement = () => {
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
           >
             <defs>
-            {/* Revenue – darkest blue */}
+            
             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#1e40af" stopOpacity={0.45} /> {/* blue-800 */}
               <stop offset="100%" stopColor="#1e40af" stopOpacity={0.05} />
             </linearGradient>
 
-            {/* Expenses – mid blue */}
+            
             <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} /> {/* blue-500 */}
               <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.05} />
             </linearGradient>
 
-            {/* Profit – green (clearly distinct) */}
+           
             <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#16a34a" stopOpacity={0.4} /> {/* green-600 */}
               <stop offset="100%" stopColor="#16a34a" stopOpacity={0.05} />
@@ -625,8 +627,12 @@ const FinancialManagement = () => {
         </div>
       </div>
 
+      
+
     </div>
   );
+
+
 
   const renderRevenue = () => (
     <div className="space-y-6">

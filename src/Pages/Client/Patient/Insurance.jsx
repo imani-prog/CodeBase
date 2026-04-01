@@ -347,16 +347,16 @@ const MpesaPayModal = ({ bill, onClose, onSuccess }) => {
         {step === 'success' && (
           <div className="text-center py-4">
             <div className="w-16 h-16 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+              <CheckCircle className="w-8 h-8 text-red-600" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">Payment Successful!</h3>
-            <p className="text-xs text-gray-500 mb-1">{bill.balance} paid via M-Pesa</p>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">Payment Failed!</h3>
+            <p className="text-xs text-gray-500 mb-1">{bill.balance} Error 404</p>
             <p className="text-xs text-gray-400">Ref: MP{Date.now().toString().slice(-8)}</p>
             <button
               onClick={() => { onSuccess && onSuccess(bill.id); onClose(); }}
               className="mt-4 w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
             >
-              Done
+              Retry
             </button>
           </div>
         )}
