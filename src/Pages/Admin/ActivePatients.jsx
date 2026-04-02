@@ -1,142 +1,62 @@
-
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { patientApi } from '../../API/endpoints/patientApi.js';
+import { LoadingSpinner, ErrorMessage } from '../../Components/Admin/DataState.jsx';
 import PatientDetailsModal from '../../Components/Admin/PatientDetailsModal';
 import EditPatientModal from '../../Components/Admin/EditPatientModal';
 import AddPatientModal from '../../Components/Admin/AddPatientModal';
 import Pagination from '../../Components/Admin/Pagination';
 
-const dummyPatients = [
-  { 
-    id: 1, 
-    name: 'John Doe',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john@example.com', 
-    phone: '+254-712-345-678',
-    nationalId: '28456123',
-    bloodType: 'O_POS',
-    city: 'Nairobi',
-    status: 'ACTIVE', 
-    lastVisit: '2025-08-20',
-    age: 45,
-    gender: 'MALE',
-    chronicConditions: 'Hypertension',
-    condition: 'Hypertension',
-    nextAppointment: '2025-09-25',
-    avatar: 'JD'
-  },
-  { 
-    id: 2, 
-    name: 'Mary Wambui',
-    firstName: 'Mary',
-    lastName: 'Wambui',
-    email: 'maryw@example.com', 
-    phone: '+254-723-456-789',
-    nationalId: '31245678',
-    bloodType: 'A_POS',
-    city: 'Kisumu',
-    status: 'ACTIVE', 
-    lastVisit: '2025-08-21',
-    age: 32,
-    gender: 'FEMALE',
-    chronicConditions: 'Diabetes',
-    condition: 'Diabetes',
-    nextAppointment: '2025-09-26',
-    avatar: 'MW'
-  },
-  { 
-    id: 3, 
-    name: 'Ali Hassan',
-    firstName: 'Ali',
-    lastName: 'Hassan',
-    email: 'alih@example.com', 
-    phone: '+254-734-567-890',
-    nationalId: '25789456',
-    bloodType: 'B_POS',
-    city: 'Mombasa',
-    status: 'ACTIVE', 
-    lastVisit: '2025-08-19',
-    age: 28,
-    gender: 'MALE',
-    chronicConditions: 'Asthma',
-    condition: 'Asthma',
-    nextAppointment: '2025-09-24',
-    avatar: 'AH'
-  },
-  { 
-    id: 4, 
-    name: 'Grace Achieng',
-    firstName: 'Grace',
-    lastName: 'Achieng',
-    email: 'grace@example.com', 
-    phone: '+254-745-678-901',
-    nationalId: '29856743',
-    bloodType: 'AB_POS',
-    city: 'Nairobi',
-    status: 'INACTIVE', 
-    lastVisit: '2025-08-22',
-    age: 67,
-    gender: 'FEMALE',
-    chronicConditions: 'Heart Disease',
-    condition: 'Heart Disease',
-    nextAppointment: '2025-09-25',
-    avatar: 'GA'
-  },
-  { 
-    id: 5, 
-    name: 'Peter Njoroge',
-    firstName: 'Peter',
-    lastName: 'Njoroge',
-    email: 'peter@example.com', 
-    phone: '+254-756-789-012',
-    nationalId: '32147896',
-    bloodType: 'O_NEG',
-    city: 'Nakuru',
-    status: 'ACTIVE', 
-    lastVisit: '2025-08-18',
-    age: 39,
-    gender: 'MALE',
-    chronicConditions: 'Surgery Recovery',
-    condition: 'Surgery Recovery',
-    nextAppointment: '2025-09-27',
-    avatar: 'PN'
-  },
-  {
-    id: 6,
-    name: 'Lilian Otieno',
-    firstName: 'Lilian',
-    lastName: 'Otieno',
-    email: 'lilian@example.com',
-    phone: '+254-767-890-123',
-    nationalId: '33456789',
-    bloodType: 'A_NEG',
-    city: 'Eldoret',
-    status: 'Critical',
-    lastVisit: '2025-08-17',
-    age: 52,
-    gender: 'FEMALE',
-    chronicConditions: 'Kidney Disease',
-    condition: 'Kidney Disease',
-    nextAppointment: '2025-09-28',
-    avatar: 'LO'
-  }
-];
-
 const ActivePatients = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [statusFilter, setStatusFilter] = useState('all');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [patients, setPatients] = useState(dummyPatients);
+
+  // ================= FETCH =================
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        setLoading(true);
+        const data = await patientApi.list();
+
+        const normalized = data.map(p => ({
+          ...p,
+          name: [p.firstName, p.lastName].filter(Boolean).join(' ') || 'Unknown',
+          age: p.dateOfBirth
+            ? Math.floor((Date.now() - new Date(p.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
+            : null,
+          condition: p.chronicConditions || p.condition || 'N/A',
+          avatar: p.firstName && p.lastName
+            ? `${p.firstName[0]}${p.lastName[0]}`
+            : 'NA'
+        }));
+
+        setPatients(normalized);
+      } catch (err) {
+        setError(err.message || 'Failed to load patients');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
 
   useEffect(() => {
     if (location.state?.openAddModal) {
@@ -145,40 +65,46 @@ const ActivePatients = () => {
     }
   }, [location.state]);
 
-  // Filter and sort patients
+  // ================= FILTER + SORT =================
   const filteredAndSortedPatients = useMemo(() => {
     let filtered = patients.filter(patient => {
-      const matchesSearch = patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           patient.condition.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || patient.status.toLowerCase() === statusFilter.toLowerCase();
+      const matchesSearch =
+        patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (patient.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (patient.condition || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (patient.status || '').toLowerCase() === statusFilter.toLowerCase();
+
       return matchesSearch && matchesStatus;
     });
 
     filtered.sort((a, b) => {
       let aValue = a[sortField];
       let bValue = b[sortField];
-      
+
       if (sortField === 'lastVisit' || sortField === 'nextAppointment') {
         aValue = new Date(aValue);
         bValue = new Date(bValue);
       }
-      
+
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
 
     return filtered;
-  }, [searchTerm, sortField, sortDirection, statusFilter, patients]);
+  }, [patients, searchTerm, sortField, sortDirection, statusFilter]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredAndSortedPatients.length / itemsPerPage);
+
   const paginatedPatients = filteredAndSortedPatients.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  // ================= HELPERS =================
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -190,18 +116,16 @@ const ActivePatients = () => {
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      Active: 'text-green-800 border-green-200',
       ACTIVE: 'text-green-800 border-green-200',
-      Critical: 'text-red-800 border-red-200',
       INACTIVE: 'text-gray-800 border-gray-200',
-      Inactive: 'text-gray-800 border-gray-200',
-      Recovering: 'text-yellow-800 border-yellow-200',
+      CRITICAL: 'text-red-800 border-red-200',
       DECEASED: 'text-red-900 border-red-300 bg-red-50',
     };
     return statusStyles[status] || 'text-gray-800 border-gray-200';
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -214,28 +138,22 @@ const ActivePatients = () => {
     return bloodType.replace('_POS', '+').replace('_NEG', '-');
   };
 
-  // Button handlers
-  const handleAddPatient = () => {
-    setShowAddModal(true);
+  // ================= CRUD =================
+  const handleSavePatient = async (updatedPatient) => {
+    await patientApi.update(updatedPatient.id, updatedPatient);
+    setPatients(prev => prev.map(p => p.id === updatedPatient.id ? updatedPatient : p));
   };
 
-  const handleExport = () => {
-    const csvContent = [
-      ['Name', 'Email', 'Phone', 'Status', 'Last Visit', 'Next Appointment'],
-      ...filteredAndSortedPatients.map(p => [
-        p.name, p.email, p.phone, p.status, p.lastVisit, p.nextAppointment
-      ])
-    ].map(row => row.join(',')).join('\n');
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `active-patients-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleAddNewPatient = async (newPatient) => {
+    const saved = await patientApi.create(newPatient);
+    setPatients(prev => [...prev, saved]);
+    setShowAddModal(false);
+  };
+
+  const handleDeletePatient = async (patient) => {
+    if (!window.confirm(`Delete ${patient.name}?`)) return;
+    await patientApi.delete(patient.id);
+    setPatients(prev => prev.filter(p => p.id !== patient.id));
   };
 
   const handleViewPatient = (patient) => {
@@ -248,33 +166,63 @@ const ActivePatients = () => {
     setShowEditModal(true);
   };
 
-  const handleContactPatient = (patient) => {
-    const subject = encodeURIComponent(`MediLink - Follow-up for ${patient.name}`);
-    const body = encodeURIComponent(`Dear ${patient.name},\n\nWe hope this message finds you well.\n\nBest regards,\nMediLink Team`);
-    window.open(`mailto:${patient.email}?subject=${subject}&body=${body}`, '_blank');
-  };
+  const handleAddPatient = () => {
+  setShowAddModal(true);
+};
 
-  const handleSavePatient = (updatedPatient) => {
-    setPatients(prev => prev.map(p => p.id === updatedPatient.id ? updatedPatient : p));
-  };
+const handleExport = () => {
+  const csvContent = [
+    [
+      'Name',
+      'Email',
+      'Phone',
+      'Status',
+      'Age',
+      'Gender',
+      'City',
+      'Condition',
+      'Last Visit',
+      'Next Appointment'
+    ],
+    ...filteredAndSortedPatients.map(p => [
+      p.name,
+      p.email || '',
+      p.phone || '',
+      p.status || '',
+      p.age || '',
+      p.gender || '',
+      p.city || '',
+      p.condition || '',
+      p.lastVisit || '',
+      p.nextAppointment || ''
+    ])
+  ]
+    .map(row => row.join(','))
+    .join('\n');
 
-  const handleAddNewPatient = (newPatient) => {
-    setPatients(prev => [...prev, newPatient]);
-    setShowAddModal(false);
-  };
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
 
-  const handleDeletePatient = (patient) => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${patient.name}?\n\nThis action cannot be undone.`
-    );
-    if (confirmDelete) {
-      setPatients(prev => prev.filter(p => p.id !== patient.id));
-    }
-  };
+  link.setAttribute('href', url);
+  link.setAttribute(
+    'download',
+    `patients-${new Date().toISOString().split('T')[0]}.csv`
+  );
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+  // ================= STATES =================
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error} onRetry={() => window.location.reload()} />;
 
   return (
     <div className="p-2 bg-gray-50 min-h-screen">
-      {/* Header Section */}
+
+    {/* Header Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -637,6 +585,7 @@ const ActivePatients = () => {
         onSavePatient={handleAddNewPatient}
       />
     </div>
+    
   );
 };
 

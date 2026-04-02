@@ -1,10 +1,26 @@
 import { API_PATHS } from "../../Services/constants/apiPaths.js";
-import { httpClient } from "../clients/httpClient.js";
+import { httpClient, setTokens } from "../clients/httpClient.js";
 
 export const authApi = {
-  register: (payload) => httpClient.post(API_PATHS.auth.register, payload, { skipAuth: true }),
-  login: (payload) => httpClient.post(API_PATHS.auth.login, payload, { skipAuth: true }),
-  refresh: (payload) => httpClient.post(API_PATHS.auth.refresh, payload, { skipAuth: true, retryOn401: false }),
-  logout: (payload) => httpClient.post(API_PATHS.auth.logout, payload),
-  me: () => httpClient.get(API_PATHS.auth.me),
+  // Login — returns { token, username, role, id }
+  login: async (credentials) => {
+    const response = await httpClient.post(
+      API_PATHS.auth.login,
+      credentials,
+      { skipAuth: true }
+    );
+    setTokens({ accessToken: response.token });
+    return response;
+  },
+
+  // Register — returns { token, username, role, id }
+  register: async (payload) => {
+    const response = await httpClient.post(
+      API_PATHS.auth.register,
+      payload,
+      { skipAuth: true }
+    );
+    setTokens({ accessToken: response.token });
+    return response;
+  },
 };

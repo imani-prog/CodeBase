@@ -6,6 +6,7 @@ export const API_PATHS = {
     logout: "/api/auth/logout",
     me: "/api/auth/me",
   },
+
   admin: {
     dashboardOverview: "/api/admin/dashboard/overview",
     dashboardKpis: "/api/admin/dashboard/kpis",
@@ -13,14 +14,24 @@ export const API_PATHS = {
   },
   users: {
     base: "/api/users",
+    me: "/api/users/me",
+    role: (id) => `/api/users/${id}/role`,
+    status: (id) => `/api/users/${id}/status`,
   },
   patients: {
     base: "/api/patients",
+    me: "/api/patients/me",
+    location: (id) => `/api/patients/${id}/location`,
   },
   chw: {
     base: "/api/chw",
-    search: "/api/chw/search",
+    me: "/api/chw/me",
+    location: (id) => `/api/chw/${id}/location`,
+    performance: (id) => `/api/chw/${id}/performance`,
     nearest: "/api/chw/nearest",
+    byRegion: (region) => `/api/chw/by-region/${region}`,
+    byStatus: (status) => `/api/chw/by-status/${status}`,
+    search: "/api/chw/search",
   },
   appointments: {
     base: "/api/appointments",

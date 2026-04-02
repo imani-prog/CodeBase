@@ -1,7 +1,7 @@
 import { useContext, createContext, useEffect, useState } from 'react';
+import { configureHttpClientHandlers, clearTokens } from '../API/index.js';
 
 const AuthContext = createContext();
-
 const AUTH_USER_KEY = 'authUser';
 
 const readStoredAuthUser = () => {
@@ -16,6 +16,21 @@ const readStoredAuthUser = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => readStoredAuthUser());
 
+  const logout = () => {
+    setUser(null);
+    clearTokens();
+    window.localStorage.removeItem(AUTH_USER_KEY);
+  };
+
+  useEffect(() => {
+    configureHttpClientHandlers({
+      onUnauthorized: () => {
+        logout();
+        window.location.href = '/login';
+      },
+    });
+  }, []);
+
   useEffect(() => {
     try {
       if (user) {
@@ -24,11 +39,9 @@ export const AuthProvider = ({ children }) => {
         window.localStorage.removeItem(AUTH_USER_KEY);
       }
     } catch {
-      // Ignore localStorage write errors in restricted environments.
+      // ignore
     }
   }, [user]);
-
-  const logout = () => setUser(null);
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout }}>
