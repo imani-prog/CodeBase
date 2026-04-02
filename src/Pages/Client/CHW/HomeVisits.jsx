@@ -418,17 +418,18 @@ const HomeVisits = () => {
           </div>
         </div>
         <iframe
-          src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
-          width="100%"
-          height="600"
-          style={{ border: 0 }}
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          title="Home Visits Map"
-          className="w-full h-[500px] xl:h-[600px]"
-        />
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d277.7549826743736!2d37.26242921919778!3d-1.5305180166278827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f87eeedd7e1cd%3A0x2bb0f6a2ec4c7859!2sMachakos%20University%20Administration!5e0!3m2!1sen!2ske!4v1774964157029!5m2!1sen!2ske"
+            width="100%"
+            height="260"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Supervisor Coverage Map"
+          />
+          
       </div>
+    
 
       {/* Full-screen map overlay — mobile/tablet only */}
       {showMap && (
