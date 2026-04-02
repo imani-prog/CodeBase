@@ -331,105 +331,105 @@ const FinancialManagement = () => {
   };
 
   const renderOverview = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="border border-gray-200 bg-white p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Total Revenue</p>
-              <p className="text-2xl font-bold ">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Total Revenue</p>
+              <p className="text-xl font-bold ">
                 {formatCurrency(financialOverview.totalRevenue)}
               </p>
-              <div className="flex items-center mt-2">
+              <div className="flex items-center mt-1">
                 <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
                 <span className="text-sm text-green-600">+{financialOverview.monthlyGrowth}%</span>
               </div>
             </div>
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-green-600" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="border border-gray-200 p-6 bg-white">
+        <div className="border border-gray-200 p-4 bg-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Total Expenses</p>
-              <p className="text-2xl font-bold ">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Total Expenses</p>
+              <p className="text-xl font-bold ">
                 {formatCurrency(financialOverview.totalExpenses)}
               </p>
-              <div className="flex items-center mt-2">
+              <div className="flex items-center mt-1">
                 <ArrowDownRight className="w-4 h-4 text-red-500 mr-1" />
                 <span className="text-sm text-red-600">68.6% of revenue</span>
               </div>
             </div>
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-              <TrendingDown className="w-6 h-6 text-red-600" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+              <TrendingDown className="w-5 h-5 text-red-600" />
             </div>
           </div>
         </div>
 
-        <div className="border border-gray-200 p-6 bg-white">
+        <div className="border border-gray-200 p-4 bg-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Net Profit</p>
-              <p className="text-2xl font-bold ">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Net Profit</p>
+              <p className="text-xl font-bold ">
                 {formatCurrency(financialOverview.netProfit)}
               </p>
-              <div className="flex items-center mt-2">
+              <div className="flex items-center mt-1">
                 <Target className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm text-blue-600">{financialOverview.profitMargin}% margin</span>
               </div>
             </div>
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-              <CircleDollarSign className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+              <CircleDollarSign className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="border border-gray-200 p-6 bg-white">
+        <div className="border border-gray-200 p-4 bg-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Pending Payments</p>
-              <p className="text-2xl font-bold ">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Pending Payments</p>
+              <p className="text-xl font-bold ">
                 {formatCurrency(financialOverview.pendingPayments)}
               </p>
-              <div className="flex items-center mt-2">
+              <div className="flex items-center mt-1">
                 <Clock className="w-4 h-4 text-yellow-500 mr-1" />
                 <span className="text-sm text-yellow-600">23 transactions</span>
               </div>
             </div>
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-              <AlertCircle className="w-6 h-6 text-yellow-600" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+              <AlertCircle className="w-5 h-5 text-yellow-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
-        <div className="border border-gray-200 p-6 bg-white">
-          <h4 className="font-semibold text-gray-900 mb-4">Quick Actions</h4>
-          <div className="space-y-3">
-            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-gray-100 rounded-lg transition-colors">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+        <div className="border border-gray-200 p-4 bg-white">
+          <h4 className="font-semibold text-gray-900 mb-3 text-sm">Quick Actions</h4>
+          <div className="space-y-2">
+            <button className="w-full flex items-center px-3 py-1.5 text-left hover:bg-gray-100 rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4 text-blue-600 mr-3" />
               <span className="text-blue-700">Add New Transaction</span>
             </button>
-            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-gray-100 rounded-lg transition-colors">
+            <button className="w-full flex items-center px-3 py-1.5 text-left hover:bg-gray-100 rounded-lg transition-colors text-sm">
               <Download className="w-4 h-4 text-blue-600 mr-3" />
               <span className="text-blue-700">Export Financial Report</span>
             </button>
-            <button className="w-full flex items-center px-4 py-2 text-left  hover:bg-gray-100 rounded-lg transition-colors">
+            <button className="w-full flex items-center px-3 py-1.5 text-left hover:bg-gray-100 rounded-lg transition-colors text-sm">
               <Users className="w-4 h-4 text-blue-600 mr-3" />
               <span className="text-blue-700">Process CHW Payments</span>
             </button>
           </div>
         </div>
 
-        <div className="border border-gray-200 p-6 bg-white ">
-          <h4 className="font-semibold text-gray-900 mb-4">Recent Transactions</h4>
-          <div className="space-y-3">
+        <div className="border border-gray-200 p-4 bg-white ">
+          <h4 className="font-semibold text-gray-900 mb-3 text-sm">Recent Transactions</h4>
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
@@ -454,9 +454,9 @@ const FinancialManagement = () => {
           </div>
         </div>
 
-        <div className="border border-gray-200 bg-white p-6">
-          <h4 className="font-semibold text-gray-900 mb-4">Financial Alerts</h4>
-          <div className="space-y-3">
+        <div className="border border-gray-200 bg-white p-4">
+          <h4 className="font-semibold text-gray-900 mb-3 text-sm">Financial Alerts</h4>
+          <div className="space-y-2">
             <div className="flex items-start">
               <AlertCircle className="w-4 h-4 text-yellow-500 mr-2 mt-0.5" />
               <div>
@@ -485,13 +485,13 @@ const FinancialManagement = () => {
 
 
       {/* Revenue vs Expenses Chart */}
-      <div className="border border-gray-200 p-6 bg-white">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Monthly Financial Trend</h3>
+      <div className="border border-gray-200 p-4 bg-white">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-gray-900">Monthly Financial Trend</h3>
           <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent text-sm"
+            className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent text-sm"
           >
             <option value="this-month">This Month</option>
             <option value="last-3-months">Last 3 Months</option>
@@ -500,7 +500,7 @@ const FinancialManagement = () => {
           </select>
         </div>
         
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={320}>
           <AreaChart 
             data={monthlyTrendData}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -596,31 +596,31 @@ const FinancialManagement = () => {
           </AreaChart>
         </ResponsiveContainer>
         
-        <div className="mt-6 grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-gray-200">
           <div className="text-center">
-            <div className="flex items-center justify-center mb-2">
+            <div className="flex items-center justify-center mb-1">
               <div className="w-3 h-3 rounded bg-blue-800 mr-2"></div>
-              <span className="text-sm text-gray-600">Latest Month Total</span>
+              <span className="text-xs text-gray-600">Latest Month Total</span>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Revenue: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].revenue)}</span>
             </p>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center mb-2">
+            <div className="flex items-center justify-center mb-1">
               <div className="w-3 h-3 rounded bg-blue-500  mr-2"></div>
-              <span className="text-sm text-gray-600">Expenses</span>
+              <span className="text-xs text-gray-600">Expenses</span>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Total: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].expenses)}</span>
             </p>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center mb-2">
+            <div className="flex items-center justify-center mb-1">
               <div className="w-3 h-3 rounded bg-green-600 mr-2"></div>
-              <span className="text-sm text-gray-600">Net Profit</span>
+              <span className="text-xs text-gray-600">Net Profit</span>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Amount: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].profit)}</span>
             </p>
           </div>
@@ -635,24 +635,24 @@ const FinancialManagement = () => {
 
 
   const renderRevenue = () => (
-    <div className="space-y-6">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold">Revenue Streams Analysis</h3>
+    <div className="space-y-4">
+      <div className="p-0">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold">Revenue Streams Analysis</h3>
           <div className="flex items-center space-x-3">
-            <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
+            <select className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent">
               <option>This Month</option>
               <option>Last Month</option>
               <option>Last 3 Months</option>
             </select>
-            <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Export
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
           <div className="border border-gray-200 bg-white overflow-hidden flex flex-col">
             <div className="overflow-x-auto flex-1">
               <table className="min-w-full divide-y divide-gray-200 h-full">
@@ -710,9 +710,9 @@ const FinancialManagement = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 p-6">
-            <h4 className="font-bold mb-4">Revenue Distribution</h4>
-            <ResponsiveContainer width="100%" height={480}>
+          <div className="bg-white border border-gray-200 p-4">
+            <h4 className="text-sm font-semibold mb-3">Revenue Distribution</h4>
+            <ResponsiveContainer width="100%" height={360}>
               <RechartsPieChart>
                 <Pie
                   data={revenueDistribution}
@@ -761,7 +761,7 @@ const FinancialManagement = () => {
                 />
               </RechartsPieChart>
             </ResponsiveContainer>
-            <div className="mt-4 space-y-2">
+            <div className="mt-3 space-y-2">
               {revenueDistribution.map((item, index) => {
                 const total = revenueDistribution.reduce((sum, i) => sum + i.value, 0);
                 const percentage = ((item.value / total) * 100).toFixed(1);
@@ -791,18 +791,18 @@ const FinancialManagement = () => {
   );
 
   const renderExpenses = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Expense Management</h3>
-        <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold text-gray-900">Expense Management</h3>
+        <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           <Plus className="w-4 h-4 mr-2" />
           Add Expense
         </button>
       </div>
 
-      <div className="border border-gray-200 p-6 bg-white">
+      <div className="border border-gray-200 p-4 bg-white">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-gray-50 border-b-2 border-gray-200">
                 <th className="text-left py-4 px-4 font-bold ">Category</th>
@@ -909,25 +909,25 @@ const FinancialManagement = () => {
   );
 
   const renderAmbulanceFinances = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold ">Ambulance Financial Performance</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold ">Ambulance Financial Performance</h3>
         <div className="flex items-center space-x-3">
-          <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
+          <select className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
             <option>All Ambulances</option>
             <option>Active Only</option>
             <option>Maintenance</option>
           </select>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </button>
         </div>
       </div>
 
-      <div className="border border-gray-200 p-6 bg-white">
+      <div className="border border-gray-200 p-4 bg-white">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 font-bold">Ambulance</th>
@@ -987,55 +987,55 @@ const FinancialManagement = () => {
   );
 
   const renderCHWPayments = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold ">Community Health Worker Payments</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold ">Community Health Worker Payments</h3>
         <div className="flex items-center space-x-3">
-          <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
+          <select className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
             <option>All CHWs</option>
             <option>Paid</option>
             <option>Pending</option>
           </select>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <CheckCircle className="w-4 h-4 mr-2" />
             Process Payments
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10 max-w-4xl mx-auto">
-        <div className="border border-gray-200 bg-white p-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6 max-w-4xl mx-auto">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <Users className="w-10 h-10 text-blue-600 mr-3" />
+            <Users className="w-7 h-7 text-blue-600 mr-2" />
             <div>
-              <p className="text-sm text-blue-600">Total CHWs</p>
-              <p className="text-2xl font-bold ">45</p>
+              <p className="text-xs text-blue-600">Total CHWs</p>
+              <p className="text-xl font-bold ">45</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 bg-white p-8">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <CheckCircle className="w-10 h-10 text-blue-600 mr-3" />
+            <CheckCircle className="w-7 h-7 text-blue-600 mr-2" />
             <div>
-              <p className="text-sm text-blue-600">Payments Processed</p>
-              <p className="text-2xl font-bold ">{formatCurrency(480000)}</p>
+              <p className="text-xs text-blue-600">Payments Processed</p>
+              <p className="text-xl font-bold ">{formatCurrency(480000)}</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 bg-white p-8">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <Clock className="w-10 h-10 text-blue-600 mr-3" />
+            <Clock className="w-7 h-7 text-blue-600 mr-2" />
             <div>
-              <p className="text-sm text-blue-600">Pending Payments</p>
-              <p className="text-2xl font-bold ">{formatCurrency(54000)}</p>
+              <p className="text-xs text-blue-600">Pending Payments</p>
+              <p className="text-xl font-bold ">{formatCurrency(54000)}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="border border-gray-200 bg-white p-6">
+      <div className="border border-gray-200 bg-white p-4">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 font-bold">CHW</th>
@@ -1094,9 +1094,9 @@ const FinancialManagement = () => {
   );
 
   const renderPatientPayments = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Patient Payment Transactions</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Patient Payment Transactions</h3>
         <div className="flex items-center space-x-3">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
@@ -1105,10 +1105,10 @@ const FinancialManagement = () => {
               placeholder="Search transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+              className="pl-10 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
             />
           </div>
-          <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
+          <select className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent">
             <option>All Payments</option>
             <option>Completed</option>
             <option>Pending</option>
@@ -1117,48 +1117,48 @@ const FinancialManagement = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 max-w-6xl mx-auto">
-        <div className="border border-gray-200 bg-white p-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6 max-w-6xl mx-auto">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <Smartphone className="w-10 h-10 text-blue-600 mr-3" />
+            <Smartphone className="w-7 h-7 text-blue-600 mr-2" />
             <div>
-              <p className="text-base text-blue-600 mb-1">M-Pesa</p>
-              <p className="text-2xl font-bold">{formatCurrency(650000)}</p>
+              <p className="text-xs text-blue-600 mb-1">M-Pesa</p>
+              <p className="text-xl font-bold">{formatCurrency(650000)}</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 bg-white p-6">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <CreditCard className="w-10 h-10 text-blue-600 mr-3" />
+            <CreditCard className="w-7 h-7 text-blue-600 mr-2" />
             <div>
-              <p className="text-base text-blue-600 mb-1">Card Payments</p>
-              <p className="text-2xl font-bold">{formatCurrency(420000)}</p>
+              <p className="text-xs text-blue-600 mb-1">Card Payments</p>
+              <p className="text-xl font-bold">{formatCurrency(420000)}</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 bg-white p-6">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <Banknote className="w-10 h-10 text-blue-600 mr-3" />
+            <Banknote className="w-7 h-7 text-blue-600 mr-2" />
             <div>
-              <p className="text-base text-blue-600 mb-1">Cash</p>
-              <p className="text-2xl font-bold">{formatCurrency(280000)}</p>
+              <p className="text-xs text-blue-600 mb-1">Cash</p>
+              <p className="text-xl font-bold">{formatCurrency(280000)}</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 bg-white p-6">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <Receipt className="w-10 h-10 text-blue-600 mr-3" />
+            <Receipt className="w-7 h-7 text-blue-600 mr-2" />
             <div>
-              <p className="text-base text-blue-600 mb-1">Insurance</p>
-              <p className="text-2xl font-bold">{formatCurrency(180000)}</p>
+              <p className="text-xs text-blue-600 mb-1">Insurance</p>
+              <p className="text-xl font-bold">{formatCurrency(180000)}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="border border-gray-200 bg-white p-6">
+      <div className="border border-gray-200 bg-white p-4">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 font-bold">Patient</th>
@@ -1218,14 +1218,14 @@ const FinancialManagement = () => {
   );
 
   const renderReports = () => (
-    <div className="space-y-6">
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Financial Reports & Analytics</h3>
+    <div className="space-y-4">
+      <div className="p-0">
+        <h3 className="text-base font-semibold text-gray-900 mb-4">Financial Reports & Analytics</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="border border-gray-200 bg-white p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="border border-gray-200 bg-white p-4">
             <div className="flex items-center mb-4">
-              <BarChart3 className="w-8 h-8 text-blue-600 mr-3" />
+              <BarChart3 className="w-6 h-6 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Revenue Report</h4>
                 <p className="text-sm text-gray-600">Monthly revenue breakdown</p>
@@ -1237,9 +1237,9 @@ const FinancialManagement = () => {
             </button>
           </div>
 
-          <div className="border border-gray-200 bg-white p-6">
+          <div className="border border-gray-200 bg-white p-4">
             <div className="flex items-center mb-4">
-              <TrendingDown className="w-8 h-8 text-blue-600 mr-3" />
+              <TrendingDown className="w-6 h-6 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Expense Report</h4>
                 <p className="text-sm text-gray-600">Detailed expense analysis</p>
@@ -1251,9 +1251,9 @@ const FinancialManagement = () => {
             </button>
           </div>
 
-          <div className="border border-gray-200 bg-white p-6">
+          <div className="border border-gray-200 bg-white p-4">
             <div className="flex items-center mb-4">
-              <Truck className="w-8 h-8 text-blue-600 mr-3" />
+              <Truck className="w-6 h-6 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Ambulance P&L</h4>
                 <p className="text-sm text-gray-600">Profit & loss per ambulance</p>
@@ -1265,9 +1265,9 @@ const FinancialManagement = () => {
             </button>
           </div>
 
-          <div className="border border-gray-200 bg-white p-6">
+          <div className="border border-gray-200 bg-white p-4">
             <div className="flex items-center mb-4">
-              <UserCheck className="w-8 h-8 text-blue-600 mr-3" />
+              <UserCheck className="w-6 h-6 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">CHW Payment Report</h4>
                 <p className="text-sm text-gray-600">Payment summary for CHWs</p>
@@ -1279,9 +1279,9 @@ const FinancialManagement = () => {
             </button>
           </div>
 
-          <div className="border border-gray-200 bg-white p-6">
+          <div className="border border-gray-200 bg-white p-4">
             <div className="flex items-center mb-4">
-              <PieChart className="w-8 h-8 text-blue-600 mr-3" />
+              <PieChart className="w-6 h-6 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Financial Summary</h4>
                 <p className="text-sm text-gray-600">Complete financial overview</p>
@@ -1293,9 +1293,9 @@ const FinancialManagement = () => {
             </button>
           </div>
 
-          <div className="border border-gray-200 bg-white p-6">
+          <div className="border border-gray-200 bg-white p-4">
             <div className="flex items-center mb-4">
-              <Activity className="w-8 h-8 text-blue-600 mr-3" />
+              <Activity className="w-6 h-6 text-blue-600 mr-3" />
               <div>
                 <h4 className="font-medium text-gray-900">Budget Analysis</h4>
                 <p className="text-sm text-gray-600">Budget vs actual comparison</p>
@@ -1312,16 +1312,16 @@ const FinancialManagement = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 lg:p-5">
       
       <div className="">
         <div className="">
           {/* Header Section */}
-          <div className="mb-8">
+          <div className="mb-4">
             <div className="">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold">Financial Management</h1>
+                  <h1 className="text-2xl font-bold">Financial Management</h1>
                   
                 </div>
               </div>
@@ -1329,15 +1329,15 @@ const FinancialManagement = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="mb-6">
-            <div className="flex overflow-x-auto">
+          <div className="mb-4">
+            <div className="flex overflow-x-auto border-b border-gray-200">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                    className={`flex items-center px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600 bg-blue-50'
                         : 'border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300'
@@ -1352,7 +1352,7 @@ const FinancialManagement = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="min-h-[600px]">
+          <div className="min-h-[560px] [&_table]:text-sm [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:py-2.5 [&_th]:px-3 [&_td]:py-2.5 [&_td]:px-3">
             {activeTab === 'overview' && renderOverview()}
             {activeTab === 'revenue' && renderRevenue()}
             {activeTab === 'expenses' && renderExpenses()}

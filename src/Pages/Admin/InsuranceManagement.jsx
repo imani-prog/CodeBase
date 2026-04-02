@@ -49,7 +49,7 @@ const InsuranceManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('all');
-  const [selectedPeriod, setSelectedPeriod] = useState('this-month');
+  const [_selectedPeriod, _setSelectedPeriod] = useState('this-month');
   const [hasChanges, setHasChanges] = useState(false);
 
   // Modal & form state
@@ -721,18 +721,18 @@ const InsuranceManagement = () => {
 
   // Render Overview Tab
   const renderOverview = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Total Providers</p>
-              <p className="text-3xl font-bold">{insuranceOverview.totalProviders}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Total Providers</p>
+              <p className="text-2xl font-bold">{insuranceOverview.totalProviders}</p>
               <p className="text-sm text-green-600 mt-1">+2 this month</p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Building2 className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
@@ -740,12 +740,12 @@ const InsuranceManagement = () => {
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className=" mb-1">Covered Patients</p>
-              <p className="text-3xl font-bold">{insuranceOverview.activePatients.toLocaleString()}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Covered Patients</p>
+              <p className="text-2xl font-bold">{insuranceOverview.activePatients.toLocaleString()}</p>
               <p className="text-sm text-green-600 mt-1">+156 this month</p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
@@ -753,12 +753,12 @@ const InsuranceManagement = () => {
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className=" mb-1">Total Coverage</p>
-              <p className="text-3xl font-bold">{formatCurrency(insuranceOverview.totalCoverage)}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Total Coverage</p>
+              <p className="text-2xl font-bold">{formatCurrency(insuranceOverview.totalCoverage)}</p>
               <p className="text-sm text-green-600 mt-1">+8.5% growth</p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Shield className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
@@ -766,22 +766,22 @@ const InsuranceManagement = () => {
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className=" mb-1">Claims Processed</p>
-              <p className="text-3xl font-bold">{insuranceOverview.claimsProcessed}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Claims Processed</p>
+              <p className="text-2xl font-bold">{insuranceOverview.claimsProcessed}</p>
               <p className="text-sm text-yellow-600 mt-1">{insuranceOverview.pendingClaims} pending</p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <FileText className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <FileText className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Charts and Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Claims by Provider</h3>
-          <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
+          <h3 className="text-base font-semibold mb-3">Claims by Provider</h3>
+          <div className="space-y-3">
             {insuranceProviders.slice(0, 4).map((provider) => (
               <div key={provider.id} className="flex items-center justify-between">
                 <div className="flex items-center">
@@ -800,36 +800,36 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
+          <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
+          <div className="grid grid-cols-2 gap-3">
             <button
               onClick={handleAddProvider}
-              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
+              className="flex items-center justify-center py-2.5 px-3 text-sm border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
             >
-              <Plus className="w-5 h-5 text-blue-600 mr-2" />
+              <Plus className="w-4 h-4 text-blue-600 mr-2" />
               Add Provider
             </button>
             <button
               onClick={handleProcessClaims}
-              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
+              className="flex items-center justify-center py-2.5 px-3 text-sm border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
             >
-              <FileText className="w-5 h-5 text-blue-600 mr-2" />
+              <FileText className="w-4 h-4 text-blue-600 mr-2" />
               Process Claims
             </button>
             <button
               onClick={handleExportReport}
               disabled={exportLoading}
-              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex items-center justify-center py-2.5 px-3 text-sm border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <Download className={`w-5 h-5 text-blue-600 mr-2 ${exportLoading ? 'animate-bounce' : ''}`} />
+              <Download className={`w-4 h-4 text-blue-600 mr-2 ${exportLoading ? 'animate-bounce' : ''}`} />
               {exportLoading ? 'Exporting...' : 'Export Report'}
             </button>
             <button
               onClick={handleOpenSettings}
-              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
+              className="flex items-center justify-center py-2.5 px-3 text-sm border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
             >
-              <Settings className="w-5 h-5 text-blue-600 mr-2" />
+              <Settings className="w-4 h-4 text-blue-600 mr-2" />
               Settings
             </button>
           </div>
@@ -837,12 +837,12 @@ const InsuranceManagement = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold mb-4">Recent Insurance Activity</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 ">
+      <div className="bg-white border border-gray-200 p-4">
+        <h3 className="text-base font-semibold mb-3">Recent Insurance Activity</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-2.5">
             <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
+              <CheckCircle className="w-6 h-6 text-blue-600 mr-2" />
               <div>
                 <p className="font-medium ">Claim Approved - CLM-2024-045</p>
                 <p className="text-sm text-gray-500">SHA - Sarah Wanjiku - KES 13,950</p>
@@ -851,9 +851,9 @@ const InsuranceManagement = () => {
             <span className="text-sm text-gray-500">2 hours ago</span>
           </div>
           
-          <div className="flex items-center justify-between p-4 ">
+          <div className="flex items-center justify-between p-2.5">
             <div className="flex items-center">
-              <UserCheck className="w-8 h-8 text-blue-600 mr-3" />
+              <UserCheck className="w-6 h-6 text-blue-600 mr-2" />
               <div>
                 <p className="font-medium ">New Patient Enrolled</p>
                 <p className="text-sm text-gray-500">NHIF - David Kiprotich - UHC Basic</p>
@@ -862,9 +862,9 @@ const InsuranceManagement = () => {
             <span className="text-sm text-gray-500">5 hours ago</span>
           </div>
 
-          <div className="flex items-center justify-between p-4 ">
+          <div className="flex items-center justify-between p-2.5">
             <div className="flex items-center">
-              <AlertCircle className="w-8 h-8 text-blue-600 mr-3" />
+              <AlertCircle className="w-6 h-6 text-blue-600 mr-2" />
               <div>
                 <p className="font-medium">Policy Renewal Required</p>
                 <p className="text-sm text-gray-500">Ambulance KCC 003C - Expires Oct 25</p>
@@ -879,31 +879,31 @@ const InsuranceManagement = () => {
 
   // Render Insurance Providers Tab
   const renderProviders = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold">Insurance Providers</h3>
-        <button onClick={handleAddProvider} className="bg-blue-600 text-white px-4 py-2 hover:bg-blue-800 transition-colors flex items-center">
+    <div className="space-y-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-base font-semibold">Insurance Providers</h3>
+        <button onClick={handleAddProvider} className="bg-blue-600 text-white px-3 py-1.5 text-sm hover:bg-blue-800 transition-colors flex items-center">
           <Plus className="w-4 h-4 mr-2" />
           Add Provider
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <Shield className="w-8 h-8 text-blue-600 mr-3" />
+            <Shield className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Providers</p>
-              <p className="text-2xl font-bold">{insuranceProviders.length}</p>
+              <p className="text-xl font-bold">{insuranceProviders.length}</p>
             </div>
           </div>
         </div>
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <Users className="w-8 h-8 text-blue-600 mr-3" />
+            <Users className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Covered Patients</p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl font-bold">
                 {insuranceProviders.reduce((sum, p) => sum + p.patients, 0).toLocaleString()}
               </p>
             </div>
@@ -911,10 +911,10 @@ const InsuranceManagement = () => {
         </div>
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <FileText className="w-8 h-8 text-blue-600 mr-3" />
+            <FileText className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Claims</p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl font-bold">
                 {insuranceProviders.reduce((sum, p) => sum + p.claimsProcessed, 0).toLocaleString()}
               </p>
             </div>
@@ -922,10 +922,10 @@ const InsuranceManagement = () => {
         </div>
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
+            <DollarSign className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Amount</p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl font-bold">
                 {formatCurrency(insuranceProviders.reduce((sum, p) => sum + p.totalAmount, 0))}
               </p>
             </div>
@@ -1044,22 +1044,22 @@ const InsuranceManagement = () => {
 
   // Render Patient Coverage Tab
   const renderPatientCoverage = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Patient Insurance Coverage</h3>
+        <h3 className="text-base font-semibold">Patient Insurance Coverage</h3>
         <div className="flex items-center space-x-4">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search patients..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <select 
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={selectedProvider}
             onChange={(e) => setSelectedProvider(e.target.value)}
           >
@@ -1168,15 +1168,15 @@ const InsuranceManagement = () => {
 
   // Render Claims Management Tab
   const renderClaims = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Claims Management</h3>
+        <h3 className="text-base font-semibold">Claims Management</h3>
         <div className="flex items-center space-x-4">
-          <button onClick={handleOpenAddClaim} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+          <button onClick={handleOpenAddClaim} className="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center">
             <Plus className="w-4 h-4 mr-2" />
             New Claim
           </button>
-          <button onClick={handleOpenBulkUpload} className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center">
+          <button onClick={handleOpenBulkUpload} className="bg-gray-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-gray-700 transition-colors flex items-center">
             <Upload className="w-4 h-4 mr-2" />
             Bulk Upload
           </button>
@@ -1184,51 +1184,51 @@ const InsuranceManagement = () => {
       </div>
 
       {/* Claims Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12  flex items-center justify-center mr-4">
-              <CheckCircle className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center mr-2">
+              <CheckCircle className="w-8 h-8 text-blue-600" />
             </div>
             <div>
               <p className="">Approved Claims</p>
-              <p className="text-2xl font-bold">{insuranceOverview.claimsProcessed}</p>
+              <p className="text-xl font-bold">{insuranceOverview.claimsProcessed}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12  flex items-center justify-center mr-4">
-              <Clock className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center mr-2">
+              <Clock className="w-8 h-8 text-blue-600" />
             </div>
             <div>
               <p className="">Pending Claims</p>
-              <p className="text-2xl font-bold">{insuranceOverview.pendingClaims}</p>
+              <p className="text-xl font-bold">{insuranceOverview.pendingClaims}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12  flex items-center justify-center mr-4">
-              <XCircle className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center mr-2">
+              <XCircle className="w-8 h-8 text-blue-600" />
             </div>
             <div>
               <p className="">Rejected Claims</p>
-              <p className="text-2xl font-bold">{insuranceOverview.rejectedClaims}</p>
+              <p className="text-xl font-bold">{insuranceOverview.rejectedClaims}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12  flex items-center justify-center mr-4">
-              <DollarSign className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center mr-2">
+              <DollarSign className="w-8 h-8 text-blue-600" />
             </div>
             <div>
               <p className="">Average Claim</p>
-              <p className="text-2xl font-bold">{formatCurrency(insuranceOverview.averageClaimAmount)}</p>
+              <p className="text-xl font-bold">{formatCurrency(insuranceOverview.averageClaimAmount)}</p>
             </div>
           </div>
         </div>
@@ -1297,12 +1297,12 @@ const InsuranceManagement = () => {
 
   // Render Ambulance Insurance Tab
   const renderAmbulanceInsurance = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold">Ambulance Insurance Management</h3>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-base font-semibold">Ambulance Insurance Management</h3>
         <button
           onClick={handleOpenAddPolicy}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+          className="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Policy
@@ -1310,33 +1310,33 @@ const InsuranceManagement = () => {
       </div>
 
       {/* Ambulance Insurance Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <Truck className="w-8 h-8 text-blue-600 mr-3" />
+            <Truck className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Vehicles</p>
-              <p className="text-2xl font-bold">{ambulancePolicies.length}</p>
+              <p className="text-xl font-bold">{ambulancePolicies.length}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <Shield className="w-8 h-8 text-blue-600 mr-3" />
+            <Shield className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="text-sm">Coverage Rate</p>
-              <p className="text-2xl font-bold">{insuranceOverview.ambulanceCoverage}%</p>
+              <p className="text-xl font-bold">{insuranceOverview.ambulanceCoverage}%</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
+            <DollarSign className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="text-sm">Total Premiums</p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl font-bold">
                 {formatCurrency(ambulancePolicies.reduce((sum, p) => sum + p.premium, 0))}
               </p>
             </div>
@@ -1934,12 +1934,12 @@ const InsuranceManagement = () => {
 
   // Render Analytics Tab (placeholder)
   const renderAnalytics = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Insurance Analytics & Reports</h3>
+    <div className="space-y-4">
+      <h3 className="text-base font-semibold">Insurance Analytics & Reports</h3>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 p-6">
-          <h4 className="text-lg font-semibold mb-4">Coverage Distribution</h4>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
+          <h4 className="text-base font-semibold mb-3">Coverage Distribution</h4>
           <div className="overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-gray-100 uppercase text-xs">
@@ -1983,8 +1983,8 @@ const InsuranceManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
-          <h4 className="text-lg font-semibold mb-4">Monthly Trends</h4>
+        <div className="bg-white border border-gray-200 p-4">
+          <h4 className="text-base font-semibold mb-3">Monthly Trends</h4>
           <div className="space-y-2">
             {/* Chart Legend */}
             <div className="flex justify-end space-x-4 text-xs mb-4">
@@ -2579,14 +2579,14 @@ const InsuranceManagement = () => {
     ];
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="text-lg font-semibold">Policy Management</h3>
+            <h3 className="text-base font-semibold">Policy Management</h3>
             
           </div>
-          <button onClick={() => setShowCreateInsurancePolicyModal(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+          <button onClick={() => setShowCreateInsurancePolicyModal(true)} className="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center">
             <Plus className="w-4 h-4 mr-2" />
             Create Policy
           </button>
@@ -2605,8 +2605,8 @@ const InsuranceManagement = () => {
               <div key={index} className="bg-white border border-gray-200 p-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="mb-1">{stat.label}</p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
+                      <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">{stat.label}</p>
+                      <p className="text-xl font-bold">{stat.value}</p>
                     <p className="text-sm mt-1">{stat.change}</p>
                   </div>
                   <div className={`p-2 rounded-lg ${colors[stat.color]}`}>
@@ -2619,8 +2619,8 @@ const InsuranceManagement = () => {
         </div>
 
         {/* Header with Actions */}
-        <div className="flex items-center justify-between mb-4">
-          <h4 className="text-lg font-semibold">All Policies</h4>
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-base font-semibold">All Policies</h4>
           <div className="flex items-center space-x-2">
             <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center">
               <Download className="w-4 h-4 mr-1" />
@@ -2634,23 +2634,23 @@ const InsuranceManagement = () => {
         </div>
 
         {/* Search and Filter */}
-        <div className="flex items-center space-x-3 mb-4">
+        <div className="flex items-center space-x-3 mb-3">
           <div className="ml-50 w-1/2 flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search by policy number, holder name..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <select className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option value="">All Categories</option>
             <option value="individual">Individual</option>
             <option value="family">Family</option>
             <option value="corporate">Corporate</option>
             <option value="emergency">Emergency</option>
           </select>
-          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <select className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="expiring">Expiring</option>
@@ -2759,31 +2759,31 @@ const InsuranceManagement = () => {
   // Render Settings Tab
   const renderSettings = () => {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Header with Actions */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold ">Insurance Management Settings</h3>
+            <h3 className="text-base font-semibold ">Insurance Management Settings</h3>
             
           </div>
           <div className="flex items-center space-x-3">
-            <button className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center text-gray-700">
+            <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center text-gray-700">
               <RefreshCw className="w-4 h-4 mr-2" />
               Reset to Default
             </button>
-            <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm">
+            <button className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm">
               <Save className="w-4 h-4 mr-2" />
               Save Changes
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* General Settings */}
-          <div className="bg-white border border-gray-200 p-6">
-            <div className="flex items-center mb-6">
+          <div className="bg-white border border-gray-200 p-4">
+            <div className="flex items-center mb-4">
               <div className="p-2  mr-3">
-                <Settings className="w-8 h-8 text-blue-600" />
+                <Settings className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <h4 className="font-semibold ">General Settings</h4>
@@ -2791,7 +2791,7 @@ const InsuranceManagement = () => {
               </div>
             </div>
             
-            <div className="space-y-5">
+            <div className="space-y-4">
               <div>
                 <label className="block font-semibold mb-2">Default Currency</label>
                 <select 
@@ -4418,7 +4418,7 @@ const InsuranceManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 p-4 lg:p-5">
       {renderViewCoverageModal()}
       {renderEditCoverageModal()}
       {renderClaimsHistoryModal()}
@@ -4438,31 +4438,31 @@ const InsuranceManagement = () => {
       {renderViewInsurancePolicyModal()}
       {renderEditInsurancePolicyModal()}
       {renderDownloadPolicyModal()}
-      <div className="">
-        <main className="">
-          <div className="">
+      <div>
+        <main>
+          <div>
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Insurance Management</h1>
+            <div className="mb-4">
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">Insurance Management</h1>
               
             </div>
 
             {/* Tab Navigation */}
-            <div className="mb-8">
-              <nav className="-mb-px flex space-x-8">
+            <div className="mb-4">
+              <nav className="flex overflow-x-auto border-b border-gray-200">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                      className={`py-2.5 px-4 border-b-2 text-xs font-semibold flex items-center whitespace-nowrap space-x-2 ${
                         activeTab === tab.id
                           ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent  hover:text-gray-700 hover:border-gray-300'
+                          : 'border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-4 h-4" />
                       <span>{tab.label}</span>
                     </button>
                   );
@@ -4471,14 +4471,16 @@ const InsuranceManagement = () => {
             </div>
 
             {/* Tab Content */}
-            {activeTab === 'overview' && renderOverview()}
-            {activeTab === 'providers' && renderProviders()}
-            {activeTab === 'patients' && renderPatientCoverage()}
-            {activeTab === 'claims' && renderClaims()}
-            {activeTab === 'ambulance' && renderAmbulanceInsurance()}
-            {activeTab === 'analytics' && renderAnalytics()}
-            {activeTab === 'policies' && renderPolicies()}
-            {activeTab === 'settings' && renderSettings()}
+            <div className="min-h-[560px] [&_table]:text-sm [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:py-2.5 [&_th]:px-3 [&_td]:py-2.5 [&_td]:px-3">
+              {activeTab === 'overview' && renderOverview()}
+              {activeTab === 'providers' && renderProviders()}
+              {activeTab === 'patients' && renderPatientCoverage()}
+              {activeTab === 'claims' && renderClaims()}
+              {activeTab === 'ambulance' && renderAmbulanceInsurance()}
+              {activeTab === 'analytics' && renderAnalytics()}
+              {activeTab === 'policies' && renderPolicies()}
+              {activeTab === 'settings' && renderSettings()}
+            </div>
           </div>
         </main>
       </div>

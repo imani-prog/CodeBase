@@ -675,10 +675,10 @@ const TrainingManagement = () => {
   };
 
   const renderOverview = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header with Quick Actions */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold ">Training Overview</h2>
+        <h2 className="text-lg font-semibold ">Training Overview</h2>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setShowCreateCourseModal(true)}
@@ -712,77 +712,77 @@ const TrainingManagement = () => {
       </div>
 
       {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white border border-gray-200 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Total Courses</p>
-              <p className="text-3xl font-bold">{trainingOverview.totalCourses}</p>
-              <div className="flex items-center mt-2">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Total Courses</p>
+              <p className="text-2xl font-bold">{trainingOverview.totalCourses}</p>
+              <div className="flex items-center mt-1">
                 <BookOpen className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm">{trainingOverview.activeCourses} active</span>
               </div>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <GraduationCap className="w-10 h-10" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <GraduationCap className="w-8 h-8" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Total Students</p>
-              <p className="text-3xl font-bold">{trainingOverview.totalStudents}</p>
-              <div className="flex items-center mt-2">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Total Students</p>
+              <p className="text-2xl font-bold">{trainingOverview.totalStudents}</p>
+              <div className="flex items-center mt-1">
                 <TrendingUp className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm ">+{trainingOverview.monthlyGrowth}% this month</span>
               </div>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Users className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Users className="w-8 h-8 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Total Revenue</p>
-              <p className="text-3xl font-bold">{formatCurrency(trainingOverview.totalRevenue)}</p>
-              <div className="flex items-center mt-2">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Total Revenue</p>
+              <p className="text-2xl font-bold">{formatCurrency(trainingOverview.totalRevenue)}</p>
+              <div className="flex items-center mt-1">
                 <DollarSign className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm">From training programs</span>
               </div>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <TrendingUp className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <TrendingUp className="w-8 h-8 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Certificates Issued</p>
-              <p className="text-3xl font-bold">{trainingOverview.certificatesIssued}</p>
-              <div className="flex items-center mt-2">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Certificates Issued</p>
+              <p className="text-2xl font-bold">{trainingOverview.certificatesIssued}</p>
+              <div className="flex items-center mt-1">
                 <Award className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm">{trainingOverview.avgCompletionRate.toFixed(1)}% completion</span>
               </div>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Award className="w-10 h-10  text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Award className="w-8 h-8 text-blue-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Charts and Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Enrollment Trends</h3>
-          <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
+          <h3 className="text-base font-semibold mb-3">Enrollment Trends</h3>
+          <div className="space-y-3">
             {enrollmentTrends.map((trend, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div>
@@ -798,8 +798,8 @@ const TrainingManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Revenue by Category</h3>
+        <div className="bg-white border border-gray-200 p-4">
+          <h3 className="text-base font-semibold mb-3">Revenue by Category</h3>
           <div className="space-y-3">
             {revenueByCategory.slice(0, 5).map((category, index) => (
               <div key={index} className="flex items-center justify-between">
@@ -820,24 +820,24 @@ const TrainingManagement = () => {
   );
 
   const renderCourses = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Course Management</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Course Management</h3>
         <div className="flex items-center space-x-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
             <input
               type="text"
               placeholder="Search courses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+              className="pl-10 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
             />
           </div>
           <select
             value={courseFilter}
             onChange={(e) => setCourseFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
           >
             <option value="all">All Courses</option>
             <option value="active">Active</option>
@@ -846,7 +846,7 @@ const TrainingManagement = () => {
           </select>
           <button 
             onClick={() => setShowCreateCourseModal(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Course
@@ -974,49 +974,49 @@ const TrainingManagement = () => {
   );
 
   const renderStudents = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Student Enrollment Management</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Student Enrollment Management</h3>
         <div className="flex items-center space-x-3">
           <button 
             onClick={() => setShowBulkEnrollmentModal(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <UserPlus className="w-4 h-4 mr-2" />
             Bulk Enrollment
           </button>
-          <button className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+          <button className="flex items-center px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
             <Upload className="w-4 h-4 mr-2" />
             Import Students
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="border border-gray-200 bg-white p-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <Users className="w-8 h-8 text-blue-600 mr-3" />
+            <Users className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Students</p>
-              <p className="text-2xl font-bold ">{trainingOverview.totalStudents}</p>
+              <p className="text-xl font-bold ">{trainingOverview.totalStudents}</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 bg-white p-6">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
+            <CheckCircle className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Active Enrollments</p>
-              <p className="text-2xl font-bold ">1,245</p>
+              <p className="text-xl font-bold ">1,245</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-200 bg-white p-6">
+        <div className="border border-gray-200 bg-white p-4">
           <div className="flex items-center">
-            <Award className="w-8 h-8 text-blue-600 mr-3" />
+            <Award className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Completed Courses</p>
-              <p className="text-2xl font-bold ">856</p>
+              <p className="text-xl font-bold ">856</p>
             </div>
           </div>
         </div>
@@ -1122,63 +1122,63 @@ const TrainingManagement = () => {
   );
 
   const renderRevenue = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white border border-gray-200 p-6">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Total Revenue</p>
-              <p className="text-2xl font-bold">{formatCurrency(trainingOverview.totalRevenue)}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Total Revenue</p>
+              <p className="text-xl font-bold">{formatCurrency(trainingOverview.totalRevenue)}</p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <DollarSign className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <DollarSign className="w-8 h-8 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Avg Revenue per Course</p>
-              <p className="text-2xl font-bold">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Avg Revenue per Course</p>
+              <p className="text-xl font-bold">
                 {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalCourses)}
               </p>
             </div>
-            <div className="w-12 h-12  flex items-center justify-center">
-              <Target className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10  flex items-center justify-center">
+              <Target className="w-8 h-8 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Avg Revenue per Student</p>
-              <p className="text-2xl font-bold">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Avg Revenue per Student</p>
+              <p className="text-xl font-bold">
                 {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalStudents)}
               </p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Users className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Users className="w-8 h-8 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="mb-1">Monthly Growth</p>
-              <p className="text-2xl font-bold">{trainingOverview.monthlyGrowth}%</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Monthly Growth</p>
+              <p className="text-xl font-bold">{trainingOverview.monthlyGrowth}%</p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <TrendingUp className="w-10 h-10 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <TrendingUp className="w-8 h-8 text-blue-600" />
             </div>
           </div>
         </div>
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Revenue by Category</h3>
+        <h3 className="text-base font-semibold">Revenue by Category</h3>
         <div className="bg-white border border-gray-200 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 uppercase text-xs">
@@ -1233,37 +1233,37 @@ const TrainingManagement = () => {
   );
 
   const renderCertificates = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Certificate Management</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Certificate Management</h3>
         <div className="flex items-center space-x-3">
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Award className="w-4 h-4 mr-2" />
             Issue Certificates
           </button>
-          <button className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+          <button className="flex items-center px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
             <Download className="w-4 h-4 mr-2" />
             Download Templates
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <Award className="w-8 h-8 text-blue-600 mr-3" />
+            <Award className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Certificates Issued</p>
-              <p className="text-2xl font-bold">{trainingOverview.certificatesIssued}</p>
+              <p className="text-xl font-bold">{trainingOverview.certificatesIssued}</p>
             </div>
           </div>
         </div>
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
+            <CheckCircle className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Pass Rate</p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl font-bold">
                 {(trainingCourses.reduce((sum, course) => sum + course.passRate, 0) / trainingCourses.length).toFixed(1)}%
               </p>
             </div>
@@ -1271,10 +1271,10 @@ const TrainingManagement = () => {
         </div>
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <Star className="w-8 h-8 text-blue-600 mr-3" />
+            <Star className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Avg Rating</p>
-              <p className="text-2xl font-bold">{trainingOverview.avgRating.toFixed(1)}</p>
+              <p className="text-xl font-bold">{trainingOverview.avgRating.toFixed(1)}</p>
             </div>
           </div>
         </div>
@@ -1346,20 +1346,20 @@ const TrainingManagement = () => {
   );
 
   const renderInstructors = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Instructor Management</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Instructor Management</h3>
         <div className="flex items-center space-x-3">
           <button 
             onClick={() => setShowExportReportsModal(true)}
-            className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </button>
           <button 
             onClick={() => setShowAddInstructorModal(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <UserPlus className="w-4 h-4 mr-2" />
             Add Instructor
@@ -1367,22 +1367,22 @@ const TrainingManagement = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <Users className="w-8 h-8 text-blue-600 mr-3" />
+            <Users className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Instructors</p>
-              <p className="text-2xl font-bold ">{instructors.length}</p>
+              <p className="text-xl font-bold ">{instructors.length}</p>
             </div>
           </div>
         </div>
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <BookOpen className="w-8 h-8 text-blue-600 mr-3" />
+            <BookOpen className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Courses</p>
-              <p className="text-2xl font-bold ">
+              <p className="text-xl font-bold ">
                 {instructors.reduce((sum, instructor) => sum + instructor.coursesTeaching, 0)}
               </p>
             </div>
@@ -1390,10 +1390,10 @@ const TrainingManagement = () => {
         </div>
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <Star className="w-8 h-8 text-blue-600 mr-3" />
+            <Star className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Avg Rating</p>
-              <p className="text-2xl font-bold ">
+              <p className="text-xl font-bold ">
                 {(instructors.reduce((sum, instructor) => sum + instructor.avgRating, 0) / instructors.length).toFixed(1)}
               </p>
             </div>
@@ -1401,10 +1401,10 @@ const TrainingManagement = () => {
         </div>
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center">
-            <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
+            <DollarSign className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Monthly Salaries</p>
-              <p className="text-2xl font-bold ">
+              <p className="text-xl font-bold ">
                 {formatCurrency(instructors.reduce((sum, instructor) => sum + instructor.salary, 0))}
               </p>
             </div>
@@ -1569,59 +1569,59 @@ const TrainingManagement = () => {
     ];
 
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold">Training Reports</h3>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold">Training Reports</h3>
           <div className="flex items-center space-x-3">
-            <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
               <Filter className="w-4 h-4 mr-2" />
               Filter Reports
             </button>
-            <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <Plus className="w-4 h-4 mr-2" />
               Generate Report
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="shadow-md border border-gray-200 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white border border-gray-200 p-4">
             <div className="flex items-center">
-              <FileText className="w-8 h-8 text-blue-600 mr-3" />
+              <FileText className="w-6 h-6 text-blue-600 mr-2" />
               <div>
                 <p className="">Total Reports</p>
-                <p className="text-2xl font-bold">{reports.length}</p>
+                <p className="text-xl font-bold">{reports.length}</p>
               </div>
             </div>
           </div>
-          <div className="shadow-md border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-4">
             <div className="flex items-center">
-              <Users className="w-8 h-8 text-blue-600 mr-3" />
+              <Users className="w-6 h-6 text-blue-600 mr-2" />
               <div>
                 <p className="">Students Tracked</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xl font-bold">
                   {reports.reduce((sum, report) => sum + report.totalStudents, 0)}
                 </p>
               </div>
             </div>
           </div>
-          <div className="shadow-md border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-4">
             <div className="flex items-center">
-              <DollarSign className="w-8 h-8 text-blue-600 mr-3" />
+              <DollarSign className="w-6 h-6 text-blue-600 mr-2" />
               <div>
                 <p className="">Total Revenue</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xl font-bold">
                   {formatCurrency(reports.reduce((sum, report) => sum + report.totalRevenue, 0))}
                 </p>
               </div>
             </div>
           </div>
-          <div className="shadow-md border border-gray-200 p-6">
+          <div className="bg-white border border-gray-200 p-4">
             <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
+              <CheckCircle className="w-6 h-6 text-blue-600 mr-2" />
               <div>
                 <p className="">Avg Completion</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xl font-bold">
                   {(reports.reduce((sum, report) => sum + report.completionRate, 0) / reports.length).toFixed(1)}%
                 </p>
               </div>
@@ -1719,7 +1719,7 @@ const TrainingManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 p-4 lg:p-5">
       {/* Feedback Notification */}
       {actionFeedback.show && (
         <div className="fixed top-4 right-4 z-50 animate-slide-in">
@@ -1811,14 +1811,14 @@ const TrainingManagement = () => {
         onAddInstructor={handleAddInstructor}
       />
 
-      <div className="">
-        <div className="">
+      <div>
+        <div>
           {/* Header Section */}
-          <div className="mb-8">
-            <div className="">
+          <div className="mb-4">
+            <div>
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-4xl font-bold mb-2">Training Management</h1>
+                  <h1 className="text-2xl font-bold mb-1">Training Management</h1>
                   
                 </div>
               </div>
@@ -1826,18 +1826,18 @@ const TrainingManagement = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className=" mb-6">
-            <div className="flex overflow-x-auto">
+          <div className="mb-4">
+            <div className="flex overflow-x-auto border-b border-gray-200">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                    className={`flex items-center px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600 bg-blue-50'
-                        : 'border-transparent  hover:text-gray-700 hover:border-gray-300'
+                        : 'border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300'
                     }`}
                   >
                     <Icon className="w-4 h-4 mr-2" />
@@ -1849,7 +1849,7 @@ const TrainingManagement = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="min-h-[600px]">
+          <div className="min-h-[560px] [&_table]:text-sm [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:py-2.5 [&_th]:px-3 [&_td]:py-2.5 [&_td]:px-3">
             {activeTab === 'overview' && renderOverview()}
             {activeTab === 'courses' && renderCourses()}
             {activeTab === 'students' && renderStudents()}

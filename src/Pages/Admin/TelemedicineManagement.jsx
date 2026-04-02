@@ -514,10 +514,10 @@ const TelemedicineManagement = () => {
   const handleHistoryDownload = (session) => { setSelectedHistorySession(session); setShowDownloadReportModal(true); };
 
   const renderOverview = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header with Quick Actions */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">Telemedicine Overview</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Telemedicine Overview</h2>
         <div className="flex items-center gap-2">
           <button
             onClick={handleScheduleSession}
@@ -544,105 +544,105 @@ const TelemedicineManagement = () => {
       </div>
 
       {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white border border-gray-200 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold  mb-1">Active Sessions</p>
-              <p className="text-3xl font-bold text-gray-900">{platformOverview.activeSessions}</p>
-              <div className="flex items-center mt-2">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Active Sessions</p>
+              <p className="text-2xl font-bold text-gray-900">{platformOverview.activeSessions}</p>
+              <div className="flex items-center mt-1">
                 <Activity className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm text-blue-600">Live now</span>
               </div>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Video className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Video className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold mb-1">Online Doctors</p>
-              <p className="text-3xl font-bold text-gray-900">{platformOverview.onlineDoctors}</p>
-              <div className="flex items-center mt-2">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Online Doctors</p>
+              <p className="text-2xl font-bold text-gray-900">{platformOverview.onlineDoctors}</p>
+              <div className="flex items-center mt-1">
                 <UserCheck className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm text-blue-600">of {platformOverview.totalDoctors} total</span>
               </div>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold mb-1">Today's Revenue</p>
-              <p className="text-3xl font-bold text-gray-900">{formatCurrency(revenueData.daily)}</p>
-              <div className="flex items-center mt-2">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Today's Revenue</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(revenueData.daily)}</p>
+              <div className="flex items-center mt-1">
                 <TrendingUp className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm text-blue-600">+{platformOverview.monthlyGrowth}%</span>
               </div>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold mb-1">Avg Session Time</p>
-              <p className="text-3xl font-bold text-gray-900">{formatDuration(platformOverview.avgSessionDuration)}</p>
-              <div className="flex items-center mt-2">
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Avg Session Time</p>
+              <p className="text-2xl font-bold text-gray-900">{formatDuration(platformOverview.avgSessionDuration)}</p>
+              <div className="flex items-center mt-1">
                 <Clock className="w-4 h-4 text-blue-500 mr-1" />
                 <span className="text-sm text-blue-600">Per session</span>
               </div>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <Timer className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Timer className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Platform Usage Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Platform Usage Distribution</h3>
-          <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
+          <h3 className="text-base font-semibold mb-3">Platform Usage Distribution</h3>
+          <div className="space-y-3">
             {Object.entries(platformStats).map(([platform, stats]) => (
               <div key={platform} className="flex items-center justify-between">
                 <div className="flex items-center">
-                  {platform === 'videoCall' && <Video className="w-5 h-5 text-blue-600 mr-3" />}
-                  {platform === 'audioCall' && <Phone className="w-5 h-5 text-blue-600 mr-3" />}
-                  {platform === 'messaging' && <MessageSquare className="w-5 h-5 text-blue-600 mr-3" />}
+                  {platform === 'videoCall' && <Video className="w-4 h-4 text-blue-600 mr-2" />}
+                  {platform === 'audioCall' && <Phone className="w-4 h-4 text-blue-600 mr-2" />}
+                  {platform === 'messaging' && <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />}
                   <div>
-                    <p className="font-medium text-gray-900 capitalize">
+                    <p className="text-sm font-medium text-gray-900 capitalize">
                       {platform.replace('Call', ' Call')}
                     </p>
-                    <p className="text-sm text-gray-600">{stats.sessions} sessions</p>
+                    <p className="text-xs text-gray-600">{stats.sessions} sessions</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">{stats.percentage}%</p>
-                  <p className="text-sm text-gray-600">{formatDuration(stats.avgDuration)} avg</p>
+                  <p className="text-sm font-semibold text-gray-900">{stats.percentage}%</p>
+                  <p className="text-xs text-gray-600">{formatDuration(stats.avgDuration)} avg</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+        <div className="bg-white border border-gray-200 p-4">
+          <h3 className="text-base font-semibold mb-3">Recent Activity</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3">
+            <div className="flex items-center justify-between p-2.5">
               <div className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-blue-600 mr-3" />
+                <CheckCircle className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
                   <p className="text-sm font-medium ">Session Completed</p>
                   <p className="text-xs text-gray-600">Dr. Sarah Mitchell - Mary Wanjiku</p>
@@ -650,9 +650,9 @@ const TelemedicineManagement = () => {
               </div>
               <span className="text-xs text-gray-500">2 min ago</span>
             </div>
-            <div className="flex items-center justify-between p-3 ">
+            <div className="flex items-center justify-between p-2.5 ">
               <div className="flex items-center">
-                <UserCheck className="w-5 h-5 text-blue-600 mr-3" />
+                <UserCheck className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
                   <p className="text-sm font-medium ">Doctor Joined</p>
                   <p className="text-xs text-gray-600">Dr. James Mwangi is now online</p>
@@ -660,9 +660,9 @@ const TelemedicineManagement = () => {
               </div>
               <span className="text-xs text-gray-500">5 min ago</span>
             </div>
-            <div className="flex items-center justify-between p-3">
+            <div className="flex items-center justify-between p-2.5">
               <div className="flex items-center">
-                <Calendar className="w-5 h-5 text-blue-600 mr-3" />
+                <Calendar className="w-4 h-4 text-blue-600 mr-2" />
                 <div>
                   <p className="text-sm font-medium ">Session Scheduled</p>
                   <p className="text-xs text-gray-600">New appointment for 2:30 PM</p>
@@ -677,14 +677,14 @@ const TelemedicineManagement = () => {
   );
 
   const renderActiveSessions = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Active Telemedicine Sessions</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Active Telemedicine Sessions</h3>
         <div className="flex items-center space-x-3">
           <select
             value={sessionFilter}
             onChange={(e) => setSessionFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
           >
             <option value="all">All Sessions</option>
             <option value="video">Video Calls</option>
@@ -693,7 +693,7 @@ const TelemedicineManagement = () => {
           </select>
           <button
             onClick={handleScheduleSession}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Session
@@ -705,16 +705,16 @@ const TelemedicineManagement = () => {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 uppercase text-xs">
             <tr>
-              <th className="px-4 py-3 text-left font-semibold">Patient</th>
-              <th className="px-4 py-3 text-left font-semibold">Patient ID</th>
-              <th className="px-4 py-3 text-left font-semibold">Doctor</th>
-              <th className="px-4 py-3 text-left font-semibold">Specialty</th>
-              <th className="px-4 py-3 text-center font-semibold">Platform</th>
-              <th className="px-4 py-3 text-center font-semibold">Priority</th>
-              <th className="px-4 py-3 text-center font-semibold">Status</th>
-              <th className="px-4 py-3 text-center font-semibold">Duration</th>
-              <th className="px-4 py-3 text-center font-semibold">Cost</th>
-              <th className="px-4 py-3 font-semibold text-right">Actions</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Patient</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Patient ID</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Doctor</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Specialty</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Platform</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Priority</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Status</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Duration</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Cost</th>
+              <th className="px-3 py-2.5 font-semibold text-right">Actions</th>
             </tr>
           </thead>
 
@@ -736,15 +736,15 @@ const TelemedicineManagement = () => {
                     isPaused ? 'bg-blue-50 opacity-70' : 'hover:bg-gray-50'
                   } ${index !== 0 ? 'border-t border-gray-200' : ''}`}
                 >
-                  <td className="px-4 py-3 font-semibold">{session.patient}</td>
+                  <td className="px-3 py-2.5 font-semibold">{session.patient}</td>
 
-                  <td className="px-4 py-3 text-xs text-gray-500">{session.patientId}</td>
+                  <td className="px-3 py-2.5 text-xs text-gray-500">{session.patientId}</td>
 
-                  <td className="px-4 py-3 font-semibold">{session.doctor}</td>
+                  <td className="px-3 py-2.5 font-semibold">{session.doctor}</td>
 
-                  <td className="px-4 py-3 text-xs text-gray-600">{session.specialty}</td>
+                  <td className="px-3 py-2.5 text-xs text-gray-600">{session.specialty}</td>
 
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-3 py-2.5 text-center">
                     <div className="flex items-center justify-center gap-1">
                       {session.platform === 'Video Call' ? (
                         <Video className="w-4 h-4 text-blue-600" />
@@ -755,13 +755,13 @@ const TelemedicineManagement = () => {
                     </div>
                   </td>
 
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-3 py-2.5 text-center">
                     <span className={`text-xs font-medium ${getPriorityColor(session.priority)}`}>
                       {session.priority}
                     </span>
                   </td>
 
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-3 py-2.5 text-center">
                     {isEnded ? (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 text-red-700 text-xs font-semibold">
                         <Square className="w-3 h-3" />
@@ -780,15 +780,15 @@ const TelemedicineManagement = () => {
                     )}
                   </td>
 
-                  <td className="px-4 py-3 text-center text-sm">
+                  <td className="px-3 py-2.5 text-center text-sm">
                     {formatDuration(session.duration)}
                   </td>
 
-                  <td className="px-4 py-3 text-center font-semibold text-sm">
+                  <td className="px-3 py-2.5 text-center font-semibold text-sm">
                     {formatCurrency(session.cost)}
                   </td>
 
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-2.5 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => handleViewSession(session)}
@@ -837,24 +837,24 @@ const TelemedicineManagement = () => {
   );
 
   const renderOnlineDoctors = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Online Doctors</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Online Doctors</h3>
         <div className="flex items-center space-x-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
             <input
               type="text"
               placeholder="Search doctors..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+              className="pl-10 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
             />
           </div>
           <select
             value={specialtyFilter}
             onChange={(e) => setSpecialtyFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
           >
             <option value="all">All Specialties</option>
             <option value="General Medicine">General Medicine</option>
@@ -869,15 +869,15 @@ const TelemedicineManagement = () => {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 uppercase text-xs">
             <tr>
-              <th className="px-4 py-3 text-left font-semibold">Doctor</th>
-              <th className="px-4 py-3 text-left font-semibold">Specialty</th>
-              <th className="px-4 py-3 text-center font-semibold">Status</th>
-              <th className="px-4 py-3 text-center font-semibold">Rating</th>
-              <th className="px-4 py-3 text-center font-semibold">Experience</th>
-              <th className="px-4 py-3 text-center font-semibold">Sessions Today</th>
-              <th className="px-4 py-3 text-center font-semibold">Avg Duration</th>
-              <th className="px-4 py-3 text-center font-semibold">Earnings</th>
-              <th className="px-4 py-3 font-semibold text-right">Actions</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Doctor</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Specialty</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Status</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Rating</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Experience</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Sessions Today</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Avg Duration</th>
+              <th className="px-3 py-2.5 text-center font-semibold">Earnings</th>
+              <th className="px-3 py-2.5 font-semibold text-right">Actions</th>
             </tr>
           </thead>
 
@@ -894,7 +894,7 @@ const TelemedicineManagement = () => {
                 key={doctor.id}
                 className={`hover:bg-gray-50 ${index !== 0 ? 'border-t border-gray-200' : ''}`}
               >
-                <td className="px-4 py-3">
+                <td className="px-3 py-2.5">
                   <div className="flex items-center">
                     <div className="relative flex-shrink-0">
                       <img
@@ -913,15 +913,15 @@ const TelemedicineManagement = () => {
                   </div>
                 </td>
 
-                <td className="px-4 py-3 text-xs text-gray-600">{doctor.specialty}</td>
+                <td className="px-3 py-2.5 text-xs text-gray-600">{doctor.specialty}</td>
 
-                <td className="px-4 py-3 text-center">
+                <td className="px-3 py-2.5 text-center">
                   <span className={`text-xs font-medium ${getStatusColor(doctor.currentStatus)}`}>
                     {doctor.currentStatus}
                   </span>
                 </td>
 
-                <td className="px-4 py-3 text-center">
+                <td className="px-3 py-2.5 text-center">
                   <div className="flex items-center justify-center gap-1">
                     <Star className="w-3.5 h-3.5 text-blue-500" />
                     <span className="font-medium text-sm">{doctor.rating}</span>
@@ -929,23 +929,23 @@ const TelemedicineManagement = () => {
                   </div>
                 </td>
 
-                <td className="px-4 py-3 text-center text-sm font-medium">
+                <td className="px-3 py-2.5 text-center text-sm font-medium">
                   {doctor.experience} yrs
                 </td>
 
-                <td className="px-4 py-3 text-center text-sm font-medium">
+                <td className="px-3 py-2.5 text-center text-sm font-medium">
                   {doctor.sessionsToday}
                 </td>
 
-                <td className="px-4 py-3 text-center text-sm">
+                <td className="px-3 py-2.5 text-center text-sm">
                   {formatDuration(doctor.avgSessionDuration)}
                 </td>
 
-                <td className="px-4 py-3 text-center text-sm font-semibold">
+                <td className="px-3 py-2.5 text-center text-sm font-semibold">
                   {formatCurrency(doctor.earnings)}
                 </td>
 
-                <td className="px-4 py-3 text-right">
+                <td className="px-3 py-2.5 text-right">
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => handleViewDoctor(doctor)}
@@ -979,14 +979,14 @@ const TelemedicineManagement = () => {
   );
 
   const renderSessionHistory = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Session History</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Session History</h3>
         <div className="flex items-center space-x-3">
           <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
           >
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -995,7 +995,7 @@ const TelemedicineManagement = () => {
           </select>
           <button 
             onClick={handleExportReports}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Download className="w-4 h-4 mr-2" />
             Export
@@ -1003,10 +1003,10 @@ const TelemedicineManagement = () => {
         </div>
       </div>
 
-      <div className="border bg-white border-gray-200 p-6">
+      <div className="border bg-white border-gray-200 p-4">
 
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-100">
                 <th className="text-left py-3 px-4 font-bold">Session</th>
@@ -1082,48 +1082,48 @@ const TelemedicineManagement = () => {
   );
 
   const renderRevenue = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-200 p-6">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Daily Revenue</p>
-              <p className="text-2xl font-bold ">{formatCurrency(revenueData.daily)}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Daily Revenue</p>
+              <p className="text-xl font-bold ">{formatCurrency(revenueData.daily)}</p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm  mb-1">Weekly Revenue</p>
-              <p className="text-2xl font-bold">{formatCurrency(revenueData.weekly)}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Weekly Revenue</p>
+              <p className="text-xl font-bold">{formatCurrency(revenueData.weekly)}</p>
             </div>
-            <div className="w-12 h-12 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm mb-1">Monthly Revenue</p>
-              <p className="text-2xl font-bold ">{formatCurrency(revenueData.monthly)}</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Monthly Revenue</p>
+              <p className="text-xl font-bold ">{formatCurrency(revenueData.monthly)}</p>
             </div>
-            <div className="w-12 h-12  flex items-center justify-center">
-              <Target className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10  flex items-center justify-center">
+              <Target className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-lg font-semibold  mb-6">Revenue by Specialty</h3>
-        <div className="grid grid-cols-2 gap-6">
+      <div className="p-0">
+        <h3 className="text-base font-semibold mb-4">Revenue by Specialty</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           
           <div className="bg-white border border-gray-200 overflow-hidden">
             <table className="w-full text-sm">
@@ -1153,9 +1153,9 @@ const TelemedicineManagement = () => {
           </div>
 
          
-          <div className="bg-white border border-gray-200 p-6">
-            <h4 className="font-semibold mb-4">Revenue Analytics</h4>
-            <ResponsiveContainer width="100%" height={300}>
+          <div className="bg-white border border-gray-200 p-4">
+            <h4 className="text-sm font-semibold mb-3">Revenue Analytics</h4>
+            <ResponsiveContainer width="100%" height={260}>
               <BarChart
                 data={revenueData.bySpecialty}
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -1592,14 +1592,14 @@ const TelemedicineManagement = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="py-2">
+    <div className="min-h-screen bg-gray-50 p-4 lg:p-5">
+      <div>
         <div>
           {/* Header Section */}
           <div className="mb-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold mb-0.5">Telemedicine Management</h1>
+                <h1 className="text-2xl font-bold mb-0.5">Telemedicine Management</h1>
                
               </div>
             </div>
@@ -1607,17 +1607,17 @@ const TelemedicineManagement = () => {
 
           {/* Navigation Tabs */}
           <div className="mb-4">
-            <div className="flex overflow-x-auto ">
+            <div className="flex overflow-x-auto border-b border-gray-200">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                    className={`flex items-center px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600 bg-blue-50'
-                        : 'border-transparent hover:text-gray-900 hover:border-gray-300'
+                        : 'border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300'
                     }`}
                   >
                     <Icon className="w-4 h-4 mr-2" />
@@ -1629,7 +1629,7 @@ const TelemedicineManagement = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="min-h-[600px]">
+          <div className="min-h-[560px] [&_table]:text-sm [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:py-2.5 [&_th]:px-3 [&_td]:py-2.5 [&_td]:px-3">
             {activeTab === 'overview' && renderOverview()}
             {activeTab === 'active-sessions' && renderActiveSessions()}
             {activeTab === 'doctors' && renderOnlineDoctors()}

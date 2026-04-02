@@ -32,7 +32,7 @@ const UserManagement = () => {
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
+  const [_viewMode, _setViewMode] = useState('table'); // 'table' or 'cards'
 
   // Sample users data - MediLink specific
   const users = [
@@ -248,13 +248,13 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 lg:p-5">
       {/* Header Section */}
-      <div className="mb-8">
+      <div className="mb-4">
         <div className="">
           <div className="flex justify-between items-center mb-4">
             <div className="items-center space-x-4">
-              <h1 className="text-4xl font-bold mb-2">User Management</h1>
+              <h1 className="text-2xl font-bold mb-1">User Management</h1>
               
               <div className="">
                   </div>
@@ -264,78 +264,78 @@ const UserManagement = () => {
           </div>
 
            {/* Summary Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
 
-            <div className="bg-white border border-gray-200 p-6">
+            <div className="bg-white border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold">Total Users</p>
-                  <p className="text-3xl font-bold">{users.length}</p>
-                  <p className="text-sm text-blue-600 mt-2">All registered users</p>
+                  <p className="text-xs uppercase tracking-wide text-gray-500">Total Users</p>
+                  <p className="text-2xl font-bold">{users.length}</p>
+                  <p className="text-sm text-blue-600 mt-1">All registered users</p>
                 </div>
-                <div className="w-12 h-12 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 p-6">
+            <div className="bg-white border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold">Healthcare Staff</p>
-                  <p className="text-3xl font-bold">
+                  <p className="text-xs uppercase tracking-wide text-gray-500">Healthcare Staff</p>
+                  <p className="text-2xl font-bold">
                     {users.filter(u => ['doctor', 'nurse', 'chw'].includes(u.role)).length}
                   </p>
-                  <p className="text-sm text-blue-600 mt-2">Active healthcare workers</p>
+                  <p className="text-sm text-blue-600 mt-1">Active healthcare workers</p>
                 </div>
-                <div className="w-12 h-12 flex items-center justify-center">
-                  <Stethoscope className="w-6 h-6 text-blue-600" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <Stethoscope className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 p-6">
+            <div className="bg-white border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold">Patients Managed</p>
-                  <p className="text-3xl font-bold">
+                  <p className="text-xs uppercase tracking-wide text-gray-500">Patients Managed</p>
+                  <p className="text-2xl font-bold">
                     {users.reduce((total, user) => total + user.patientsManaged, 0)}
                   </p>
-                  <p className="text-sm text-blue-600 mt-2">Total patient interactions</p>
+                  <p className="text-sm text-blue-600 mt-1">Total patient interactions</p>
                 </div>
-                <div className="w-12 h-12 flex items-center justify-center">
-                  <Activity className="w-6 h-6 text-blue-600" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 p-6">
+            <div className="bg-white border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold">Pending Approvals</p>
-                  <p className="text-3xl font-bold">
+                  <p className="text-xs uppercase tracking-wide text-gray-500">Pending Approvals</p>
+                  <p className="text-2xl font-bold">
                     {users.filter(u => u.status === 'pending').length}
                   </p>
-                  <p className="text-sm text-blue-600 mt-2">Awaiting approval</p>
+                  <p className="text-sm text-blue-600 mt-1">Awaiting approval</p>
                 </div>
-                <div className="w-12 h-12 flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-blue-600" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Controls Section */}
-          <div className=" p-6 mb-6">
+          <div className="mb-4">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               {/* Search and Filters */}
               <div className="flex flex-col sm:flex-row gap-4 flex-1">
                 <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
                     placeholder="Search users, emails, or departments..."
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -346,7 +346,7 @@ const UserManagement = () => {
                   <select
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value)}
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                   >
                     {roleOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -359,7 +359,7 @@ const UserManagement = () => {
                   <select
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
                   >
                     {statusOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -379,14 +379,14 @@ const UserManagement = () => {
                     </span>
                     <button
                       onClick={() => handleBulkAction('activate')}
-                      className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      className="flex items-center px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Activate
                     </button>
                     <button
                       onClick={() => handleBulkAction('deactivate')}
-                      className="flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                      className="flex items-center px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
                     >
                       <XCircle className="w-4 h-4 mr-1" />
                       Deactivate
@@ -394,17 +394,17 @@ const UserManagement = () => {
                   </>
                 )}
                 
-                <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                   <Download className="w-4 h-4 mr-2" />
                   Export
                 </button>
                 
-                <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                <button className="flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                   <Upload className="w-4 h-4 mr-2" />
                   Import
                 </button>
                 
-                <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                   <UserPlus className="w-4 h-4 mr-2" />
                   Add User
                 </button>
@@ -415,10 +415,10 @@ const UserManagement = () => {
           {/* Users Table */}
           <div className="bg-white border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4 text-left">
+                    <th className="px-3 py-2.5 text-left">
                       <input
                         type="checkbox"
                         onChange={(e) => {
@@ -431,25 +431,25 @@ const UserManagement = () => {
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">
                       User
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">
                       Role & Department
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">
                       Location
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">
                       Last Login
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">
                       Patients
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -457,7 +457,7 @@ const UserManagement = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         <input
                           type="checkbox"
                           checked={selectedUsers.includes(user.id)}
@@ -465,17 +465,17 @@ const UserManagement = () => {
                           className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="flex items-center">
                           <img
                             src={user.avatar}
                             alt={user.name}
-                            className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                            className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
                             onError={(e) => {
                               e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3B82F6&color=fff&size=40`;
                             }}
                           />
-                          <div className="ml-4">
+                          <div className="ml-3">
                             <div className="text-sm font-medium text-gray-900">{user.name}</div>
                             <div className="text-sm text-gray-500">{user.email}</div>
                             <div className="text-xs text-gray-400 flex items-center mt-1">
@@ -485,31 +485,31 @@ const UserManagement = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="flex items-center mb-2">
                           {getRoleIcon(user.role)}
-                          <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium border ${getRoleColor(user.role)}`}>
+                          <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium border ${getRoleColor(user.role)}`}>
                             {user.role.toUpperCase()}
                           </span>
                         </div>
                         <div className="text-sm text-gray-600">{user.department}</div>
                         <div className="text-xs text-gray-500">{user.specialization}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="flex items-center">
                           {getStatusIcon(user.status)}
-                          <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(user.status)}`}>
+                          <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(user.status)}`}>
                             {user.status.toUpperCase()}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="flex items-center text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 mr-1 text-gray-400" />
+                          <MapPin className="w-3.5 h-3.5 mr-1 text-gray-400" />
                           {user.location}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
                         <div className="flex flex-col">
                           {user.lastLogin === 'Never' ? (
                             <span className="text-gray-400">Never</span>
@@ -523,22 +523,22 @@ const UserManagement = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           {user.patientsManaged}
                         </div>
                         <div className="text-xs text-gray-500">managed</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-2">
                           <button className="text-blue-600 hover:text-blue-900 transition-colors">
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-3.5 h-3.5" />
                           </button>
                           <button className="text-green-600 hover:text-green-900 transition-colors">
-                            <Edit3 className="w-4 h-4" />
+                            <Edit3 className="w-3.5 h-3.5" />
                           </button>
                           <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                            <MoreHorizontal className="w-4 h-4" />
+                            <MoreHorizontal className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>
@@ -550,7 +550,7 @@ const UserManagement = () => {
 
             {/* Empty State */}
             {filteredUsers.length === 0 && (
-              <div className="text-center py-12">
+              <div className="text-center py-10">
                 <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-12 h-12 text-gray-400" />
                 </div>
