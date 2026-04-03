@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   MapPin,
   Calendar,
@@ -19,12 +19,50 @@ import {
 } from 'lucide-react';
 import { syncHomeVisitWorkItems } from '../../../Services/chwAssignmentsStore';
 import { syncHomeVisitGovernance } from '../../../Services/homeVisitGovernanceStore';
+import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
+import { useAuth } from '../../../hooks/useAuth';
 
-const CHW_META = {
-  chwId: 'CHW-001',
+const DEFAULT_CHW_META = {
+  chwId: 1,
+  chwCode: 'CHW-001',
   chwName: 'Grace Akinyi Achieng',
   serviceZone: 'Machakos',
 };
+
+function toNumericId(value) {
+  if (value == null) return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const match = String(value).trim().match(/\d+/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function toStrictNumericId(value) {
+  if (value == null) return null;
+  const text = String(value).trim();
+  if (!/^\d+$/.test(text)) return null;
+  const parsed = Number(text);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function resolveChwMeta(user) {
+  const name = user?.name || user?.fullName || user?.username || DEFAULT_CHW_META.chwName;
+  const numericId =
+    toNumericId(user?.chwId) ||
+    toNumericId(user?.providerId) ||
+    toNumericId(user?.id) ||
+    toNumericId(user?.userId) ||
+    toNumericId(user?.employeeId) ||
+    DEFAULT_CHW_META.chwId;
+
+  return {
+    chwId: numericId,
+    chwCode: user?.chwCode || user?.code || user?.employeeId || `CHW-${numericId}`,
+    chwName: name,
+    serviceZone: user?.region || user?.county || DEFAULT_CHW_META.serviceZone,
+  };
+}
 
 function calculateNotesQuality(outcomeText) {
   const words = String(outcomeText || '')
@@ -40,8 +78,13 @@ function calculateNotesQuality(outcomeText) {
 }
 
 const HomeVisits = () => {
+  const { user } = useAuth();
+  const chwMeta = useMemo(() => resolveChwMeta(user), [user]);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showMap, setShowMap] = useState(false);
+  const [isLoadingVisits, setIsLoadingVisits] = useState(true);
+  const [visitsError, setVisitsError] = useState('');
+  const [hasHydratedVisits, setHasHydratedVisits] = useState(false);
   const [completeModal, setCompleteModal] = useState({
     open: false,
     visit: null,
@@ -97,10 +140,32 @@ const HomeVisits = () => {
     return errs;
   };
 
-  const handleScheduleSubmit = (e) => {
+  const handleScheduleSubmit = async (e) => {
     e.preventDefault();
     const errs = validateSchedule();
     if (Object.keys(errs).length > 0) { setScheduleErrors(errs); return; }
+
+    const backendPatientId = toStrictNumericId(scheduleForm.patientId);
+    if (backendPatientId && chwMeta?.chwId) {
+      try {
+        await homeVisitService.createHomeVisit({
+          patientId: backendPatientId,
+          chwId: chwMeta.chwId,
+          visitType: scheduleForm.type,
+          priority: String(scheduleForm.priority || 'NORMAL').toUpperCase(),
+          scheduledAt: new Date(`${scheduleForm.date}T${scheduleForm.time}:00`).toISOString(),
+          location: scheduleForm.location.trim(),
+          notes: scheduleForm.notes.trim(),
+          reason: scheduleForm.notes.trim(),
+        });
+        setScheduleModal({ open: false });
+        await loadHomeVisits();
+        return;
+      } catch (error) {
+        setVisitsError(error?.message || 'Failed to create home visit in backend. Saved locally only.');
+      }
+    }
+
     const [h, m] = scheduleForm.time.split(':');
     const hour = parseInt(h, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -224,10 +289,36 @@ const HomeVisits = () => {
     ]
   });
 
+  const loadHomeVisits = useCallback(async () => {
+    setIsLoadingVisits(true);
+    setVisitsError('');
+
+    try {
+      const query = chwMeta?.chwId ? { chwId: chwMeta.chwId } : {};
+      const list = await homeVisitService.listHomeVisits(query);
+      const grouped = homeVisitService.groupHomeVisitsByTab(list);
+      setVisits(grouped);
+      setHasHydratedVisits(true);
+    } catch (error) {
+      setVisitsError(error?.message || 'Failed to fetch home visits from backend.');
+      setVisits({ upcoming: [], completed: [], cancelled: [] });
+      setHasHydratedVisits(false);
+    } finally {
+      setIsLoadingVisits(false);
+    }
+  }, [chwMeta]);
+
   useEffect(() => {
-    syncHomeVisitWorkItems(visits, CHW_META);
-    syncHomeVisitGovernance(visits, CHW_META);
-  }, [visits]);
+    loadHomeVisits();
+    const timer = window.setInterval(loadHomeVisits, 45000);
+    return () => window.clearInterval(timer);
+  }, [loadHomeVisits]);
+
+  useEffect(() => {
+    if (!hasHydratedVisits) return;
+    syncHomeVisitWorkItems(visits, chwMeta);
+    syncHomeVisitGovernance(visits, chwMeta);
+  }, [visits, chwMeta, hasHydratedVisits]);
 
   const handleDirections = (visit) => {
     if (!visit.location) return;
@@ -245,10 +336,25 @@ const HomeVisits = () => {
   const openCompleteModal = (visit) =>
     setCompleteModal({ open: true, visit, outcome: '', geoCheckPassed: false });
 
-  const handleCompleteSubmit = () => {
+  const handleCompleteSubmit = async () => {
     const { visit, outcome, geoCheckPassed } = completeModal;
+    if (!visit) return;
     const completedAt = new Date().toISOString();
     const qualityScore = calculateNotesQuality(outcome);
+
+    try {
+      await homeVisitService.completeHomeVisit(visit.id, {
+        outcome: outcome.trim() || 'Visit completed successfully',
+        notes: outcome.trim() || undefined,
+        geoCheckPassed,
+        completedAt,
+      });
+      setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false });
+      await loadHomeVisits();
+      return;
+    } catch (error) {
+      setVisitsError(error?.message || 'Failed to complete visit in backend. Saved locally only.');
+    }
 
     setVisits(prev => ({
       ...prev,
@@ -283,12 +389,27 @@ const HomeVisits = () => {
   const openNoShowModal = (visit) =>
     setNoShowModal({ open: true, visit, reason: 'Patient unavailable at scheduled time' });
 
-  const handleRescheduleSubmit = () => {
+  const handleRescheduleSubmit = async () => {
     const { visit, date, time, reason, mode } = rescheduleModal;
+    if (!visit) return;
     const [h, m] = time.split(':');
     const hour = parseInt(h, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const formattedTime = `${hour % 12 || 12}:${m} ${ampm}`;
+
+    if (date && time) {
+      try {
+        await homeVisitService.rescheduleHomeVisit(visit.id, {
+          scheduledAt: new Date(`${date}T${time}:00`).toISOString(),
+          reason: reason.trim() || 'Schedule conflict',
+        });
+        setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' });
+        await loadHomeVisits();
+        return;
+      } catch (error) {
+        setVisitsError(error?.message || 'Failed to reschedule visit in backend. Saved locally only.');
+      }
+    }
 
     if (mode === 'CANCELLED') {
       const { reason: _r, reasonType: _rt, status: _s, ...rest } = visit;
@@ -325,8 +446,23 @@ const HomeVisits = () => {
     setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' });
   };
 
-  const handleNoShowSubmit = () => {
+  const handleNoShowSubmit = async () => {
     const { visit, reason } = noShowModal;
+    if (!visit) return;
+
+    try {
+      await homeVisitService.cancelHomeVisit(visit.id, {
+        reason: reason.trim() || 'Patient unavailable at scheduled time',
+        reasonType: 'NO_SHOW',
+        status: 'NO_SHOW',
+      });
+      setNoShowModal({ open: false, visit: null, reason: '' });
+      await loadHomeVisits();
+      return;
+    } catch (error) {
+      setVisitsError(error?.message || 'Failed to update no-show status in backend. Saved locally only.');
+    }
+
     setVisits(prev => ({
       ...prev,
       upcoming: prev.upcoming.filter(v => v.id !== visit.id),
@@ -366,7 +502,10 @@ const HomeVisits = () => {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Home Visits</h1>
-          
+          <p className="text-sm text-gray-500 mt-1">
+            {isLoadingVisits ? 'Syncing home visits from backend...' : `CHW: ${chwMeta.chwName}`}
+          </p>
+          {visitsError && <p className="text-sm text-red-700 mt-1">{visitsError}</p>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {/* Mobile-only: open map overlay */}
@@ -398,7 +537,7 @@ const HomeVisits = () => {
                 Coverage Area Map
               </h2>
               <p className="text-sm text-gray-500 mt-0.5">
-                Showing your assigned service zone — Machakos &amp; surrounding regions. Use this map to plan efficient routes between patient home visits.
+                Showing your assigned service zone — {chwMeta.serviceZone} &amp; surrounding regions. Use this map to plan efficient routes between patient home visits.
               </p>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500 shrink-0">
@@ -440,7 +579,7 @@ const HomeVisits = () => {
               <MapPin className="w-5 h-5 text-blue-600" />
               <div>
                 <h2 className="text-sm font-semibold text-gray-900">Coverage Area Map</h2>
-                <p className="text-xs text-gray-500">Machakos &amp; surrounding regions</p>
+                <p className="text-xs text-gray-500">{chwMeta.serviceZone} &amp; surrounding regions</p>
               </div>
             </div>
             <button

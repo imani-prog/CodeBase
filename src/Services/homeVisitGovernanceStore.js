@@ -1,113 +1,8 @@
-const STORAGE_KEY = 'medilink_home_visit_governance_v1';
+const STORAGE_KEY = 'medilink_home_visit_governance_v2';
 const STORE_UPDATED_EVENT = 'home-visit-governance-store-updated';
 
-const SEED_META = {
-  chwId: 'CHW-001',
-  chwName: 'Jane Wanjiru',
-  serviceZone: 'Machakos',
-};
-
-const SEEDED_VISITS_STATE = {
-  upcoming: [
-    {
-      id: 1,
-      patientName: 'Sarah Wanjiru',
-      patientId: 'PT-2023-001',
-      phone: '+254790383295',
-      date: '2024-10-25',
-      time: '10:00 AM',
-      location: 'Katoloni AIC Church, House 23',
-      coordinates: { lat: -1.3139, lng: 36.789 },
-      type: 'Follow-up Visit',
-      priority: 'normal',
-      notes: 'Check blood pressure and review medication',
-    },
-    {
-      id: 2,
-      patientName: 'John Kamau',
-      patientId: 'PT-2023-045',
-      phone: '+254723456789',
-      date: '2024-10-25',
-      time: '2:00 PM',
-      location: 'Kathemboni Mosque',
-      coordinates: { lat: -1.2627, lng: 36.8598 },
-      type: 'Initial Assessment',
-      priority: 'urgent',
-      notes: 'New patient - comprehensive health assessment needed',
-      rescheduleHistory: [
-        {
-          previousDate: '2024-10-24',
-          previousTime: '11:00 AM',
-          newDate: '2024-10-25',
-          newTime: '2:00 PM',
-          reason: 'Patient requested afternoon slot',
-          changedAt: '2024-10-24T08:30:00.000Z',
-        },
-      ],
-    },
-  ],
-  completed: [
-    {
-      id: 5,
-      patientName: 'Grace Akinyi',
-      patientId: 'PT-2023-156',
-      phone: '+254756789012',
-      date: '2024-10-22',
-      time: '10:30 AM',
-      location: 'Mathare, House 45',
-      coordinates: { lat: -1.2572, lng: 36.8585 },
-      type: 'Nutrition Assessment',
-      status: 'completed',
-      outcome: 'Patient improving - continue current plan',
-      completionEvidence: {
-        completedAt: '2024-10-22T10:52:00.000Z',
-        notesQualityScore: 90,
-        geoCheckPassed: true,
-      },
-    },
-    {
-      id: 6,
-      patientName: 'David Mwangi',
-      patientId: 'PT-2023-201',
-      phone: '+254767890123',
-      date: '2024-10-21',
-      time: '2:00 PM',
-      location: 'Kawangware, Block A',
-      coordinates: { lat: -1.2833, lng: 36.75 },
-      type: 'Follow-up Visit',
-      status: 'completed',
-      outcome: 'Blood pressure stable - medication working well',
-      completionEvidence: {
-        completedAt: '2024-10-21T14:35:00.000Z',
-        notesQualityScore: 75,
-        geoCheckPassed: false,
-      },
-    },
-  ],
-  cancelled: [
-    {
-      id: 7,
-      patientName: 'Jane Wambui',
-      patientId: 'PT-2023-178',
-      phone: '+254778901234',
-      date: '2024-10-20',
-      time: '3:00 PM',
-      location: 'Muthini Estate, House 5',
-      coordinates: { lat: -1.31, lng: 36.791 },
-      type: 'Follow-up Visit',
-      status: 'cancelled',
-      reason: 'Patient not available - rescheduled',
-      reasonType: 'NO_SHOW',
-    },
-  ],
-};
-
-function buildSeededVisits() {
-  return flattenVisits(SEEDED_VISITS_STATE, SEED_META);
-}
-
 const defaultStore = {
-  visits: buildSeededVisits(),
+  visits: [],
   updatedAt: new Date().toISOString(),
 };
 
@@ -121,25 +16,11 @@ function readStore() {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const seeded = {
-        ...defaultStore,
-        visits: buildSeededVisits(),
-        updatedAt: new Date().toISOString(),
-      };
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-      return seeded;
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultStore));
+      return defaultStore;
     }
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.visits)) return defaultStore;
-    if (parsed.visits.length === 0) {
-      const seeded = {
-        ...parsed,
-        visits: buildSeededVisits(),
-        updatedAt: new Date().toISOString(),
-      };
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-      return seeded;
-    }
     return {
       ...defaultStore,
       ...parsed,
@@ -204,6 +85,9 @@ function haversineDistanceKm(a, b) {
 function normalizeVisit(visit, status, meta) {
   const reasonType = visit.reasonType || (status === 'NO_SHOW' ? 'NO_SHOW' : null);
   const sourceVisitId = String(visit.id);
+  const resolvedChwId = visit.chwId || meta.chwId;
+  const resolvedChwName = visit.chwName || meta.chwName;
+  const resolvedServiceZone = visit.serviceZone || meta.serviceZone || 'Unspecified';
   const completionEvidence = visit.completionEvidence || null;
   const evidenceReview = visit.evidenceReview || (completionEvidence ? {
     status: 'PENDING',
@@ -213,12 +97,12 @@ function normalizeVisit(visit, status, meta) {
   } : null);
 
   return {
-    id: `${meta.chwId}:${sourceVisitId}`,
+    id: `${resolvedChwId || 'CHW'}:${sourceVisitId}`,
     sourceVisitId,
     source: 'CHW_HOME_VISITS',
-    chwId: meta.chwId,
-    chwName: meta.chwName,
-    serviceZone: meta.serviceZone || 'Unspecified',
+    chwId: resolvedChwId,
+    chwName: resolvedChwName,
+    serviceZone: resolvedServiceZone,
     patientName: visit.patientName || 'Unknown Patient',
     patientId: visit.patientId || 'N/A',
     phone: visit.phone || null,
@@ -381,13 +265,16 @@ export function syncHomeVisitGovernance(visitsState, meta = {}) {
     chwId: meta.chwId || 'CHW-001',
     chwName: meta.chwName || 'CHW User',
     serviceZone: meta.serviceZone || 'Machakos',
+    replaceAllSources: Boolean(meta.replaceAllSources),
   };
 
   const normalized = flattenVisits(visitsState, chwMeta);
   const store = readStore();
 
   const remaining = store.visits.filter((visit) => {
-    return !(visit.source === 'CHW_HOME_VISITS' && visit.chwId === chwMeta.chwId);
+    if (visit.source !== 'CHW_HOME_VISITS') return true;
+    if (chwMeta.replaceAllSources) return false;
+    return String(visit.chwId || '') !== String(chwMeta.chwId || '');
   });
 
   writeStore({

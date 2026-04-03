@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   CalendarClock,
@@ -13,8 +13,10 @@ import {
   reassignHomeVisitOwner,
   resolveNoShowVisit,
   reviewCompletionEvidence,
+  syncHomeVisitGovernance,
   subscribeToHomeVisitGovernanceUpdates,
 } from '../../Services/homeVisitGovernanceStore';
+import { homeVisitService } from '../../Services/domain/homeVisitService.js';
 
 function percent(value) {
   return `${Math.round(value)}%`;
@@ -67,11 +69,42 @@ function downloadCsv(rows, fileName) {
 
 const HomeVisitGovernance = () => {
   const [snapshot, setSnapshot] = useState(getHomeVisitGovernanceSnapshot());
+  const [isSyncing, setIsSyncing] = useState(true);
+  const [syncError, setSyncError] = useState('');
+
+  const refreshFromBackend = useCallback(async () => {
+    setIsSyncing(true);
+    setSyncError('');
+
+    try {
+      const backendVisits = await homeVisitService.listHomeVisits();
+      const grouped = homeVisitService.groupHomeVisitsByTab(backendVisits);
+      syncHomeVisitGovernance(grouped, {
+        chwId: 'BACKEND',
+        chwName: 'Backend Sync',
+        serviceZone: 'Multiple Zones',
+        replaceAllSources: true,
+      });
+      setSnapshot(getHomeVisitGovernanceSnapshot());
+    } catch (error) {
+      setSyncError(error?.message || 'Failed to sync home visits from backend.');
+    } finally {
+      setIsSyncing(false);
+    }
+  }, []);
 
   useEffect(() => {
     setSnapshot(getHomeVisitGovernanceSnapshot());
-    return subscribeToHomeVisitGovernanceUpdates((next) => setSnapshot(next));
-  }, []);
+    refreshFromBackend();
+
+    const timer = window.setInterval(refreshFromBackend, 45000);
+    const unsubscribe = subscribeToHomeVisitGovernanceUpdates((next) => setSnapshot(next));
+
+    return () => {
+      window.clearInterval(timer);
+      unsubscribe();
+    };
+  }, [refreshFromBackend]);
 
   const recentCompleted = useMemo(() => {
     return snapshot.visits
@@ -183,7 +216,10 @@ const HomeVisitGovernance = () => {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Home Visit Governance</h1>
-          
+          <p className="text-sm text-gray-500 mt-1">
+            {isSyncing ? 'Syncing home visits from backend...' : `Last sync: ${new Date(snapshot.updatedAt).toLocaleString('en-KE')}`}
+          </p>
+          {syncError && <p className="text-sm text-red-700 mt-1">{syncError}</p>}
         </div>
         <button
           type="button"
