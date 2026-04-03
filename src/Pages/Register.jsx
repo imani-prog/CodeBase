@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
+import { Eye, EyeOff } from 'lucide-react';
 import { authApi } from '../API/endpoints/authApi.js';
 
 const Register = () => {
@@ -97,12 +98,14 @@ const Register = () => {
             className="p-2 border rounded w-full pr-10"
             required
           />
-          <span
-            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
-            onClick={() => setShowPassword(v => !v)}
+          <button
+            type="button"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+            onClick={() => setShowPassword((v) => !v)}
           >
-            {showPassword ? '🙈' : '👁️'}
-          </span>
+            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
         </div>
 
         <select

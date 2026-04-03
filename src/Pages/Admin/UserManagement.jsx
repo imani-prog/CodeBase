@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+ import { userApi } from '../../API/endpoints/userApi.js';
+import { LoadingSpinner, ErrorMessage } from '../../Components/Admin/DataState.jsx';
+
 import { 
   Users, 
   UserPlus, 
@@ -34,145 +37,38 @@ const UserManagement = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [_viewMode, _setViewMode] = useState('table'); // 'table' or 'cards'
 
-  // Sample users data - MediLink specific
-  const users = [
-    {
-      id: 1,
-      name: 'Dr. Sarah Mitchell',
-      email: 'sarah.mitchell@medilink.com',
-      phone: '+254 701 123 456',
-      role: 'admin',
-      status: 'active',
-      department: 'Administration',
-      location: 'Nairobi HQ',
-      avatar: '/src/assets/StaffMembersTeam.jpeg',
-      lastLogin: '2024-10-11 16:45:32',
-      joinDate: '2023-01-15',
-      permissions: ['full_access', 'user_management', 'system_config'],
-      patientsManaged: 0,
-      specialization: 'Chief Administrator'
-    },
-    {
-      id: 2,
-      name: 'Dr. Kevin Murage',
-      email: 'kevin.murage@medilink.com',
-      phone: '+254 712 345 678',
-      role: 'doctor',
-      status: 'active',
-      department: 'Internal Medicine',
-      location: 'Kenyatta Hospital',
-      avatar: '/src/assets/Kevin Murage.jpeg',
-      lastLogin: '2024-10-11 15:23:12',
-      joinDate: '2023-03-10',
-      permissions: ['patient_access', 'medical_records', 'prescriptions'],
-      patientsManaged: 145,
-      specialization: 'Internal Medicine'
-    },
-    {
-      id: 3,
-      name: 'Grace Achieng',
-      email: 'grace.achieng@medilink.com',
-      phone: '+254 723 456 789',
-      role: 'chw',
-      status: 'active',
-      department: 'Community Health',
-      location: 'Kibera, Nairobi',
-      avatar: '/src/assets/Grace Achieng.jpeg',
-      lastLogin: '2024-10-11 14:10:45',
-      joinDate: '2023-06-20',
-      permissions: ['patient_reports', 'health_education', 'referrals'],
-      patientsManaged: 78,
-      specialization: 'Community Health Worker'
-    },
-    {
-      id: 4,
-      name: 'Peter Njoroge',
-      email: 'peter.njoroge@email.com',
-      phone: '+254 734 567 890',
-      role: 'patient',
-      status: 'active',
-      department: 'N/A',
-      location: 'Mathare, Nairobi',
-      avatar: '/src/assets/PeterNjoroge.jpeg',
-      lastLogin: '2024-10-11 12:30:15',
-      joinDate: '2024-02-14',
-      permissions: ['view_records', 'book_appointments'],
-      patientsManaged: 0,
-      specialization: 'Diabetes Management'
-    },
-    {
-      id: 5,
-      name: 'Susan Mwangi',
-      email: 'susan.mwangi@medilink.com',
-      phone: '+254 745 678 901',
-      role: 'nurse',
-      status: 'active',
-      department: 'General Care',
-      location: 'Mathare Health Center',
-      avatar: '/src/assets/Susan Mwangi.jpeg',
-      lastLogin: '2024-10-11 13:45:20',
-      joinDate: '2023-09-05',
-      permissions: ['patient_care', 'vital_signs', 'medication_admin'],
-      patientsManaged: 89,
-      specialization: 'General Nursing'
-    },
-    {
-      id: 6,
-      name: 'Linda Wambui',
-      email: 'linda.wambui@medilink.com',
-      phone: '+254 756 789 012',
-      role: 'chw',
-      status: 'inactive',
-      department: 'Community Health',
-      location: 'Dandora, Nairobi',
-      avatar: '/src/assets/LindaWambui.jpeg',
-      lastLogin: '2024-10-08 09:15:33',
-      joinDate: '2023-11-12',
-      permissions: ['patient_reports', 'health_education'],
-      patientsManaged: 45,
-      specialization: 'Maternal Health'
-    },
-    {
-      id: 7,
-      name: 'Joseph Otieno',
-      email: 'joseph.otieno@medilink.com',
-      phone: '+254 767 890 123',
-      role: 'technician',
-      status: 'active',
-      department: 'IT Support',
-      location: 'Nairobi HQ',
-      avatar: '/src/assets/Joseph Otieno.jpeg',
-      lastLogin: '2024-10-11 16:20:44',
-      joinDate: '2023-05-18',
-      permissions: ['system_maintenance', 'technical_support'],
-      patientsManaged: 0,
-      specialization: 'Medical IT Systems'
-    },
-    {
-      id: 8,
-      name: 'Esther Nyambura',
-      email: 'esther.nyambura@medilink.com',
-      phone: '+254 778 901 234',
-      role: 'chw',
-      status: 'pending',
-      department: 'Community Health',
-      location: 'Eastlands, Nairobi',
-      avatar: '/src/assets/Esther Nyambura.jpeg',
-      lastLogin: 'Never',
-      joinDate: '2024-10-10',
-      permissions: [],
-      patientsManaged: 0,
-      specialization: 'Pediatric Care'
-    }
-  ];
+
+// Replace hardcoded users array with:
+const [users, setUsers] = useState([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
+
+const fetchUsers = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    const data = await userApi.list();
+
+    const normalized = (Array.isArray(data) ? data : []).map(user => ({
+      ...user,
+      patientsManaged: user.patients ?? user.patientsManaged ?? 0
+    }));
+
+    setUsers(normalized);
+  } catch (err) {
+    setError(err.message || 'Failed to load users');
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => { fetchUsers(); }, []);
 
   const roleOptions = [
     { value: 'all', label: 'All Roles', count: users.length },
     { value: 'admin', label: 'Administrators', count: users.filter(user => user.role === 'admin').length },
     { value: 'doctor', label: 'Doctors', count: users.filter(user => user.role === 'doctor').length },
-    { value: 'nurse', label: 'Nurses', count: users.filter(user => user.role === 'nurse').length },
     { value: 'chw', label: 'CHWs', count: users.filter(user => user.role === 'chw').length },
-    { value: 'technician', label: 'Technicians', count: users.filter(user => user.role === 'technician').length },
     { value: 'patient', label: 'Patients', count: users.filter(user => user.role === 'patient').length }
   ];
 
@@ -184,13 +80,16 @@ const UserManagement = () => {
   ];
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.department.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = selectedRole === 'all' || user.role === selectedRole;
-    const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus;
-    return matchesSearch && matchesRole && matchesStatus;
-  });
+  const matchesSearch =
+    (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.department || "").toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesRole = selectedRole === 'all' || user.role === selectedRole;
+  const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus;
+
+  return matchesSearch && matchesRole && matchesStatus;
+});
 
   const getRoleIcon = (role) => {
     switch (role) {
@@ -467,14 +366,14 @@ const UserManagement = () => {
                       </td>
                       <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="flex items-center">
-                          <img
+                          {/* <img
                             src={user.avatar}
                             alt={user.name}
                             className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
                             onError={(e) => {
                               e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3B82F6&color=fff&size=40`;
                             }}
-                          />
+                          /> */}
                           <div className="ml-3">
                             <div className="text-sm font-medium text-gray-900">{user.name}</div>
                             <div className="text-sm text-gray-500">{user.email}</div>

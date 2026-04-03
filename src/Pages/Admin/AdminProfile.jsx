@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+
+
+import { useNavigate } from 'react-router-dom';
+
+import { userApi } from '../../API/endpoints/userApi.js';
 import {
   User, Mail, Phone, Shield, Settings, Activity, Bell, Key,
   Monitor, Camera, Check, X, Edit3, Save, MapPin,
@@ -29,35 +34,53 @@ const Field = ({ label, value }) => (
 
 const AdminProfile = () => {
   const { user, setUser } = useAuth();
-  const [profile, setProfile] = useState({
-    name: user?.name ?? "",
-    email: user?.email ?? "",
-    phone: user?.phone ?? "",
-    role: user?.title ?? "",
-    department: user?.department ?? "",
-    employeeId: user?.employeeId ?? "",
-    joinDate: user?.joinDate ?? "",
-    location: user?.location ?? "",
-    timezone: user?.timezone ?? "",
-    language: user?.language ?? "",
-    status: user?.status ?? "",
-  });
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    setProfile({
-      name: user?.name ?? "",
-      email: user?.email ?? "",
-      phone: user?.phone ?? "",
-      role: user?.title ?? "",
-      department: user?.department ?? "",
-      employeeId: user?.employeeId ?? "",
-      joinDate: user?.joinDate ?? "",
-      location: user?.location ?? "",
-      timezone: user?.timezone ?? "",
-      language: user?.language ?? "",
-      status: user?.status ?? "",
-    });
-  }, [user]);
+  const [profile, setProfile] = useState({
+  name: '',
+  email: '',
+  phone: '',
+  role: '',
+  department: '',
+  employeeId: '',
+  joinDate: '',
+  location: '',
+  timezone: 'EAT (UTC+3)',
+  language: 'English',
+  status: 'ACTIVE',
+});
+
+useEffect(() => {
+  const loadProfile = async () => {
+    try {
+      setLoadingProfile(true);
+      const data = await userApi.me();
+      
+      setProfile({
+        name: data.fullName || user?.name || '',
+        email: data.email || user?.email || '',
+        phone: data.phone || user?.phone || '',
+        role: data.role || user?.title || '',
+        department: user?.department || '',
+        employeeId: `USR-${String(data.id).padStart(4, '0')}`,
+        joinDate: data.createdAt ? new Date(data.createdAt).toLocaleDateString() : '',
+        location: user?.location || '',
+        timezone: user?.timezone || 'EAT (UTC+3)',
+        language: user?.language || 'English',
+        status: data.status || 'ACTIVE',
+      });
+    } catch (err) {
+      console.error('Failed to load profile:', err);
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  loadProfile();
+}, []);
+
 
   const [editMode, setEditMode] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -112,26 +135,25 @@ const AdminProfile = () => {
                   <X className="w-4 h-4 mr-1.5" /> Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    setUser((prev) => ({
-                      ...prev,
-                      name: profile.name,
-                      email: profile.email,
-                      phone: profile.phone,
-                      title: profile.role,
-                      department: profile.department,
-                      location: profile.location,
-                      timezone: profile.timezone,
-                      language: profile.language,
-                      initials: profile.name
-                        .split(' ')
-                        .filter(Boolean)
-                        .map((w) => w[0].toUpperCase())
-                        .slice(0, 2)
-                        .join(''),
-                    }));
-                    setEditMode(false);
+                  onClick={async () => {
+                    try {
+                      await userApi.update(user.id, {
+                        fullName: profile.name,
+                        email: profile.email,
+                        phone: profile.phone,
+                      });
+                      setUser((prev) => ({
+                        ...prev,
+                        name: profile.name,
+                        email: profile.email,
+                        phone: profile.phone,
+                      }));
+                      setEditMode(false);
+                    } catch (err) {
+                      alert('Failed to save profile: ' + err.message);
+                    }
                   }}
+
                   className="flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   <Save className="w-4 h-4 mr-1.5" /> Save Changes
@@ -145,9 +167,17 @@ const AdminProfile = () => {
                 <Edit3 className="w-4 h-4 mr-1.5" /> Edit Profile
               </button>
             )}
+
             <button className="flex items-center px-3 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50">
-              <LogOut className="w-4 h-4 mr-1.5" /> Logout
+              <LogOut 
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+              className="w-4 h-4 mr-1.5" /> Logout
             </button>
+
+
           </div>
         </div>
 
