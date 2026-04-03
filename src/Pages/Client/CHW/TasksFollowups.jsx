@@ -16,6 +16,12 @@ import {
 } from 'lucide-react';
 import { syncTaskWorkItems } from '../../../Services/chwAssignmentsStore';
 
+const CHW_TASK_META = {
+  chwId: 1,
+  chwCode: 'CHW-001',
+  chwName: 'Grace Akinyi Achieng',
+};
+
 const CATEGORIES = ['Medical Follow-up', 'Medication', 'Education', 'Assessment', 'Other'];
 const PRIORITIES = ['normal', 'high', 'urgent'];
 
@@ -140,7 +146,7 @@ const TasksFollowups = () => {
   });
 
   useEffect(() => {
-    syncTaskWorkItems(tasks);
+    syncTaskWorkItems(tasks, CHW_TASK_META);
   }, [tasks]);
 
   //  Modal states

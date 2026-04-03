@@ -225,7 +225,7 @@ const HomeVisits = () => {
   });
 
   useEffect(() => {
-    syncHomeVisitWorkItems(visits);
+    syncHomeVisitWorkItems(visits, CHW_META);
     syncHomeVisitGovernance(visits, CHW_META);
   }, [visits]);
 

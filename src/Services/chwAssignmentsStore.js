@@ -225,6 +225,12 @@ const defaultStore = {
   workItems: defaultWorkItems,
 };
 
+const DEFAULT_CHW_REFERENCE = {
+  chwId: 1,
+  chwCode: 'CHW-001',
+  chwName: 'Grace Akinyi Achieng',
+};
+
 function normalizeText(value) {
   return String(value || '').trim().toLowerCase();
 }
@@ -336,19 +342,48 @@ function findAssignment(assignments, patientIdText, patientName) {
   });
 }
 
-function ensureAssignment(store, patientIdText, patientName, priority) {
-  const existing = findAssignment(store.assignments, patientIdText, patientName);
+function resolveChwReference(chwRef = {}) {
+  const merged = {
+    chwId: chwRef.chwId ?? DEFAULT_CHW_REFERENCE.chwId,
+    chwCode: chwRef.chwCode || DEFAULT_CHW_REFERENCE.chwCode,
+    chwName: chwRef.chwName || DEFAULT_CHW_REFERENCE.chwName,
+  };
+
+  const hasIdentifier = Boolean(merged.chwId || merged.chwCode || merged.chwName);
+  return hasIdentifier ? merged : null;
+}
+
+function ensureAssignment(store, payload = {}) {
+  const {
+    patientIdText,
+    patientName,
+    priority,
+    chwRef,
+  } = payload;
+
+  const normalizedPatientId = String(patientIdText || '').trim();
+  const normalizedPatientName = String(patientName || '').trim();
+  if (!normalizedPatientId && !normalizedPatientName) {
+    return null;
+  }
+
+  const existing = findAssignment(store.assignments, normalizedPatientId, normalizedPatientName);
   if (existing) return existing.id;
+
+  const resolvedChw = resolveChwReference(chwRef);
+  if (!resolvedChw) {
+    return null;
+  }
 
   const nextId = store.assignments.length > 0 ? Math.max(...store.assignments.map((item) => item.id)) + 1 : 1;
   const assignment = {
     id: nextId,
     assignmentCode: `ASG-${String(nextId).padStart(3, '0')}`,
-    patientIdText: patientIdText || `PT-UNMAPPED-${nextId}`,
-    patientName: patientName || `Unknown Patient ${nextId}`,
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
+    patientIdText: normalizedPatientId || `PT-UNMAPPED-${nextId}`,
+    patientName: normalizedPatientName || `Unknown Patient ${nextId}`,
+    chwId: resolvedChw.chwId,
+    chwCode: resolvedChw.chwCode,
+    chwName: resolvedChw.chwName,
     priority: (priority || 'NORMAL').toUpperCase(),
     status: 'ASSIGNED',
     assignedAt: new Date().toISOString(),
@@ -414,19 +449,59 @@ function visitToWorkItem(visit, tab, assignmentId) {
   };
 }
 
+function mapAppointmentStatus(status) {
+  const value = String(status || '').toUpperCase();
+  if (value === 'ARRIVED' || value === 'IN_PROGRESS') return 'IN_PROGRESS';
+  if (value === 'COMPLETED') return 'COMPLETED';
+  if (value === 'CANCELED' || value === 'CANCELLED') return 'CANCELED';
+  return 'PENDING';
+}
+
+function appointmentToWorkItem(appointment, assignmentId) {
+  const mappedStatus = mapAppointmentStatus(appointment?.status);
+  const scheduledAt = safeDate(appointment?.scheduledAt);
+  return {
+    id: `APPOINTMENT-${appointment?.id}`,
+    assignmentId,
+    workType: 'APPOINTMENT',
+    sourceId: appointment?.sourceAppointmentId || appointment?.id,
+    title: appointment?.reason || appointment?.appointmentType || 'CHW Appointment',
+    patientName: appointment?.patientName || 'Unknown Patient',
+    patientIdText: appointment?.patientId || '',
+    category: 'Appointment',
+    priority: 'NORMAL',
+    status: mappedStatus,
+    dueAt: scheduledAt,
+    scheduledAt,
+    completedAt: mappedStatus === 'COMPLETED' ? scheduledAt : null,
+    notes: appointment?.reason || '',
+    location: appointment?.facility || null,
+    visitType: appointment?.appointmentType || 'Appointment',
+    approvalStatus: mappedStatus === 'COMPLETED' ? 'PENDING_REVIEW' : 'NOT_REQUIRED',
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 export function getChwAssignmentsSnapshot() {
   return readStore();
 }
 
-export function syncTaskWorkItems(tasksByStatus) {
+export function syncTaskWorkItems(tasksByStatus, meta = {}) {
   const store = readStore();
   const keep = store.workItems.filter((item) => item.workType !== 'TASK');
   const built = [];
+  const chwRef = resolveChwReference(meta);
 
   ['pending', 'inProgress', 'completed'].forEach((tab) => {
     const list = Array.isArray(tasksByStatus?.[tab]) ? tasksByStatus[tab] : [];
     list.forEach((task) => {
-      const assignmentId = ensureAssignment(store, task.patientId, task.patient, task.priority);
+      const assignmentId = ensureAssignment(store, {
+        patientIdText: task.patientId,
+        patientName: task.patient,
+        priority: task.priority,
+        chwRef,
+      });
+      if (!assignmentId) return;
       built.push(taskToWorkItem(task, tab, assignmentId));
     });
   });
@@ -434,17 +509,52 @@ export function syncTaskWorkItems(tasksByStatus) {
   return writeStore({ ...store, workItems: [...keep, ...built] });
 }
 
-export function syncHomeVisitWorkItems(visitsByStatus) {
+export function syncHomeVisitWorkItems(visitsByStatus, meta = {}) {
   const store = readStore();
   const keep = store.workItems.filter((item) => item.workType !== 'HOME_VISIT');
   const built = [];
+  const chwRef = resolveChwReference(meta);
 
   ['upcoming', 'completed', 'cancelled'].forEach((tab) => {
     const list = Array.isArray(visitsByStatus?.[tab]) ? visitsByStatus[tab] : [];
     list.forEach((visit) => {
-      const assignmentId = ensureAssignment(store, visit.patientId, visit.patientName, visit.priority);
+      const assignmentId = ensureAssignment(store, {
+        patientIdText: visit.patientId,
+        patientName: visit.patientName,
+        priority: visit.priority,
+        chwRef,
+      });
+      if (!assignmentId) return;
       built.push(visitToWorkItem(visit, tab, assignmentId));
     });
+  });
+
+  return writeStore({ ...store, workItems: [...keep, ...built] });
+}
+
+export function syncChwAppointmentWorkItems(appointments) {
+  const store = readStore();
+  const keep = store.workItems.filter((item) => item.workType !== 'APPOINTMENT');
+  const built = [];
+  const list = Array.isArray(appointments) ? appointments : [];
+
+  list.forEach((appointment) => {
+    if (String(appointment?.providerRole || '').toUpperCase() !== 'CHW') {
+      return;
+    }
+
+    const assignmentId = ensureAssignment(store, {
+      patientIdText: appointment?.patientId,
+      patientName: appointment?.patientName,
+      priority: 'NORMAL',
+      chwRef: {
+        chwId: appointment?.providerId,
+        chwCode: appointment?.providerId,
+        chwName: appointment?.providerName,
+      },
+    });
+    if (!assignmentId) return;
+    built.push(appointmentToWorkItem(appointment, assignmentId));
   });
 
   return writeStore({ ...store, workItems: [...keep, ...built] });

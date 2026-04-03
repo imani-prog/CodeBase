@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ClipboardList,
   Home,
@@ -15,10 +15,11 @@ import {
   subscribeToChwAssignmentUpdates,
   transitionWorkItemStatus,
   approveWorkItem,
-  reassignAssignment,
+  reassignAssignment as reassignLocalAssignment,
 } from '../../Services/chwAssignmentsStore';
+import { assignmentService } from '../../Services/domain/assignmentService.js';
 
-const WORK_TYPE_OPTIONS = ['ALL', 'TASK', 'HOME_VISIT'];
+const WORK_TYPE_OPTIONS = ['ALL', 'TASK', 'HOME_VISIT', 'APPOINTMENT'];
 const STATUS_OPTIONS = ['ALL', 'PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELED'];
 const PRIORITY_OPTIONS = ['ALL', 'URGENT', 'HIGH', 'NORMAL'];
 const TAB_OPTIONS = [
@@ -38,6 +39,12 @@ function badgeClassByPriority(priority) {
   if (priority === 'URGENT') return 'text-red-800';
   if (priority === 'HIGH') return 'text-orange-800';
   return 'text-blue-800';
+}
+
+function displayWorkType(type) {
+  if (type === 'TASK') return 'TASK';
+  if (type === 'APPOINTMENT') return 'APPOINTMENT';
+  return 'HOME_VISIT';
 }
 
 function displayDate(isoDate) {
@@ -61,8 +68,40 @@ function inferIsOverdue(item) {
   return dueTs < Date.now();
 }
 
+function normalizeText(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function toAssignmentStatus(workItemStatus) {
+  if (workItemStatus === 'IN_PROGRESS') return 'IN_PROGRESS';
+  if (workItemStatus === 'COMPLETED') return 'COMPLETED';
+  if (workItemStatus === 'CANCELED') return 'CANCELED';
+  return 'ASSIGNED';
+}
+
+function toDisplayAssignment(row = {}) {
+  const raw = row.raw || {};
+  const patientRaw = raw.patient || {};
+  return {
+    ...row,
+    dataSource: 'BACKEND',
+    assignmentCode: raw.assignmentCode || `ASG-${String(row.id || '').padStart(3, '0')}`,
+    patientIdText:
+      raw.patientIdText ||
+      patientRaw.patientId ||
+      patientRaw.code ||
+      (row.patientId ? `PT-${row.patientId}` : ''),
+    patientName: row.patientName || patientRaw.fullName || patientRaw.name || '',
+    chwCode: raw.chwCode || raw.chw?.code || (row.chwId ? `CHW-${row.chwId}` : ''),
+    chwName: row.chwName || raw.chw?.fullName || raw.chw?.name || '',
+  };
+}
+
 const CHWAssignments = () => {
   const [snapshot, setSnapshot] = useState(getChwAssignmentsSnapshot());
+  const [backendAssignments, setBackendAssignments] = useState([]);
+  const [isBackendLoading, setIsBackendLoading] = useState(true);
+  const [backendError, setBackendError] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedWorkType,] = useState('ALL');
@@ -76,13 +115,58 @@ const CHWAssignments = () => {
     });
   }, []);
 
-  const assignmentIndex = useMemo(() => {
+  const loadBackendAssignments = useCallback(async () => {
+    setIsBackendLoading(true);
+    setBackendError('');
+    try {
+      const list = await assignmentService.listAssignments();
+      setBackendAssignments(list.map(toDisplayAssignment));
+    } catch (error) {
+      setBackendError(error?.message || 'Failed to fetch CHW assignments from backend.');
+    } finally {
+      setIsBackendLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBackendAssignments();
+    const timer = window.setInterval(loadBackendAssignments, 30000);
+    return () => window.clearInterval(timer);
+  }, [loadBackendAssignments]);
+
+  const localAssignmentIndex = useMemo(() => {
     const index = new Map();
     snapshot.assignments.forEach((assignment) => {
       index.set(assignment.id, assignment);
     });
     return index;
   }, [snapshot.assignments]);
+
+  const backendAssignmentIndex = useMemo(() => {
+    const index = new Map();
+    backendAssignments.forEach((assignment) => {
+      if (assignment?.id == null) return;
+      index.set(assignment.id, assignment);
+    });
+    return index;
+  }, [backendAssignments]);
+
+  const resolveAssignmentForItem = useCallback((item) => {
+    const backendById = backendAssignmentIndex.get(item.assignmentId);
+    if (backendById) return backendById;
+
+    const itemPatientId = normalizeText(item.patientIdText);
+    const itemPatientName = normalizeText(item.patientName);
+
+    const backendByPatient = backendAssignments.find((assignment) => {
+      if (itemPatientId && normalizeText(assignment.patientIdText) === itemPatientId) return true;
+      if (itemPatientName && normalizeText(assignment.patientName) === itemPatientName) return true;
+      return false;
+    });
+    if (backendByPatient) return backendByPatient;
+
+    return localAssignmentIndex.get(item.assignmentId);
+  }, [backendAssignmentIndex, backendAssignments, localAssignmentIndex]);
 
   const filteredItems = useMemo(() => {
     return snapshot.workItems.filter((item) => {
@@ -95,7 +179,7 @@ const CHWAssignments = () => {
 
       if (!searchTerm.trim()) return true;
       const q = searchTerm.toLowerCase();
-      const assignment = assignmentIndex.get(item.assignmentId);
+      const assignment = resolveAssignmentForItem(item);
 
       return (
         String(item.title || '').toLowerCase().includes(q) ||
@@ -113,7 +197,7 @@ const CHWAssignments = () => {
     selectedStatus,
     selectedPriority,
     searchTerm,
-    assignmentIndex,
+    resolveAssignmentForItem,
   ]);
 
   const metrics = useMemo(() => {
@@ -127,13 +211,23 @@ const CHWAssignments = () => {
 
   const refreshSnapshot = () => setSnapshot(getChwAssignmentsSnapshot());
 
-  const handleStatusAction = (item, nextStatus) => {
+  const handleStatusAction = async (item, nextStatus) => {
     const result = transitionWorkItemStatus(item.id, nextStatus);
     if (!result.ok) {
       window.alert(result.reason || 'Status update failed.');
       return;
     }
     refreshSnapshot();
+
+    const assignment = resolveAssignmentForItem(item);
+    if (assignment?.dataSource !== 'BACKEND' || assignment?.id == null) return;
+
+    try {
+      await assignmentService.updateAssignmentStatus(assignment.id, toAssignmentStatus(nextStatus));
+      loadBackendAssignments();
+    } catch (error) {
+      setBackendError(error?.message || 'Backend assignment status sync failed.');
+    }
   };
 
   const handleApprove = (item) => {
@@ -145,12 +239,34 @@ const CHWAssignments = () => {
     refreshSnapshot();
   };
 
-  const handleReassign = (assignmentId, currentChwName, currentChwCode) => {
+  const handleReassign = async (item, assignment) => {
+    if (assignment?.dataSource === 'BACKEND') {
+      const nextChwId = window.prompt('Reassign to CHW id', String(assignment?.chwId || ''));
+      if (nextChwId === null) return;
+      const reason = window.prompt('Reassignment reason', 'Coverage balancing');
+      if (reason === null) return;
+
+      try {
+        await assignmentService.reassignAssignment(assignment.id, {
+          chwId: nextChwId,
+          reason,
+        });
+        await loadBackendAssignments();
+      } catch (error) {
+        setBackendError(error?.message || 'Backend reassignment failed.');
+        window.alert(error?.message || 'Backend reassignment failed.');
+      }
+      return;
+    }
+
+    const assignmentId = item.assignmentId;
+    const currentChwName = assignment?.chwName;
+    const currentChwCode = assignment?.chwCode;
     const nextName = window.prompt('Reassign to CHW name', currentChwName || '');
     if (nextName === null) return;
     const nextCode = window.prompt('Reassign to CHW code', currentChwCode || '');
     if (nextCode === null) return;
-    reassignAssignment(assignmentId, nextName.trim() || currentChwName, nextCode.trim() || currentChwCode);
+    reassignLocalAssignment(assignmentId, nextName.trim() || currentChwName, nextCode.trim() || currentChwCode);
     refreshSnapshot();
   };
 
@@ -158,7 +274,12 @@ const CHWAssignments = () => {
     <div className="p-6 bg-gray-50 min-h-screen space-y-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">CHW Assignments</h1>
-        
+        <p className="text-sm text-gray-600">
+          {isBackendLoading ? 'Syncing assignments from backend...' : `Backend assignments loaded: ${backendAssignments.length}`}
+        </p>
+        {backendError && (
+          <p className="text-sm text-red-700">{backendError}</p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -275,7 +396,7 @@ const CHWAssignments = () => {
                 </tr>
               ) : (
                 filteredItems.map((item) => {
-                  const assignment = assignmentIndex.get(item.assignmentId);
+                  const assignment = resolveAssignmentForItem(item);
                   const isOverdue = inferIsOverdue(item);
                   const showStart = item.status === 'PENDING';
                   const showComplete = item.status === 'IN_PROGRESS';
@@ -292,7 +413,7 @@ const CHWAssignments = () => {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-blue-800">
-                          {item.workType === 'TASK' ? 'TASK' : 'HOME_VISIT'}
+                          {displayWorkType(item.workType)}
                         </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
@@ -354,7 +475,7 @@ const CHWAssignments = () => {
                             </button>
                           )}
                           <button
-                            onClick={() => handleReassign(item.assignmentId, assignment?.chwName, assignment?.chwCode)}
+                            onClick={() => handleReassign(item, assignment)}
                             className="px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100 rounded"
                           >
                             Reassign

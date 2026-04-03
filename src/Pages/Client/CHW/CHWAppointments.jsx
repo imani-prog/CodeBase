@@ -19,7 +19,8 @@ import {
 import AddAppointmentModal from '../../../Components/CHW/AddAppointmentModal';
 import EditAppointmentModal from '../../../Components/CHW/EditAppointmentModal';
 import CancelAppointmentModal from '../../../Components/CHW/CancelAppointmentModal';
-import { syncChwAppointments } from '../../../Services/appointmentGovernanceStore';
+import { getAppointmentGovernanceSnapshot, syncChwAppointments } from '../../../Services/appointmentGovernanceStore';
+import { syncChwAppointmentWorkItems } from '../../../Services/chwAssignmentsStore';
 
 const CHW_APPOINTMENT_META = {
   chwId: 'CHW-001',
@@ -134,6 +135,8 @@ const CHWAppointments = () => {
 
   useEffect(() => {
     syncChwAppointments(appointmentData, CHW_APPOINTMENT_META);
+    const snapshot = getAppointmentGovernanceSnapshot();
+    syncChwAppointmentWorkItems(snapshot.appointments);
   }, [appointmentData]);
 
   const handleAddSave = (newAppt) => {

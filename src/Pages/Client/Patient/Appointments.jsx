@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Calendar, Clock, MapPin, Video, User, Plus, X, Phone, Mail, AlertCircle, CheckCircle, ExternalLink, Download } from 'lucide-react';
-import { syncPatientAppointments } from '../../../Services/appointmentGovernanceStore';
+import { getAppointmentGovernanceSnapshot, syncPatientAppointments } from '../../../Services/appointmentGovernanceStore';
+import { syncChwAppointmentWorkItems } from '../../../Services/chwAssignmentsStore';
 
 const PATIENT_APPOINTMENT_META = {
   patientId: 'PT-SELF-001',
@@ -136,6 +137,8 @@ const Appointments = () => {
 
   useEffect(() => {
     syncPatientAppointments(appointments, PATIENT_APPOINTMENT_META);
+    const snapshot = getAppointmentGovernanceSnapshot();
+    syncChwAppointmentWorkItems(snapshot.appointments);
   }, [appointments]);
 
   const handleViewDetails = (appointment) => {
