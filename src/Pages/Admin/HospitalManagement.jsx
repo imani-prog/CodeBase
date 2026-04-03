@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { 
   Building2, 
   Plus, 
@@ -39,9 +39,9 @@ import {
 } from 'lucide-react';
 import HospitalFormModal from '../../Components/Admin/EditHospitalModal';
 import Pagination from '../../Components/Admin/Pagination';
+import { hospitalService } from '../../Services/domain/hospitalService.js';
 
 const HospitalManagement = () => {
-  const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -51,9 +51,10 @@ const HospitalManagement = () => {
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [hospitals, setHospitals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
-  // Hospital types matching backend enum
-  const hospitalTypes = ['PUBLIC', 'PRIVATE', 'FAITH_BASED', 'NGO'];
   const hospitalStatuses = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
   
   // Facility types matching backend
@@ -70,310 +71,94 @@ const HospitalManagement = () => {
     'INPATIENT'
   ];
 
-  // Sample hospitals data matching backend structure exactly
-  const hospitals = [
-    {
-      id: 1,
-      code: 'HS001',
-      name: 'Kenyatta National Hospital',
-      type: 'GENERAL',
-      registrationNumber: 'KNH-REG-2001',
-      taxId: 'TAX-KNH-001',
-      mainPhone: '+254-20-2726300',
-      altPhone: '+254-20-2726301',
-      email: 'info@knh.or.ke',
-      website: 'www.knh.or.ke',
-      fax: '+254-20-2725272',
-      addressLine1: 'Hospital Road, Upper Hill',
-      addressLine2: 'P.O. Box 20723-00202',
-      city: 'Nairobi',
-      state: 'Nairobi County',
-      postalCode: '00202',
-      country: 'Kenya',
-      latitude: -1.3018,
-      longitude: 36.8073,
-      adminContactName: 'Dr. Sarah Kamau',
-      adminContactEmail: 'admin@knh.or.ke',
-      adminContactPhone: '+254-20-2726302',
-      numberOfBeds: 1800,
-      numberOfIcuBeds: 80,
-      numberOfAmbulances: 15,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, Oncology, Cardiology, Neurology, Orthopedics',
-      departments: 'Cardiology, Oncology, Neurology, Orthopedics, Pediatrics, Maternity',
-      operatingHours: '24/7 Emergency, Mon-Fri 8AM-5PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA, AAR, Jubilee, Britam, Madison, CIC',
-      notes: 'National referral and teaching hospital',
-      status: 'ACTIVE',
-      createdAt: '2020-01-15T08:00:00',
-      updatedAt: '2025-12-15T10:30:00'
-    },
-    {
-      id: 2,
-      code: 'HS002',
-      name: 'Aga Khan University Hospital',
-      type: 'SPECIALTY',
-      registrationNumber: 'AKUH-REG-1998',
-      taxId: 'TAX-AKUH-002',
-      mainPhone: '+254-20-3662000',
-      altPhone: '+254-20-3662001',
-      email: 'info@aku.edu',
-      website: 'www.aku.edu/nairobi',
-      fax: '+254-20-3740917',
-      addressLine1: '3rd Parklands Avenue',
-      addressLine2: 'P.O. Box 30270-00100',
-      city: 'Nairobi',
-      state: 'Nairobi County',
-      postalCode: '00100',
-      country: 'Kenya',
-      latitude: -1.2626,
-      longitude: 36.8070,
-      adminContactName: 'Dr. James Orwa',
-      adminContactEmail: 'j.orwa@aku.edu',
-      adminContactPhone: '+254-20-3662002',
-      numberOfBeds: 254,
-      numberOfIcuBeds: 24,
-      numberOfAmbulances: 8,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Cardiology, Oncology, Diagnostics, Wellness Center',
-      departments: 'Cardiology, Oncology, Surgery, Maternity, Diagnostics, Emergency Medicine',
-      operatingHours: '24/7 Emergency and Critical Care, Mon-Sat 8AM-8PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison, CIC, Resolution',
-      notes: 'Leading private teaching hospital with international accreditation',
-      status: 'ACTIVE',
-      createdAt: '2019-05-10T09:00:00',
-      updatedAt: '2025-12-18T14:20:00'
-    },
-    {
-      id: 3,
-      code: 'HS003',
-      name: 'Mombasa General Hospital',
-      type: 'GENERAL',
-      registrationNumber: 'MGH-REG-2003',
-      taxId: 'TAX-MGH-003',
-      mainPhone: '+254-41-2314201',
-      altPhone: '+254-41-2314202',
-      email: 'info@mombasahospital.go.ke',
-      website: 'www.mombasahospital.go.ke',
-      fax: '+254-41-2225792',
-      addressLine1: 'Nyerere Avenue',
-      addressLine2: 'P.O. Box 90114-80100',
-      city: 'Mombasa',
-      state: 'Mombasa County',
-      postalCode: '80100',
-      country: 'Kenya',
-      latitude: -4.0435,
-      longitude: 39.6682,
-      adminContactName: 'Dr. Fatuma Hassan',
-      adminContactEmail: 'f.hassan@mombasahospital.go.ke',
-      adminContactPhone: '+254-41-2314203',
-      numberOfBeds: 650,
-      numberOfIcuBeds: 30,
-      numberOfAmbulances: 6,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, General Medicine, Orthopedics',
-      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Internal Medicine, Orthopedics',
-      operatingHours: '24/7 Emergency Services, Mon-Fri 8AM-6PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA, AAR, Jubilee',
-      notes: 'Main referral hospital for Coast region',
-      status: 'ACTIVE',
-      createdAt: '2020-03-20T10:00:00',
-      updatedAt: '2025-12-10T09:15:00'
-    },
-    {
-      id: 4,
-      code: 'HS004',
-      name: 'Kisumu County Hospital',
-      type: 'GENERAL',
-      registrationNumber: 'KCH-REG-2005',
-      taxId: 'TAX-KCH-004',
-      mainPhone: '+254-57-2020333',
-      altPhone: '+254-57-2020334',
-      email: 'info@kisumuhospital.go.ke',
-      website: null,
-      fax: null,
-      addressLine1: 'Oginga Odinga Street',
-      addressLine2: 'P.O. Box 612-40100',
-      city: 'Kisumu',
-      state: 'Kisumu County',
-      postalCode: '40100',
-      country: 'Kenya',
-      latitude: -0.0917,
-      longitude: 34.7680,
-      adminContactName: 'Dr. Peter Odhiambo',
-      adminContactEmail: 'p.odhiambo@kisumuhospital.go.ke',
-      adminContactPhone: '+254-57-2020335',
-      numberOfBeds: 420,
-      numberOfIcuBeds: 18,
-      numberOfAmbulances: 4,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, HIV/AIDS Care, TB Treatment',
-      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Infectious Diseases',
-      operatingHours: '24/7 Emergency, Mon-Fri 8AM-5PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA',
-      notes: 'County referral hospital serving Nyanza region',
-      status: 'ACTIVE',
-      createdAt: '2020-06-12T11:30:00',
-      updatedAt: '2025-12-05T16:45:00'
-    },
-    {
-      id: 5,
-      code: 'HS005',
-      name: "St. Mary's Mission Hospital",
-      type: 'CLINIC',
-      registrationNumber: 'STMH-REG-1995',
-      taxId: 'TAX-STMH-005',
-      mainPhone: '+254-45-31234',
-      altPhone: '+254-45-31236',
-      email: 'info@stmarysmission.org',
-      website: 'www.stmarysmission.org',
-      fax: '+254-45-31235',
-      addressLine1: 'Catholic Diocese Road',
-      addressLine2: 'P.O. Box 134-60400',
-      city: 'Mumias',
-      state: 'Kakamega County',
-      postalCode: '60400',
-      country: 'Kenya',
-      latitude: 0.3348,
-      longitude: 34.4877,
-      adminContactName: 'Sr. Mary Wanjiru',
-      adminContactEmail: 'm.wanjiru@stmarysmission.org',
-      adminContactPhone: '+254-45-31237',
-      numberOfBeds: 180,
-      numberOfIcuBeds: 8,
-      numberOfAmbulances: 2,
-      servicesOffered: 'General Medicine, Maternity, Surgery, HIV/AIDS Care, TB Treatment, Community Health',
-      departments: 'General Medicine, Maternity, Surgery, Infectious Diseases, Outpatient Services',
-      operatingHours: '24/7 Emergency and Maternity, Mon-Sat 8AM-5PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA',
-      notes: 'Faith-based mission hospital serving rural community',
-      status: 'ACTIVE',
-      createdAt: '2019-11-08T08:00:00',
-      updatedAt: '2025-12-12T13:00:00'
-    },
-    {
-      id: 6,
-      code: 'HS006',
-      name: 'Nairobi Women\'s Hospital',
-      type: 'SPECIALTY',
-      registrationNumber: 'NWH-REG-2001',
-      taxId: 'TAX-NWH-006',
-      mainPhone: '+254-20-7202000',
-      altPhone: '+254-20-7202001',
-      email: 'info@nwch.co.ke',
-      website: 'www.nwch.co.ke',
-      fax: '+254-20-3870219',
-      addressLine1: 'Adams Arcade, Ngong Road',
-      addressLine2: 'P.O. Box 10552-00100',
-      city: 'Nairobi',
-      state: 'Nairobi County',
-      postalCode: '00100',
-      country: 'Kenya',
-      latitude: -1.3027,
-      longitude: 36.7693,
-      adminContactName: 'Dr. Lucy Mwangi',
-      adminContactEmail: 'l.mwangi@nwch.co.ke',
-      adminContactPhone: '+254-20-7202002',
-      numberOfBeds: 120,
-      numberOfIcuBeds: 12,
-      numberOfAmbulances: 5,
-      servicesOffered: 'Maternity, Gynecology, Pediatrics, Fertility Clinic, Well Woman Clinic, Neonatal Care',
-      departments: 'Maternity, Gynecology, Pediatrics, Fertility, Neonatal ICU',
-      operatingHours: '24/7 Emergency Maternity Services, Mon-Sat 8AM-8PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT',
-      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison, CIC, APA',
-      notes: 'Specialized women and children healthcare facility',
-      status: 'ACTIVE',
-      createdAt: '2019-08-22T10:00:00',
-      updatedAt: '2025-12-19T11:30:00'
-    },
-    {
-      id: 7,
-      code: 'HS007',
-      name: 'Gertrude\'s Children Hospital',
-      type: 'SPECIALTY',
-      registrationNumber: 'GCH-REG-1999',
-      taxId: 'TAX-GCH-007',
-      mainPhone: '+254-20-7206000',
-      altPhone: '+254-20-7206001',
-      email: 'info@gerties.org',
-      website: 'www.gerties.org',
-      fax: '+254-20-2721175',
-      addressLine1: 'Muthaiga Road',
-      addressLine2: 'P.O. Box 42325-00100',
-      city: 'Nairobi',
-      state: 'Nairobi County',
-      postalCode: '00100',
-      country: 'Kenya',
-      latitude: -1.2571,
-      longitude: 36.8267,
-      adminContactName: 'Dr. Robert Nyarango',
-      adminContactEmail: 'r.nyarango@gerties.org',
-      adminContactPhone: '+254-20-7206002',
-      numberOfBeds: 85,
-      numberOfIcuBeds: 15,
-      numberOfAmbulances: 3,
-      servicesOffered: 'Pediatrics, Neonatal Care, Pediatric Surgery, Child Vaccination, Child Nutrition, Child Development',
-      departments: 'Pediatrics, Neonatology, Pediatric Surgery, Pediatric ICU, Immunization',
-      operatingHours: '24/7 Emergency Pediatric Care, Mon-Sun 8AM-8PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison',
-      notes: 'Leading pediatric specialty hospital',
-      status: 'ACTIVE',
-      createdAt: '2019-04-18T09:00:00',
-      updatedAt: '2025-12-17T15:20:00'
-    },
-    {
-      id: 8,
-      code: 'HS008',
-      name: 'Nakuru Level 5 Hospital',
-      type: 'GENERAL',
-      registrationNumber: 'NKR-REG-2004',
-      taxId: 'TAX-NKR-008',
-      mainPhone: '+254-51-2212995',
-      altPhone: '+254-51-2212996',
-      email: 'info@nakuruhospital.go.ke',
-      website: null,
-      fax: null,
-      addressLine1: 'Hospital Road',
-      addressLine2: 'P.O. Box 851-20100',
-      city: 'Nakuru',
-      state: 'Nakuru County',
-      postalCode: '20100',
-      country: 'Kenya',
-      latitude: -0.2827,
-      longitude: 36.0667,
-      adminContactName: 'Dr. Jane Kiplagat',
-      adminContactEmail: 'j.kiplagat@nakuruhospital.go.ke',
-      adminContactPhone: '+254-51-2212997',
-      numberOfBeds: 380,
-      numberOfIcuBeds: 16,
-      numberOfAmbulances: 5,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, General Medicine, Orthopedics',
-      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Internal Medicine, Orthopedics',
-      operatingHours: '24/7 Emergency Services, Mon-Fri 8AM-5PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA, AAR',
-      notes: 'County referral hospital for Rift Valley region',
-      status: 'ACTIVE',
-      createdAt: '2020-02-10T10:30:00',
-      updatedAt: '2025-12-14T12:00:00'
+  // Local fallback sample data used only if API loading fails.
+  const sampleHospitals = useMemo(() => [
+    
+  ], []);
+
+  const normalizeHospital = useCallback((row = {}) => ({
+    id: row.id ?? null,
+    code: row.code || '',
+    name: row.name || 'Unnamed Hospital',
+    type: row.type || 'GENERAL',
+    registrationNumber: row.registrationNumber || '',
+    taxId: row.taxId || '',
+    mainPhone: row.mainPhone || row.phone || '',
+    altPhone: row.altPhone || '',
+    email: row.email || '',
+    website: row.website || '',
+    fax: row.fax || '',
+    addressLine1: row.addressLine1 || '',
+    addressLine2: row.addressLine2 || '',
+    city: row.city || '',
+    state: row.state || '',
+    postalCode: row.postalCode || '',
+    country: row.country || 'Kenya',
+    latitude: row.latitude ?? '',
+    longitude: row.longitude ?? '',
+    adminContactName: row.adminContactName || '',
+    adminContactEmail: row.adminContactEmail || '',
+    adminContactPhone: row.adminContactPhone || '',
+    numberOfBeds: Number(row.numberOfBeds) || 0,
+    numberOfIcuBeds: Number(row.numberOfIcuBeds) || 0,
+    numberOfAmbulances: Number(row.numberOfAmbulances) || 0,
+    servicesOffered: Array.isArray(row.servicesOffered)
+      ? row.servicesOffered.join(', ')
+      : (row.servicesOffered || ''),
+    departments: Array.isArray(row.departments)
+      ? row.departments.join(', ')
+      : (row.departments || ''),
+    operatingHours: row.operatingHours || '',
+    facilities: Array.isArray(row.facilities)
+      ? row.facilities.join(', ')
+      : (row.facilities || ''),
+    acceptedInsurance: Array.isArray(row.acceptedInsurance)
+      ? row.acceptedInsurance.join(', ')
+      : (row.acceptedInsurance || ''),
+    notes: row.notes || '',
+    status: row.status || 'ACTIVE',
+    createdAt: row.createdAt || '',
+    updatedAt: row.updatedAt || '',
+  }), []);
+
+  const fetchHospitals = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError('');
+    try {
+      const payload = await hospitalService.listHospitals();
+      const rows = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.items)
+          ? payload.items
+          : Array.isArray(payload?.content)
+            ? payload.content
+            : [];
+      setHospitals(rows.map(normalizeHospital));
+    } catch (error) {
+      setLoadError(error?.message || 'Failed to load hospitals from API.');
+      setHospitals(sampleHospitals.map(normalizeHospital));
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  }, [normalizeHospital, sampleHospitals]);
+
+  useEffect(() => {
+    fetchHospitals();
+  }, [fetchHospitals]);
 
   // Filter hospitals
-  const filteredHospitals = hospitals.filter(hospital => {
-    const matchesSearch = 
-      hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.city.toLowerCase().includes(searchTerm.toLowerCase());
-    
+  const filteredHospitals = useMemo(() => hospitals.filter((hospital) => {
+    const query = searchTerm.toLowerCase();
+    const matchesSearch =
+      (hospital.name || '').toLowerCase().includes(query) ||
+      (hospital.code || '').toLowerCase().includes(query) ||
+      (hospital.city || '').toLowerCase().includes(query);
+
     const matchesType = selectedType === 'all' || hospital.type === selectedType;
     const matchesStatus = selectedStatus === 'all' || hospital.status === selectedStatus;
-    
+
     return matchesSearch && matchesType && matchesStatus;
-  });
+  }), [hospitals, searchTerm, selectedType, selectedStatus]);
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -381,21 +166,41 @@ const HospitalManagement = () => {
   const currentHospitals = filteredHospitals.slice(indexOfFirstItem, indexOfLastItem);
 
   // Reset to page 1 when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedType, selectedStatus]);
 
   // Calculate statistics
-  const stats = {
+  const stats = useMemo(() => ({
     total: hospitals.length,
     active: hospitals.filter(h => h.status === 'ACTIVE').length,
     totalBeds: hospitals.reduce((sum, h) => sum + h.numberOfBeds, 0),
     totalAmbulances: hospitals.reduce((sum, h) => sum + h.numberOfAmbulances, 0),
-    public: hospitals.filter(h => h.type === 'PUBLIC').length,
-    private: hospitals.filter(h => h.type === 'PRIVATE').length,
-    faithBased: hospitals.filter(h => h.type === 'FAITH_BASED').length,
-    ngo: hospitals.filter(h => h.type === 'NGO').length
-  };
+  }), [hospitals]);
+
+  const hospitalTypes = useMemo(() => {
+    const uniqueTypes = new Set(
+      hospitals
+        .map((hospital) => hospital.type)
+        .filter(Boolean)
+    );
+    return Array.from(uniqueTypes).sort();
+  }, [hospitals]);
+
+  const hospitalTypeStats = useMemo(() => {
+    const counts = hospitals.reduce((acc, hospital) => {
+      const type = hospital.type || 'UNKNOWN';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4);
+  }, [hospitals]);
+
+  const topTypeRowOne = hospitalTypeStats.slice(0, 2);
+  const topTypeRowTwo = hospitalTypeStats.slice(2, 4);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -411,7 +216,7 @@ const HospitalManagement = () => {
       case 'PUBLIC': return 'text-blue-800';
       case 'PRIVATE': return 'text-blue-800';
       case 'FAITH_BASED': return 'text-blue-800';
-      case 'NGO': return 'text-tblue-800';
+      case 'NGO': return 'text-blue-800';
       default: return 'text-blue-800';
     }
   };
@@ -424,6 +229,19 @@ const HospitalManagement = () => {
   const handleEditHospital = (hospital) => {
     setSelectedHospital(hospital);
     setShowEditModal(true);
+  };
+
+  const handleDeleteHospital = async (hospital) => {
+    if (!hospital?.id) return;
+    const confirmed = window.confirm(`Delete ${hospital.name}? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      await hospitalService.deleteHospital(hospital.id);
+      await fetchHospitals();
+    } catch (error) {
+      setLoadError(error?.message || 'Failed to delete hospital.');
+    }
   };
 
   return (
@@ -501,16 +319,30 @@ const HospitalManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm mb-1">Hospital Types</p>
-                <div className="flex items-center space-x-2 mt-2">
-                  <span className="text-sm font-medium text-blue-600">{stats.public} Public</span>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-sm font-medium text-blue-600">{stats.private} Private</span>
-                </div>
-                <div className="flex items-center space-x-2 mt-1">
-                  <span className="text-sm font-medium text-blue-600">{stats.faithBased} Faith</span>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-sm font-medium text-blue-600">{stats.ngo} NGO</span>
-                </div>
+                {hospitalTypeStats.length > 0 ? (
+                  <>
+                    <div className="flex items-center space-x-2 mt-2">
+                      {topTypeRowOne.map(([type, count], index) => (
+                        <span key={type} className="text-sm font-medium text-blue-600">
+                          {index > 0 && <span className="text-gray-300 mr-2">•</span>}
+                          {count} {type.replaceAll('_', ' ')}
+                        </span>
+                      ))}
+                    </div>
+                    {topTypeRowTwo.length > 0 && (
+                      <div className="flex items-center space-x-2 mt-1">
+                        {topTypeRowTwo.map(([type, count], index) => (
+                          <span key={type} className="text-sm font-medium text-blue-600">
+                            {index > 0 && <span className="text-gray-300 mr-2">•</span>}
+                            {count} {type.replaceAll('_', ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm mt-2 text-gray-500">No type data</p>
+                )}
               </div>
               <div className="h-14 w-14  flex items-center justify-center">
                 <Target className="w-7 h-7 text-blue-600" />
@@ -568,6 +400,12 @@ const HospitalManagement = () => {
           <div className="mt-4 flex items-center space-x-2 text-sm text-gray-600">
             <span>Showing {filteredHospitals.length} of {hospitals.length} hospitals</span>
           </div>
+
+          {loadError && (
+            <div className="mt-3 p-3 border border-red-200 bg-red-50 text-red-700 text-sm rounded-lg">
+              {loadError}
+            </div>
+          )}
         </div>
 
         {/* Hospitals Table */}
@@ -612,7 +450,19 @@ const HospitalManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {currentHospitals.map((hospital) => (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={11} className="px-3 py-10 text-center text-sm text-gray-600">
+                      Loading hospitals...
+                    </td>
+                  </tr>
+                ) : currentHospitals.length === 0 ? (
+                  <tr>
+                    <td colSpan={11} className="px-3 py-10 text-center text-sm text-gray-600">
+                      No hospitals found for the selected filters.
+                    </td>
+                  </tr>
+                ) : currentHospitals.map((hospital) => (
                   <tr key={hospital.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-3 py-3 whitespace-nowrap">
                       <span className="text-xs font-bold text-gray-900">{hospital.code}</span>
@@ -668,6 +518,7 @@ const HospitalManagement = () => {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button 
+                          onClick={() => handleDeleteHospital(hospital)}
                           className="text-red-600 hover:text-red-900 transition-colors"
                           title="Delete"
                         >
@@ -977,10 +828,19 @@ const HospitalManagement = () => {
               setShowEditModal(false);
               setSelectedHospital(null);
             }}
-            onSave={(hospitalData) => {
-              
-              console.log('Saving hospital:', hospitalData);
-             
+            onSave={async (hospitalData) => {
+              try {
+                if (showEditModal && selectedHospital?.id) {
+                  await hospitalService.updateHospital(selectedHospital.id, hospitalData);
+                } else {
+                  await hospitalService.createHospital(hospitalData);
+                }
+                await fetchHospitals();
+                setLoadError('');
+              } catch (error) {
+                setLoadError(error?.message || 'Failed to save hospital.');
+                throw error;
+              }
             }}
             facilityTypes={facilityTypes}
           />

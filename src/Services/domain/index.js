@@ -6,6 +6,7 @@ export { authService } from "./authService.js";
 export { chwService } from "./chwService.js";
 export { healthRecordService } from "./healthRecordService.js";
 export { homeVisitService } from "./homeVisitService.js";
+export { hospitalService } from "./hospitalService.js";
 export { insuranceService } from "./insuranceService.js";
 export { patientService } from "./patientService.js";
 export { prescriptionService } from "./prescriptionService.js";

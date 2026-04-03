@@ -71,6 +71,9 @@ export const API_PATHS = {
     dispatch: "/api/assist",
     drivers: "/api/drivers",
   },
+  hospitals: {
+    base: "/api/hospitals",
+  },
   reports: {
     base: "/api/reports",
   },

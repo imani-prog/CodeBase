@@ -6,6 +6,7 @@ export { assignmentApi } from "./assignmentApi.js";
 export { chwApi } from "./chwApi.js";
 export { healthRecordApi } from "./healthRecordApi.js";
 export { homeVisitApi } from "./homeVisitApi.js";
+export { hospitalApi } from "./hospitalApi.js";
 export { insuranceApi } from "./insuranceApi.js";
 export { patientApi } from "./patientApi.js";
 export { prescriptionApi } from "./prescriptionApi.js";
