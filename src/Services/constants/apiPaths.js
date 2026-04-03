@@ -39,7 +39,7 @@ export const API_PATHS = {
     range: "/api/appointments/range",
   },
   assignments: {
-    base: "/api/chw-assignments",
+    base: "/api/assignments",
   },
   homeVisits: {
     base: "/api/home-visits",

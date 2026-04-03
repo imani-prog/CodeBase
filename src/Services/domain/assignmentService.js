@@ -6,12 +6,18 @@ import { normalizeArray } from "../mappers/normalize.js";
 function mapAssignmentToUi(row = {}) {
   return {
     id: row.id ?? null,
+    assignmentCode: row.assignmentCode || row.code || "",
     patientId: row.patientId ?? row.patient?.id ?? null,
     chwId: row.chwId ?? row.chw?.id ?? null,
+    appointmentId: row.appointmentId ?? row.appointment?.id ?? null,
+    assignmentType: (row.assignmentType || "TASK").toUpperCase(),
     status: (row.status || "ASSIGNED").toUpperCase(),
     assignedAt: row.assignedAt || null,
     startedAt: row.startedAt || null,
     completedAt: row.completedAt || null,
+    createdAt: row.createdAt || null,
+    updatedAt: row.updatedAt || null,
+    notes: row.notes || "",
     patientName: row.patientName || row.patient?.fullName || row.patient?.name || "",
     chwName: row.chwName || row.chw?.fullName || row.chw?.name || "",
     sourceType: row.sourceType || null,
@@ -81,6 +87,7 @@ async function createAssignment(payload) {
     ...payload,
     patientId,
     chwId,
+    assignmentType: (payload.assignmentType || 'TASK').toUpperCase(),
   };
   return mapAssignmentToUi(await assignmentApi.create(normalizedPayload));
 }
@@ -99,6 +106,7 @@ async function reassignAssignment(assignmentId, payload = {}) {
 
   const requestPayload = {
     chwId: nextChwId,
+    newChwId: nextChwId,
     reason: payload.reason || 'Coverage balancing',
   };
 
@@ -123,6 +131,8 @@ async function createAssignmentFromAppointment(appointment = {}) {
   const payload = {
     patientId: appointment.patientId ?? appointment.patient?.id,
     chwId: appointment.chwId ?? appointment.providerId ?? appointment.chw?.id,
+    appointmentId: appointment.id ?? appointment.sourceAppointmentId ?? null,
+    assignmentType: "APPOINTMENT",
     status: "ASSIGNED",
     assignedAt: appointment.scheduledAt || appointment.scheduledStart || new Date().toISOString(),
   };
