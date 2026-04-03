@@ -56,8 +56,10 @@ useEffect(() => {
   const loadProfile = async () => {
     try {
       setLoadingProfile(true);
-      const data = await userApi.me();
       
+      
+      const data = await userApi.me();
+
       setProfile({
         name: data.fullName || user?.name || '',
         email: data.email || user?.email || '',
@@ -71,6 +73,16 @@ useEffect(() => {
         language: user?.language || 'English',
         status: data.status || 'ACTIVE',
       });
+
+      setUser(prev => ({
+      ...prev,
+      id: data.id,
+      name: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      role: data.role?.toLowerCase(),
+      status: data.status,
+    }));
     } catch (err) {
       console.error('Failed to load profile:', err);
     } finally {
