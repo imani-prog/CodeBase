@@ -1639,29 +1639,16 @@ const AmbulanceManagement = () => {
                     </button>
                   </div>
                 </div>
-
-                {/* Map Placeholder */}
-                <div className="h-64 flex items-center justify-center bg-gray-50">
-                  <div className="text-center">
-                    <Map className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <h3 className="text-base font-medium mb-1">Interactive Map View</h3>
-                    <p className="text-sm text-gray-600">Integration with Google Maps/Mapbox for live tracking</p>
-                    <div className="mt-3 flex justify-center space-x-4">
-                      <div className="flex items-center text-xs text-gray-600">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                        Available
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
-                        In Transit
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600">
-                        <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
-                        Emergency
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d277.7549826743736!2d37.26242921919778!3d-1.5305180166278827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f87eeedd7e1cd%3A0x2bb0f6a2ec4c7859!2sMachakos%20University%20Administration!5e0!3m2!1sen!2ske!4v1774964157029!5m2!1sen!2ske"
+                      width="100%"
+                      height="260"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Supervisor Coverage Map"
+                    />
               </div>
 
               {/* Live Tracking Table */}
