@@ -12,3 +12,4 @@ export { patientService } from "./patientService.js";
 export { prescriptionService } from "./prescriptionService.js";
 export { reportService } from "./reportService.js";
 export { telemedicineService } from "./telemedicineService.js";
+

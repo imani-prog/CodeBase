@@ -82,19 +82,7 @@ const AddDriverModal = ({ onClose, onSave }) => {
       return;
     }
 
-    // Generate new driver object
-    const newDriver = {
-      id: Date.now(),
-      ...formData,
-      totalTrips: 0,
-      rating: 0,
-      lastTrip: null,
-      avatar: `/src/assets/Timothy Imani.jpeg`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    onSave(newDriver);
+    onSave(formData);
     onClose();
   };
 

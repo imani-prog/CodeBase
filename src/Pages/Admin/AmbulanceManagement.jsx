@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { 
   Truck, 
   Users, 
@@ -65,6 +65,446 @@ import EditDriverModal from './AmbulanceManagement/modals/EditDriverModal';
 import MoreOptionsDriverModal from './AmbulanceManagement/modals/MoreOptionsDriverModal';
 import MoreOptionsModal from './AmbulanceManagement/modals/MoreOptionsModal';
 import Pagination from '../../Components/Admin/Pagination';
+import { ambulanceService } from '../../Services/domain/ambulanceService.js';
+import { hospitalService } from '../../Services/domain/hospitalService.js';
+
+const toArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.content)) return payload.content;
+  return [];
+};
+
+const toNumberOrNull = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const toNumberFromTextOrNull = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  const parsed = Number(String(value).replace(/[^\d.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const toIsoDate = (value) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().slice(0, 10);
+};
+
+const toDateOrNow = (value) => {
+  if (value instanceof Date) return value;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? new Date() : date;
+};
+
+const formatDateTime = (value) => {
+  if (!value) return 'N/A';
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return 'N/A';
+  return date.toLocaleString();
+};
+
+const formatFieldLabel = (key) => {
+  const spaced = String(key)
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return spaced ? spaced.charAt(0).toUpperCase() + spaced.slice(1) : key;
+};
+
+const formatFieldValue = (value) => {
+  if (value === null || value === undefined || value === '') return 'N/A';
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+  if (Array.isArray(value)) {
+    if (value.length === 0) return 'N/A';
+    const primitive = value.every((item) => ['string', 'number', 'boolean'].includes(typeof item));
+    return primitive ? value.join(', ') : JSON.stringify(value, null, 2);
+  }
+  if (typeof value === 'object') return JSON.stringify(value, null, 2);
+  return String(value);
+};
+
+const getExtraFields = (payload, excludedKeys = []) => {
+  if (!payload || typeof payload !== 'object') return [];
+  const excluded = new Set(excludedKeys);
+  return Object.entries(payload).filter(
+    ([key, value]) => !excluded.has(key) && value !== null && value !== undefined && value !== ''
+  );
+};
+
+const mapTypeFromApi = (type) => String(type || '').trim().toLowerCase();
+const mapTypeToApi = (type) => String(type || '').trim().replace(/\s+/g, '_').toUpperCase();
+
+const mapFuelToApi = (fuelType) => {
+  const normalized = String(fuelType || 'DIESEL').trim().toUpperCase();
+  if (normalized === 'PETROL' || normalized === 'ELECTRIC') return normalized;
+  return 'DIESEL';
+};
+
+const mapDriverStatusFromApi = (status) => {
+  const normalized = String(status || '').trim().replace(/\s+/g, '_').toUpperCase();
+  switch (normalized) {
+    case 'ON_DUTY':
+    case 'AVAILABLE':
+      return 'on_duty';
+    case 'ON_TRIP':
+    case 'ON_CALL':
+    case 'BUSY':
+      return 'on_trip';
+    case 'ON_BREAK':
+      return 'on_break';
+    default:
+      return 'off_duty';
+  }
+};
+
+const mapDriverStatusToApi = (status) => String(status || 'off_duty').trim().replace(/\s+/g, '_').toUpperCase();
+
+const extractEquipment = (row = {}) => {
+  if (Array.isArray(row.equipmentList)) return row.equipmentList;
+  if (Array.isArray(row.equipment)) {
+    return row.equipment.map((item) => item?.name || item?.equipmentName || String(item)).filter(Boolean);
+  }
+  if (typeof row.equipmentJson === 'string' && row.equipmentJson.trim()) {
+    try {
+      const parsed = JSON.parse(row.equipmentJson);
+      if (Array.isArray(parsed)) return parsed.map((item) => String(item)).filter(Boolean);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+const normalizeAmbulance = (row = {}) => {
+  const vehiclePlate = row.vehiclePlate || row.vehicleNumber || row.ambulanceUnitId || `AMB-${row.id ?? 'N/A'}`;
+  const averageResponseMinutes = toNumberOrNull(row.averageResponseMinutes);
+  return {
+    id: row.id,
+    vehiclePlate,
+    vehicleNumber: vehiclePlate,
+    registrationNumber: row.registrationNumber || '',
+    model: row.model || '',
+    year: toNumberOrNull(row.year) || '',
+    type: mapTypeFromApi(row.type),
+    status: String(row.status || 'AVAILABLE').toUpperCase(),
+    fuelType: String(row.fuelType || 'DIESEL').toUpperCase(),
+    capacity: toNumberOrNull(row.capacity) || 0,
+    equippedForICU: Boolean(row.equippedForICU),
+    gpsEnabled: Boolean(row.gpsEnabled),
+    location: row.currentLocation || row.locationAddress || row.location || 'N/A',
+    currentLocation: row.currentLocation || row.locationAddress || row.location || 'N/A',
+    driverName: row.driverName || row.currentDriver?.name || row.currentDriverName || 'Unassigned',
+    driverPhone: row.driverPhone || row.currentDriver?.phone || '',
+    medicName: row.medicName || '',
+    insurancePolicyNumber: row.insurancePolicyNumber || '',
+    insuranceProvider: row.insuranceProvider || '',
+    currentDriver: row.driverName || row.currentDriver?.name || row.currentDriverName || 'Unassigned',
+    driverContact: row.driverPhone || row.currentDriver?.phone || '',
+    lastMaintenance: toIsoDate(row.lastMaintenanceDate || row.lastMaintenance),
+    nextMaintenance: toIsoDate(row.nextMaintenanceDate || row.nextMaintenance),
+    mileage: toNumberOrNull(row.mileage) || 0,
+    fuelLevel: toNumberOrNull(row.fuelLevel) || 0,
+    equipment: extractEquipment(row),
+    lastDispatch: row.lastDispatchTime || row.lastDispatch || '',
+    totalDispatches: toNumberOrNull(row.totalDispatches) || 0,
+    averageResponseTime: averageResponseMinutes !== null
+      ? `${averageResponseMinutes} minutes`
+      : (row.averageResponseTime || 'N/A'),
+    createdAt: row.createdAt || '',
+    updatedAt: row.updatedAt || '',
+    notes: row.notes || '',
+    image: row.imageUrl || '/src/assets/MedilinkAmbulance.png',
+    backend: row,
+  };
+};
+
+const normalizeDriver = (row = {}) => {
+  const name = row.name
+    || row.driverName
+    || [row.firstName, row.lastName].filter(Boolean).join(' ')
+    || `Driver ${row.id ?? ''}`.trim();
+  const currentAmbulance = row.currentAmbulance || row.assignedAmbulance || row.ambulance || null;
+  const yearsOfExperience = toNumberOrNull(
+    row.yearsOfExperience ?? row.experienceYears ?? row.experience
+  );
+  const certifications = Array.isArray(row.certifications)
+    ? row.certifications
+    : typeof row.certifications === 'string'
+      ? row.certifications.split(',').map((item) => item.trim()).filter(Boolean)
+      : [];
+
+  const normalizedCurrentAmbulance = currentAmbulance
+    ? {
+      id: currentAmbulance.id ?? null,
+      vehiclePlate: currentAmbulance.vehiclePlate || currentAmbulance.vehicleNumber || '',
+      status: currentAmbulance.status || '',
+      currentLocation: currentAmbulance.currentLocation || currentAmbulance.location || '',
+    }
+    : null;
+
+  return {
+    id: row.id,
+    name,
+    licenseNumber: row.licenseNumber || '',
+    phone: row.phone || row.driverPhone || '',
+    email: row.email || '',
+    status: mapDriverStatusFromApi(row.status),
+    experience: yearsOfExperience !== null ? `${yearsOfExperience} years` : '',
+    yearsOfExperience,
+    experienceYears: yearsOfExperience,
+    certifications,
+    currentVehicle: row.vehiclePlate
+      || row.currentVehicle
+      || normalizedCurrentAmbulance?.vehiclePlate
+      || '',
+    currentAmbulance: normalizedCurrentAmbulance,
+    currentAmbulanceId: normalizedCurrentAmbulance?.id || null,
+    location: row.location || row.currentLocation || normalizedCurrentAmbulance?.currentLocation || 'N/A',
+    shiftStart: row.shiftStart || '',
+    shiftEnd: row.shiftEnd || '',
+    totalTrips: toNumberOrNull(row.totalTrips || row.totalDispatches) || 0,
+    rating: toNumberOrNull(row.rating || row.averageRating) || 0,
+    lastTrip: row.lastTripTime || row.lastTrip || '',
+    emergencyContact: row.emergencyContact || '',
+    dateOfBirth: toIsoDate(row.dateOfBirth),
+    hireDate: toIsoDate(row.hireDate),
+    createdAt: row.createdAt || '',
+    updatedAt: row.updatedAt || '',
+    avatarUrl: row.avatarUrl || row.avatar || '',
+    notes: row.notes || '',
+    avatar: row.avatarUrl || row.avatar || '/src/assets/Timothy Imani.jpeg',
+    backend: row,
+  };
+};
+
+const normalizeDispatch = (row = {}) => {
+  const pickupLocation = [
+    row.pickupAddressLine1,
+    row.pickupAddressLine2,
+    row.pickupCity,
+  ].filter(Boolean).join(', ') || row.pickupLocation || row.location || '';
+  const destination = row.dropoffAddressLine1 || row.hospitalName || row.destination || 'Nearest Hospital';
+  const assignedAmbulance = row.vehiclePlate || row.ambulance?.vehiclePlate || row.ambulanceUnitId || '';
+  return {
+    id: row.incidentId || `EMG-${row.id}`,
+    backendId: row.id,
+    incidentId: row.incidentId,
+    incidentType: row.incidentType || 'TRAFFIC_ACCIDENT',
+    callId: row.incidentId || `EMG-${row.id}`,
+    ambulanceId: assignedAmbulance,
+    ambulanceUnitId: row.ambulanceUnitId || assignedAmbulance,
+    vehiclePlate: assignedAmbulance,
+    priority: String(row.priority || 'MEDIUM').toUpperCase(),
+    status: String(row.status || 'REQUESTED').toUpperCase(),
+    callerName: row.callerName || 'Unknown Caller',
+    callerPhone: row.callerPhone || '',
+    callerNotes: row.callerNotes || '',
+    patientId: row.patientId || '',
+    patientName: row.patientName || 'Unknown Patient',
+    patientAge: row.patientAge || '',
+    patientGender: row.patientGender || '',
+    condition: row.patientCondition || row.condition || 'Not specified',
+    location: pickupLocation || 'N/A',
+    pickupLocation,
+    pickupAddressLine1: row.pickupAddressLine1 || '',
+    pickupAddressLine2: row.pickupAddressLine2 || '',
+    pickupCity: row.pickupCity || '',
+    pickupState: row.pickupState || '',
+    pickupPostalCode: row.pickupPostalCode || '',
+    pickupCountry: row.pickupCountry || 'Kenya',
+    pickupLatitude: row.pickupLatitude || '',
+    pickupLongitude: row.pickupLongitude || '',
+    destination,
+    hospitalId: row.hospitalId || '',
+    dropoffAddressLine1: row.dropoffAddressLine1 || '',
+    dropoffAddressLine2: row.dropoffAddressLine2 || '',
+    dropoffCity: row.dropoffCity || '',
+    dropoffState: row.dropoffState || '',
+    dropoffPostalCode: row.dropoffPostalCode || '',
+    dropoffCountry: row.dropoffCountry || 'Kenya',
+    dropoffLatitude: row.dropoffLatitude || '',
+    dropoffLongitude: row.dropoffLongitude || '',
+    callTime: toDateOrNow(row.requestTime || row.createdAt),
+    requestTime: row.requestTime,
+    dispatchTime: row.dispatchTime,
+    onSceneTime: row.onSceneTime || null,
+    arrivalTime: row.onSceneTime || row.arrivalAtHospitalTime || null,
+    completionTime: row.completionTime || null,
+    estimatedResponse: row.estimatedResponseTime || 'N/A',
+    estimatedDistance: row.estimatedDistance || '',
+    requiresICU: Boolean(row.requiresICU),
+    requiresOxygen: Boolean(row.requiresOxygen),
+    requiresStretcher: row.requiresStretcher === undefined ? null : Boolean(row.requiresStretcher),
+    nearestAmbulances: assignedAmbulance ? [assignedAmbulance] : [],
+    assignedAmbulance,
+    specialInstructions: row.specialInstructions || '',
+    notes: row.notes || '',
+    backend: row,
+  };
+};
+
+const normalizeTrackingRoute = (row, latitude, longitude) => {
+  const source = Array.isArray(row.route)
+    ? row.route
+    : Array.isArray(row.routeHistory)
+      ? row.routeHistory
+      : [];
+
+  const normalized = source
+    .map((point) => {
+      const lat = toNumberOrNull(point?.lat ?? point?.latitude);
+      const lng = toNumberOrNull(point?.lng ?? point?.longitude);
+      if (lat === null || lng === null) return null;
+      return {
+        lat,
+        lng,
+        timestamp: toDateOrNow(point?.timestamp || point?.updatedAt || point?.createdAt).toLocaleTimeString(),
+        speed: toNumberOrNull(point?.speed) || 0,
+      };
+    })
+    .filter(Boolean);
+
+  if (normalized.length > 0) return normalized;
+
+  return [
+    {
+      lat: latitude,
+      lng: longitude,
+      timestamp: toDateOrNow(row.timestamp || row.updatedAt || row.createdAt).toLocaleTimeString(),
+      speed: toNumberOrNull(row.speed) || 0,
+    },
+  ];
+};
+
+const normalizeTrackingMap = (payload = [], ambulances = []) => {
+  const trackingMap = {};
+  payload.forEach((row) => {
+    const ambulanceFromId = ambulances.find((item) => Number(item.id) === Number(row.ambulanceId));
+    const vehicleId = row.vehiclePlate
+      || row.ambulanceVehiclePlate
+      || row.ambulance?.vehiclePlate
+      || ambulanceFromId?.vehiclePlate;
+    if (!vehicleId) return;
+    const latitude = toNumberOrNull(row.latitude ?? row.currentLatitude);
+    const longitude = toNumberOrNull(row.longitude ?? row.currentLongitude);
+    if (latitude === null || longitude === null) return;
+
+    trackingMap[vehicleId] = {
+      vehicleId,
+      ambulanceId: row.ambulanceId ?? ambulanceFromId?.id ?? null,
+      latitude,
+      longitude,
+      speed: toNumberOrNull(row.speed) || 0,
+      heading: toNumberOrNull(row.heading) || 0,
+      batteryLevel: toNumberOrNull(row.batteryLevel) || 100,
+      signalStrength: toNumberOrNull(row.signalStrength) || 4,
+      locationAddress: row.locationAddress || row.currentLocation || ambulanceFromId?.location || '',
+      connectionStatus: row.connectionStatus || row.networkStatus || 'CONNECTED',
+      lastUpdate: toDateOrNow(row.timestamp || row.updatedAt || row.createdAt),
+      route: normalizeTrackingRoute(row, latitude, longitude),
+      backend: row,
+    };
+  });
+  return trackingMap;
+};
+
+const normalizeHospitalOption = (row = {}) => ({
+  id: row.id,
+  name: row.name || row.hospitalName || row.code || `Hospital ${row.id || ''}`.trim(),
+});
+
+const buildAmbulancePayload = (ambulance = {}) => ({
+  vehiclePlate: ambulance.vehiclePlate,
+  driverName: ambulance.driverName || 'Unassigned',
+  driverPhone: ambulance.driverPhone || 'N/A',
+  status: String(ambulance.status || 'AVAILABLE').toUpperCase(),
+  medicName: ambulance.medicName || null,
+  notes: ambulance.notes || null,
+  registrationNumber: ambulance.registrationNumber || null,
+  model: ambulance.model || null,
+  year: Number(ambulance.year || new Date().getFullYear()),
+  fuelType: mapFuelToApi(ambulance.fuelType),
+  capacity: Number(ambulance.capacity || 1),
+  equippedForICU: Boolean(ambulance.equippedForICU),
+  gpsEnabled: Boolean(ambulance.gpsEnabled),
+  insurancePolicyNumber: ambulance.insurancePolicyNumber || null,
+  insuranceProvider: ambulance.insuranceProvider || null,
+  type: mapTypeToApi(ambulance.type || 'basic_life_support'),
+  currentLocation: ambulance.location || ambulance.currentLocation || null,
+  lastMaintenanceDate: ambulance.lastMaintenance || null,
+  nextMaintenanceDate: ambulance.nextMaintenance || null,
+  mileage: Number(ambulance.mileage || 0),
+  fuelLevel: toNumberOrNull(ambulance.fuelLevel),
+  equipmentList: Array.isArray(ambulance.equipment) ? ambulance.equipment : [],
+});
+
+const buildDriverPayload = (driver = {}) => ({
+  name: driver.name,
+  licenseNumber: driver.licenseNumber || null,
+  phone: driver.phone || null,
+  email: driver.email || null,
+  status: mapDriverStatusToApi(driver.status),
+  yearsOfExperience: toNumberFromTextOrNull(
+    driver.yearsOfExperience ?? driver.experienceYears ?? driver.experience
+  ),
+  shiftStart: driver.shiftStart || null,
+  shiftEnd: driver.shiftEnd || null,
+  totalTrips: toNumberOrNull(driver.totalTrips),
+  rating: toNumberOrNull(driver.rating),
+  emergencyContact: driver.emergencyContact || null,
+  avatarUrl: driver.avatarUrl || driver.avatar || null,
+  dateOfBirth: driver.dateOfBirth || null,
+  hireDate: driver.hireDate || null,
+  certifications: Array.isArray(driver.certifications) ? driver.certifications : [],
+  notes: driver.notes || null,
+});
+
+const buildDispatchPayload = (form = {}, ambulanceId = null) => ({
+  incidentType: String(form.incidentType || 'TRAFFIC_ACCIDENT').toUpperCase(),
+  priority: String(form.priority || 'MEDIUM').toUpperCase(),
+  patientId: form.patientId || null,
+  patientName: form.patientName || 'Unknown Patient',
+  patientAge: toNumberOrNull(form.patientAge),
+  patientGender: form.patientGender ? String(form.patientGender).toUpperCase() : null,
+  patientCondition: form.condition || form.patientCondition || null,
+  callerName: form.callerName || null,
+  callerPhone: form.callerPhone || null,
+  callerNotes: form.callerNotes || null,
+  pickupAddressLine1: form.pickupAddressLine1 || form.pickupLocation || null,
+  pickupAddressLine2: form.pickupAddressLine2 || null,
+  pickupCity: form.pickupCity || null,
+  pickupState: form.pickupState || null,
+  pickupPostalCode: form.pickupPostalCode || null,
+  pickupCountry: form.pickupCountry || 'Kenya',
+  pickupLatitude: toNumberOrNull(form.pickupLatitude),
+  pickupLongitude: toNumberOrNull(form.pickupLongitude),
+  dropoffAddressLine1: form.dropoffAddressLine1 || form.destination || null,
+  dropoffAddressLine2: form.dropoffAddressLine2 || null,
+  dropoffCity: form.dropoffCity || null,
+  dropoffState: form.dropoffState || null,
+  dropoffPostalCode: form.dropoffPostalCode || null,
+  dropoffCountry: form.dropoffCountry || 'Kenya',
+  dropoffLatitude: toNumberOrNull(form.dropoffLatitude),
+  dropoffLongitude: toNumberOrNull(form.dropoffLongitude),
+  hospitalId: /^\d+$/.test(String(form.hospitalId || '')) ? Number(form.hospitalId) : null,
+  specialInstructions: form.specialInstructions || form.notes || null,
+  estimatedResponseTime: form.estimatedTime || null,
+  estimatedDistance: toNumberOrNull(
+    typeof form.estimatedDistance === 'string'
+      ? form.estimatedDistance.replace(/[^\d.-]/g, '')
+      : form.estimatedDistance
+  ),
+  requiresICU: Boolean(form.requiresICU),
+  requiresOxygen: Boolean(form.requiresOxygen),
+  requiresStretcher: form.requiresStretcher === undefined ? true : Boolean(form.requiresStretcher),
+  ambulanceId: ambulanceId || null,
+});
 
 const AmbulanceManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -135,512 +575,109 @@ const AmbulanceManagement = () => {
     estimatedDistance: '',
     estimatedTime: ''
   });
+  const [ambulances, setAmbulances] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [loadError, setLoadError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hospitals, setHospitals] = useState([]);
+  const [trackingData, setTrackingData] = useState({});
+  const [emergencyCalls, setEmergencyCalls] = useState([]);
 
-
-  const ambulances = useMemo(() => [
-    {
-      id: 1,
-      vehiclePlate: 'AMB-001-NB',
-      vehicleNumber: 'AMB-001-NB',
-      registrationNumber: 'KCB-001-2020',
-      model: 'Toyota Land Cruiser',
-      year: 2020,
-      type: 'advanced_life_support',
-      status: 'AVAILABLE',
-      fuelType: 'DIESEL',
-      capacity: 6,
-      equippedForICU: true,
-      gpsEnabled: true,
-      location: 'Nairobi Central Hospital',
-      driverName: 'John Kamau',
-      driverPhone: '+254 712 345 678',
-      medicName: 'Dr. Sarah Kimani',
-      insurancePolicyNumber: 'INS-KE-2024-001',
-      insuranceProvider: 'Jubilee Insurance', 
-      currentDriver: 'John Kamau',
-      driverContact: '+254 712 345 678',
-      lastMaintenance: '2024-10-05',
-      nextMaintenance: '2024-12-05',
-      mileage: 45230,
-      fuelLevel: 85,
-      equipment: ['Defibrillator', 'Oxygen Tank', 'Ventilator', 'ECG Monitor'],
-      lastDispatch: '2024-10-11 14:30:00',
-      totalDispatches: 187,
-      averageResponseTime: '8.5 minutes',
-      notes: 'Primary emergency response unit for Nairobi Central',
-      image: '/src/assets/MedilinkAmbulance.png'
-    },
-    {
-      id: 2,
-      vehiclePlate: 'AMB-002-NB',
-      vehicleNumber: 'AMB-002-NB',
-      registrationNumber: 'KCB-002-2021',
-      model: 'Mercedes-Benz Sprinter',
-      year: 2021,
-      type: 'basic_life_support',
-      status: 'BUSY',
-      fuelType: 'DIESEL',
-      capacity: 4,
-      equippedForICU: false,
-      gpsEnabled: true,
-      location: 'En route to Mathare',
-      driverName: 'Mary Wanjiku',
-      driverPhone: '+254 723 456 789',
-      medicName: 'Nurse Peter Omondi',
-      insurancePolicyNumber: 'INS-KE-2024-002',
-      insuranceProvider: 'AAR Insurance',
-      currentDriver: 'Mary Wanjiku',
-      driverContact: '+254 723 456 789',
-      lastMaintenance: '2024-09-20',
-      nextMaintenance: '2024-11-20',
-      mileage: 38940,
-      fuelLevel: 65,
-      equipment: ['First Aid Kit', 'Oxygen Tank', 'Stretcher', 'Basic Monitors'],
-      lastDispatch: '2024-10-11 16:15:00',
-      totalDispatches: 142,
-      averageResponseTime: '12.3 minutes',
-      notes: 'Specialized for non-critical patient transfers',
-      image: '/src/assets/MedilinkAmbulance.png'
-    },
-    {
-      id: 3,
-      vehiclePlate: 'AMB-003-NB',
-      vehicleNumber: 'AMB-003-NB',
-      registrationNumber: 'KCB-003-2019',
-      model: 'Ford Transit Custom',
-      year: 2019,
-      type: 'critical_care',
-      status: 'MAINTENANCE',
-      fuelType: 'DIESEL',
-      capacity: 4,
-      equippedForICU: true,
-      gpsEnabled: true,
-      location: 'Maintenance Garage',
-      driverName: 'David Mwangi',
-      driverPhone: '+254 734 567 890',
-      medicName: 'Dr. Elizabeth Wangari',
-      insurancePolicyNumber: 'INS-KE-2024-003',
-      insuranceProvider: 'CIC Insurance',
-      currentDriver: 'David Mwangi',
-      driverContact: '+254 734 567 890',
-      lastMaintenance: '2024-10-10',
-      nextMaintenance: '2024-12-10',
-      mileage: 52100,
-      fuelLevel: 30,
-      equipment: ['Advanced Ventilator', 'ECMO', 'Multiple IV Pumps', 'Cardiac Monitor'],
-      lastDispatch: '2024-10-09 22:45:00',
-      totalDispatches: 98,
-      averageResponseTime: '15.2 minutes',
-      notes: 'Critical care unit undergoing routine maintenance',
-      image: '/src/assets/MedilinkAmbulance.png'
-    },
-    {
-      id: 4,
-      vehiclePlate: 'AMB-004-NB',
-      vehicleNumber: 'AMB-004-NB',
-      registrationNumber: 'KCB-004-2022',
-      model: 'Volkswagen Crafter',
-      year: 2022,
-      type: 'patient_transport',
-      status: 'AVAILABLE',
-      fuelType: 'PETROL',
-      capacity: 8,
-      equippedForICU: false,
-      gpsEnabled: true,
-      location: 'Kenyatta Hospital',
-      driverName: 'Grace Nyong\'o',
-      driverPhone: '+254 745 678 901',
-      medicName: 'Nurse James Mutua',
-      insurancePolicyNumber: 'INS-KE-2024-004',
-      insuranceProvider: 'ICEA Lion',
-      currentDriver: 'Grace Nyong\'o',
-      driverContact: '+254 745 678 901',
-      lastMaintenance: '2024-09-15',
-      nextMaintenance: '2024-11-15',
-      mileage: 29876,
-      fuelLevel: 78,
-      equipment: ['Wheelchair Lift', 'Patient Comfort Items', 'Basic First Aid'],
-      lastDispatch: '2024-10-11 13:20:00',
-      totalDispatches: 234,
-      averageResponseTime: '18.7 minutes',
-      notes: 'Wheelchair accessible vehicle for scheduled transfers',
-      image: '/src/assets/MedilinkAmbulance.png'
-    }
-  ], []);
-
-  // Sample drivers data
-  const drivers = [
-    {
-      id: 1,
-      name: 'John Kamau',
-      licenseNumber: 'DL-123456-KE',
-      phone: '+254 712 345 678',
-      email: 'john.kamau@medilink.com',
-      status: 'on_duty',
-      experience: '8 years',
-      certifications: ['EMT-Basic', 'CPR Certified', 'Defensive Driving'],
-      currentVehicle: 'AMB-001-NB',
-      location: 'Nairobi Central Hospital',
-      shiftStart: '06:00',
-      shiftEnd: '18:00',
-      totalTrips: 342,
-      rating: 4.8,
-      lastTrip: '2024-10-11 14:30:00',
-      emergencyContact: '+254 701 234 567',
-      avatar: '/src/assets/Timothy Imani.jpeg'
-    },
-    {
-      id: 2,
-      name: 'Mary Wanjiku',
-      licenseNumber: 'DL-789012-KE',
-      phone: '+254 723 456 789',
-      email: 'mary.wanjiku@medilink.com',
-      status: 'on_trip',
-      experience: '5 years',
-      certifications: ['EMT-Intermediate', 'CPR Certified', 'First Aid'],
-      currentVehicle: 'AMB-002-NB',
-      location: 'En route to Mathare',
-      shiftStart: '18:00',
-      shiftEnd: '06:00',
-      totalTrips: 278,
-      rating: 4.9,
-      lastTrip: '2024-10-11 16:15:00',
-      emergencyContact: '+254 712 345 678',
-      avatar: '/src/assets/Grace Achieng.jpeg'
-    },
-    {
-      id: 3,
-      name: 'David Mwangi',
-      licenseNumber: 'DL-345678-KE',
-      phone: '+254 734 567 890',
-      email: 'david.mwangi@medilink.com',
-      status: 'off_duty',
-      experience: '12 years',
-      certifications: ['EMT-Paramedic', 'Advanced Life Support', 'Critical Care Transport'],
-      currentVehicle: 'AMB-003-NB',
-      location: 'Off Duty',
-      shiftStart: '06:00',
-      shiftEnd: '18:00',
-      totalTrips: 456,
-      rating: 4.7,
-      lastTrip: '2024-10-09 22:45:00',
-      emergencyContact: '+254 723 456 789',
-      avatar: '/src/assets/Joseph Otieno.jpeg'
-    },
-    {
-      id: 4,
-      name: 'Grace Nyong\'o',
-      licenseNumber: 'DL-901234-KE',
-      phone: '+254 745 678 901',
-      email: 'grace.nyongo@medilink.com',
-      status: 'on_duty',
-      experience: '3 years',
-      certifications: ['EMT-Basic', 'Patient Transport', 'Customer Service'],
-      currentVehicle: 'AMB-004-NB',
-      location: 'Kenyatta Hospital',
-      shiftStart: '12:00',
-      shiftEnd: '00:00',
-      totalTrips: 189,
-      rating: 4.6,
-      lastTrip: '2024-10-11 13:20:00',
-      emergencyContact: '+254 734 567 890',
-      avatar: '/src/assets/Susan Mwangi.jpeg'
-    }
-  ];
-
-  // Sample dispatch records
-  const dispatches = [
-    {
-      id: 1,
-      incidentId: 'INC-2024-1011-001',
-      incidentType: 'CARDIAC_ARREST',
-      callId: 'EMRG-2024-1011-001',
-      ambulanceId: 'AMB-002-NB',
-      ambulanceUnitId: 'UNIT-002',
-      vehiclePlate: 'AMB-002-NB',
-      driverId: 2,
-      driverName: 'Mary Wanjiku',
-      medicName: 'Nurse Peter Omondi',
-      priority: 'CRITICAL',
-      status: 'TRANSPORTING',
-      
-  
-      callerName: 'Dr. Susan Mwangi',
-      callerPhone: '+254712890123',
-      callerNotes: 'Patient is unconscious, CPR in progress by bystanders',
-      
- 
-      patientId: 'PAT-2024-045',
-      patientName: 'Michael Ochieng',
-      patientAge: 45,
-      condition: 'Chest Pain - Suspected Myocardial Infarction',
-      
-      
-      pickupLocation: 'Mathare Shopping Center',
-      pickupAddressLine1: 'Mathare Shopping Center',
-      pickupAddressLine2: 'Juja Road',
-      pickupCity: 'Nairobi',
-      pickupState: 'Nairobi County',
-      pickupPostalCode: '00100',
-      pickupCountry: 'Kenya',
-      pickupLatitude: -1.2541,
-      pickupLongitude: 36.8749,
-      
-  
-      destination: 'Kenyatta Hospital Emergency',
-      hospitalId: 'HOSP-001',
-      dropoffAddressLine1: 'Kenyatta National Hospital',
-      dropoffAddressLine2: 'Hospital Road',
-      dropoffCity: 'Nairobi',
-      dropoffState: 'Nairobi County',
-      dropoffPostalCode: '00202',
-      dropoffCountry: 'Kenya',
-      dropoffLatitude: -1.3018,
-      dropoffLongitude: 36.8073,
-      
-      requestTime: '2024-10-11T16:15:00+03:00',
-      dispatchTime: '2024-10-11T16:16:30+03:00', 
-      enRouteTime: '2024-10-11T16:17:45+03:00', 
-      onSceneTime: '2024-10-11T16:25:30+03:00', 
-      departSceneTime: '2024-10-11T16:35:15+03:00',
-      arrivalAtHospitalTime: null,
-      completionTime: null, 
-      
-      
-      callTime: '2024-10-11 16:15:00',
-      arrivalTime: null,
-      
-      distance: '12.5 km',
-      estimatedTime: '15 minutes',
-      notes: 'Patient stabilized on scene, transported with ALS support, IV access established'
-    },
-    {
-      id: 2,
-      incidentId: 'INC-2024-1011-002',
-      incidentType: 'TRAFFIC_ACCIDENT',
-      callId: 'EMRG-2024-1011-002',
-      ambulanceId: 'AMB-001-NB',
-      ambulanceUnitId: 'UNIT-001',
-      vehiclePlate: 'AMB-001-NB',
-      driverId: 1,
-      driverName: 'John Kamau',
-      medicName: 'Dr. Sarah Kimani',
+  const resetDispatchForm = useCallback(() => {
+    setDispatchForm({
       priority: 'HIGH',
-      status: 'COMPLETED',
-      
-      callerName: 'Traffic Police',
-      callerPhone: '+254700123456',
-      callerNotes: 'Two vehicle collision, multiple casualties, ambulance requested for one critical patient',
-      
-      patientId: 'PAT-2024-032',
-      patientName: 'Sarah Wanjiku',
-      patientAge: 32,
-      condition: 'Motor Vehicle Accident - Multiple Trauma',
-      
-      pickupLocation: 'Uhuru Highway Junction',
-      pickupAddressLine1: 'Uhuru Highway',
-      pickupAddressLine2: 'Near Nyayo Stadium',
-      pickupCity: 'Nairobi',
-      pickupState: 'Nairobi County',
-      pickupPostalCode: '00100',
+      incidentType: 'TRAFFIC_ACCIDENT',
+      patientName: '',
+      patientId: '',
+      patientAge: '',
+      condition: '',
+      pickupLocation: '',
+      pickupAddressLine1: '',
+      pickupAddressLine2: '',
+      pickupCity: '',
+      pickupState: '',
+      pickupPostalCode: '',
       pickupCountry: 'Kenya',
-      pickupLatitude: -1.3019,
-      pickupLongitude: 36.8267,
-      
-      destination: 'Nairobi Hospital Trauma Center',
-      hospitalId: 'HOSP-002',
-      dropoffAddressLine1: 'Nairobi Hospital',
-      dropoffAddressLine2: 'Argwings Kodhek Road',
-      dropoffCity: 'Nairobi',
-      dropoffState: 'Nairobi County',
-      dropoffPostalCode: '00506',
+      pickupLatitude: '',
+      pickupLongitude: '',
+      destination: '',
+      hospitalId: '',
+      dropoffAddressLine1: '',
+      dropoffAddressLine2: '',
+      dropoffCity: '',
+      dropoffState: '',
+      dropoffPostalCode: '',
       dropoffCountry: 'Kenya',
-      dropoffLatitude: -1.2884,
-      dropoffLongitude: 36.8082,
-      
-      requestTime: '2024-10-11T14:30:00+03:00',
-      dispatchTime: '2024-10-11T14:31:15+03:00',
-      enRouteTime: '2024-10-11T14:32:00+03:00',
-      onSceneTime: '2024-10-11T14:38:45+03:00',
-      departSceneTime: '2024-10-11T14:52:30+03:00',
-      arrivalAtHospitalTime: '2024-10-11T15:05:15+03:00',
-      completionTime: '2024-10-11T15:15:30+03:00',
-      
-      callTime: '2024-10-11 14:30:00',
-      arrivalTime: '2024-10-11 14:38:45',
-      
-      distance: '8.2 km',
-      estimatedTime: '12 minutes',
-      actualTime: '7.5 minutes',
-      notes: 'Patient extracted from vehicle, C-spine immobilization, rapid transport to trauma center. GCS 13 on scene.'
-    },
-    {
-      id: 3,
-      incidentId: 'INC-2024-1011-003',
-      incidentType: 'SCHEDULED_TRANSPORT',
-      callId: 'EMRG-2024-1011-003',
-      ambulanceId: 'AMB-004-NB',
-      ambulanceUnitId: 'UNIT-004',
-      vehiclePlate: 'AMB-004-NB',
-      driverId: 4,
-      driverName: 'Grace Nyong\'o',
-      medicName: 'Nurse James Mutua',
-      priority: 'MEDIUM',
-      status: 'COMPLETED',
-      
-      callerName: 'Family Member',
-      callerPhone: '+254723567890',
-      callerNotes: 'Scheduled dialysis appointment, patient has mobility issues, wheelchair required',
-      
-      patientId: 'PAT-2024-067',
-      patientName: 'Peter Kimani',
-      patientAge: 67,
-      condition: 'Scheduled Dialysis Transfer - ESRD Patient',
-      
-      pickupLocation: 'Patient Home - Dandora',
-      pickupAddressLine1: 'House No. 45',
-      pickupAddressLine2: 'Phase 4, Dandora',
-      pickupCity: 'Nairobi',
-      pickupState: 'Nairobi County',
-      pickupPostalCode: '00100',
-      pickupCountry: 'Kenya',
-      pickupLatitude: -1.2574,
-      pickupLongitude: 36.8969,
-      
-      destination: 'Nairobi Dialysis Center',
-      hospitalId: 'HOSP-003',
-      dropoffAddressLine1: 'Nairobi Dialysis Center',
-      dropoffAddressLine2: 'Ngong Road',
-      dropoffCity: 'Nairobi',
-      dropoffState: 'Nairobi County',
-      dropoffPostalCode: '00100',
-      dropoffCountry: 'Kenya',
-      dropoffLatitude: -1.2921,
-      dropoffLongitude: 36.7820,
-      
-      requestTime: '2024-10-11T13:20:00+03:00',
-      dispatchTime: '2024-10-11T13:22:30+03:00',
-      enRouteTime: '2024-10-11T13:25:00+03:00',
-      onSceneTime: '2024-10-11T13:35:15+03:00',
-      departSceneTime: '2024-10-11T13:45:30+03:00',
-      arrivalAtHospitalTime: '2024-10-11T14:05:00+03:00',
-      completionTime: '2024-10-11T14:20:45+03:00',
-      
-      callTime: '2024-10-11 13:20:00',
-      arrivalTime: '2024-10-11 13:35:15',
-      
-      distance: '15.3 km',
-      estimatedTime: '25 minutes',
-      actualTime: '12.75 minutes',
-      notes: 'Routine dialysis transport, patient stable, vitals monitored throughout transport. Family notified of safe arrival.'
-    }
-  ];
+      dropoffLatitude: '',
+      dropoffLongitude: '',
+      callerName: '',
+      callerPhone: '',
+      callerNotes: '',
+      specialInstructions: '',
+      notes: '',
+      estimatedDistance: '',
+      estimatedTime: '',
+    });
+  }, []);
 
-  // Live tracking data for active ambulances
-  const [trackingData, setTrackingData] = useState({
-    'AMB-001-NB': {
-      latitude: -1.2921,
-      longitude: 36.8219,
-      speed: 0,
-      heading: 180,
-      batteryLevel: 85,
-      signalStrength: 4,
-      lastUpdate: new Date(),
-      route: [
-        { lat: -1.2921, lng: 36.8219, timestamp: '16:15:00' },
-        { lat: -1.2925, lng: 36.8225, timestamp: '16:16:00' },
-        { lat: -1.2930, lng: 36.8230, timestamp: '16:17:00' }
-      ]
-    },
-    'AMB-002-NB': {
-      latitude: -1.2541,
-      longitude: 36.7749,
-      speed: 45,
-      heading: 90,
-      batteryLevel: 72,
-      signalStrength: 3,
-      lastUpdate: new Date(),
-      route: [
-        { lat: -1.2541, lng: 36.7749, timestamp: '16:15:30' },
-        { lat: -1.2545, lng: 36.7755, timestamp: '16:16:30' },
-        { lat: -1.2548, lng: 36.7760, timestamp: '16:17:30' }
-      ]
+  const refreshDashboardData = useCallback(async ({ silent = false } = {}) => {
+    if (silent) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
     }
-  });
+    setLoadError('');
 
-  // Active emergency calls queue
-  const [emergencyCalls, setEmergencyCalls] = useState([
-    {
-      id: 'EMG-001',
-      priority: 'critical',
-      patientName: 'Jane Doe',
-      condition: 'Cardiac Arrest',
-      location: 'Westlands Shopping Mall, Parking Lot A',
-      coordinates: { lat: -1.2676, lng: 36.8108 },
-      callerName: 'Security Guard',
-      callerPhone: '+254 722 123 456',
-      callTime: new Date(Date.now() - 5 * 60000),
-      estimatedResponse: '8 minutes',
-      nearestAmbulances: ['AMB-001-NB', 'AMB-003-NB'],
-      status: 'pending'
-    },
-    {
-      id: 'EMG-002',
-      priority: 'high',
-      patientName: 'Peter Kiprotich',
-      condition: 'Motor Vehicle Accident - Multiple Injuries',
-      location: 'Thika Road, Near Githurai Roundabout',
-      coordinates: { lat: -1.1838, lng: 36.9289 },
-      callerName: 'Witness',
-      callerPhone: '+254 733 987 654',
-      callTime: new Date(Date.now() - 10 * 60000),
-      estimatedResponse: '12 minutes',
-      nearestAmbulances: ['AMB-002-NB', 'AMB-004-NB'],
-      status: 'pending'
-    },
-    {
-      id: 'EMG-003',
-      priority: 'medium',
-      patientName: 'Lucy Wambui',
-      condition: 'Fall Injury - Possible Fracture',
-      location: 'Karen Shopping Center, Near Entrance B',
-      coordinates: { lat: -1.3521, lng: 36.7073 },
-      callerName: 'Shop Owner',
-      callerPhone: '+254 711 654 321',
-      callTime: new Date(Date.now() - 15 * 60000),
-      estimatedResponse: '10 minutes',
-      nearestAmbulances: ['AMB-005-NB', 'AMB-006-NB'],
-      status: 'pending'
+    try {
+      const [ambulancePayload, driverPayload, dispatchPayload, trackingPayload, hospitalPayload] = await Promise.all([
+        ambulanceService.getAllAmbulances(),
+        ambulanceService.getAllDrivers(),
+        ambulanceService.getAllDispatches(),
+        ambulanceService.getAllActiveTracking(),
+        hospitalService.listHospitals().catch((error) => {
+          console.error('Hospital list sync failed:', error);
+          return [];
+        }),
+      ]);
+
+      const nextAmbulances = toArray(ambulancePayload).map(normalizeAmbulance);
+      const nextDrivers = toArray(driverPayload).map(normalizeDriver);
+      const nextDispatches = toArray(dispatchPayload).map(normalizeDispatch);
+      const nextTrackingMap = normalizeTrackingMap(toArray(trackingPayload), nextAmbulances);
+      const nextHospitals = toArray(hospitalPayload).map(normalizeHospitalOption);
+
+      setAmbulances(nextAmbulances);
+      setDrivers(nextDrivers);
+      setEmergencyCalls(nextDispatches);
+      setTrackingData(nextTrackingMap);
+      setHospitals(nextHospitals);
+    } catch (error) {
+      console.error('Ambulance dashboard sync failed:', error);
+      setLoadError(error?.message || 'Failed to load ambulance data from backend.');
+      if (!silent) {
+        setAmbulances([]);
+        setDrivers([]);
+        setEmergencyCalls([]);
+        setTrackingData({});
+        setHospitals([]);
+      }
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
     }
-  ]);
+  }, []);
 
-  // Auto-update tracking data simulation
+  useEffect(() => {
+    refreshDashboardData();
+  }, [refreshDashboardData]);
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setTrackingData(prevData => {
-        const updatedData = { ...prevData };
-        
-        Object.keys(updatedData).forEach(vehicleId => {
-          const data = updatedData[vehicleId];
-          
-          const ambulance = ambulances.find(a => a.vehicleNumber === vehicleId);
-          if (ambulance && (ambulance.status === 'BUSY' || ambulance.status === 'in_transit' || ambulance.status === 'TRANSPORTING')) {
-            updatedData[vehicleId] = {
-              ...data,
-              latitude: data.latitude + (Math.random() - 0.5) * 0.001,
-              longitude: data.longitude + (Math.random() - 0.5) * 0.001,
-              speed: Math.max(0, data.speed + (Math.random() - 0.5) * 10),
-              heading: (data.heading + (Math.random() - 0.5) * 20) % 360,
-              lastUpdate: new Date()
-            };
-          }
-        });
-        
-        return updatedData;
-      });
-    }, 5000);
+      refreshDashboardData({ silent: true });
+    }, 20000);
     return () => clearInterval(interval);
-  }, [ambulances]);
+  }, [refreshDashboardData]);
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
@@ -724,31 +761,35 @@ const AmbulanceManagement = () => {
     }
   };
 
-  const filteredAmbulances = ambulances.filter(ambulance => {
-    const matchesSearch = ambulance.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ambulance.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ambulance.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ambulance.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ambulance.currentDriver.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ambulance.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ambulance.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || ambulance.status === selectedStatus || ambulance.status.toLowerCase() === selectedStatus.toLowerCase();
+  const filteredAmbulances = ambulances.filter((ambulance) => {
+    const query = searchTerm.toLowerCase();
+    const matchesSearch =
+      (ambulance.vehicleNumber || '').toLowerCase().includes(query)
+      || (ambulance.vehiclePlate || '').toLowerCase().includes(query)
+      || (ambulance.registrationNumber || '').toLowerCase().includes(query)
+      || (ambulance.model || '').toLowerCase().includes(query)
+      || (ambulance.currentDriver || '').toLowerCase().includes(query)
+      || (ambulance.driverName || '').toLowerCase().includes(query)
+      || (ambulance.location || '').toLowerCase().includes(query);
+    const matchesStatus = selectedStatus === 'all'
+      || ambulance.status === selectedStatus
+      || String(ambulance.status || '').toLowerCase() === selectedStatus.toLowerCase();
     const matchesType = selectedType === 'all' || ambulance.type === selectedType;
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const filteredDrivers = drivers.filter(driver => {
-    const matchesSearch = driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         driver.currentVehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         driver.location.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+  const filteredDrivers = drivers.filter((driver) => {
+    const query = searchTerm.toLowerCase();
+    return (driver.name || '').toLowerCase().includes(query)
+      || (driver.currentVehicle || '').toLowerCase().includes(query)
+      || (driver.location || '').toLowerCase().includes(query);
   });
 
-  const filteredDispatches = dispatches.filter(dispatch => {
-    const matchesSearch = dispatch.callId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dispatch.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dispatch.pickupLocation.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+  const _filteredDispatches = emergencyCalls.filter((dispatch) => {
+    const query = searchTerm.toLowerCase();
+    return (dispatch.callId || dispatch.id || '').toLowerCase().includes(query)
+      || (dispatch.patientName || '').toLowerCase().includes(query)
+      || (dispatch.pickupLocation || dispatch.location || '').toLowerCase().includes(query);
   });
 
   // Paginated data
@@ -765,239 +806,280 @@ const AmbulanceManagement = () => {
   }, [filteredDrivers, driverPage]);
 
   // Dispatch handling functions
-  const handleDispatch = (ambulanceId, callId) => {
-    const call = emergencyCalls.find(c => c.id === callId);
+  const handleDispatch = async (ambulancePlate, callId) => {
+    const call = emergencyCalls.find((item) => item.id === callId);
     if (!call) return;
 
-    const _newDispatch = {
-      id: Date.now(),
-      callId: `EMRG-2024-${new Date().getMonth() + 1}${new Date().getDate()}-${String(dispatches.length + 1).padStart(3, '0')}`,
-      ambulanceId,
-      driverId: ambulances.find(a => a.vehicleNumber === ambulanceId)?.currentDriver,
-      priority: call.priority,
-      status: 'dispatched',
-      callTime: call.callTime.toISOString(),
-      dispatchTime: new Date().toISOString(),
-      arrivalTime: null,
-      completionTime: null,
-      patientName: call.patientName,
-      condition: call.condition,
-      pickupLocation: call.location,
-      destination: dispatchForm.destination || 'Nearest Hospital',
-      callerName: call.callerName,
-      callerPhone: call.callerPhone,
-      specialInstructions: dispatchForm.specialInstructions
-    };
-
-    // Update emergency calls
-    setEmergencyCalls(prev => 
-      prev.map(c => c.id === callId ? { ...c, status: 'dispatched', assignedAmbulance: ambulanceId } : c)
+    const selectedUnit = ambulances.find(
+      (item) => item.vehiclePlate === ambulancePlate || item.vehicleNumber === ambulancePlate
     );
-
-    setShowDispatchModal(false);
-    setDispatchForm({
-      priority: 'HIGH',
-      incidentType: 'TRAFFIC_ACCIDENT',
-      patientName: '',
-      patientId: '',
-      patientAge: '',
-      condition: '',
-      pickupLocation: '',
-      pickupAddressLine1: '',
-      pickupAddressLine2: '',
-      pickupCity: '',
-      pickupState: '',
-      pickupPostalCode: '',
-      pickupCountry: 'Kenya',
-      pickupLatitude: '',
-      pickupLongitude: '',
-      destination: '',
-      hospitalId: '',
-      dropoffAddressLine1: '',
-      dropoffAddressLine2: '',
-      dropoffCity: '',
-      dropoffState: '',
-      dropoffPostalCode: '',
-      dropoffCountry: 'Kenya',
-      dropoffLatitude: '',
-      dropoffLongitude: '',
-      callerName: '',
-      callerPhone: '',
-      callerNotes: '',
-      specialInstructions: '',
-      notes: '',
-      estimatedDistance: '',
-      estimatedTime: ''
-    });
-
-    
-    alert(`Ambulance ${ambulanceId} successfully dispatched to ${call.location}`);
-  };
-
-  const handleQuickDispatch = (call) => {
-    const availableAmbulances = ambulances.filter(a => a.status === 'available');
-    if (availableAmbulances.length === 0) {
-      alert('No ambulances available for dispatch');
+    if (!selectedUnit?.id) {
+      window.alert('Selected ambulance was not found in backend records.');
       return;
     }
 
-    
-    const nearestAmbulance = availableAmbulances[0];
-    handleDispatch(nearestAmbulance.vehicleNumber, call.id);
-  };
+    try {
+      setIsDispatching(true);
+      const payload = buildDispatchPayload(
+        {
+          incidentType: call.incidentType || dispatchForm.incidentType,
+          priority: call.priority || dispatchForm.priority,
+          patientName: call.patientName || dispatchForm.patientName,
+          patientAge: call.patientAge || dispatchForm.patientAge,
+          condition: call.condition || dispatchForm.condition,
+          pickupAddressLine1: call.pickupAddressLine1 || call.pickupLocation || call.location,
+          pickupAddressLine2: call.pickupAddressLine2 || '',
+          pickupCity: call.pickupCity || '',
+          pickupState: call.pickupState || '',
+          pickupPostalCode: call.pickupPostalCode || '',
+          pickupCountry: call.pickupCountry || 'Kenya',
+          pickupLatitude: call.pickupLatitude,
+          pickupLongitude: call.pickupLongitude,
+          callerName: call.callerName,
+          callerPhone: call.callerPhone,
+          callerNotes: call.callerNotes,
+          destination: call.destination || dispatchForm.destination,
+          specialInstructions: call.specialInstructions || dispatchForm.specialInstructions,
+          estimatedTime: call.estimatedResponse,
+        },
+        selectedUnit.id
+      );
 
-  const handleEditSave = (updatedAmbulance) => {
-    
-    console.log('Saving updated ambulance:', updatedAmbulance);
-    
-  
-    setShowEditModal(false);
-    setCurrentAmbulance(null);
-    
-    
-    setTimeout(() => {
-      alert(' Ambulance updated successfully!');
-    }, 100);
-  };
+      if (call.backendId) {
+        await ambulanceService.updateDispatch(call.backendId, payload);
+      } else {
+        await ambulanceService.createDispatch(payload);
+      }
 
-  const handleAddSave = (newAmbulance) => {
-  
-    console.log('Adding new ambulance:', newAmbulance);
-    
-    setShowAddModal(false);
- 
-    setTimeout(() => {
-      alert(' Ambulance added successfully!');
-    }, 100);
-  };
+      await ambulanceService.updateStatus(selectedUnit.id, 'DISPATCHED');
+      await refreshDashboardData({ silent: true });
 
-  const handleAddDriverSave = (newDriver) => {
-
-    console.log('Adding new driver:', newDriver);
-  
-    setShowAddDriverModal(false);
-  
-    setTimeout(() => {
-      alert(' Driver added successfully!');
-    }, 100);
-  };
-
-  const handleAddTrackingSave = (newTrackingData) => {
-    console.log('Adding unit to tracking:', newTrackingData);
-    
-  
-    setShowAddTrackingModal(false);
-  
-    setTrackingData(prev => ({
-      ...prev,
-      [newTrackingData.vehicleId]: newTrackingData
-    }));
-   
-    setTimeout(() => {
-      alert(` ${newTrackingData.vehicleId} added to live tracking!`);
-    }, 100);
-  };
-
-  const handleEditDriverSave = (updatedDriver) => {
-    
-    console.log('Updating driver:', updatedDriver);
-  
-    setShowEditDriverModal(false);
-    setCurrentDriver(null);
-    
-   
-    setTimeout(() => {
-      alert('Driver updated successfully!');
-    }, 100);
-  };
-
-  const handleMoreDriverAction = (action, driver) => {
-    console.log(`Action: ${action} for driver:`, driver);
-    
-    switch(action) {
-      case 'view-history':
-        alert(`Loading trip history for ${driver.name}...`);
-        break;
-      case 'schedule':
-        alert(`Opening schedule management for ${driver.name}...`);
-        break;
-      case 'location':
-        alert(`Tracking location for ${driver.name}...`);
-        break;
-      case 'export':
-        alert(`Exporting details for ${driver.name}...`);
-        break;
-      case 'suspend':
-        if (confirm(`Are you sure you want to suspend ${driver.name}?`)) {
-          alert(`${driver.name} has been suspended.`);
-        }
-        break;
-      case 'deactivate':
-        if (confirm(`Are you sure you want to deactivate ${driver.name}? This action cannot be undone.`)) {
-          alert(`${driver.name} has been deactivated.`);
-        }
-        break;
-      case 'delete':
-        if (confirm(`Are you sure you want to permanently delete ${driver.name}? This action cannot be undone and all data will be lost.`)) {
-          
-          alert(`${driver.name} has been deleted from the system.`);
-          console.log('Deleting driver:', driver);
-        }
-        break;
-      default:
-        alert(`Action ${action} not implemented yet.`);
+      setEmergencyCalls((prev) =>
+        prev.map((item) =>
+          item.id === callId
+            ? { ...item, status: 'DISPATCHED', assignedAmbulance: selectedUnit.vehiclePlate }
+            : item
+        )
+      );
+      setShowDispatchModal(false);
+      resetDispatchForm();
+      setSelectedAmbulance(null);
+      window.alert(`Ambulance ${selectedUnit.vehiclePlate} dispatched successfully.`);
+    } catch (error) {
+      window.alert(error?.message || 'Failed to dispatch ambulance.');
+    } finally {
+      setIsDispatching(false);
     }
-    
-    
+  };
+
+  const handleQuickDispatch = async (call) => {
+    const availableAmbulances = ambulances.filter((item) => item.status === 'AVAILABLE');
+    if (availableAmbulances.length === 0) {
+      window.alert('No ambulances available for dispatch');
+      return;
+    }
+    const nearestAmbulance = availableAmbulances[0];
+    await handleDispatch(nearestAmbulance.vehiclePlate, call.id);
+  };
+
+  const handleEditSave = async (updatedAmbulance) => {
+    if (!updatedAmbulance?.id) {
+      window.alert('Cannot update ambulance without backend id.');
+      return;
+    }
+
+    try {
+      await ambulanceService.updateAmbulance(updatedAmbulance.id, buildAmbulancePayload(updatedAmbulance));
+      await refreshDashboardData({ silent: true });
+      setShowEditModal(false);
+      setCurrentAmbulance(null);
+      window.alert('Ambulance updated successfully.');
+    } catch (error) {
+      window.alert(error?.message || 'Failed to update ambulance.');
+    }
+  };
+
+  const handleAddSave = async (newAmbulance) => {
+    try {
+      await ambulanceService.addAmbulance(buildAmbulancePayload(newAmbulance));
+      await refreshDashboardData({ silent: true });
+      setShowAddModal(false);
+      window.alert('Ambulance added successfully.');
+    } catch (error) {
+      window.alert(error?.message || 'Failed to add ambulance.');
+    }
+  };
+
+  const handleAddDriverSave = async (newDriver) => {
+    try {
+      const createdDriver = await ambulanceService.addDriver(buildDriverPayload(newDriver));
+
+      if (newDriver.currentVehicle && createdDriver?.id) {
+        const matchedAmbulance = ambulances.find(
+          (item) => item.vehiclePlate === newDriver.currentVehicle || item.vehicleNumber === newDriver.currentVehicle
+        );
+        if (matchedAmbulance?.id) {
+          await ambulanceService.assignToAmbulance(createdDriver.id, matchedAmbulance.id);
+        }
+      }
+
+      await refreshDashboardData({ silent: true });
+      setShowAddDriverModal(false);
+      window.alert('Driver added successfully.');
+    } catch (error) {
+      window.alert(error?.message || 'Failed to add driver.');
+    }
+  };
+
+  const handleAddTrackingSave = async (newTrackingData) => {
+    try {
+      const selectedUnit = ambulances.find(
+        (item) => item.vehiclePlate === newTrackingData.vehicleId || item.vehicleNumber === newTrackingData.vehicleId
+      );
+      if (!selectedUnit?.id) {
+        window.alert('Selected ambulance was not found in backend records.');
+        return;
+      }
+
+      await ambulanceService.updateLocation(selectedUnit.id, {
+        latitude: toNumberOrNull(newTrackingData.latitude),
+        longitude: toNumberOrNull(newTrackingData.longitude),
+        speed: toNumberOrNull(newTrackingData.speed),
+        heading: toNumberOrNull(newTrackingData.heading),
+        batteryLevel: toNumberOrNull(newTrackingData.batteryLevel),
+        signalStrength: toNumberOrNull(newTrackingData.signalStrength),
+        locationAddress: selectedUnit.location,
+        timestamp: new Date().toISOString(),
+      });
+
+      await refreshDashboardData({ silent: true });
+      setShowAddTrackingModal(false);
+      window.alert(`${newTrackingData.vehicleId} added to live tracking.`);
+    } catch (error) {
+      window.alert(error?.message || 'Failed to add tracking unit.');
+    }
+  };
+
+  const handleEditDriverSave = async (updatedDriver) => {
+    if (!updatedDriver?.id) {
+      window.alert('Cannot update driver without backend id.');
+      return;
+    }
+
+    try {
+      await ambulanceService.updateDriver(updatedDriver.id, buildDriverPayload(updatedDriver));
+
+      const selectedVehicle = (updatedDriver.currentVehicle || '').trim();
+      if (selectedVehicle) {
+        const matchedAmbulance = ambulances.find(
+          (item) => item.vehiclePlate === selectedVehicle || item.vehicleNumber === selectedVehicle
+        );
+        if (matchedAmbulance?.id) {
+          await ambulanceService.assignToAmbulance(updatedDriver.id, matchedAmbulance.id);
+        }
+      } else {
+        await ambulanceService.unassignFromAmbulance(updatedDriver.id);
+      }
+
+      await refreshDashboardData({ silent: true });
+      setShowEditDriverModal(false);
+      setCurrentDriver(null);
+      window.alert('Driver updated successfully.');
+    } catch (error) {
+      window.alert(error?.message || 'Failed to update driver.');
+    }
+  };
+
+  const handleMoreDriverAction = async (action, driver) => {
+    try {
+      switch (action) {
+        case 'view-history':
+          window.alert(`Loading trip history for ${driver.name}...`);
+          break;
+        case 'schedule':
+          window.alert(`Opening schedule management for ${driver.name}...`);
+          break;
+        case 'location':
+          window.alert(`Tracking location for ${driver.name}...`);
+          break;
+        case 'export':
+          window.alert(`Exporting details for ${driver.name}...`);
+          break;
+        case 'suspend':
+          if (window.confirm(`Are you sure you want to suspend ${driver.name}?`)) {
+            await ambulanceService.updateDriverStatus(driver.id, 'OFF_DUTY');
+            await refreshDashboardData({ silent: true });
+            window.alert(`${driver.name} has been suspended.`);
+          }
+          break;
+        case 'deactivate':
+          if (window.confirm(`Are you sure you want to deactivate ${driver.name}? This action cannot be undone.`)) {
+            await ambulanceService.updateDriverStatus(driver.id, 'OFF_DUTY');
+            await refreshDashboardData({ silent: true });
+            window.alert(`${driver.name} has been deactivated.`);
+          }
+          break;
+        case 'delete':
+          if (window.confirm(`Are you sure you want to permanently delete ${driver.name}? This action cannot be undone and all data will be lost.`)) {
+            await ambulanceService.deleteDriver(driver.id);
+            await refreshDashboardData({ silent: true });
+            window.alert(`${driver.name} has been deleted from the system.`);
+          }
+          break;
+        default:
+          window.alert(`Action ${action} not implemented yet.`);
+      }
+    } catch (error) {
+      window.alert(error?.message || 'Driver action failed.');
+    }
+
     setShowMoreDriverModal(false);
     setCurrentDriver(null);
   };
 
-  const handleMoreAction = (action, ambulance) => {
-    console.log(`Action: ${action} for ambulance:`, ambulance);
-    
-    switch(action) {
-      case 'track':
-        
-        alert(`Tracking ${ambulance.vehiclePlate}...`);
-        break;
-      case 'schedule':
-       
-        alert(`Opening maintenance schedule for ${ambulance.vehiclePlate}...`);
-        break;
-      case 'history':
-        
-        alert(`Loading service history for ${ambulance.vehiclePlate}...`);
-        break;
-      case 'export':
-        
-        alert(`Exporting details for ${ambulance.vehiclePlate}...`);
-        break;
-      case 'print':
-        
-        alert(`Printing report for ${ambulance.vehiclePlate}...`);
-        break;
-      case 'refresh':
-        
-        alert(`Refreshing status for ${ambulance.vehiclePlate}...`);
-        break;
-      case 'archive':
-        if (confirm(`Are you sure you want to archive ${ambulance.vehiclePlate}?`)) {
-          
-          alert(`${ambulance.vehiclePlate} archived successfully`);
-        }
-        break;
-      case 'delete':
-        if (confirm(`Are you sure you want to delete ${ambulance.vehiclePlate}? This action cannot be undone.`)) {
-         
-          alert(`${ambulance.vehiclePlate} deleted successfully`);
-        }
-        break;
-      default:
-        console.log('Unknown action:', action);
+  const handleMoreAction = async (action, ambulance) => {
+    try {
+      switch (action) {
+        case 'track':
+          window.alert(`Tracking ${ambulance.vehiclePlate}...`);
+          break;
+        case 'schedule':
+          window.alert(`Opening maintenance schedule for ${ambulance.vehiclePlate}...`);
+          break;
+        case 'history':
+          window.alert(`Loading service history for ${ambulance.vehiclePlate}...`);
+          break;
+        case 'export':
+          window.alert(`Exporting details for ${ambulance.vehiclePlate}...`);
+          break;
+        case 'print':
+          window.alert(`Printing report for ${ambulance.vehiclePlate}...`);
+          break;
+        case 'refresh':
+          await refreshDashboardData({ silent: true });
+          window.alert(`${ambulance.vehiclePlate} refreshed successfully`);
+          break;
+        case 'archive':
+          if (window.confirm(`Are you sure you want to archive ${ambulance.vehiclePlate}?`)) {
+            await ambulanceService.updateStatus(ambulance.id, 'OUT_OF_SERVICE');
+            await refreshDashboardData({ silent: true });
+            window.alert(`${ambulance.vehiclePlate} archived successfully`);
+          }
+          break;
+        case 'delete':
+          if (window.confirm(`Are you sure you want to delete ${ambulance.vehiclePlate}? This action cannot be undone.`)) {
+            await ambulanceService.deleteAmbulance(ambulance.id);
+            await refreshDashboardData({ silent: true });
+            window.alert(`${ambulance.vehiclePlate} deleted successfully`);
+          }
+          break;
+        default:
+          console.log('Unknown action:', action);
+      }
+    } catch (error) {
+      window.alert(error?.message || 'Ambulance action failed.');
     }
-    
-    // Close modal
+
     setShowMoreModal(false);
     setCurrentAmbulance(null);
   };
@@ -1021,9 +1103,16 @@ const AmbulanceManagement = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl font-bold mb-1">Ambulance Management</h1>
-             
+              {isLoading && <p className="text-sm text-gray-500">Loading backend ambulance data...</p>}
+              {!isLoading && isRefreshing && <p className="text-sm text-gray-500">Refreshing backend data...</p>}
             </div>
           </div>
+
+          {loadError && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {loadError}
+            </div>
+          )}
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1039,7 +1128,7 @@ const AmbulanceManagement = () => {
               </div>
               <div className="mt-2 text-xs text-blue-600 flex items-center">
                 <CheckCircle className="w-3 h-3 mr-1" />
-                {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').length} Available
+                {ambulances.filter((a) => String(a.status || '').toUpperCase() === 'AVAILABLE').length} Available
               </div>
             </div>
 
@@ -1065,7 +1154,10 @@ const AmbulanceManagement = () => {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Emergency Calls</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {emergencyCalls.filter(c => c.status === 'pending').length}
+                    {emergencyCalls.filter(c => {
+                      const normalized = String(c.status || '').toUpperCase();
+                      return normalized === 'REQUESTED' || normalized === 'PENDING';
+                    }).length}
                   </p>
                 </div>
                 <div className="p-3 rounded-lg">
@@ -1133,7 +1225,10 @@ const AmbulanceManagement = () => {
                 }`}
               >
                 <Send className="w-4 h-4 inline mr-2" />
-                Emergency Dispatch ({emergencyCalls.filter(c => c.status === 'pending').length})
+                Emergency Dispatch ({emergencyCalls.filter(c => {
+                  const normalized = String(c.status || '').toUpperCase();
+                  return normalized === 'REQUESTED' || normalized === 'PENDING';
+                }).length})
               </button>
               <button
                 onClick={() => setActiveTab('tracking')}
@@ -1190,7 +1285,10 @@ const AmbulanceManagement = () => {
                 </div>
 
                 <div className="flex  space-x-3">
-                  <button className="flex items-center px-4 py-2 border border-gray-300  text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button
+                    onClick={() => refreshDashboardData({ silent: true })}
+                    className="flex items-center px-4 py-2 border border-gray-300  text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Refresh
                   </button>
@@ -1399,7 +1497,7 @@ const AmbulanceManagement = () => {
                           </span>
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">{driver.currentVehicle}</span>
+                          <span className="text-sm font-medium text-gray-900">{driver.currentVehicle || 'Not assigned'}</span>
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap">
                           <span className="text-sm text-gray-600">{driver.location}</span>
@@ -1497,13 +1595,19 @@ const AmbulanceManagement = () => {
                           <div className="font-semibold text-gray-900">{call.id}</div>
                         </td>
                         <td className="px-4 py-4">
+                          {(() => {
+                            const normalizedPriority = String(call.priority || 'MEDIUM').toUpperCase();
+                            return (
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${
-                            call.priority === 'critical' ? 'text-red-800 bg-red-50 border-red-200' :
-                            call.priority === 'high' ? 'text-orange-800 bg-orange-50 border-orange-200' :
-                            'text-yellow-800 bg-yellow-50 border-yellow-200'
+                            normalizedPriority === 'CRITICAL' ? 'text-red-800 bg-red-50 border-red-200' :
+                            normalizedPriority === 'HIGH' ? 'text-orange-800 bg-orange-50 border-orange-200' :
+                            normalizedPriority === 'MEDIUM' ? 'text-yellow-800 bg-yellow-50 border-yellow-200' :
+                            'text-blue-800 bg-blue-50 border-blue-200'
                           }`}>
-                            {call.priority.toUpperCase()}
+                            {normalizedPriority}
                           </span>
+                            );
+                          })()}
                         </td>
                         <td className="px-4 py-4">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(call.status)}`}>
@@ -1514,12 +1618,28 @@ const AmbulanceManagement = () => {
                           <div className="space-y-1">
                             <div className="font-medium text-gray-900">{call.patientName}</div>
                             <div className="text-xs text-gray-600">{call.condition}</div>
+                            <div className="text-xs text-gray-500">
+                              {call.patientId ? `ID: ${call.patientId}` : 'ID: N/A'}
+                              {call.patientAge ? ` • Age: ${call.patientAge}` : ''}
+                              {call.patientGender ? ` • ${String(call.patientGender).toUpperCase()}` : ''}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Incident: {String(call.incidentType || 'OTHER').replace(/_/g, ' ')}
+                            </div>
                           </div>
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-start max-w-xs">
                             <MapPin className="w-4 h-4 mr-1 mt-0.5 text-gray-400 flex-shrink-0" />
-                            <span className="text-gray-700">{call.location}</span>
+                            <div>
+                              <div className="text-gray-700">{call.location}</div>
+                              <div className="text-xs text-gray-500 mt-1">To: {call.destination || 'N/A'}</div>
+                              <div className="text-xs text-gray-500">
+                                {call.pickupLatitude && call.pickupLongitude
+                                  ? `${call.pickupLatitude}, ${call.pickupLongitude}`
+                                  : 'Coordinates: N/A'}
+                              </div>
+                            </div>
                           </div>
                         </td>
                         <td className="px-4 py-4">
@@ -1529,6 +1649,11 @@ const AmbulanceManagement = () => {
                               <Phone className="w-3 h-3 mr-1" />
                               {call.callerPhone}
                             </div>
+                            {call.callerNotes && (
+                              <div className="text-xs text-gray-500 max-w-xs truncate" title={call.callerNotes}>
+                                Notes: {call.callerNotes}
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td className="px-4 py-4">
@@ -1537,19 +1662,34 @@ const AmbulanceManagement = () => {
                               <Clock className="w-3 h-3 mr-1" />
                               {call.callTime.toLocaleTimeString()}
                             </div>
+                            <div className="text-xs text-gray-600">Requested: {formatDateTime(call.requestTime)}</div>
+                            <div className="text-xs text-gray-600">Dispatched: {formatDateTime(call.dispatchTime)}</div>
+                            <div className="text-xs text-gray-600">On Scene: {formatDateTime(call.onSceneTime)}</div>
+                            <div className="text-xs text-gray-600">Completed: {formatDateTime(call.completionTime)}</div>
                             <div className="text-xs text-gray-600">
                               Est: {call.estimatedResponse}
                             </div>
+                            {call.estimatedDistance && (
+                              <div className="text-xs text-gray-600">Distance: {call.estimatedDistance}</div>
+                            )}
                             <div className="text-xs font-medium text-red-600">
                               Elapsed: {Math.floor((Date.now() - call.callTime.getTime()) / 60000)} min
                             </div>
+                            {call.backend && (
+                              <details className="mt-2">
+                                <summary className="cursor-pointer text-xs text-blue-700">API payload</summary>
+                                <pre className="mt-1 max-h-40 overflow-auto rounded bg-gray-50 p-2 text-[10px] text-gray-700 whitespace-pre-wrap break-words">
+                                  {JSON.stringify(call.backend, null, 2)}
+                                </pre>
+                              </details>
+                            )}
                           </div>
                         </td>
                         <td className="px-4 py-4">
                           <div className="space-y-1">
                             {call.nearestAmbulances.slice(0, 2).map((ambulanceId) => {
                               const ambulance = ambulances.find(a => a.vehicleNumber === ambulanceId);
-                              const isAvailable = ambulance?.status === 'available';
+                              const isAvailable = String(ambulance?.status || '').toUpperCase() === 'AVAILABLE';
                               
                               return (
                                 <div key={ambulanceId} className="flex items-center text-xs">
@@ -1569,7 +1709,10 @@ const AmbulanceManagement = () => {
                         {/* Actions */}
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-center space-x-2">
-                            {call.status === 'pending' ? (
+                            {(() => {
+                              const normalized = String(call.status || '').toUpperCase();
+                              return normalized === 'REQUESTED' || normalized === 'PENDING';
+                            })() ? (
                               <>
                                 <button
                                   onClick={() => handleQuickDispatch(call)}
@@ -1586,10 +1729,12 @@ const AmbulanceManagement = () => {
                                       ...dispatchForm,
                                       patientName: call.patientName,
                                       condition: call.condition,
-                                      pickupLocation: call.location,
+                                      pickupLocation: call.pickupLocation || call.location || '',
+                                      pickupAddressLine1: call.pickupAddressLine1 || call.pickupLocation || call.location || '',
+                                      pickupCity: call.pickupCity || '',
                                       callerName: call.callerName,
                                       callerPhone: call.callerPhone,
-                                      priority: call.priority
+                                      priority: String(call.priority || 'HIGH').toUpperCase()
                                     });
                                     setShowDispatchModal(true);
                                   }}
@@ -1678,6 +1823,28 @@ const AmbulanceManagement = () => {
                       {Object.entries(trackingData).map(([vehicleId, data]) => {
                         const ambulance = ambulances.find(a => a.vehicleNumber === vehicleId);
                         if (!ambulance) return null;
+                        const trackingExtraFields = getExtraFields(data.backend, [
+                          'ambulanceId',
+                          'vehiclePlate',
+                          'ambulanceVehiclePlate',
+                          'latitude',
+                          'currentLatitude',
+                          'longitude',
+                          'currentLongitude',
+                          'speed',
+                          'heading',
+                          'batteryLevel',
+                          'signalStrength',
+                          'timestamp',
+                          'updatedAt',
+                          'createdAt',
+                          'route',
+                          'routeHistory',
+                          'locationAddress',
+                          'currentLocation',
+                          'connectionStatus',
+                          'networkStatus',
+                        ]);
 
                         return (
                           <tr key={vehicleId} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
@@ -1714,7 +1881,7 @@ const AmbulanceManagement = () => {
                                     {data.latitude.toFixed(4)}, {data.longitude.toFixed(4)}
                                   </div>
                                   <div className="text-xs text-gray-500 mt-0.5">
-                                    {ambulance.location}
+                                    {data.locationAddress || ambulance.location}
                                   </div>
                                 </div>
                               </div>
@@ -1747,7 +1914,7 @@ const AmbulanceManagement = () => {
                                 </div>
                                 <div className="flex items-center text-xs text-gray-600">
                                   <Wifi className="w-3 h-3 mr-1" />
-                                  Connected
+                                  {String(data.connectionStatus || 'CONNECTED').replace(/_/g, ' ')}
                                 </div>
                               </div>
                             </td>
@@ -1769,6 +1936,27 @@ const AmbulanceManagement = () => {
                                     <span className="truncate">{point.timestamp} - {point.lat.toFixed(4)}, {point.lng.toFixed(4)}</span>
                                   </div>
                                 ))}
+                                {trackingExtraFields.length > 0 && (
+                                  <details className="mt-2">
+                                    <summary className="cursor-pointer text-xs text-blue-700">More API fields</summary>
+                                    <div className="mt-1 max-h-32 overflow-auto rounded bg-gray-50 p-2 text-[10px]">
+                                      {trackingExtraFields.map(([key, value]) => (
+                                        <div key={key} className="mb-1 text-gray-700">
+                                          <span className="font-semibold">{formatFieldLabel(key)}:</span>{' '}
+                                          <span className="whitespace-pre-wrap break-words">{formatFieldValue(value)}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </details>
+                                )}
+                                {data.backend && (
+                                  <details className="mt-2">
+                                    <summary className="cursor-pointer text-xs text-blue-700">Full API payload</summary>
+                                    <pre className="mt-1 max-h-40 overflow-auto rounded bg-gray-50 p-2 text-[10px] text-gray-700 whitespace-pre-wrap break-words">
+                                      {JSON.stringify(data.backend, null, 2)}
+                                    </pre>
+                                  </details>
+                                )}
                               </div>
                             </td>
 
@@ -1870,7 +2058,7 @@ const AmbulanceManagement = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                   >
                     <option value="">Auto-Select Nearest</option>
-                    {ambulances.filter(a => a.status === 'AVAILABLE' || a.status === 'available').map(ambulance => (
+                    {ambulances.filter((a) => String(a.status || '').toUpperCase() === 'AVAILABLE').map(ambulance => (
                       <option key={ambulance.vehicleNumber} value={ambulance.vehicleNumber}>
                         {ambulance.vehiclePlate} - {ambulance.driverName}
                       </option>
@@ -2038,12 +2226,9 @@ const AmbulanceManagement = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
                   >
                     <option value="">Select destination hospital</option>
-                    <option value="HOSP-001">Kenyatta National Hospital</option>
-                    <option value="HOSP-002">Nairobi Hospital</option>
-                    <option value="HOSP-003">Aga Khan Hospital</option>
-                    <option value="HOSP-004">Mater Hospital</option>
-                    <option value="HOSP-005">MP Shah Hospital</option>
-                    <option value="HOSP-999">Nearest Hospital</option>
+                    {hospitals.map((hospital) => (
+                      <option key={hospital.id} value={String(hospital.id)}>{hospital.name}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2226,103 +2411,42 @@ const AmbulanceManagement = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    // Prevent multiple clicks
+                  onClick={async () => {
                     if (isDispatching) return;
-                    
-                    const ambulanceToDispatch = selectedAmbulance || ambulances.find(a => a.status === 'AVAILABLE' || a.status === 'available')?.vehicleNumber;
-                    
-                    // Validate required fields
+
+                    const ambulanceToDispatch = selectedAmbulance
+                      || ambulances.find((a) => String(a.status || '').toUpperCase() === 'AVAILABLE')?.vehicleNumber;
                     if (!ambulanceToDispatch) {
-                      alert(' No ambulance available for dispatch');
+                      window.alert('No ambulance available for dispatch');
                       return;
                     }
                     if (!dispatchForm.patientName || !dispatchForm.pickupAddressLine1 || !dispatchForm.callerName) {
-                      alert(' Please fill in all required fields:\n• Patient Name\n• Pickup Address\n• Caller Name');
+                      window.alert('Please fill in all required fields:\n- Patient Name\n- Pickup Address\n- Caller Name');
                       return;
                     }
-                    
-                    // Set loading state
+
+                    const selectedUnit = ambulances.find(
+                      (item) => item.vehiclePlate === ambulanceToDispatch || item.vehicleNumber === ambulanceToDispatch
+                    );
+                    if (!selectedUnit?.id) {
+                      window.alert('Selected ambulance was not found in backend records.');
+                      return;
+                    }
+
                     setIsDispatching(true);
-                    
                     try {
-                      // Create a new emergency call from the form data
-                      const newEmergencyCall = {
-                        id: `EMG-${String(Date.now()).slice(-3)}`,
-                        priority: dispatchForm.priority.toLowerCase(),
-                        status: 'dispatched',
-                        patientName: dispatchForm.patientName,
-                        condition: dispatchForm.condition || 'Not specified',
-                        location: dispatchForm.pickupAddressLine1 + (dispatchForm.pickupAddressLine2 ? ', ' + dispatchForm.pickupAddressLine2 : '') + ', ' + dispatchForm.pickupCity,
-                        callerName: dispatchForm.callerName,
-                        callerPhone: dispatchForm.callerPhone,
-                        callTime: new Date(),
-                        estimatedResponse: dispatchForm.estimatedTime || 'Calculating...',
-                        nearestAmbulances: [ambulanceToDispatch],
-                        assignedAmbulance: ambulanceToDispatch
-                      };
-                      
-                      // Add to emergency calls
-                      setEmergencyCalls(prev => [newEmergencyCall, ...prev]);
-                      
-                      // Note: ambulances is static mock data, cannot update status
-                      // In production, this would update via API call
-                      
-                      // Reset form first
-                      setDispatchForm({
-                        priority: 'HIGH',
-                        incidentType: 'TRAFFIC_ACCIDENT',
-                        patientName: '',
-                        patientId: '',
-                        patientAge: '',
-                        condition: '',
-                        pickupLocation: '',
-                        pickupAddressLine1: '',
-                        pickupAddressLine2: '',
-                        pickupCity: '',
-                        pickupState: '',
-                        pickupPostalCode: '',
-                        pickupCountry: 'Kenya',
-                        pickupLatitude: '',
-                        pickupLongitude: '',
-                        destination: '',
-                        hospitalId: '',
-                        dropoffAddressLine1: '',
-                        dropoffAddressLine2: '',
-                        dropoffCity: '',
-                        dropoffState: '',
-                        dropoffPostalCode: '',
-                        dropoffCountry: 'Kenya',
-                        dropoffLatitude: '',
-                        dropoffLongitude: '',
-                        callerName: '',
-                        callerPhone: '',
-                        callerNotes: '',
-                        specialInstructions: '',
-                        notes: '',
-                        estimatedDistance: '',
-                        estimatedTime: ''
-                      });
-                      setSelectedAmbulance(null);
-                      
-                      // Close modal immediately
+                      await ambulanceService.createDispatch(buildDispatchPayload(dispatchForm, selectedUnit.id));
+                      await ambulanceService.updateStatus(selectedUnit.id, 'DISPATCHED');
+                      await refreshDashboardData({ silent: true });
+
                       setShowDispatchModal(false);
-                      setIsDispatching(false);
-                      
-                      // Show success notification after modal closes
-                      setTimeout(() => {
-                        alert(` Ambulance Dispatched Successfully!\n\n` +
-                              `Call ID: ${newEmergencyCall.id}\n` +
-                              `Ambulance: ${ambulanceToDispatch}\n` +
-                              `Patient: ${dispatchForm.patientName}\n` +
-                              `Location: ${dispatchForm.pickupAddressLine1}, ${dispatchForm.pickupCity}\n` +
-                              `Priority: ${dispatchForm.priority}`);
-                      }, 100);
-                      
+                      resetDispatchForm();
+                      setSelectedAmbulance(null);
+                      window.alert(`Dispatch created for ${dispatchForm.patientName} with unit ${selectedUnit.vehiclePlate}.`);
                     } catch (error) {
-                      console.error('Dispatch error:', error);
+                      window.alert(error?.message || 'Failed to dispatch ambulance. Please try again.');
+                    } finally {
                       setIsDispatching(false);
-                      alert('Failed to dispatch ambulance. Please try again.');
                     }
                   }}
                   disabled={isDispatching}
@@ -2399,16 +2523,23 @@ const AmbulanceManagement = () => {
         <AddDispatchModal
           ambulances={ambulances}
           onClose={() => setShowAddDispatchModal(false)}
-          onSave={(newDispatch) => {
-            console.log('New dispatch created:', newDispatch);
-            // Close modal first
-            setShowAddDispatchModal(false);
-            // Add the new dispatch to emergency calls
-            setEmergencyCalls(prev => [newDispatch, ...prev]);
-            // Show success message
-            setTimeout(() => {
-              alert(` Dispatch Created Successfully!\n\nCall ID: ${newDispatch.id}\nPatient: ${newDispatch.patientName}`);
-            }, 100);
+          onSave={async (newDispatch) => {
+            try {
+              const selectedUnit = ambulances.find(
+                (item) => item.vehiclePlate === newDispatch.selectedAmbulance || item.vehicleNumber === newDispatch.selectedAmbulance
+              ) || ambulances.find((item) => String(item.status || '').toUpperCase() === 'AVAILABLE');
+
+              await ambulanceService.createDispatch(buildDispatchPayload(newDispatch, selectedUnit?.id || null));
+              if (selectedUnit?.id) {
+                await ambulanceService.updateStatus(selectedUnit.id, 'DISPATCHED');
+              }
+
+              await refreshDashboardData({ silent: true });
+              setShowAddDispatchModal(false);
+              window.alert(`Dispatch created for ${newDispatch.patientName || 'patient'} successfully.`);
+            } catch (error) {
+              window.alert(error?.message || 'Failed to create dispatch.');
+            }
           }}
         />
       )}

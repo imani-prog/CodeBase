@@ -35,6 +35,7 @@ const getDriversByStatus = (status) => ambulanceApi.listDriversByStatus(status);
 const updateDriver = (id, payload) => ambulanceApi.updateDriver(id, payload);
 const updateDriverStatus = (id, status) => ambulanceApi.updateDriverStatus(id, status);
 const assignToAmbulance = (id, ambulanceId) => ambulanceApi.assignDriverToAmbulance(id, ambulanceId);
+const unassignFromAmbulance = (id) => ambulanceApi.unassignDriverFromAmbulance(id);
 const deleteDriver = (id) => ambulanceApi.deleteDriver(id);
 
 export const ambulanceService = {
@@ -72,6 +73,7 @@ export const ambulanceService = {
   updateDriver,
   updateDriverStatus,
   assignToAmbulance,
+  unassignFromAmbulance,
   deleteDriver,
 
   // Backward-compatible aliases
@@ -96,4 +98,5 @@ export const ambulanceService = {
   getAmbulanceDriversByStatus: getDriversByStatus,
   updateAmbulanceDriverStatus: updateDriverStatus,
   assignDriverToAmbulance: assignToAmbulance,
+  unassignDriverFromAmbulance: unassignFromAmbulance,
 };

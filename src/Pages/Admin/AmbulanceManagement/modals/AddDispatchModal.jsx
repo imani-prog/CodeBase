@@ -79,23 +79,7 @@ const AddDispatchModal = ({ ambulances, onClose, onSave }) => {
       return;
     }
 
-    // Generate new dispatch object
-    const newDispatch = {
-      id: `EMG-${String(Date.now()).slice(-3)}`,
-      callId: `CALL-${Date.now()}`,
-      ...formData,
-      status: 'PENDING',
-      callTime: new Date(),
-      dispatchTime: null,
-      arrivalTime: null,
-      completionTime: null,
-      estimatedResponse: 'Calculating...',
-      nearestAmbulances: formData.selectedAmbulance ? [formData.selectedAmbulance] : [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    onSave(newDispatch);
+    onSave(formData);
     onClose();
   };
 

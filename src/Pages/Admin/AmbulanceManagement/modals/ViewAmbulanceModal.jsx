@@ -20,6 +20,72 @@ import {
 const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon }) => {
   if (!ambulance) return null;
 
+  const formatLabel = (key) => {
+    const spaced = String(key)
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return spaced ? spaced.charAt(0).toUpperCase() + spaced.slice(1) : key;
+  };
+
+  const formatValue = (value) => {
+    if (value === null || value === undefined || value === '') return 'N/A';
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    if (Array.isArray(value)) {
+      if (value.length === 0) return 'N/A';
+      const primitive = value.every((item) => ['string', 'number', 'boolean'].includes(typeof item));
+      return primitive ? value.join(', ') : JSON.stringify(value, null, 2);
+    }
+    if (typeof value === 'object') return JSON.stringify(value, null, 2);
+    return String(value);
+  };
+
+  const renderedKeys = new Set([
+    'id',
+    'vehiclePlate',
+    'vehicleNumber',
+    'registrationNumber',
+    'model',
+    'year',
+    'type',
+    'status',
+    'fuelType',
+    'capacity',
+    'equippedForICU',
+    'gpsEnabled',
+    'location',
+    'currentLocation',
+    'driverName',
+    'driverPhone',
+    'medicName',
+    'insurancePolicyNumber',
+    'insuranceProvider',
+    'currentDriver',
+    'driverContact',
+    'lastMaintenance',
+    'nextMaintenance',
+    'mileage',
+    'fuelLevel',
+    'equipment',
+    'equipmentList',
+    'lastDispatch',
+    'totalDispatches',
+    'averageResponseTime',
+    'averageResponseMinutes',
+    'createdAt',
+    'updatedAt',
+    'notes',
+    'image',
+    'imageUrl',
+  ]);
+
+  const extraBackendFields = ambulance.backend
+    ? Object.entries(ambulance.backend).filter(
+      ([key, value]) => !renderedKeys.has(key) && value !== null && value !== undefined && value !== ''
+    )
+    : [];
+
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
       <div className="bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
@@ -265,6 +331,30 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
                 Notes
               </h3>
               <p className="text-sm text-gray-700">{ambulance.notes}</p>
+            </div>
+          )}
+
+          {(extraBackendFields.length > 0 || ambulance.backend) && (
+            <div className="mt-6 border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Backend Fields</h3>
+              {extraBackendFields.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {extraBackendFields.map(([key, value]) => (
+                    <div key={key}>
+                      <p className="text-xs text-gray-500">{formatLabel(key)}</p>
+                      <p className="text-sm font-medium whitespace-pre-wrap break-words">{formatValue(value)}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {ambulance.backend && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm font-medium text-blue-700">Full API payload</summary>
+                  <pre className="mt-2 max-h-56 overflow-auto rounded bg-gray-50 p-3 text-[11px] text-gray-700 whitespace-pre-wrap break-words">
+                    {JSON.stringify(ambulance.backend, null, 2)}
+                  </pre>
+                </details>
+              )}
             </div>
           )}
         </div>

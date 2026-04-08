@@ -54,31 +54,13 @@ const AddTrackingUnitModal = ({ ambulances, onClose, onSave }) => {
       return;
     }
 
-    // Find the selected ambulance
-    const selectedAmbulance = ambulances.find(a => a.vehicleNumber === formData.vehicleId);
-
-    // Create tracking data object
-    const trackingData = {
+    onSave({
       vehicleId: formData.vehicleId,
       latitude: parseFloat(formData.latitude),
       longitude: parseFloat(formData.longitude),
       speed: parseFloat(formData.speed),
       heading: parseFloat(formData.heading),
-      batteryLevel: 85,
-      signalStrength: 4,
-      lastUpdate: new Date(),
-      route: [
-        {
-          lat: parseFloat(formData.latitude),
-          lng: parseFloat(formData.longitude),
-          timestamp: new Date().toLocaleTimeString(),
-          speed: parseFloat(formData.speed)
-        }
-      ],
-      ambulanceData: selectedAmbulance
-    };
-
-    onSave(trackingData);
+    });
     onClose();
   };
 

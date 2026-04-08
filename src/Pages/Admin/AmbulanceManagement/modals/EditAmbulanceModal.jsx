@@ -221,7 +221,6 @@ const EditAmbulanceModal = ({ ambulance, onClose, onSave }) => {
                 <option value="DIESEL">Diesel</option>
                 <option value="PETROL">Petrol</option>
                 <option value="ELECTRIC">Electric</option>
-                <option value="HYBRID">Hybrid</option>
               </select>
             </div>
 
