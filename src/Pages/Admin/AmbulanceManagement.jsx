@@ -1467,7 +1467,7 @@ const AmbulanceManagement = () => {
                   </td>
                   <td className="px-3 py-3 whitespace-nowrap">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                      className={`px-2 py-1 text-xs font-medium ${getStatusColor(
                         a.status
                       )}`}
                     >
@@ -1576,16 +1576,8 @@ const AmbulanceManagement = () => {
                     {paginatedDrivers.map((driver) => (
                       <tr key={driver.id} className="hover:bg-gray-50 transition-colors border-b border-gray-200">
                         <td className="px-3 py-3">
-                          <div className="flex items-center whitespace-nowrap">
-                            <img
-                              src={driver.avatar}
-                              alt={driver.name}
-                              className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 flex-shrink-0"
-                              onError={(e) => {
-                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=3B82F6&color=fff&size=32`;
-                              }}
-                            />
-                            <span className="ml-3 text-sm font-medium text-gray-900">{driver.name}</span>
+                          <div className="whitespace-nowrap">
+                            <span className="text-sm font-medium text-gray-900">{driver.name}</span>
                           </div>
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap">
