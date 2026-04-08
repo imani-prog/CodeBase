@@ -89,7 +89,7 @@ const MoreOptionsModal = ({ ambulance, onClose, onAction }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur flex items-center justify-center p-4 z-50">
       <div className="bg-white shadow-2xl max-w-2xl w-full">
         {/* Header */}
         <div className="p-6 rounded-t-xl">

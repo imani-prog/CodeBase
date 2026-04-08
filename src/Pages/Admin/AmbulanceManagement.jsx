@@ -33,7 +33,6 @@ import {
   Globe,
   Compass,
   Radio,
-  Map,
   Crosshair,
   Play,
   Pause,
@@ -123,9 +122,24 @@ const formatFieldValue = (value) => {
   if (Array.isArray(value)) {
     if (value.length === 0) return 'N/A';
     const primitive = value.every((item) => ['string', 'number', 'boolean'].includes(typeof item));
-    return primitive ? value.join(', ') : JSON.stringify(value, null, 2);
+    if (primitive) return value.join(', ');
+    return value
+      .map((item) => {
+        if (!item || typeof item !== 'object') return String(item);
+        return Object.entries(item)
+          .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== '')
+          .map(([nestedKey, nestedValue]) => `${formatFieldLabel(nestedKey)}: ${nestedValue}`)
+          .join(' | ');
+      })
+      .filter(Boolean)
+      .join(' ; ');
   }
-  if (typeof value === 'object') return JSON.stringify(value, null, 2);
+  if (typeof value === 'object') {
+    const parts = Object.entries(value)
+      .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== '')
+      .map(([nestedKey, nestedValue]) => `${formatFieldLabel(nestedKey)}: ${nestedValue}`);
+    return parts.length > 0 ? parts.join(' | ') : 'N/A';
+  }
   return String(value);
 };
 
@@ -181,6 +195,77 @@ const extractEquipment = (row = {}) => {
   return [];
 };
 
+const splitCertificationString = (value) => String(value)
+  .split(/[;,|/]/)
+  .map((item) => item.trim())
+  .filter(Boolean);
+
+const normalizeCertificationEntry = (entry) => {
+  if (entry === null || entry === undefined) return '';
+  if (typeof entry === 'string') return entry.trim();
+  if (typeof entry === 'number') return String(entry);
+  if (typeof entry === 'object') {
+    return (
+      entry.name
+      || entry.certificationName
+      || entry.title
+      || entry.label
+      || entry.type
+      || entry.code
+      || entry.value
+      || ''
+    );
+  }
+  return '';
+};
+
+const extractDriverCertifications = (row = {}) => {
+  const sources = [
+    row.certifications,
+    row.certification,
+    row.certificationName,
+    row.certificate,
+    row.certificates,
+    row.certificateNames,
+    row.driverCertifications,
+    row.trainingCertifications,
+    row.qualifications,
+    row.skills,
+    row.specializations,
+    row.licenses,
+  ];
+
+  const collected = [];
+
+  sources.forEach((source) => {
+    if (!source) return;
+
+    if (Array.isArray(source)) {
+      source.forEach((item) => {
+        if (typeof item === 'string') {
+          collected.push(...splitCertificationString(item));
+          return;
+        }
+        const normalized = normalizeCertificationEntry(item);
+        if (normalized) collected.push(normalized);
+      });
+      return;
+    }
+
+    if (typeof source === 'string') {
+      collected.push(...splitCertificationString(source));
+      return;
+    }
+
+    if (typeof source === 'object') {
+      const normalized = normalizeCertificationEntry(source);
+      if (normalized) collected.push(normalized);
+    }
+  });
+
+  return [...new Set(collected.map((item) => item.trim()).filter(Boolean))];
+};
+
 const normalizeAmbulance = (row = {}) => {
   const vehiclePlate = row.vehiclePlate || row.vehicleNumber || row.ambulanceUnitId || `AMB-${row.id ?? 'N/A'}`;
   const averageResponseMinutes = toNumberOrNull(row.averageResponseMinutes);
@@ -233,11 +318,7 @@ const normalizeDriver = (row = {}) => {
   const yearsOfExperience = toNumberOrNull(
     row.yearsOfExperience ?? row.experienceYears ?? row.experience
   );
-  const certifications = Array.isArray(row.certifications)
-    ? row.certifications
-    : typeof row.certifications === 'string'
-      ? row.certifications.split(',').map((item) => item.trim()).filter(Boolean)
-      : [];
+  const certifications = extractDriverCertifications(row);
 
   const normalizedCurrentAmbulance = currentAmbulance
     ? {
@@ -642,7 +723,37 @@ const AmbulanceManagement = () => {
       ]);
 
       const nextAmbulances = toArray(ambulancePayload).map(normalizeAmbulance);
-      const nextDrivers = toArray(driverPayload).map(normalizeDriver);
+      const rawDrivers = toArray(driverPayload);
+      const shouldHydrateDriverDetails = rawDrivers.length > 0
+        && rawDrivers.every((driver) => extractDriverCertifications(driver).length === 0);
+
+      let mergedDrivers = rawDrivers;
+      if (shouldHydrateDriverDetails) {
+        const detailedDrivers = await Promise.all(
+          rawDrivers.map(async (driver) => {
+            if (!driver?.id) return null;
+            try {
+              return await ambulanceService.getDriverById(driver.id);
+            } catch (error) {
+              console.warn(`Driver detail sync failed for id ${driver.id}:`, error);
+              return null;
+            }
+          })
+        );
+
+        const driverDetailMap = new globalThis.Map(
+          detailedDrivers
+            .filter((driver) => driver && driver.id !== undefined && driver.id !== null)
+            .map((driver) => [Number(driver.id), driver])
+        );
+
+        mergedDrivers = rawDrivers.map((driver) => ({
+          ...driver,
+          ...(driverDetailMap.get(Number(driver.id)) || {}),
+        }));
+      }
+
+      const nextDrivers = mergedDrivers.map(normalizeDriver);
       const nextDispatches = toArray(dispatchPayload).map(normalizeDispatch);
       const nextTrackingMap = normalizeTrackingMap(toArray(trackingPayload), nextAmbulances);
       const nextHospitals = toArray(hospitalPayload).map(normalizeHospitalOption);
@@ -1456,7 +1567,7 @@ const AmbulanceManagement = () => {
                       <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Vehicle</th>
                       <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Location</th>
                       <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Experience</th>
-                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Certifications</th>
+                      <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">License Number</th>
                       <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">Total Trips</th>
                       <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">Actions</th>
                     </tr>
@@ -1507,7 +1618,7 @@ const AmbulanceManagement = () => {
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap">
                           <span className="text-sm text-gray-600">
-                            {driver.certifications.slice(0, 2).join(', ')}
+                            {driver.licenseNumber || 'N/A'}
                           </span>
                         </td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
@@ -1591,6 +1702,60 @@ const AmbulanceManagement = () => {
                   <tbody>
                     {emergencyCalls.map((call) => (
                       <tr key={call.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        {(() => {
+                          const dispatchExtraFields = getExtraFields(call.backend, [
+                            'id',
+                            'incidentId',
+                            'incidentType',
+                            'priority',
+                            'status',
+                            'callerName',
+                            'callerPhone',
+                            'callerNotes',
+                            'patientId',
+                            'patientName',
+                            'patientAge',
+                            'patientGender',
+                            'patientCondition',
+                            'condition',
+                            'pickupAddressLine1',
+                            'pickupAddressLine2',
+                            'pickupCity',
+                            'pickupState',
+                            'pickupPostalCode',
+                            'pickupCountry',
+                            'pickupLatitude',
+                            'pickupLongitude',
+                            'dropoffAddressLine1',
+                            'dropoffAddressLine2',
+                            'dropoffCity',
+                            'dropoffState',
+                            'dropoffPostalCode',
+                            'dropoffCountry',
+                            'dropoffLatitude',
+                            'dropoffLongitude',
+                            'hospitalId',
+                            'vehiclePlate',
+                            'ambulanceUnitId',
+                            'ambulanceId',
+                            'specialInstructions',
+                            'notes',
+                            'requestTime',
+                            'dispatchTime',
+                            'onSceneTime',
+                            'arrivalAtHospitalTime',
+                            'completionTime',
+                            'estimatedResponseTime',
+                            'estimatedDistance',
+                            'requiresICU',
+                            'requiresOxygen',
+                            'requiresStretcher',
+                            'createdAt',
+                            'updatedAt',
+                          ]);
+
+                          return (
+                            <>
                         <td className="px-4 py-4">
                           <div className="font-semibold text-gray-900">{call.id}</div>
                         </td>
@@ -1675,12 +1840,17 @@ const AmbulanceManagement = () => {
                             <div className="text-xs font-medium text-red-600">
                               Elapsed: {Math.floor((Date.now() - call.callTime.getTime()) / 60000)} min
                             </div>
-                            {call.backend && (
+                            {dispatchExtraFields.length > 0 && (
                               <details className="mt-2">
-                                <summary className="cursor-pointer text-xs text-blue-700">API payload</summary>
-                                <pre className="mt-1 max-h-40 overflow-auto rounded bg-gray-50 p-2 text-[10px] text-gray-700 whitespace-pre-wrap break-words">
-                                  {JSON.stringify(call.backend, null, 2)}
-                                </pre>
+                                <summary className="cursor-pointer text-xs text-blue-700">More details</summary>
+                                <div className="mt-1 max-h-40 overflow-auto rounded bg-gray-50 p-2 text-[10px]">
+                                  {dispatchExtraFields.map(([key, value]) => (
+                                    <div key={key} className="mb-1 text-gray-700">
+                                      <span className="font-semibold">{formatFieldLabel(key)}:</span>{' '}
+                                      <span className="whitespace-pre-wrap break-words">{formatFieldValue(value)}</span>
+                                    </div>
+                                  ))}
+                                </div>
                               </details>
                             )}
                           </div>
@@ -1756,6 +1926,9 @@ const AmbulanceManagement = () => {
                             )}
                           </div>
                         </td>
+                            </>
+                          );
+                        })()}
                       </tr>
                     ))}
                   </tbody>
@@ -1938,7 +2111,7 @@ const AmbulanceManagement = () => {
                                 ))}
                                 {trackingExtraFields.length > 0 && (
                                   <details className="mt-2">
-                                    <summary className="cursor-pointer text-xs text-blue-700">More API fields</summary>
+                                    <summary className="cursor-pointer text-xs text-blue-700">More details</summary>
                                     <div className="mt-1 max-h-32 overflow-auto rounded bg-gray-50 p-2 text-[10px]">
                                       {trackingExtraFields.map(([key, value]) => (
                                         <div key={key} className="mb-1 text-gray-700">
@@ -1947,14 +2120,6 @@ const AmbulanceManagement = () => {
                                         </div>
                                       ))}
                                     </div>
-                                  </details>
-                                )}
-                                {data.backend && (
-                                  <details className="mt-2">
-                                    <summary className="cursor-pointer text-xs text-blue-700">Full API payload</summary>
-                                    <pre className="mt-1 max-h-40 overflow-auto rounded bg-gray-50 p-2 text-[10px] text-gray-700 whitespace-pre-wrap break-words">
-                                      {JSON.stringify(data.backend, null, 2)}
-                                    </pre>
                                   </details>
                                 )}
                               </div>

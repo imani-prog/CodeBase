@@ -45,9 +45,24 @@ const ViewDriverModal = ({ driver, onClose, getStatusColor }) => {
     if (Array.isArray(value)) {
       if (value.length === 0) return 'N/A';
       const isPrimitiveList = value.every((item) => ['string', 'number', 'boolean'].includes(typeof item));
-      return isPrimitiveList ? value.join(', ') : JSON.stringify(value, null, 2);
+      if (isPrimitiveList) return value.join(', ');
+      return value
+        .map((item) => {
+          if (!item || typeof item !== 'object') return String(item);
+          return Object.entries(item)
+            .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== '')
+            .map(([nestedKey, nestedValue]) => `${formatLabel(nestedKey)}: ${nestedValue}`)
+            .join(' | ');
+        })
+        .filter(Boolean)
+        .join(' ; ');
     }
-    if (typeof value === 'object') return JSON.stringify(value, null, 2);
+    if (typeof value === 'object') {
+      const parts = Object.entries(value)
+        .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== '')
+        .map(([nestedKey, nestedValue]) => `${formatLabel(nestedKey)}: ${nestedValue}`);
+      return parts.length > 0 ? parts.join(' | ') : 'N/A';
+    }
     return String(value);
   };
 

@@ -79,7 +79,7 @@ const MoreOptionsDriverModal = ({ driver, onClose, onAction }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
+    <div className="fixed inset-0 flex bg-black/60 backdrop-blur items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
       <div className="bg-white shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="relative px-8 py-6 bg-blue-950 text-white">

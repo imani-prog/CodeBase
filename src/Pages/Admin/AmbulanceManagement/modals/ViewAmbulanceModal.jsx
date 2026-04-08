@@ -35,9 +35,24 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
     if (Array.isArray(value)) {
       if (value.length === 0) return 'N/A';
       const primitive = value.every((item) => ['string', 'number', 'boolean'].includes(typeof item));
-      return primitive ? value.join(', ') : JSON.stringify(value, null, 2);
+      if (primitive) return value.join(', ');
+      return value
+        .map((item) => {
+          if (!item || typeof item !== 'object') return String(item);
+          return Object.entries(item)
+            .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== '')
+            .map(([nestedKey, nestedValue]) => `${formatLabel(nestedKey)}: ${nestedValue}`)
+            .join(' | ');
+        })
+        .filter(Boolean)
+        .join(' ; ');
     }
-    if (typeof value === 'object') return JSON.stringify(value, null, 2);
+    if (typeof value === 'object') {
+      const parts = Object.entries(value)
+        .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== '')
+        .map(([nestedKey, nestedValue]) => `${formatLabel(nestedKey)}: ${nestedValue}`);
+      return parts.length > 0 ? parts.join(' | ') : 'N/A';
+    }
     return String(value);
   };
 
@@ -334,27 +349,17 @@ const ViewAmbulanceModal = ({ ambulance, onClose, getStatusColor, getTypeIcon })
             </div>
           )}
 
-          {(extraBackendFields.length > 0 || ambulance.backend) && (
+          {extraBackendFields.length > 0 && (
             <div className="mt-6 border border-gray-200 p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Backend Fields</h3>
-              {extraBackendFields.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {extraBackendFields.map(([key, value]) => (
-                    <div key={key}>
-                      <p className="text-xs text-gray-500">{formatLabel(key)}</p>
-                      <p className="text-sm font-medium whitespace-pre-wrap break-words">{formatValue(value)}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {ambulance.backend && (
-                <details className="mt-4">
-                  <summary className="cursor-pointer text-sm font-medium text-blue-700">Full API payload</summary>
-                  <pre className="mt-2 max-h-56 overflow-auto rounded bg-gray-50 p-3 text-[11px] text-gray-700 whitespace-pre-wrap break-words">
-                    {JSON.stringify(ambulance.backend, null, 2)}
-                  </pre>
-                </details>
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {extraBackendFields.map(([key, value]) => (
+                  <div key={key}>
+                    <p className="text-xs text-gray-500">{formatLabel(key)}</p>
+                    <p className="text-sm font-medium whitespace-pre-wrap break-words">{formatValue(value)}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
