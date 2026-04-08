@@ -151,6 +151,33 @@ const getExtraFields = (payload, excludedKeys = []) => {
   );
 };
 
+const downloadTextFile = (filename, content, mimeType = 'text/plain;charset=utf-8') => {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+};
+
+const toSafeFileSegment = (value) => String(value || 'record')
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '')
+  || 'record';
+
+const buildCsv = (rows = []) => rows
+  .map((row) => row.map((cell) => {
+    const value = String(cell ?? '');
+    if (/[",\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
+    return value;
+  }).join(','))
+  .join('\n');
+
 const mapTypeFromApi = (type) => String(type || '').trim().toLowerCase();
 const mapTypeToApi = (type) => String(type || '').trim().replace(/\s+/g, '_').toUpperCase();
 
@@ -1104,95 +1131,286 @@ const AmbulanceManagement = () => {
   const handleMoreDriverAction = async (action, driver) => {
     try {
       switch (action) {
-        case 'view-history':
-          window.alert(`Loading trip history for ${driver.name}...`);
-          break;
-        case 'schedule':
-          window.alert(`Opening schedule management for ${driver.name}...`);
-          break;
-        case 'location':
-          window.alert(`Tracking location for ${driver.name}...`);
-          break;
-        case 'export':
-          window.alert(`Exporting details for ${driver.name}...`);
-          break;
+        case 'view-history': {
+          const dispatchPayload = await ambulanceService.getAllDispatches();
+          const dispatches = toArray(dispatchPayload).map(normalizeDispatch);
+          const normalizedDriverName = String(driver.name || '').trim().toLowerCase();
+          const normalizedVehicle = String(driver.currentVehicle || '').trim().toUpperCase();
+
+          const driverTrips = dispatches.filter((trip) => {
+            const backendDriverName = String(trip.backend?.driverName || trip.backend?.driver?.name || '').trim().toLowerCase();
+            const tripVehicle = String(trip.vehiclePlate || trip.ambulanceUnitId || '').trim().toUpperCase();
+            return (normalizedDriverName && backendDriverName === normalizedDriverName)
+              || (normalizedVehicle && normalizedVehicle === tripVehicle);
+          });
+
+          return {
+            type: 'info',
+            message: `${driver.name} has ${driverTrips.length} dispatch records.`,
+            details: driverTrips.slice(0, 5).map((trip) => ({
+              callId: trip.callId || trip.id,
+              patient: trip.patientName,
+              status: trip.status,
+              priority: trip.priority,
+              requestedAt: formatDateTime(trip.requestTime || trip.callTime),
+            })),
+          };
+        }
+        case 'schedule': {
+          const freshDriver = normalizeDriver(await ambulanceService.getDriverById(driver.id));
+          return {
+            type: 'info',
+            message: `Current schedule for ${freshDriver.name}`,
+            details: {
+              shiftStart: freshDriver.shiftStart || 'N/A',
+              shiftEnd: freshDriver.shiftEnd || 'N/A',
+              status: String(freshDriver.status || 'off_duty').replace(/_/g, ' ').toUpperCase(),
+            },
+          };
+        }
+        case 'location': {
+          const matchedAmbulance = ambulances.find(
+            (unit) => unit.id === driver.currentAmbulanceId
+              || unit.vehiclePlate === driver.currentVehicle
+              || unit.vehicleNumber === driver.currentVehicle
+          );
+
+          if (!matchedAmbulance?.id) {
+            return {
+              type: 'info',
+              message: `${driver.name} is not currently assigned to an ambulance with active GPS data.`,
+            };
+          }
+
+          const location = await ambulanceService.getCurrentLocation(matchedAmbulance.id);
+          return {
+            type: 'success',
+            message: `Live location fetched for ${driver.name}.`,
+            details: {
+              ambulance: matchedAmbulance.vehiclePlate,
+              latitude: location?.latitude ?? location?.currentLatitude ?? 'N/A',
+              longitude: location?.longitude ?? location?.currentLongitude ?? 'N/A',
+              speed: location?.speed ?? 'N/A',
+              timestamp: formatDateTime(location?.timestamp || location?.updatedAt || location?.createdAt),
+            },
+          };
+        }
+        case 'export': {
+          const freshDriver = normalizeDriver(await ambulanceService.getDriverById(driver.id));
+          const rows = [
+            ['Field', 'Value'],
+            ['Name', freshDriver.name],
+            ['License Number', freshDriver.licenseNumber],
+            ['Phone', freshDriver.phone],
+            ['Email', freshDriver.email],
+            ['Status', String(freshDriver.status || '').replace(/_/g, ' ').toUpperCase()],
+            ['Assigned Vehicle', freshDriver.currentVehicle || 'N/A'],
+            ['Experience', freshDriver.experience || 'N/A'],
+            ['Certifications', freshDriver.certifications.join(', ') || 'N/A'],
+            ['Total Trips', freshDriver.totalTrips],
+            ['Rating', freshDriver.rating || 'N/A'],
+          ];
+          const csv = buildCsv(rows);
+          const filename = `driver-${toSafeFileSegment(freshDriver.name)}-${new Date().toISOString().slice(0, 10)}.csv`;
+          downloadTextFile(filename, csv, 'text/csv;charset=utf-8');
+
+          return {
+            type: 'success',
+            message: `Driver export generated: ${filename}`,
+          };
+        }
         case 'suspend':
-          if (window.confirm(`Are you sure you want to suspend ${driver.name}?`)) {
-            await ambulanceService.updateDriverStatus(driver.id, 'OFF_DUTY');
-            await refreshDashboardData({ silent: true });
-            window.alert(`${driver.name} has been suspended.`);
-          }
-          break;
+          await ambulanceService.updateDriverStatus(driver.id, 'OFF_DUTY');
+          await refreshDashboardData({ silent: true });
+          return {
+            type: 'success',
+            message: `${driver.name} has been suspended and set to OFF DUTY.`,
+          };
         case 'deactivate':
-          if (window.confirm(`Are you sure you want to deactivate ${driver.name}? This action cannot be undone.`)) {
-            await ambulanceService.updateDriverStatus(driver.id, 'OFF_DUTY');
-            await refreshDashboardData({ silent: true });
-            window.alert(`${driver.name} has been deactivated.`);
-          }
-          break;
+          await ambulanceService.updateDriverStatus(driver.id, 'OFF_DUTY');
+          await ambulanceService.unassignFromAmbulance(driver.id).catch(() => null);
+          await refreshDashboardData({ silent: true });
+          return {
+            type: 'success',
+            message: `${driver.name} has been deactivated and unassigned.`,
+          };
         case 'delete':
-          if (window.confirm(`Are you sure you want to permanently delete ${driver.name}? This action cannot be undone and all data will be lost.`)) {
-            await ambulanceService.deleteDriver(driver.id);
-            await refreshDashboardData({ silent: true });
-            window.alert(`${driver.name} has been deleted from the system.`);
-          }
-          break;
+          await ambulanceService.deleteDriver(driver.id);
+          await refreshDashboardData({ silent: true });
+          return {
+            type: 'success',
+            message: `${driver.name} has been deleted from the system.`,
+            closeModal: true,
+          };
         default:
-          window.alert(`Action ${action} not implemented yet.`);
+          return {
+            type: 'info',
+            message: `Action ${action} is not supported.`,
+          };
       }
     } catch (error) {
-      window.alert(error?.message || 'Driver action failed.');
+      return {
+        type: 'error',
+        message: error?.message || 'Driver action failed.',
+      };
     }
-
-    setShowMoreDriverModal(false);
-    setCurrentDriver(null);
   };
 
   const handleMoreAction = async (action, ambulance) => {
     try {
       switch (action) {
-        case 'track':
-          window.alert(`Tracking ${ambulance.vehiclePlate}...`);
-          break;
-        case 'schedule':
-          window.alert(`Opening maintenance schedule for ${ambulance.vehiclePlate}...`);
-          break;
-        case 'history':
-          window.alert(`Loading service history for ${ambulance.vehiclePlate}...`);
-          break;
-        case 'export':
-          window.alert(`Exporting details for ${ambulance.vehiclePlate}...`);
-          break;
-        case 'print':
-          window.alert(`Printing report for ${ambulance.vehiclePlate}...`);
-          break;
+        case 'track': {
+          const location = await ambulanceService.getCurrentLocation(ambulance.id);
+          return {
+            type: 'success',
+            message: `Live location fetched for ${ambulance.vehiclePlate}.`,
+            details: {
+              latitude: location?.latitude ?? location?.currentLatitude ?? 'N/A',
+              longitude: location?.longitude ?? location?.currentLongitude ?? 'N/A',
+              speed: location?.speed ?? 'N/A',
+              heading: location?.heading ?? 'N/A',
+              timestamp: formatDateTime(location?.timestamp || location?.updatedAt || location?.createdAt),
+            },
+          };
+        }
+        case 'schedule': {
+          const latest = normalizeAmbulance(await ambulanceService.getAmbulanceById(ambulance.id));
+          return {
+            type: 'info',
+            message: `Maintenance schedule for ${latest.vehiclePlate}.`,
+            details: {
+              lastMaintenance: latest.lastMaintenance || 'N/A',
+              nextMaintenance: latest.nextMaintenance || 'N/A',
+              mileage: latest.mileage ? `${latest.mileage.toLocaleString()} km` : 'N/A',
+            },
+          };
+        }
+        case 'history': {
+          const historyPayload = await ambulanceService.getDispatchHistory(ambulance.id);
+          const historyItems = toArray(historyPayload).map(normalizeDispatch);
+          return {
+            type: 'info',
+            message: `${ambulance.vehiclePlate} has ${historyItems.length} dispatch history records.`,
+            details: historyItems.slice(0, 5).map((item) => ({
+              callId: item.callId || item.id,
+              patient: item.patientName,
+              status: item.status,
+              priority: item.priority,
+              requestedAt: formatDateTime(item.requestTime || item.callTime),
+            })),
+          };
+        }
+        case 'export': {
+          const latest = normalizeAmbulance(await ambulanceService.getAmbulanceById(ambulance.id));
+          const rows = [
+            ['Field', 'Value'],
+            ['Vehicle Plate', latest.vehiclePlate],
+            ['Registration Number', latest.registrationNumber],
+            ['Model', latest.model],
+            ['Year', latest.year],
+            ['Status', latest.status],
+            ['Type', latest.type],
+            ['Fuel Type', latest.fuelType],
+            ['Capacity', latest.capacity],
+            ['Driver', latest.driverName],
+            ['Driver Phone', latest.driverPhone || 'N/A'],
+            ['Medic', latest.medicName || 'N/A'],
+            ['Location', latest.location || 'N/A'],
+            ['Insurance Provider', latest.insuranceProvider || 'N/A'],
+            ['Policy Number', latest.insurancePolicyNumber || 'N/A'],
+            ['Total Dispatches', latest.totalDispatches],
+            ['Average Response', latest.averageResponseTime],
+          ];
+          const csv = buildCsv(rows);
+          const filename = `ambulance-${toSafeFileSegment(latest.vehiclePlate)}-${new Date().toISOString().slice(0, 10)}.csv`;
+          downloadTextFile(filename, csv, 'text/csv;charset=utf-8');
+          return {
+            type: 'success',
+            message: `Ambulance export generated: ${filename}`,
+          };
+        }
+        case 'print': {
+          const latest = normalizeAmbulance(await ambulanceService.getAmbulanceById(ambulance.id));
+          const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=700');
+          if (!printWindow) {
+            return {
+              type: 'error',
+              message: 'Popup blocked. Allow popups to print the report.',
+            };
+          }
+
+          printWindow.document.write(`
+            <html>
+              <head>
+                <title>Ambulance Report - ${latest.vehiclePlate}</title>
+                <style>
+                  body { font-family: Arial, sans-serif; padding: 24px; color: #111827; }
+                  h1 { margin-bottom: 4px; }
+                  p { margin: 0 0 12px 0; color: #4b5563; }
+                  table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+                  th, td { border: 1px solid #e5e7eb; padding: 10px; text-align: left; }
+                  th { background: #f9fafb; width: 35%; }
+                </style>
+              </head>
+              <body>
+                <h1>Ambulance Report</h1>
+                <p>${latest.vehiclePlate} • Generated ${new Date().toLocaleString()}</p>
+                <table>
+                  <tr><th>Vehicle Plate</th><td>${latest.vehiclePlate}</td></tr>
+                  <tr><th>Registration Number</th><td>${latest.registrationNumber || 'N/A'}</td></tr>
+                  <tr><th>Model</th><td>${latest.model || 'N/A'}</td></tr>
+                  <tr><th>Status</th><td>${latest.status || 'N/A'}</td></tr>
+                  <tr><th>Driver</th><td>${latest.driverName || 'N/A'}</td></tr>
+                  <tr><th>Medic</th><td>${latest.medicName || 'N/A'}</td></tr>
+                  <tr><th>Current Location</th><td>${latest.location || 'N/A'}</td></tr>
+                  <tr><th>Total Dispatches</th><td>${latest.totalDispatches ?? 0}</td></tr>
+                  <tr><th>Average Response</th><td>${latest.averageResponseTime || 'N/A'}</td></tr>
+                </table>
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+          printWindow.focus();
+          printWindow.print();
+
+          return {
+            type: 'success',
+            message: `Print report opened for ${latest.vehiclePlate}.`,
+          };
+        }
         case 'refresh':
           await refreshDashboardData({ silent: true });
-          window.alert(`${ambulance.vehiclePlate} refreshed successfully`);
-          break;
+          return {
+            type: 'success',
+            message: `${ambulance.vehiclePlate} refreshed successfully.`,
+          };
         case 'archive':
-          if (window.confirm(`Are you sure you want to archive ${ambulance.vehiclePlate}?`)) {
-            await ambulanceService.updateStatus(ambulance.id, 'OUT_OF_SERVICE');
-            await refreshDashboardData({ silent: true });
-            window.alert(`${ambulance.vehiclePlate} archived successfully`);
-          }
-          break;
+          await ambulanceService.updateStatus(ambulance.id, 'OUT_OF_SERVICE');
+          await refreshDashboardData({ silent: true });
+          return {
+            type: 'success',
+            message: `${ambulance.vehiclePlate} archived successfully.`,
+          };
         case 'delete':
-          if (window.confirm(`Are you sure you want to delete ${ambulance.vehiclePlate}? This action cannot be undone.`)) {
-            await ambulanceService.deleteAmbulance(ambulance.id);
-            await refreshDashboardData({ silent: true });
-            window.alert(`${ambulance.vehiclePlate} deleted successfully`);
-          }
-          break;
+          await ambulanceService.deleteAmbulance(ambulance.id);
+          await refreshDashboardData({ silent: true });
+          return {
+            type: 'success',
+            message: `${ambulance.vehiclePlate} deleted successfully.`,
+            closeModal: true,
+          };
         default:
-          console.log('Unknown action:', action);
+          return {
+            type: 'info',
+            message: `Action ${action} is not supported.`,
+          };
       }
     } catch (error) {
-      window.alert(error?.message || 'Ambulance action failed.');
+      return {
+        type: 'error',
+        message: error?.message || 'Ambulance action failed.',
+      };
     }
-
-    setShowMoreModal(false);
-    setCurrentAmbulance(null);
   };
 
   const _calculateDistance = (lat1, lon1, lat2, lon2) => {
