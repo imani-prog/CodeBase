@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { 
   Truck, 
   Users, 
@@ -177,6 +177,16 @@ const buildCsv = (rows = []) => rows
     return value;
   }).join(','))
   .join('\n');
+
+const AUTO_REFRESH_INTERVAL_MS = 60000;
+
+const toSignature = (value) => {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(Date.now());
+  }
+};
 
 const mapTypeFromApi = (type) => String(type || '').trim().toLowerCase();
 const mapTypeToApi = (type) => String(type || '').trim().replace(/\s+/g, '_').toUpperCase();
@@ -687,10 +697,16 @@ const AmbulanceManagement = () => {
   const [drivers, setDrivers] = useState([]);
   const [loadError, setLoadError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hospitals, setHospitals] = useState([]);
   const [trackingData, setTrackingData] = useState({});
   const [emergencyCalls, setEmergencyCalls] = useState([]);
+  const dataSignatureRef = useRef({
+    ambulances: '',
+    drivers: '',
+    dispatches: '',
+    tracking: '',
+    hospitals: '',
+  });
 
   const resetDispatchForm = useCallback(() => {
     setDispatchForm({
@@ -730,12 +746,10 @@ const AmbulanceManagement = () => {
   }, []);
 
   const refreshDashboardData = useCallback(async ({ silent = false } = {}) => {
-    if (silent) {
-      setIsRefreshing(true);
-    } else {
+    if (!silent) {
       setIsLoading(true);
+      setLoadError('');
     }
-    setLoadError('');
 
     try {
       const [ambulancePayload, driverPayload, dispatchPayload, trackingPayload, hospitalPayload] = await Promise.all([
@@ -785,11 +799,38 @@ const AmbulanceManagement = () => {
       const nextTrackingMap = normalizeTrackingMap(toArray(trackingPayload), nextAmbulances);
       const nextHospitals = toArray(hospitalPayload).map(normalizeHospitalOption);
 
-      setAmbulances(nextAmbulances);
-      setDrivers(nextDrivers);
-      setEmergencyCalls(nextDispatches);
-      setTrackingData(nextTrackingMap);
-      setHospitals(nextHospitals);
+      const nextSignatures = {
+        ambulances: toSignature(nextAmbulances),
+        drivers: toSignature(nextDrivers),
+        dispatches: toSignature(nextDispatches),
+        tracking: toSignature(nextTrackingMap),
+        hospitals: toSignature(nextHospitals),
+      };
+
+      if (dataSignatureRef.current.ambulances !== nextSignatures.ambulances) {
+        setAmbulances(nextAmbulances);
+        dataSignatureRef.current.ambulances = nextSignatures.ambulances;
+      }
+
+      if (dataSignatureRef.current.drivers !== nextSignatures.drivers) {
+        setDrivers(nextDrivers);
+        dataSignatureRef.current.drivers = nextSignatures.drivers;
+      }
+
+      if (dataSignatureRef.current.dispatches !== nextSignatures.dispatches) {
+        setEmergencyCalls(nextDispatches);
+        dataSignatureRef.current.dispatches = nextSignatures.dispatches;
+      }
+
+      if (dataSignatureRef.current.tracking !== nextSignatures.tracking) {
+        setTrackingData(nextTrackingMap);
+        dataSignatureRef.current.tracking = nextSignatures.tracking;
+      }
+
+      if (dataSignatureRef.current.hospitals !== nextSignatures.hospitals) {
+        setHospitals(nextHospitals);
+        dataSignatureRef.current.hospitals = nextSignatures.hospitals;
+      }
     } catch (error) {
       console.error('Ambulance dashboard sync failed:', error);
       setLoadError(error?.message || 'Failed to load ambulance data from backend.');
@@ -802,7 +843,6 @@ const AmbulanceManagement = () => {
       }
     } finally {
       setIsLoading(false);
-      setIsRefreshing(false);
     }
   }, []);
 
@@ -813,7 +853,7 @@ const AmbulanceManagement = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       refreshDashboardData({ silent: true });
-    }, 20000);
+    }, AUTO_REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [refreshDashboardData]);
 
@@ -992,13 +1032,6 @@ const AmbulanceManagement = () => {
       await ambulanceService.updateStatus(selectedUnit.id, 'DISPATCHED');
       await refreshDashboardData({ silent: true });
 
-      setEmergencyCalls((prev) =>
-        prev.map((item) =>
-          item.id === callId
-            ? { ...item, status: 'DISPATCHED', assignedAmbulance: selectedUnit.vehiclePlate }
-            : item
-        )
-      );
       setShowDispatchModal(false);
       resetDispatchForm();
       setSelectedAmbulance(null);
@@ -1433,7 +1466,6 @@ const AmbulanceManagement = () => {
             <div>
               <h1 className="text-3xl font-bold mb-1">Ambulance Management</h1>
               {isLoading && <p className="text-sm text-gray-500">Loading backend ambulance data...</p>}
-              {!isLoading && isRefreshing && <p className="text-sm text-gray-500">Refreshing backend data...</p>}
             </div>
           </div>
 
