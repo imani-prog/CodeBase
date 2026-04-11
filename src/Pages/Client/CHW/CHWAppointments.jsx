@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Calendar,
   Clock,
@@ -19,21 +19,142 @@ import {
 import AddAppointmentModal from '../../../Components/CHW/AddAppointmentModal';
 import EditAppointmentModal from '../../../Components/CHW/EditAppointmentModal';
 import CancelAppointmentModal from '../../../Components/CHW/CancelAppointmentModal';
-import { getAppointmentGovernanceSnapshot, syncChwAppointments } from '../../../Services/appointmentGovernanceStore';
+import { appointmentApi } from '../../../API/endpoints/appointmentApi.js';
+import {
+  refreshAppointmentGovernanceSnapshot,
+  transitionGovernanceAppointment,
+} from '../../../Services/appointmentGovernanceStore';
 import { syncChwAppointmentWorkItems } from '../../../Services/chwAssignmentsStore';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
-const CHW_APPOINTMENT_META = {
-  chwId: 'CHW-001',
-  chwName: 'Jane Wanjiru',
-};
+const EMPTY_APPOINTMENTS = { upcoming: [], completed: [], cancelled: [] };
+
+function toInputDate(iso) {
+  const ts = Date.parse(iso || '');
+  if (Number.isNaN(ts)) return new Date().toISOString().slice(0, 10);
+  return new Date(ts).toISOString().slice(0, 10);
+}
+
+function toInputTime(iso) {
+  const ts = Date.parse(iso || '');
+  if (Number.isNaN(ts)) return '09:00';
+  const d = new Date(ts);
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+function normalizeType(value) {
+  const text = String(value || '').toLowerCase();
+  if (text.includes('video') || text.includes('tele')) return 'Video Call';
+  if (text.includes('phone')) return 'Phone Call';
+  if (text.includes('home')) return 'Home Visit';
+  return 'In-Person';
+}
+
+function durationLabel(startIso, endIso) {
+  const start = Date.parse(startIso || '');
+  const end = Date.parse(endIso || '');
+  if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return '30 min';
+  const mins = Math.round((end - start) / (60 * 1000));
+  return `${mins} min`;
+}
+
+function mapStatus(status) {
+  const normalized = String(status || '').toUpperCase();
+  if (normalized === 'COMPLETED') return 'completed';
+  if (normalized === 'CANCELED' || normalized === 'CANCELLED') return 'cancelled';
+  if (normalized === 'BOOKED') return 'pending';
+  return 'confirmed';
+}
+
+function mapSnapshotToChwAppointments(rows = [], chwId) {
+  const chwRows = rows.filter((row) => String(row.providerRole || '').toUpperCase() === 'CHW');
+  const scopedRows = chwRows.filter((row) => {
+    if (String(row.providerRole || '').toUpperCase() !== 'CHW') return false;
+    if (chwId === undefined || chwId === null || chwId === '') return true;
+    return String(row.providerId ?? '') === String(chwId);
+  });
+  const rowsToUse = scopedRows.length > 0 ? scopedRows : chwRows;
+
+  const mapped = rowsToUse.map((row) => {
+    const status = String(row.status || '').toUpperCase();
+    return {
+      id: row.id,
+      patientName: row.patientName || 'Unknown Patient',
+      patientId: row.patientId || 'N/A',
+      date: toInputDate(row.scheduledAt),
+      time: toInputTime(row.scheduledAt),
+      duration: durationLabel(row.scheduledAt, row.scheduledEnd),
+      type: normalizeType(row.appointmentType),
+      location: row.facility || 'Unknown Location',
+      reason: row.reason || 'General appointment',
+      notes: row.notes || '',
+      status: mapStatus(status),
+      cancelReason: row.cancellationReason || '',
+    };
+  });
+
+  return {
+    upcoming: mapped
+      .filter((item) => item.status !== 'completed' && item.status !== 'cancelled')
+      .sort((a, b) => Date.parse(`${a.date}T${a.time}:00`) - Date.parse(`${b.date}T${b.time}:00`)),
+    completed: mapped
+      .filter((item) => item.status === 'completed')
+      .sort((a, b) => Date.parse(`${b.date}T${b.time}:00`) - Date.parse(`${a.date}T${a.time}:00`)),
+    cancelled: mapped
+      .filter((item) => item.status === 'cancelled')
+      .sort((a, b) => Date.parse(`${b.date}T${b.time}:00`) - Date.parse(`${a.date}T${a.time}:00`)),
+  };
+}
+
+function parseDuration(durationText) {
+  const match = String(durationText || '').match(/(\d+)/);
+  if (!match) return 30;
+  const value = Number(match[1]);
+  return Number.isFinite(value) && value > 0 ? value : 30;
+}
+
+function toIsoWindow(date, time, durationText) {
+  const start = new Date(`${date}T${time}:00`);
+  if (Number.isNaN(start.getTime())) return { startIso: null, endIso: null };
+  const end = new Date(start.getTime() + parseDuration(durationText) * 60 * 1000);
+  return {
+    startIso: start.toISOString(),
+    endIso: end.toISOString(),
+  };
+}
+
+function buildChwPayload(appointment, chwId) {
+  const { startIso, endIso } = toIsoWindow(appointment.date, appointment.time, appointment.duration);
+  if (!startIso || !endIso) {
+    throw new Error('Invalid appointment date/time');
+  }
+
+  return {
+    patientId: appointment.patientId,
+    chwId,
+    providerRole: 'CHW',
+    type: appointment.type,
+    appointmentType: appointment.type,
+    location: appointment.location,
+    reason: appointment.reason,
+    notes: appointment.notes,
+    scheduledStart: startIso,
+    scheduledEnd: endIso,
+    startAt: startIso,
+    endAt: endIso,
+    status: 'BOOKED',
+  };
+}
 
 const CHWAppointments = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('upcoming');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editAppointment, setEditAppointment] = useState(null);
   const [cancelAppointment, setCancelAppointment] = useState(null);
   const [toast, setToast] = useState(null);
+  const [appointmentData, setAppointmentData] = useState(EMPTY_APPOINTMENTS);
 
   useEffect(() => {
     if (!toast) return;
@@ -43,136 +164,63 @@ const CHWAppointments = () => {
 
   const showToast = (type, message) => setToast({ type, message });
 
-  const [appointmentData, setAppointmentData] = useState({
-    upcoming: [
-      {
-        id: 1,
-        patientName: 'Sarah Wanjiru',
-        patientId: 'PT-2023-001',
-        date: '2024-10-25',
-        time: '10:00 AM',
-        duration: '30 min',
-        type: 'In-Person',
-        location: 'Community Health Center',
-        reason: 'Blood Pressure Check',
-        status: 'confirmed'
-      },
-      {
-        id: 2,
-        patientName: 'John Kamau',
-        patientId: 'PT-2023-045',
-        date: '2024-10-25',
-        time: '2:00 PM',
-        duration: '45 min',
-        type: 'Video Call',
-        location: 'Telemedicine',
-        reason: 'Follow-up Consultation',
-        status: 'pending'
-      },
-      {
-        id: 3,
-        patientName: 'Mary Njoki',
-        patientId: 'PT-2023-089',
-        date: '2024-10-26',
-        time: '9:00 AM',
-        duration: '60 min',
-        type: 'In-Person',
-        location: 'Community Health Center',
-        reason: 'Prenatal Checkup',
-        status: 'confirmed'
-      },
-      {
-        id: 4,
-        patientName: 'Peter Ochieng',
-        patientId: 'PT-2023-112',
-        date: '2024-10-27',
-        time: '11:00 AM',
-        duration: '30 min',
-        type: 'Phone Call',
-        location: 'Remote',
-        reason: 'Medication Review',
-        status: 'confirmed'
-      }
-    ],
-    completed: [
-      {
-        id: 5,
-        patientName: 'Grace Akinyi',
-        patientId: 'PT-2023-156',
-        date: '2024-10-22',
-        time: '10:30 AM',
-        duration: '30 min',
-        type: 'In-Person',
-        reason: 'Nutrition Counseling',
-        notes: 'Patient showed improvement in diet adherence'
-      },
-      {
-        id: 6,
-        patientName: 'David Mwangi',
-        patientId: 'PT-2023-201',
-        date: '2024-10-21',
-        time: '2:00 PM',
-        duration: '45 min',
-        type: 'Video Call',
-        reason: 'Mental Health Screening',
-        notes: 'Referred to counselor for additional support'
-      }
-    ],
-    cancelled: [
-      {
-        id: 7,
-        patientName: 'Jane Wambui',
-        patientId: 'PT-2023-178',
-        date: '2024-10-20',
-        time: '3:00 PM',
-        duration: '30 min',
-        type: 'In-Person',
-        reason: 'General Checkup',
-        cancelReason: 'Patient requested reschedule'
-      }
-    ]
-  });
+  const loadAppointments = useCallback(async () => {
+    try {
+      const snapshot = await refreshAppointmentGovernanceSnapshot({
+        providerRole: 'CHW',
+        chwId: user?.id,
+      });
+      const nextData = mapSnapshotToChwAppointments(snapshot.appointments, user?.id);
+      setAppointmentData(nextData);
+      syncChwAppointmentWorkItems(snapshot.appointments);
+    } catch (error) {
+      setAppointmentData(EMPTY_APPOINTMENTS);
+      showToast('error', error?.message || 'Failed to load appointments.');
+    }
+  }, [user?.id]);
 
   useEffect(() => {
-    syncChwAppointments(appointmentData, CHW_APPOINTMENT_META);
-    const snapshot = getAppointmentGovernanceSnapshot();
-    syncChwAppointmentWorkItems(snapshot.appointments);
+    loadAppointments();
+  }, [loadAppointments]);
+
+  const handleAddSave = async (newAppt) => {
+    const payload = buildChwPayload(newAppt, user?.id);
+    await appointmentApi.create(payload);
+    await loadAppointments();
+    showToast('success', `Appointment for ${newAppt.patientName || 'patient'} scheduled successfully.`);
+  };
+
+  const handleEditSave = async (updated) => {
+    const payload = buildChwPayload(updated, user?.id);
+    await appointmentApi.update(updated.id, payload);
+    await loadAppointments();
+    setEditAppointment(null);
+    showToast('success', `Appointment for ${updated.patientName} updated successfully.`);
+  };
+
+  const handleCancelConfirm = async (appt) => {
+    const result = await transitionGovernanceAppointment(appt.id, 'CANCELED', 'Cancelled by CHW');
+    if (!result.ok) {
+      throw new Error(result.reason || 'Failed to cancel appointment.');
+    }
+    await loadAppointments();
+    showToast('success', `Appointment for ${appt.patientName} has been cancelled.`);
+  };
+
+  const patientOptions = useMemo(() => {
+    const uniquePatients = new Map();
+    [...appointmentData.upcoming, ...appointmentData.completed, ...appointmentData.cancelled].forEach((item) => {
+      const key = String(item.patientId || '').trim();
+      if (!key) return;
+      if (!uniquePatients.has(key)) {
+        uniquePatients.set(key, {
+          id: item.patientId,
+          name: item.patientName || item.patientId,
+        });
+      }
+    });
+    return Array.from(uniquePatients.values());
   }, [appointmentData]);
-
-  const handleAddSave = (newAppt) => {
-    try {
-      setAppointmentData((prev) => ({ ...prev, upcoming: [newAppt, ...prev.upcoming] }));
-      showToast('success', `Appointment for ${newAppt.patientName || 'patient'} scheduled successfully.`);
-    } catch {
-      showToast('error', 'Failed to schedule appointment. Please try again.');
-    }
-  };
-
-  const handleEditSave = (updated) => {
-    try {
-      setAppointmentData((prev) => ({
-        ...prev,
-        upcoming: prev.upcoming.map((a) => (a.id === updated.id ? { ...a, ...updated } : a)),
-      }));
-      setEditAppointment(null);
-      showToast('success', `Appointment for ${updated.patientName} updated successfully.`);
-    } catch {
-      showToast('error', 'Failed to update appointment. Please try again.');
-    }
-  };
-
-  const handleCancelConfirm = (appt) => {
-    try {
-      setAppointmentData((prev) => ({
-        ...prev,
-        upcoming: prev.upcoming.filter((a) => a.id !== appt.id),
-        cancelled: [{ ...appt, cancelReason: appt.cancelReason || 'Cancelled by CHW' }, ...prev.cancelled],
-      }));
-      showToast('success', `Appointment for ${appt.patientName} has been cancelled.`);
-    } catch {
-      showToast('error', 'Failed to cancel appointment. Please try again.');
-    }
-  };
 
   const filterAppts = (list) => {
     if (!searchTerm.trim()) return list;
@@ -661,12 +709,14 @@ const CHWAppointments = () => {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSave={handleAddSave}
+        patients={patientOptions}
       />
       <EditAppointmentModal
         isOpen={!!editAppointment}
         appointment={editAppointment}
         onClose={() => setEditAppointment(null)}
         onSave={handleEditSave}
+        patients={patientOptions}
       />
       <CancelAppointmentModal
         isOpen={!!cancelAppointment}

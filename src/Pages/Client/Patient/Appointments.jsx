@@ -1,107 +1,137 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Calendar, Clock, MapPin, Video, User, Plus, X, Phone, Mail, AlertCircle, CheckCircle, ExternalLink, Download } from 'lucide-react';
-import { getAppointmentGovernanceSnapshot, syncPatientAppointments } from '../../../Services/appointmentGovernanceStore';
+import { appointmentApi } from '../../../API/endpoints/appointmentApi.js';
+import {
+  refreshAppointmentGovernanceSnapshot,
+  transitionGovernanceAppointment,
+} from '../../../Services/appointmentGovernanceStore';
 import { syncChwAppointmentWorkItems } from '../../../Services/chwAssignmentsStore';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
-const PATIENT_APPOINTMENT_META = {
-  patientId: 'PT-SELF-001',
-  patientName: 'Patient User',
-};
+const EMPTY_APPOINTMENTS = { upcoming: [], past: [], cancelled: [] };
+const DEFAULT_MEETING_LINK = 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1';
 
-const initialAppointments = {
-  upcoming: [
-    {
-      id: 1,
-      type: 'Clinic Visit',
-      doctor: 'Dr. Sarah Kamau',
-      specialty: 'General Practitioner',
-      date: '2025-10-22',
-      time: '10:00 AM',
-      location: 'Nairobi Health Center',
-      address: 'Kimathi Street, Nairobi CBD',
-      status: 'confirmed',
-      reason: 'Annual checkup',
-      phone: '+254 712 345 678',
-      email: 'info@nairobihealth.co.ke',
-      instructions: 'Please arrive 15 minutes early. Bring your NHIF card and ID.',
-      bookingRef: 'APT-2025-001234'
-    },
-    {
-      id: 2,
-      type: 'Telemedicine',
-      doctor: 'Dr. John Mwangi',
-      specialty: 'Cardiologist',
-      date: '2025-10-25',
-      time: '2:00 PM',
-      location: 'Video Consultation',
-      status: 'pending',
-      reason: 'Follow-up consultation',
-      phone: '+254 723 456 789',
-      email: 'dr.mwangi@medilink.co.ke',
-      meetingLink: 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1',
-      instructions: 'Ensure you have a stable internet connection. Have your recent test results ready.',
-      bookingRef: 'APT-2025-001235'
-    },
-    {
-      id: 3,
-      type: 'Home Visit',
-      doctor: 'Nurse Jane Ochieng',
-      specialty: 'Community Health Worker',
-      date: '2025-10-30',
-      time: '11:00 AM',
-      location: 'Patient Home',
-      address: '1234 Riverside Drive, Nairobi',
-      status: 'confirmed',
-      reason: 'Post-surgery care',
-      phone: '+254 734 567 890',
-      email: 'nurse.ochieng@medilink.co.ke',
-      instructions: 'Please ensure a family member is present during the visit. Have your medication list ready.',
-      bookingRef: 'APT-2025-001236'
-    }
-  ],
-  past: [
-    {
-      id: 31,
-      type: 'Home Visit',
-      doctor: 'Nurse Jane Ochieng',
-      specialty: 'Community Health Worker',
-      date: '2025-10-10',
-      time: '3:00 PM',
-      location: 'Patient Home',
-      status: 'completed',
-      reason: 'Post-surgery care',
-      bookingRef: 'APT-2025-001210'
-    },
-    {
-      id: 4,
-      type: 'Clinic Visit',
-      doctor: 'Dr. Emily Njoroge',
-      specialty: 'Dermatologist',
-      date: '2025-09-15',
-      time: '9:00 AM',
-      location: 'Mombasa Medical Clinic',
-      status: 'completed',
-      reason: 'Skin rash evaluation',
-      bookingRef: 'APT-2025-001211'
-    }
-  ],
-  cancelled: [
-    {
-      id: 5,
-      type: 'Telemedicine',
-      doctor: 'Dr. David Otieno',
-      specialty: 'Pediatrician',
-      date: '2025-10-05',
-      time: '4:00 PM',
-      location: 'Video Consultation',
-      status: 'cancelled',
-      reason: 'Child fever follow-up',
-      bookingRef: 'APT-2025-001212'
-    }
-  ]
-};
+function formatDate(iso) {
+  const ts = Date.parse(iso || '');
+  if (Number.isNaN(ts)) return new Date().toISOString().slice(0, 10);
+  return new Date(ts).toISOString().slice(0, 10);
+}
+
+function formatTime(iso) {
+  const ts = Date.parse(iso || '');
+  if (Number.isNaN(ts)) return '09:00 AM';
+  return new Date(ts).toLocaleTimeString('en-KE', { hour: 'numeric', minute: '2-digit' });
+}
+
+function normalizeType(value) {
+  const text = String(value || '').toLowerCase();
+  if (text.includes('tele') || text.includes('video')) return 'Telemedicine';
+  if (text.includes('home')) return 'Home Visit';
+  return 'Clinic Visit';
+}
+
+function normalizeStatus(value) {
+  const text = String(value || '').toUpperCase();
+  if (text === 'COMPLETED') return 'completed';
+  if (text === 'CANCELED' || text === 'CANCELLED') return 'cancelled';
+  if (text === 'BOOKED') return 'pending';
+  return 'confirmed';
+}
+
+function toWindowFromSlot(date, slot) {
+  const lowered = String(slot || '').toLowerCase();
+  let hourMinute = '09:00';
+
+  if (lowered.includes('morning')) hourMinute = '09:00';
+  else if (lowered.includes('afternoon')) hourMinute = '14:00';
+  else if (lowered.includes('evening')) hourMinute = '18:00';
+  else if (/^\d{2}:\d{2}$/.test(String(slot || ''))) hourMinute = String(slot);
+
+  const start = new Date(`${date}T${hourMinute}:00`);
+  if (Number.isNaN(start.getTime())) return { startIso: null, endIso: null };
+
+  const end = new Date(start.getTime() + 30 * 60 * 1000);
+  return {
+    startIso: start.toISOString(),
+    endIso: end.toISOString(),
+  };
+}
+
+function mapSnapshotToPatientAppointments(rows = [], user) {
+  const userId = user?.id !== undefined && user?.id !== null ? String(user.id) : '';
+  const username = String(user?.username || '').toLowerCase();
+
+  let scoped = rows;
+  if (userId) {
+    scoped = rows.filter((row) => String(row.patientId ?? '') === userId);
+  }
+  if (scoped.length === 0 && username) {
+    scoped = rows.filter((row) => String(row.patientName || '').toLowerCase() === username);
+  }
+  if (scoped.length === 0) {
+    scoped = rows;
+  }
+
+  const mapped = scoped.map((row) => {
+    const type = normalizeType(row.appointmentType);
+    const status = normalizeStatus(row.status);
+    return {
+      id: row.id,
+      type,
+      doctor: row.providerName || 'Assigned Provider',
+      specialty: String(row.providerRole || '').toUpperCase() === 'CHW' ? 'Community Health Worker' : 'General Practitioner',
+      date: formatDate(row.scheduledAt),
+      time: formatTime(row.scheduledAt),
+      location: row.facility || 'Health Facility',
+      status,
+      reason: row.reason || 'General consultation',
+      bookingRef: row.sourceAppointmentId ? `APT-${row.sourceAppointmentId}` : `APT-${row.id}`,
+      meetingLink: type === 'Telemedicine' ? DEFAULT_MEETING_LINK : undefined,
+      instructions: row.reason ? 'Please keep your phone nearby. You will receive confirmation shortly.' : undefined,
+      patientId: row.patientId,
+      patientName: row.patientName,
+    };
+  });
+
+  return {
+    upcoming: mapped.filter((item) => item.status === 'pending' || item.status === 'confirmed'),
+    past: mapped.filter((item) => item.status === 'completed'),
+    cancelled: mapped.filter((item) => item.status === 'cancelled'),
+  };
+}
+
+function buildPatientPayload(bookingForm, bookingType, userId) {
+  const { startIso, endIso } = toWindowFromSlot(bookingForm.date, bookingForm.time);
+  if (!startIso || !endIso) {
+    throw new Error('Invalid date or time for appointment booking');
+  }
+
+  const appointmentType =
+    bookingType === 'telemedicine' ? 'Telemedicine' : bookingType === 'home' ? 'Home Visit' : 'Clinic Visit';
+
+  return {
+    patientId: userId,
+    providerRole: bookingType === 'home' ? 'CHW' : 'DOCTOR',
+    type: appointmentType,
+    appointmentType,
+    location:
+      bookingType === 'telemedicine'
+        ? 'Video Consultation'
+        : bookingType === 'home'
+          ? bookingForm.address || 'Patient Home'
+          : bookingForm.location,
+    reason: bookingForm.reason,
+    notes: `Insurance: ${bookingForm.insurance}`,
+    scheduledStart: startIso,
+    scheduledEnd: endIso,
+    startAt: startIso,
+    endAt: endIso,
+    status: 'BOOKED',
+  };
+}
 
 const Appointments = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -109,7 +139,9 @@ const Appointments = () => {
   const [showJoinCallModal, setShowJoinCallModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [bookingType, setBookingType] = useState('clinic');
-  const [appointments, setAppointments] = useState(initialAppointments);
+  const [appointments, setAppointments] = useState(EMPTY_APPOINTMENTS);
+  const [loadingAppointments, setLoadingAppointments] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [bookingError, setBookingError] = useState('');
   const [bookingForm, setBookingForm] = useState({
     specialty: 'General Practitioner',
@@ -135,11 +167,26 @@ const Appointments = () => {
     };
   }, [isAnyModalOpen]);
 
+  const loadAppointments = useCallback(async () => {
+    setLoadingAppointments(true);
+    setLoadError('');
+
+    try {
+      const snapshot = await refreshAppointmentGovernanceSnapshot();
+      const mapped = mapSnapshotToPatientAppointments(snapshot.appointments, user);
+      setAppointments(mapped);
+      syncChwAppointmentWorkItems(snapshot.appointments);
+    } catch (error) {
+      setAppointments(EMPTY_APPOINTMENTS);
+      setLoadError(error?.message || 'Could not load appointments.');
+    } finally {
+      setLoadingAppointments(false);
+    }
+  }, [user]);
+
   useEffect(() => {
-    syncPatientAppointments(appointments, PATIENT_APPOINTMENT_META);
-    const snapshot = getAppointmentGovernanceSnapshot();
-    syncChwAppointmentWorkItems(snapshot.appointments);
-  }, [appointments]);
+    loadAppointments();
+  }, [loadAppointments]);
 
   const handleViewDetails = (appointment) => {
     setSelectedAppointment(appointment);
@@ -156,21 +203,21 @@ const Appointments = () => {
     setShowJoinCallModal(true);
   };
 
-  const confirmCancellation = () => {
+  const confirmCancellation = async () => {
     if (!selectedAppointment) return;
 
-    setAppointments((prev) => {
-      const target = prev.upcoming.find((item) => item.id === selectedAppointment.id);
-      if (!target) return prev;
+    const result = await transitionGovernanceAppointment(
+      selectedAppointment.id,
+      'CANCELED',
+      'Cancelled by patient'
+    );
 
-      const updatedTarget = { ...target, status: 'cancelled' };
-      return {
-        ...prev,
-        upcoming: prev.upcoming.filter((item) => item.id !== selectedAppointment.id),
-        cancelled: [updatedTarget, ...prev.cancelled]
-      };
-    });
+    if (!result.ok) {
+      window.alert(result.reason || 'Could not cancel appointment');
+      return;
+    }
 
+    await loadAppointments();
     setSelectedAppointment((current) => (current ? { ...current, status: 'cancelled' } : null));
     setShowCancelModal(false);
     setActiveTab('cancelled');
@@ -203,12 +250,6 @@ const Appointments = () => {
     return 'clinic';
   };
 
-  const mapBookingTypeToAppointmentType = (type) => {
-    if (type === 'telemedicine') return 'Telemedicine';
-    if (type === 'home') return 'Home Visit';
-    return 'Clinic Visit';
-  };
-
   const resetBookingForm = (type = 'clinic') => {
     setBookingForm({
       specialty: 'General Practitioner',
@@ -231,7 +272,7 @@ const Appointments = () => {
     }));
   };
 
-  const handleBookAppointment = () => {
+  const handleBookAppointment = async () => {
     if (!bookingForm.date || !bookingForm.reason.trim()) {
       setBookingError('Please provide a date and reason for visit before booking.');
       return;
@@ -239,47 +280,16 @@ const Appointments = () => {
 
     setBookingError('');
 
-    const nowYear = new Date().getFullYear();
-    const generatedId = Date.now();
-    const bookingRef = `APT-${nowYear}-${String(generatedId).slice(-6)}`;
-    const appointmentType = mapBookingTypeToAppointmentType(bookingType);
-    const assignedDoctor =
-      bookingType === 'home'
-        ? 'Nurse On-Call'
-        : `Dr. ${bookingForm.specialty.split(' ')[0]} Specialist`;
-
-    const newAppointment = {
-      id: generatedId,
-      type: appointmentType,
-      doctor: assignedDoctor,
-      specialty: bookingForm.specialty,
-      date: bookingForm.date,
-      time: bookingForm.time,
-      location:
-        bookingType === 'telemedicine'
-          ? 'Video Consultation'
-          : bookingType === 'home'
-            ? bookingForm.address || 'Patient Home'
-            : bookingForm.location,
-      address: bookingType === 'home' ? bookingForm.address : undefined,
-      status: 'pending',
-      reason: bookingForm.reason,
-      bookingRef,
-      meetingLink:
-        bookingType === 'telemedicine'
-          ? 'https://app.zoom.us/wc/88034100679/start?fromPWA=1&pwd=pVmy08XQyh0Ef3gWCFLCCikrXuW6o1.1'
-          : undefined,
-      instructions: 'Please keep your phone nearby. You will receive confirmation shortly.'
-    };
-
-    setAppointments((prev) => ({
-      ...prev,
-      upcoming: [newAppointment, ...prev.upcoming]
-    }));
-
-    setShowBookingModal(false);
-    setActiveTab('upcoming');
-    resetBookingForm(bookingType);
+    try {
+      const payload = buildPatientPayload(bookingForm, bookingType, user?.id);
+      await appointmentApi.create(payload);
+      await loadAppointments();
+      setShowBookingModal(false);
+      setActiveTab('upcoming');
+      resetBookingForm(bookingType);
+    } catch (error) {
+      setBookingError(error?.message || 'Could not book appointment. Please try again.');
+    }
   };
 
   const renderAppointmentActions = (appointment) => {
@@ -783,7 +793,7 @@ const Appointments = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">My Appointments</h1>
-            
+            {loadError && <p className="text-sm text-red-600">{loadError}</p>}
           </div>
           <button
             onClick={() => {
@@ -832,7 +842,12 @@ const Appointments = () => {
 
         {/* Appointments List */}
         <div className="p-3 sm:p-4 lg:p-6">
-          {appointments[activeTab].length > 0 ? (
+          {loadingAppointments ? (
+            <div className="text-center py-12">
+              <Calendar className="w-16 h-16 mx-auto mb-4 text-blue-600" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Loading appointments...</h3>
+            </div>
+          ) : appointments[activeTab].length > 0 ? (
             <>
               {/* Mobile/Tablet Cards */}
               <div className="grid grid-cols-1 gap-3 lg:hidden">

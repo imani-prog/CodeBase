@@ -96,7 +96,6 @@ const AddAppointmentModal = ({ isOpen, onClose, onSave, patients = SAMPLE_PATIEN
     if (isSaving || !validate()) return;
     setSaveError('');
     setIsSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
     try {
       const appointment = {
         id: Date.now(),
@@ -111,7 +110,7 @@ const AddAppointmentModal = ({ isOpen, onClose, onSave, patients = SAMPLE_PATIEN
         notes: form.notes,
         status: 'pending',
       };
-      onSave?.(appointment);
+      await onSave?.(appointment);
       handleClose();
     } catch {
       setSaveError('Something went wrong saving the appointment. Please try again.');

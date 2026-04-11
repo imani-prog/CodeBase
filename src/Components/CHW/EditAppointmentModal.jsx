@@ -114,9 +114,8 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
     if (isSaving || !validate()) return;
     setSaveError('');
     setIsSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
     try {
-      onSave?.({ ...appointment, ...form, patientName: selectedPatient?.name || appointment?.patientName });
+      await onSave?.({ ...appointment, ...form, patientName: selectedPatient?.name || appointment?.patientName });
       handleClose();
     } catch {
       setSaveError('Something went wrong updating the appointment. Please try again.');
