@@ -370,8 +370,7 @@ const TelemedicineManagement = () => {
   };
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: Monitor },
-    { id: 'active-sessions', label: 'Active Sessions', icon: Video },
+    { id: 'overview', label: 'Overview & Active Sessions', icon: Monitor },
     { id: 'doctors', label: 'Online Doctors', icon: UserCheck },
     { id: 'session-history', label: 'Session History', icon: Calendar },
     { id: 'revenue', label: 'Revenue Analytics', icon: DollarSign },
@@ -674,6 +673,8 @@ const TelemedicineManagement = () => {
         </div>
       </div>
     </div>
+
+    
   );
 
   const renderActiveSessions = () => (
@@ -833,6 +834,14 @@ const TelemedicineManagement = () => {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+
+  const renderOverviewAndActiveSessions = () => (
+    <div className="space-y-6">
+      {renderOverview()}
+      {renderActiveSessions()}
+      
     </div>
   );
 
@@ -1630,8 +1639,7 @@ const TelemedicineManagement = () => {
 
           {/* Tab Content */}
           <div className="min-h-[560px] [&_table]:text-sm [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:py-2.5 [&_th]:px-3 [&_td]:py-2.5 [&_td]:px-3">
-            {activeTab === 'overview' && renderOverview()}
-            {activeTab === 'active-sessions' && renderActiveSessions()}
+            {activeTab === 'overview' && renderOverviewAndActiveSessions()}
             {activeTab === 'doctors' && renderOnlineDoctors()}
             {activeTab === 'session-history' && renderSessionHistory()}
             {activeTab === 'revenue' && renderRevenue()}
