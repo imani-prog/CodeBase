@@ -50,9 +50,15 @@ const fetchUsers = async () => {
     const data = await userApi.list();
 
     const normalized = (Array.isArray(data) ? data : []).map(user => ({
-      ...user,
-      patientsManaged: user.patients ?? user.patientsManaged ?? 0
-    }));
+  ...user,
+  name: user.fullName ?? user.username ?? '—',
+  status: (user.status ?? 'ACTIVE').toLowerCase(),
+  role: (user.role ?? 'PATIENT').toLowerCase(),
+  lastLogin: user.lastLoginAt ?? null,
+  patientsManaged: user.patientsManaged ?? 0,
+}));
+
+
 
     setUsers(normalized);
   } catch (err) {
@@ -145,6 +151,8 @@ useEffect(() => { fetchUsers(); }, []);
     console.log(`Bulk ${action} for users:`, selectedUsers);
     setSelectedUsers([]);
   };
+
+  
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 lg:p-5">
@@ -408,20 +416,20 @@ useEffect(() => { fetchUsers(); }, []);
                           {user.location}
                         </div>
                       </td>
-                      <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
-                        <div className="flex flex-col">
-                          {user.lastLogin === 'Never' ? (
-                            <span className="text-gray-400">Never</span>
-                          ) : (
-                            <>
-                              <span>{new Date(user.lastLogin).toLocaleDateString()}</span>
-                              <span className="text-xs text-gray-400">
-                                {new Date(user.lastLogin).toLocaleTimeString()}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </td>
+                     <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
+                          {(() => {
+                            const raw = user.lastLogin;
+                            if (!raw) return <span className="text-gray-400 text-xs">Never</span>;
+                            const d = new Date(raw);
+                            if (isNaN(d.getTime())) return <span className="text-gray-400 text-xs">Never</span>;
+                            return (
+                              <div className="flex flex-col">
+                                <span>{d.toLocaleDateString()}</span>
+                                <span className="text-xs text-gray-400">{d.toLocaleTimeString()}</span>
+                              </div>
+                            );
+                          })()}
+                        </td>
                       <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           {user.patientsManaged}
