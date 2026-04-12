@@ -28,7 +28,7 @@ const SystemLogs = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedLog, setSelectedLog] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 10;
 
   const [auditLogs, setAuditLogs] = useState([]);
   const [totalItems, setTotalItems] = useState(0);

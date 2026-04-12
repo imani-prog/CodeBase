@@ -1,5 +1,5 @@
 import { useContext, createContext, useEffect, useState } from 'react';
-import { configureHttpClientHandlers, clearTokens } from '../API/index.js';
+import { authApi, configureHttpClientHandlers, clearTokens, getRefreshToken } from '../API/index.js';
 
 const AuthContext = createContext();
 const AUTH_USER_KEY = 'authUser';
@@ -16,10 +16,16 @@ const readStoredAuthUser = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => readStoredAuthUser());
 
-  const logout = () => {
-    setUser(null);
-    clearTokens();
-    window.localStorage.removeItem(AUTH_USER_KEY);
+  const logout = async () => {
+    try {
+      await authApi.logout({ refreshToken: getRefreshToken() });
+    } catch {
+      // Ignore logout API failures and still clear local auth state.
+    } finally {
+      setUser(null);
+      clearTokens();
+      window.localStorage.removeItem(AUTH_USER_KEY);
+    }
   };
 
   useEffect(() => {

@@ -17,9 +17,9 @@ const AdminNavbar = () => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleSignOut = () => { 
-    logout(); 
-    navigate('/login'); 
+  const handleSignOut = async () => {
+    await logout();
+    navigate('/login');
   };
 
   

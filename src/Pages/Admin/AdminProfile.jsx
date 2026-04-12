@@ -182,8 +182,8 @@ useEffect(() => {
 
             <button className="flex items-center px-3 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50">
               <LogOut 
-              onClick={() => {
-                logout();
+              onClick={async () => {
+                await logout();
                 navigate('/login');
               }}
               className="w-4 h-4 mr-1.5" /> Logout

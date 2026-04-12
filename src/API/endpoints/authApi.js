@@ -9,7 +9,10 @@ export const authApi = {
       credentials,
       { skipAuth: true }
     );
-    setTokens({ accessToken: response.token });
+    setTokens({
+      accessToken: response.token || response.accessToken,
+      refreshToken: response.refreshToken,
+    });
     return response;
   },
 
@@ -20,7 +23,23 @@ export const authApi = {
       payload,
       { skipAuth: true }
     );
-    setTokens({ accessToken: response.token });
+    setTokens({
+      accessToken: response.token || response.accessToken,
+      refreshToken: response.refreshToken,
+    });
     return response;
   },
+
+  refresh: (payload) =>
+    httpClient.post(API_PATHS.auth.refresh, payload, {
+      skipAuth: true,
+      retryOn401: false,
+    }),
+
+  me: () => httpClient.get(API_PATHS.auth.me),
+
+  logout: (payload = {}) =>
+    httpClient.post(API_PATHS.auth.logout, payload, {
+      retryOn401: false,
+    }),
 };

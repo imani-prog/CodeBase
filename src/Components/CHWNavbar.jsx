@@ -109,10 +109,10 @@ const CHWNavbar = ({ onMenuClick }) => {
     if (profileDropdownOpen) setProfileDropdownOpen(false);
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    logout();
+    await logout();
     navigate('/login');
   };
 
