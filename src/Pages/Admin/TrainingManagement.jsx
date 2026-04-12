@@ -756,7 +756,6 @@ const handleEnrollStudent = (courseId) => {
   setShowConfirmationModal(true);
 };
 
-  // Instructor handlers
   const handleViewInstructor = (instructor) => {
     setSelectedInstructor(instructor);
     setShowViewInstructorModal(true);
