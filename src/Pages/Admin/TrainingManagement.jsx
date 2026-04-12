@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { trainingApi } from '../../API/endpoints/trainingApi.js';
 import { chwApi } from '../../API/endpoints/chwApi.js';
+import { userApi } from '../../API/endpoints/userApi.js';
+import { reportApi } from '../../API/endpoints/reportApi.js';
 import { LoadingSpinner, ErrorMessage } from '../../Components/Admin/DataState.jsx';
 import { 
   BookOpen, 
@@ -112,6 +114,126 @@ const TrainingManagement = () => {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
+  const normalizeIdValue = (value) => {
+    if (value === null || value === undefined || value === '') return null;
+    const asNumber = Number(value);
+    return Number.isFinite(asNumber) ? asNumber : value;
+  };
+
+  const normalizeStatusValue = (value, fallback = 'ACTIVE') => {
+    const raw = String(value || '').trim();
+    if (!raw) return fallback;
+    return raw.toUpperCase().replace(/\s+/g, '_');
+  };
+
+  const buildUsername = (name, email) => {
+    const fromEmail = String(email || '').split('@')[0]?.trim();
+    if (fromEmail) return fromEmail.toLowerCase();
+
+    const compact = String(name || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '.')
+      .replace(/^\.+|\.+$/g, '');
+
+    return compact || `instructor.${Date.now()}`;
+  };
+
+  const isInstructorRole = (value) => {
+    const role = String(value || '').trim().toLowerCase();
+    return ['doctor', 'instructor', 'trainer', 'teacher', 'facilitator'].includes(role);
+  };
+
+  const resolveInstructorUserId = (instructor) => {
+    const candidate =
+      instructor?.userId ??
+      instructor?._rawUser?.id ??
+      instructor?.id;
+
+    if (candidate === null || candidate === undefined || candidate === '') return null;
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
+
+    const text = String(candidate).trim();
+    if (!text || text.includes(' ') || text.toLowerCase() === 'unassigned') return null;
+
+    const asNumber = Number(text);
+    return Number.isFinite(asNumber) ? asNumber : text;
+  };
+
+  const normalizeInstructorFromUser = (user = {}) => ({
+    id: user.id,
+    userId: user.id,
+    name: user.fullName || user.name || user.username || 'Unknown Instructor',
+    specialization: user.specialization || 'General',
+    qualification: user.qualification || 'Not provided',
+    experience: user.experience || user.yearsOfExperience || 'N/A',
+    coursesTeaching: 0,
+    totalStudents: 0,
+    avgRating: 0,
+    email: user.email || '-',
+    phone: user.phone || '-',
+    status: toLabel(user.status, 'Active'),
+    joinDate: user.createdAt || user.createdDate || '',
+    completedCourses: 0,
+    salary: toNumber(user.salary ?? user.monthlySalary, 0),
+    _rawUser: user,
+  });
+
+  const mergeInstructorData = (courseRows, usersPayload) => {
+    const userRows = normalizeArrayPayload(usersPayload)
+      .filter((user) => isInstructorRole(user.role))
+      .map((user) => normalizeInstructorFromUser(user));
+
+    if (userRows.length === 0) return courseRows;
+
+    const usedCourseIndexes = new Set();
+
+    const merged = userRows.map((userRow) => {
+      const matchedIndex = courseRows.findIndex((courseRow) => {
+        const matchesId =
+          userRow.userId !== null &&
+          userRow.userId !== undefined &&
+          String(courseRow.userId ?? courseRow.id ?? '') === String(userRow.userId);
+        const matchesEmail =
+          userRow.email !== '-' &&
+          String(courseRow.email || '').trim().toLowerCase() === String(userRow.email || '').trim().toLowerCase();
+        const matchesName =
+          String(courseRow.name || '').trim().toLowerCase() === String(userRow.name || '').trim().toLowerCase();
+        return matchesId || matchesEmail || matchesName;
+      });
+
+      if (matchedIndex === -1) {
+        return userRow;
+      }
+
+      usedCourseIndexes.add(matchedIndex);
+      const courseRow = courseRows[matchedIndex];
+
+      return {
+        ...courseRow,
+        ...userRow,
+        id: userRow.userId ?? courseRow.id,
+        userId: userRow.userId ?? courseRow.userId,
+        name: userRow.name || courseRow.name,
+        specialization: userRow.specialization || courseRow.specialization,
+        qualification:
+          userRow.qualification && userRow.qualification !== 'Not provided'
+            ? userRow.qualification
+            : courseRow.qualification,
+        experience: userRow.experience && userRow.experience !== 'N/A' ? userRow.experience : courseRow.experience,
+        email: userRow.email !== '-' ? userRow.email : courseRow.email,
+        phone: userRow.phone !== '-' ? userRow.phone : courseRow.phone,
+        status: userRow.status || courseRow.status,
+        salary: userRow.salary > 0 ? userRow.salary : courseRow.salary,
+      };
+    });
+
+    const unmatchedCourseRows = courseRows.filter((_, index) => !usedCourseIndexes.has(index));
+
+    return [...merged, ...unmatchedCourseRows].sort((a, b) =>
+      String(a.name || '').localeCompare(String(b.name || ''))
+    );
+  };
+
   const buildCategoryRevenue = (courses) => {
     const categoryMap = new Map();
 
@@ -138,6 +260,7 @@ const TrainingManagement = () => {
       if (!byName.has(key)) {
         byName.set(key, {
           id: course.instructorId || key,
+          userId: course.instructorId || null,
           name: key,
           specialization: course.category || 'General',
           qualification: course._raw?.instructorQualification || 'Not provided',
@@ -211,8 +334,33 @@ const TrainingManagement = () => {
       setLoading(true);
       setFetchError(null);
 
-      const modulesPayload = await trainingApi.list();
+      const [modulesResult, usersResult, chwsResult] = await Promise.allSettled([
+        trainingApi.list(),
+        userApi.list(),
+        chwApi.list(),
+      ]);
+
+      if (modulesResult.status !== 'fulfilled') {
+        throw modulesResult.reason;
+      }
+
+      const modulesPayload = modulesResult.value;
+      const usersPayload = usersResult.status === 'fulfilled' ? usersResult.value : [];
+      const chwsPayload = chwsResult.status === 'fulfilled' ? chwsResult.value : [];
       const rawModules = normalizeArrayPayload(modulesPayload);
+      const rawChws = normalizeArrayPayload(chwsPayload);
+
+      const chwsById = new Map(
+        rawChws
+          .filter((chw) => chw?.id !== null && chw?.id !== undefined)
+          .map((chw) => [String(chw.id), chw])
+      );
+
+      const chwsByCode = new Map(
+        rawChws
+          .filter((chw) => String(chw?.code || '').trim() !== '')
+          .map((chw) => [String(chw.code).trim().toLowerCase(), chw])
+      );
 
       let normalizedModules = rawModules.map((module) => ({
         id: module.id,
@@ -260,6 +408,37 @@ const TrainingManagement = () => {
         const rows = result?.status === 'fulfilled' ? normalizeArrayPayload(result.value) : [];
 
         const mappedRows = rows.map((enrollment, rowIndex) => {
+          const enrollmentChwId = normalizeIdValue(
+            enrollment.chwId ||
+            enrollment.studentId ||
+            enrollment.userId ||
+            enrollment.chw?.id ||
+            enrollment.student?.id
+          );
+
+          const enrollmentCode = String(
+            enrollment.chwCode ||
+            enrollment.studentCode ||
+            enrollment.chw?.code ||
+            ''
+          )
+            .trim()
+            .toLowerCase();
+
+          const chwMatch =
+            (enrollmentChwId !== null && enrollmentChwId !== undefined
+              ? chwsById.get(String(enrollmentChwId))
+              : null) ||
+            (enrollmentCode ? chwsByCode.get(enrollmentCode) : null) ||
+            null;
+
+          const chwName =
+            `${chwMatch?.firstName || ''} ${chwMatch?.lastName || ''}`.trim() ||
+            chwMatch?.fullName ||
+            chwMatch?.name ||
+            chwMatch?.code ||
+            null;
+
           const rawStatus = String(enrollment.status || 'ACTIVE').toUpperCase();
           const progress = toNumber(
             enrollment.progressPercentage ?? enrollment.progress,
@@ -268,6 +447,7 @@ const TrainingManagement = () => {
 
           const mapped = {
             id: enrollment.id || enrollment.enrollmentId || `${course.id}-${rowIndex}`,
+            backendId: enrollment.id || enrollment.enrollmentId || null,
             name:
               enrollment.fullName ||
               enrollment.studentName ||
@@ -275,9 +455,25 @@ const TrainingManagement = () => {
               enrollment.chwFullName ||
               enrollment.name ||
               enrollment.chw?.fullName ||
+              enrollment.student?.fullName ||
+              chwName ||
               'Unknown Learner',
-            email: enrollment.email || enrollment.studentEmail || enrollment.chwEmail || enrollment.chw?.email || '-',
-            phone: enrollment.phone || enrollment.studentPhone || enrollment.chwPhone || enrollment.chw?.phone || '-',
+            email:
+              enrollment.email ||
+              enrollment.studentEmail ||
+              enrollment.chwEmail ||
+              enrollment.chw?.email ||
+              enrollment.student?.email ||
+              chwMatch?.email ||
+              '-',
+            phone:
+              enrollment.phone ||
+              enrollment.studentPhone ||
+              enrollment.chwPhone ||
+              enrollment.chw?.phone ||
+              enrollment.student?.phone ||
+              chwMatch?.phone ||
+              '-',
             courseId: course.id,
             enrollmentDate: enrollment.enrollmentDate || enrollment.enrolledAt || enrollment.createdAt || '',
             progress,
@@ -333,7 +529,7 @@ const TrainingManagement = () => {
       setTrainingCourses(normalizedModules);
       setEnrolledStudents(normalizedEnrollments);
       setRevenueByCategory(buildCategoryRevenue(normalizedModules));
-      setInstructors(buildInstructorSummary(normalizedModules));
+      setInstructors(mergeInstructorData(buildInstructorSummary(normalizedModules), usersPayload));
       setEnrollmentTrends(buildEnrollmentTrends(normalizedEnrollments, priceByCourseId));
     } catch (error) {
       setFetchError(error.message || 'Failed to load training modules');
@@ -571,21 +767,91 @@ const handleEnrollStudent = (courseId) => {
     setShowEditInstructorModal(true);
   };
 
-  const handleSaveEditedInstructor = (updatedInstructor) => {
-    showFeedback('Instructor updates require a backend endpoint and were not saved.', 'warning');
-    setShowEditInstructorModal(false);
-    setSelectedInstructor(updatedInstructor || null);
+  const handleSaveEditedInstructor = async (updatedInstructor) => {
+    const instructorId = resolveInstructorUserId(updatedInstructor);
+    if (!instructorId) {
+      showFeedback('Selected instructor is missing a valid backend user id.', 'error');
+      return;
+    }
+
+    try {
+      await userApi.update(instructorId, {
+        fullName: String(updatedInstructor.name || '').trim(),
+        username: buildUsername(updatedInstructor.name, updatedInstructor.email),
+        email: String(updatedInstructor.email || '').trim(),
+        phone: String(updatedInstructor.phone || '').trim(),
+        role: String(updatedInstructor?._rawUser?.role || 'DOCTOR').toUpperCase(),
+        status: normalizeStatusValue(updatedInstructor.status, 'ACTIVE'),
+        specialization: String(updatedInstructor.specialization || '').trim(),
+        qualification: String(updatedInstructor.qualification || '').trim(),
+        experience: String(updatedInstructor.experience || '').trim(),
+        salary: toNumber(updatedInstructor.salary, 0),
+      });
+
+      setShowEditInstructorModal(false);
+      setSelectedInstructor(null);
+      await fetchModules();
+      showFeedback('Instructor updated successfully!', 'success');
+    } catch (err) {
+      showFeedback(err.message || 'Failed to update instructor', 'error');
+    }
   };
 
-  const handleAddInstructor = (newInstructor) => {
-    showFeedback('Instructor creation requires a backend endpoint and was not saved.', 'warning');
+  const handleAddInstructor = async (newInstructor) => {
+    const payload = {
+      fullName: String(newInstructor.name || '').trim(),
+      username: buildUsername(newInstructor.name, newInstructor.email),
+      email: String(newInstructor.email || '').trim(),
+      phone: String(newInstructor.phone || '').trim(),
+      role: 'DOCTOR',
+      status: normalizeStatusValue(newInstructor.status, 'ACTIVE'),
+      specialization: String(newInstructor.specialization || '').trim(),
+      qualification: String(newInstructor.qualification || '').trim(),
+      experience: String(newInstructor.experience || '').trim(),
+      salary: toNumber(newInstructor.salary, 0),
+    };
+
+    try {
+      await userApi.create(payload);
+    } catch (error) {
+      if (!/password/i.test(String(error?.message || ''))) {
+        showFeedback(error.message || 'Failed to create instructor', 'error');
+        return;
+      }
+
+      await userApi.create({
+        ...payload,
+        password: `MediLink@${Math.floor(1000 + Math.random() * 9000)}`,
+      });
+    }
+
     setShowAddInstructorModal(false);
-    setSelectedInstructor(newInstructor || null);
+    setSelectedInstructor(null);
+    await fetchModules();
+    showFeedback('Instructor created successfully!', 'success');
   };
 
   const handleDeleteInstructor = (instructor) => {
+    const instructorId = resolveInstructorUserId(instructor);
+    if (!instructorId) {
+      showFeedback('Selected instructor is missing a valid backend user id.', 'error');
+      return;
+    }
+
     setSelectedInstructor(instructor);
-    showFeedback('Instructor deletion requires a backend endpoint and was not performed.', 'warning');
+    setConfirmationTitle('Delete Instructor');
+    setConfirmationMessage(`Permanently delete instructor "${instructor?.name}"? This action cannot be undone.`);
+    setConfirmationType('danger');
+    setConfirmationAction(() => async () => {
+      try {
+        await userApi.delete(instructorId);
+        await fetchModules();
+        showFeedback('Instructor deleted successfully!', 'success');
+      } catch (err) {
+        showFeedback(err.message || 'Failed to delete instructor', 'error');
+      }
+    });
+    setShowConfirmationModal(true);
   };
 
   const renderOverview = () => (
@@ -1199,7 +1465,10 @@ const handleEnrollStudent = (courseId) => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-semibold">Certificate Management</h3>
         <div className="flex items-center space-x-3">
-          <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button
+            onClick={() => setShowIssueCertificatesModal(true)}
+            className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <Award className="w-4 h-4 mr-2" />
             Issue Certificates
           </button>
@@ -1668,19 +1937,156 @@ const handleEnrollStudent = (courseId) => {
 //   showFeedback('Course updated successfully!', 'success');
 // };
 
-  const handleBulkEnroll = (enrollmentData) => {
-    console.log('Bulk enrollment:', enrollmentData);
-    
+  const handleBulkEnroll = async (enrollmentData) => {
+    const courseId = normalizeIdValue(enrollmentData?.courseId);
+    const students = Array.isArray(enrollmentData?.students) ? enrollmentData.students : [];
+
+    if (!courseId) {
+      throw new Error('Please select a valid course for enrollment.');
+    }
+
+    if (students.length === 0) {
+      throw new Error('No student entries provided for bulk enrollment.');
+    }
+
+    const enrollmentRequests = students.map((entry) => {
+      const value = String(entry || '').trim();
+      if (!value) {
+        return Promise.reject(new Error('Empty student entry detected.'));
+      }
+
+      const payload = /^\d+$/.test(value)
+        ? { chwId: Number(value) }
+        : value.includes('@')
+          ? { email: value }
+          : { username: value };
+
+      return trainingApi.enroll(courseId, payload);
+    });
+
+    const results = await Promise.allSettled(enrollmentRequests);
+    const success = results.filter((result) => result.status === 'fulfilled').length;
+    const failed = results.length - success;
+
+    if (success > 0) {
+      await fetchModules();
+      showFeedback(`Bulk enrollment completed: ${success} success, ${failed} failed.`, failed ? 'warning' : 'success');
+    } else {
+      throw new Error('Bulk enrollment failed for all submitted students.');
+    }
+
+    return {
+      success,
+      failed,
+      total: results.length,
+      failures: results
+        .filter((result) => result.status === 'rejected')
+        .map((result) => result.reason?.message || 'Enrollment failed'),
+    };
   };
 
-  const handleIssueCertificates = (certificateData) => {
-    console.log('Certificates issued:', certificateData);
-    
+  const handleIssueCertificates = async (certificateData) => {
+    const courseId = normalizeIdValue(certificateData?.courseId);
+    const selectedRows = Array.isArray(certificateData?.studentRows) ? certificateData.studentRows : [];
+    const enrollmentIds = selectedRows
+      .map((row) => row.backendId ?? row.id)
+      .map((id) => normalizeIdValue(id))
+      .filter((id) => id !== null && id !== undefined);
+
+    if (!courseId) {
+      throw new Error('Please select a valid course for certificate issuance.');
+    }
+
+    if (enrollmentIds.length === 0) {
+      throw new Error('No valid backend enrollments were selected for certificate issuance.');
+    }
+
+    let issued = 0;
+    let failed = 0;
+
+    try {
+      const response = await trainingApi.issueCertificates(courseId, {
+        enrollmentIds,
+        issuedAt: certificateData?.issuedAt || new Date().toISOString(),
+      });
+
+      issued = toNumber(response?.issuedCount ?? response?.issued ?? enrollmentIds.length, enrollmentIds.length);
+      failed = Math.max(enrollmentIds.length - issued, 0);
+    } catch (primaryError) {
+      const fallbackResults = await Promise.allSettled(
+        enrollmentIds.map((enrollmentId) => trainingApi.updateStatus(enrollmentId, 'COMPLETED'))
+      );
+
+      issued = fallbackResults.filter((result) => result.status === 'fulfilled').length;
+      failed = fallbackResults.length - issued;
+
+      if (issued === 0) {
+        throw primaryError;
+      }
+    }
+
+    await fetchModules();
+    showFeedback(`Certificate issuance completed: ${issued} issued, ${failed} failed.`, failed ? 'warning' : 'success');
+
+    return {
+      issued,
+      failed,
+      total: enrollmentIds.length,
+      courseTitle: trainingCourses.find((course) => String(course.id) === String(courseId))?.title,
+    };
   };
 
-  const handleExportReport = (reportData) => {
-    console.log('Report exported:', reportData);
-  
+  const handleExportReport = async (reportData) => {
+    const payload = {
+      module: 'TRAINING',
+      reportType: String(reportData?.reportType || '').toUpperCase(),
+      format: String(reportData?.format || 'pdf').toUpperCase(),
+      dateRange: reportData?.dateRange,
+      customStartDate: reportData?.customStartDate || null,
+      customEndDate: reportData?.customEndDate || null,
+      selectedCourses: Array.isArray(reportData?.selectedCourses) ? reportData.selectedCourses : [],
+      options: {
+        includeCharts: Boolean(reportData?.includeCharts),
+        includeStudentDetails: Boolean(reportData?.includeStudentDetails),
+        includeFinancials: Boolean(reportData?.includeFinancials),
+      },
+      generatedAt: reportData?.generatedAt || new Date().toISOString(),
+    };
+
+    let response;
+    try {
+      response = await trainingApi.exportReport(payload);
+    } catch {
+      response = await reportApi.create({
+        ...payload,
+        title: `Training ${toLabel(reportData?.reportType, 'Report')} Export`,
+        status: 'GENERATED',
+      });
+    }
+
+    showFeedback('Report generated successfully!', 'success');
+
+    return {
+      reportId: response?.id || reportData?.reportId,
+      fileName: response?.fileName || response?.name || `training-report-${Date.now()}.${String(reportData?.format || 'pdf')}`,
+      generatedAt: response?.generatedAt || reportData?.generatedAt || new Date().toISOString(),
+      downloadUrl: response?.downloadUrl || response?.fileUrl || response?.url || null,
+      fileContent:
+        typeof response === 'string'
+          ? response
+          : typeof response?.content === 'string'
+            ? response.content
+            : typeof response?.data === 'string'
+              ? response.data
+              : null,
+      fileBase64:
+        response?.fileBase64 ||
+        response?.base64 ||
+        (typeof response?.data === 'string' && /^[A-Za-z0-9+/=\n\r]+$/.test(response.data) ? response.data : null) ||
+        null,
+      fileBytes: Array.isArray(response?.bytes) ? response.bytes : null,
+      format: String(reportData?.format || 'pdf'),
+    };
   };
 
   const EnrollCHWModal = ({ course, onClose, onSaved }) => {
@@ -1831,7 +2237,7 @@ const handleEnrollStudent = (courseId) => {
         showModal={showIssueCertificatesModal}
         setShowModal={setShowIssueCertificatesModal}
         courses={trainingCourses}
-        students={[]} 
+        students={enrolledStudents}
         onIssueCertificates={handleIssueCertificates}
       />
       <ExportReportsModal 

@@ -10,31 +10,40 @@ const IssueCertificatesModal = ({ showModal, setShowModal, courses, students, on
   const [issuing, setIssuing] = useState(false);
   const [results, setResults] = useState(null);
 
-  // Mock student completion data
-  const studentCompletionData = students?.map(student => ({
-    ...student,
-    completionRate: Math.floor(Math.random() * 100),
-    passedAssessments: Math.random() > 0.3,
-    enrolledCourses: [1, 2, 3].map(id => ({
-      courseId: id,
-      completed: Math.random() > 0.3
-    }))
-  })) || [];
+  const getStudentKey = (student) => student.backendId ?? student.id;
+
+  const normalizeStudents = () => {
+    return (students || []).map((student) => {
+      const completionRate = Number(student.progress ?? 0);
+      const score = Number(student.score ?? 0);
+      const normalizedStatus = String(student.status || '').toLowerCase();
+      const completed = normalizedStatus === 'completed' || completionRate >= 100;
+
+      return {
+        ...student,
+        completionRate,
+        score,
+        completed,
+        passedAssessments: score >= 50,
+        key: getStudentKey(student),
+      };
+    });
+  };
 
   const getEligibleStudents = () => {
     if (!selectedCourse) return [];
-    
-    return studentCompletionData.filter(student => {
-      const courseEnrollment = student.enrolledCourses?.find(
-        c => c.courseId === parseInt(selectedCourse)
-      );
-      
+
+    return normalizeStudents().filter(student => {
+      const inCourse = String(student.courseId) === String(selectedCourse);
+      if (!inCourse) return false;
+
       if (filterStatus === 'completed') {
-        return courseEnrollment?.completed;
+        return student.completed;
       } else if (filterStatus === 'eligible') {
-        return student.completionRate >= 80 && student.passedAssessments;
+        return student.completed && student.passedAssessments;
       }
-      return courseEnrollment !== undefined;
+
+      return true;
     }).filter(student => 
       student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -57,7 +66,7 @@ const IssueCertificatesModal = ({ showModal, setShowModal, courses, students, on
     if (selectedStudents.length === eligibleStudents.length) {
       setSelectedStudents([]);
     } else {
-      setSelectedStudents(eligibleStudents.map(s => s.id));
+      setSelectedStudents(eligibleStudents.map(getStudentKey));
     }
   };
 
@@ -76,7 +85,7 @@ const IssueCertificatesModal = ({ showModal, setShowModal, courses, students, on
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validate()) {
@@ -85,24 +94,37 @@ const IssueCertificatesModal = ({ showModal, setShowModal, courses, students, on
 
     setIssuing(true);
 
-    // Simulate certificate generation
-    setTimeout(() => {
+    try {
+      const selectedRows = eligibleStudents.filter((student) =>
+        selectedStudents.includes(getStudentKey(student))
+      );
+
       const certificateData = {
         courseId: selectedCourse,
-        students: selectedStudents,
+        studentIds: selectedRows.map(getStudentKey),
+        studentRows: selectedRows,
         issuedAt: new Date().toISOString(),
-        certificateIds: selectedStudents.map(id => `CERT-${Date.now()}-${id}`)
       };
 
-      onIssueCertificates?.(certificateData);
-      
-      setResults({
-        issued: selectedStudents.length,
-        courseTitle: courses?.find(c => c.id === parseInt(selectedCourse))?.title
-      });
+      const response = await onIssueCertificates?.(certificateData);
 
+      setResults({
+        issued: Number(response?.issued ?? selectedRows.length),
+        failed: Number(response?.failed ?? 0),
+        courseTitle:
+          response?.courseTitle ||
+          courses?.find((c) => String(c.id) === String(selectedCourse))?.title ||
+          'Selected Course',
+      });
+      setErrors({});
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        submit: error?.message || 'Failed to issue certificates.',
+      }));
+    } finally {
       setIssuing(false);
-    }, 2000);
+    }
   };
 
   const handleClose = () => {
@@ -251,17 +273,17 @@ const IssueCertificatesModal = ({ showModal, setShowModal, courses, students, on
                                   const isEligible = student.completionRate >= 80 && student.passedAssessments;
                                   return (
                                     <tr
-                                      key={student.id}
+                                      key={getStudentKey(student)}
                                       className={`hover:bg-gray-50 cursor-pointer ${
-                                        selectedStudents.includes(student.id) ? 'bg-blue-50' : ''
+                                        selectedStudents.includes(getStudentKey(student)) ? 'bg-blue-50' : ''
                                       }`}
-                                      onClick={() => handleStudentSelect(student.id)}
+                                      onClick={() => handleStudentSelect(getStudentKey(student))}
                                     >
                                       <td className="px-4 py-3">
                                         <input
                                           type="checkbox"
-                                          checked={selectedStudents.includes(student.id)}
-                                          onChange={() => handleStudentSelect(student.id)}
+                                          checked={selectedStudents.includes(getStudentKey(student))}
+                                          onChange={() => handleStudentSelect(getStudentKey(student))}
                                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                                           onClick={(e) => e.stopPropagation()}
                                         />
@@ -343,6 +365,10 @@ const IssueCertificatesModal = ({ showModal, setShowModal, courses, students, on
                       <span className="text-lg font-bold text-blue-600">{results.issued}</span>
                     </div>
                     <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">Failed</span>
+                      <span className="text-sm font-medium text-gray-900">{results.failed || 0}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-700">Issued Date</span>
                       <span className="text-sm font-medium text-gray-900">
                         {new Date().toLocaleDateString()}
@@ -373,6 +399,15 @@ const IssueCertificatesModal = ({ showModal, setShowModal, courses, students, on
                 <div className="text-center py-8">
                   <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
                   <p className="text-gray-600">Generating certificates...</p>
+                </div>
+              )}
+
+              {errors.submit && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-700 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    {errors.submit}
+                  </p>
                 </div>
               )}
             </div>

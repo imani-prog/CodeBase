@@ -74,6 +74,28 @@ const BulkEnrollmentModal = ({ showModal, setShowModal, courses, onBulkEnroll })
     return Object.keys(newErrors).length === 0;
   };
 
+  const parseStudentsFromCsv = async (file) => {
+    if (!file) return [];
+
+    const text = await file.text();
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (lines.length === 0) return [];
+
+    const header = lines[0].split(',').map((cell) => cell.trim().toLowerCase());
+    const emailIndex = header.findIndex((cell) => cell === 'email');
+    const startIndex = emailIndex >= 0 ? 1 : 0;
+    const valueIndex = emailIndex >= 0 ? emailIndex : 0;
+
+    return lines
+      .slice(startIndex)
+      .map((line) => line.split(',')[valueIndex]?.trim())
+      .filter(Boolean);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -83,36 +105,45 @@ const BulkEnrollmentModal = ({ showModal, setShowModal, courses, onBulkEnroll })
 
     setProcessing(true);
 
-    // Simulate processing
-    setTimeout(() => {
-      let studentList = [];
-      
-      if (enrollmentMethod === 'manual') {
-        studentList = studentEmails.split(/[,\n]/).map(e => e.trim()).filter(e => e);
-      } else {
-        // Simulate file processing
-        studentList = ['student1@example.com', 'student2@example.com', 'student3@example.com'];
-      }
+    try {
+      const studentList = enrollmentMethod === 'manual'
+        ? studentEmails.split(/[,\n]/).map(e => e.trim()).filter(Boolean)
+        : await parseStudentsFromCsv(uploadedFile);
 
-      const successCount = studentList.length;
-      const failedCount = 0;
+      if (studentList.length === 0) {
+        setErrors(prev => ({
+          ...prev,
+          submit: 'No valid student identifiers were found in the input.',
+        }));
+        setProcessing(false);
+        return;
+      }
 
       const enrollmentData = {
         courseId: selectedCourse,
         students: studentList,
-        enrolledAt: new Date().toISOString()
+        enrolledAt: new Date().toISOString(),
+        method: enrollmentMethod,
       };
 
-      onBulkEnroll?.(enrollmentData);
-      
+      const response = await onBulkEnroll?.(enrollmentData);
+      const successCount = Number(response?.success ?? studentList.length);
+      const failedCount = Number(response?.failed ?? Math.max(studentList.length - successCount, 0));
+
       setResults({
         success: successCount,
         failed: failedCount,
-        total: successCount + failedCount
+        total: Number(response?.total ?? studentList.length),
       });
-
+      setErrors({});
+    } catch (error) {
+      setErrors(prev => ({
+        ...prev,
+        submit: error?.message || 'Bulk enrollment failed. Please try again.',
+      }));
+    } finally {
       setProcessing(false);
-    }, 2000);
+    }
   };
 
   const handleClose = () => {
@@ -342,6 +373,15 @@ const BulkEnrollmentModal = ({ showModal, setShowModal, courses, onBulkEnroll })
                 <div className="text-center py-8">
                   <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
                   <p className="text-gray-600">Processing enrollments...</p>
+                </div>
+              )}
+
+              {errors.submit && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-700 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    {errors.submit}
+                  </p>
                 </div>
               )}
             </div>

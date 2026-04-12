@@ -30,4 +30,8 @@ export const trainingApi = {
   updateStatus:     (enrollmentId, status)   =>
     httpClient.patch(`${API_PATHS.training.enrollmentStatus(enrollmentId)}?status=${status}`),
   unenroll:         (enrollmentId)           => httpClient.delete(API_PATHS.training.unenroll(enrollmentId)),
+  issueCertificates:(moduleId, payload)      =>
+    httpClient.post(`${API_PATHS.training.byId(moduleId)}/certificates/issue`, payload),
+  exportReport:     (payload)                =>
+    httpClient.post(`${API_PATHS.training.base}/reports/export`, payload),
 };

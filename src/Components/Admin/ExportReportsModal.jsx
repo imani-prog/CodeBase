@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Download, AlertCircle, FileText, Calendar, Filter, CheckCircle } from 'lucide-react';
+import { getApiBaseUrl, getAccessToken } from '../../API/clients/httpClient.js';
 
 const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport, module = 'training' }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport, 
   const [errors, setErrors] = useState({});
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [generatedReport, setGeneratedReport] = useState(null);
 
   // Report types based on module
   const trainingReportTypes = [
@@ -102,7 +104,7 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport, 
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validate()) {
@@ -111,18 +113,29 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport, 
 
     setGenerating(true);
 
-    // Simulate report generation
-    setTimeout(() => {
+    try {
       const reportData = {
         ...formData,
         generatedAt: new Date().toISOString(),
         reportId: `RPT-${Date.now()}`
       };
 
-      onExportReport?.(reportData);
-      setGenerating(false);
+      const response = await onExportReport?.(reportData);
+
+      setGeneratedReport({
+        ...reportData,
+        ...response,
+      });
+      setErrors({});
       setGenerated(true);
-    }, 2500);
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        submit: error?.message || 'Failed to generate report. Please try again.',
+      }));
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const handleClose = () => {
@@ -142,14 +155,141 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport, 
     setErrors({});
     setGenerating(false);
     setGenerated(false);
+    setGeneratedReport(null);
   };
 
   if (!showModal) return null;
 
   const getReportFileName = () => {
+    if (generatedReport?.fileName) return generatedReport.fileName;
     const type = reportTypes.find(t => t.value === formData.reportType);
     const date = new Date().toISOString().split('T')[0];
     return `${type?.label || 'report'}_${date}.${formData.format}`;
+  };
+
+  const getMimeType = (format) => {
+    const value = String(format || '').toLowerCase();
+    if (value === 'pdf') return 'application/pdf';
+    if (value === 'csv') return 'text/csv;charset=utf-8';
+    if (value === 'excel' || value === 'xlsx') {
+      return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    }
+    return 'text/plain;charset=utf-8';
+  };
+
+  const triggerBlobDownload = (blob, fileName) => {
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const maybeDecodeBase64ToBlob = (base64Value) => {
+    if (!base64Value || typeof base64Value !== 'string') return null;
+
+    const raw = base64Value.includes(',') ? base64Value.split(',').pop() : base64Value;
+    if (!raw) return null;
+
+    try {
+      const binary = window.atob(raw.replace(/\s+/g, ''));
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return new Blob([bytes], { type: getMimeType(generatedReport?.format || formData.format) });
+    } catch {
+      return null;
+    }
+  };
+
+  const maybeFetchBlobByReportId = async () => {
+    if (!generatedReport?.reportId) return null;
+
+    const reportId = generatedReport.reportId;
+    const token = getAccessToken();
+    const apiBase = getApiBaseUrl();
+    const idSegment = encodeURIComponent(String(reportId));
+
+    const candidates = [
+      `${apiBase}/api/reports/${idSegment}/download`,
+      `${apiBase}/api/reports/${idSegment}/file`,
+      `${apiBase}/api/reports/download/${idSegment}`,
+      `${apiBase}/api/training-modules/reports/${idSegment}/download`,
+      `${apiBase}/api/training-modules/reports/download/${idSegment}`,
+    ];
+
+    for (const url of candidates) {
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!response.ok) continue;
+
+        const blob = await response.blob();
+        if (blob && blob.size > 0) {
+          return blob;
+        }
+      } catch {
+        // Ignore and continue trying other candidates.
+      }
+    }
+
+    return null;
+  };
+
+  const handleDownload = async () => {
+    const downloadUrl = generatedReport?.downloadUrl || generatedReport?.url;
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    if (Array.isArray(generatedReport?.fileBytes) && generatedReport.fileBytes.length > 0) {
+      const bytes = new Uint8Array(generatedReport.fileBytes);
+      const blob = new Blob([bytes], { type: getMimeType(generatedReport?.format || formData.format) });
+      triggerBlobDownload(blob, getReportFileName());
+      return;
+    }
+
+    const base64Blob = maybeDecodeBase64ToBlob(generatedReport?.fileBase64 || generatedReport?.base64);
+    if (base64Blob) {
+      triggerBlobDownload(base64Blob, getReportFileName());
+      return;
+    }
+
+    const fetchedBlob = await maybeFetchBlobByReportId();
+    if (fetchedBlob) {
+      triggerBlobDownload(fetchedBlob, getReportFileName());
+      return;
+    }
+
+    const fileContent = generatedReport?.fileContent || generatedReport?.content;
+    if (typeof fileContent === 'string' && fileContent.trim() !== '') {
+      const blob = new Blob([fileContent], { type: getMimeType(generatedReport?.format || formData.format) });
+      triggerBlobDownload(blob, getReportFileName());
+      return;
+    }
+
+    const fallbackContent = JSON.stringify(
+      {
+        message: 'Backend did not provide a report file; this export metadata was downloaded as fallback.',
+        report: generatedReport || null,
+      },
+      null,
+      2
+    );
+    const fallbackBlob = new Blob([fallbackContent], { type: 'application/json;charset=utf-8' });
+    triggerBlobDownload(fallbackBlob, getReportFileName().replace(/\.[^.]+$/, '.json'));
+
+    setErrors((prev) => ({
+      ...prev,
+      submit: 'Downloaded fallback metadata because the backend did not return a file payload.',
+    }));
   };
 
   return (
@@ -434,12 +574,14 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport, 
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-700">Format</span>
-                      <span className="text-sm font-medium text-gray-900">{formData.format.toUpperCase()}</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {String(generatedReport?.format || formData.format).toUpperCase()}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-700">Generated</span>
                       <span className="text-sm font-medium text-gray-900">
-                        {new Date().toLocaleString()}
+                        {new Date(generatedReport?.generatedAt || new Date().toISOString()).toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -447,16 +589,22 @@ const ExportReportsModal = ({ showModal, setShowModal, courses, onExportReport, 
                   <div className="flex justify-center mt-6">
                     <button
                       type="button"
-                      onClick={() => {
-                        
-                        console.log('Downloading report...');
-                      }}
+                      onClick={handleDownload}
                       className="flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Download Report
                     </button>
                   </div>
+                </div>
+              )}
+
+              {errors.submit && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-700 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    {errors.submit}
+                  </p>
                 </div>
               )}
 
