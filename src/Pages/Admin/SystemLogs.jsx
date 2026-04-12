@@ -37,13 +37,11 @@ const SystemLogs = () => {
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
 
 
-  // Event types
+  
   const eventTypes = ['LOGIN', 'LOGOUT', 'READ', 'CREATE', 'UPDATE', 'DELETE', 'EXPORT', 'INTEGRATION'];
 
-  // Entity types that can be audited
   const entityTypes = ['PATIENT', 'CHW', 'HOSPITAL', 'APPOINTMENT', 'INSURANCE_CLAIM', 'USER', 'REPORT', 'AMBULANCE_DISPATCH'];
 
-  // Status types
   const statusTypes = ['SUCCESS', 'FAILURE'];
 
   const fetchLogs = useCallback(async (silent = false) => {
@@ -161,11 +159,9 @@ const SystemLogs = () => {
     URL.revokeObjectURL(downloadUrl);
   };
 
-  // Backend already returns filtered + paginated results
   const filteredLogs = auditLogs;
   const paginatedLogs = auditLogs;
 
-  // Statistics (computed from loaded page; total comes from backend)
   const stats = useMemo(() => {
     return {
       total: totalItems,
@@ -544,7 +540,7 @@ const SystemLogs = () => {
                     </h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs font-medium">User Name</p>
+                        <p className="text-xs font-medium">Full Names</p>
                         <p className="text-sm  font-bold">{selectedLog.userName}</p>
                       </div>
                       <div>
@@ -634,7 +630,7 @@ const SystemLogs = () => {
                   </div>
                 )}
 
-                <div className="bg-gray-50 p-5 border border-gray-200 mt-6">
+                {/* <div className="bg-gray-50 p-5 border border-gray-200 mt-6">
                   <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center">
                     <FileText className="w-4 h-4 mr-2" />
                     Complete Backend Payload
@@ -644,7 +640,7 @@ const SystemLogs = () => {
                       {JSON.stringify(selectedLog, null, 2)}
                     </pre>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Action Buttons */}
                 <div className="mt-8 flex items-center justify-end space-x-3">
