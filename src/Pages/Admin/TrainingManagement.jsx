@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { trainingApi } from '../../API/endpoints/trainingApi.js';
 import { chwApi } from '../../API/endpoints/chwApi.js';
 import { LoadingSpinner, ErrorMessage } from '../../Components/Admin/DataState.jsx';
@@ -85,227 +85,314 @@ const TrainingManagement = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
 
- const [trainingCourses, setTrainingCourses] = useState([]);
-const [loading, setLoading]                 = useState(true);
-const [fetchError, setFetchError]           = useState(null);
+  const [trainingCourses, setTrainingCourses] = useState([]);
+  const [enrolledStudents, setEnrolledStudents] = useState([]);
+  const [instructors, setInstructors] = useState([]);
+  const [enrollmentTrends, setEnrollmentTrends] = useState([]);
+  const [revenueByCategory, setRevenueByCategory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
-const fetchModules = async () => {
-  try {
-    setLoading(true);
-    setFetchError(null);
-    const data = await trainingApi.list();
-    // Normalize backend fields to match your existing UI field names
-    const normalized = (Array.isArray(data) ? data : []).map(m => ({
-      id:               m.id,
-      title:            m.courseName,
-      duration:         m.duration,
-      level:            m.courseLevel,
-      difficulty:       m.courseLevel?.charAt(0) + m.courseLevel?.slice(1).toLowerCase(),
-      description:      m.description ?? '',
-      modules:          m.courseModules ?? [],
-      certification:    m.certification ? m.courseName + ' Certificate' : null,
-      participants:     m.enrolledCount ?? 0,
-      rating:           m.rating ?? 0,
-      status:           m.isActive ? 'active' : 'inactive',
-      price:            m.price ?? 0,
-      revenue:          (m.price ?? 0) * (m.enrolledCount ?? 0),
-      completionRate:   0,  // not returned by backend yet
-      instructor:       m.instructorName ?? '—',
-      createdDate:      m.createdAt?.slice(0, 10) ?? '',
-      lastUpdated:      m.updatedAt?.slice(0, 10) ?? '',
-      category:         (m.tags ?? []).join(', ') || 'General',
-      enrolledStudents: m.enrolledCount ?? 0,
-      maxStudents:      m.maxEnrollment ?? 0,
-      passRate:         0,  // not returned by backend yet
-      tags:             m.tags ?? [],
-      courseModules:    m.courseModules ?? [],
-      isActive:         m.isActive,
-      enrollNowAvailable: m.enrollNowAvailable,
-      _raw:             m,  // keep raw for modals that need backend fields
-    }));
-    setTrainingCourses(normalized);
-  } catch (err) {
-    setFetchError(err.message || 'Failed to load training modules');
-  } finally {
-    setLoading(false);
-  }
-};
-
-useEffect(() => { fetchModules(); }, []);
-
-  // Student enrollment data
-  const [enrolledStudents, _setEnrolledStudents] = useState([
-    { id: 1, name: 'Sarah Wanjiru', email: 'sarah.w@example.com', phone: '+254 712 345 678', courseId: 1, enrollmentDate: '2024-06-20', progress: 85, score: 92, status: 'Active', lastActivity: '2024-10-15' },
-    { id: 2, name: 'John Kamau', email: 'john.k@example.com', phone: '+254 723 456 789', courseId: 2, enrollmentDate: '2024-07-05', progress: 72, score: 88, status: 'Active', lastActivity: '2024-10-14' },
-    { id: 3, name: 'Mary Akinyi', email: 'mary.a@example.com', phone: '+254 734 567 890', courseId: 1, enrollmentDate: '2024-06-15', progress: 100, score: 95, status: 'Completed', lastActivity: '2024-09-30' },
-    { id: 4, name: 'Peter Omondi', email: 'peter.o@example.com', phone: '+254 745 678 901', courseId: 3, enrollmentDate: '2024-08-01', progress: 45, score: 78, status: 'Active', lastActivity: '2024-10-10' },
-    { id: 5, name: 'Grace Njeri', email: 'grace.n@example.com', phone: '+254 756 789 012', courseId: 2, enrollmentDate: '2024-07-20', progress: 90, score: 91, status: 'Active', lastActivity: '2024-10-16' },
-    { id: 6, name: 'David Mwangi', email: 'david.m@example.com', phone: '+254 767 890 123', courseId: 4, enrollmentDate: '2024-08-15', progress: 65, score: 82, status: 'Active', lastActivity: '2024-10-12' },
-    { id: 7, name: 'Lucy Nyambura', email: 'lucy.n@example.com', phone: '+254 778 901 234', courseId: 1, enrollmentDate: '2024-06-25', progress: 95, score: 94, status: 'Active', lastActivity: '2024-10-17' },
-    { id: 8, name: 'James Otieno', email: 'james.o@example.com', phone: '+254 789 012 345', courseId: 5, enrollmentDate: '2024-09-01', progress: 30, score: 75, status: 'Active', lastActivity: '2024-10-08' }
-  ]);
-
-    const trainingOverview = {
-      totalCourses: trainingCourses.length,
-      activeCourses: trainingCourses.filter(c => c.status === 'active').length,
-      totalStudents: trainingCourses.reduce((sum, course) => sum + course.participants, 0),
-      totalRevenue: trainingCourses.reduce((sum, course) => sum + course.revenue, 0),
-      avgCompletionRate: trainingCourses.reduce((sum, course) => sum + course.completionRate, 0) / trainingCourses.length,
-      avgRating: trainingCourses.reduce((sum, course) => sum + course.rating, 0) / trainingCourses.length,
-    monthlyGrowth: 24.5,
-    certificatesIssued: 856
+  const normalizeArrayPayload = (payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.content)) return payload.content;
+    if (Array.isArray(payload?.items)) return payload.items;
+    if (Array.isArray(payload?.data)) return payload.data;
+    return [];
   };
 
-  const revenueByCategory = [
-    { category: 'Community Health', revenue: 3750000, courses: 1, students: 250 },
-    { category: 'Technology', revenue: 2160000, courses: 1, students: 180 },
-    { category: 'Administration', revenue: 2375000, courses: 1, students: 95 },
-    { category: 'Telemedicine', revenue: 2520000, courses: 1, students: 140 },
-    { category: 'Data Analytics', revenue: 1870000, courses: 1, students: 85 },
-    { category: 'Maternal Health', revenue: 2400000, courses: 1, students: 120 },
-    { category: 'Quality Management', revenue: 1520000, courses: 1, students: 95 },
-    { category: 'Mental Health', revenue: 1440000, courses: 1, students: 180 }
-  ];
+  const toNumber = (value, fallback = 0) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  };
 
-  // Instructors data
-  const [instructors, setInstructors] = useState([
-    {
-      id: 1,
-      name: 'Dr. Grace Achieng',
-      specialization: 'Community Health',
-      qualification: 'PhD in Public Health',
-      experience: '12 years',
-      coursesTeaching: 2,
-      totalStudents: 430,
-      avgRating: 4.8,
-      email: 'grace.achieng@medilink.com',
-      phone: '+254 712 345 678',
-      status: 'Active',
-      joinDate: '2020-03-15',
-      completedCourses: 24,
-      salary: 250000
-    },
-    {
-      id: 2,
-      name: 'Dr. James Kimani',
-      specialization: 'Digital Health Technology',
-      qualification: 'MSc in Health Informatics',
-      experience: '8 years',
-      coursesTeaching: 1,
-      totalStudents: 180,
-      avgRating: 4.7,
-      email: 'james.kimani@medilink.com',
-      phone: '+254 723 456 789',
-      status: 'Active',
-      joinDate: '2021-06-20',
-      completedCourses: 12,
-      salary: 180000
-    },
-    {
-      id: 3,
-      name: 'Dr. Mary Wanjiru',
-      specialization: 'Healthcare Administration',
-      qualification: 'MBA Healthcare Management',
-      experience: '15 years',
-      coursesTeaching: 1,
-      totalStudents: 95,
-      avgRating: 4.5,
-      email: 'mary.wanjiru@medilink.com',
-      phone: '+254 734 567 890',
-      status: 'Active',
-      joinDate: '2019-09-10',
-      completedCourses: 18,
-      salary: 220000
-    },
-    {
-      id: 4,
-      name: 'Dr. David Omondi',
-      specialization: 'Clinical Skills',
-      qualification: 'MD, MMED (Internal Medicine)',
-      experience: '18 years',
-      coursesTeaching: 1,
-      totalStudents: 160,
-      avgRating: 4.9,
-      email: 'david.omondi@medilink.com',
-      phone: '+254 745 678 901',
-      status: 'Active',
-      joinDate: '2018-01-05',
-      completedCourses: 32,
-      salary: 280000
-    },
-    {
-      id: 5,
-      name: 'Dr. Peter Njoroge',
-      specialization: 'Data Analytics',
-      qualification: 'PhD in Biostatistics',
-      experience: '10 years',
-      coursesTeaching: 1,
-      totalStudents: 85,
-      avgRating: 4.6,
-      email: 'peter.njoroge@medilink.com',
-      phone: '+254 756 789 012',
-      status: 'Active',
-      joinDate: '2020-11-12',
-      completedCourses: 8,
-      salary: 200000
-    },
-    {
-      id: 6,
-      name: 'Dr. Esther Nyambura',
-      specialization: 'Maternal & Child Health',
-      qualification: 'MD, MMED (Obstetrics)',
-      experience: '14 years',
-      coursesTeaching: 1,
-      totalStudents: 120,
-      avgRating: 4.9,
-      email: 'esther.nyambura@medilink.com',
-      phone: '+254 767 890 123',
-      status: 'Active',
-      joinDate: '2019-04-22',
-      completedCourses: 22,
-      salary: 240000
-    },
-    {
-      id: 7,
-      name: 'Dr. Joseph Otieno',
-      specialization: 'Quality Management',
-      qualification: 'MPH, Six Sigma Black Belt',
-      experience: '11 years',
-      coursesTeaching: 1,
-      totalStudents: 95,
-      avgRating: 4.6,
-      email: 'joseph.otieno@medilink.com',
-      phone: '+254 778 901 234',
-      status: 'Active',
-      joinDate: '2020-08-17',
-      completedCourses: 15,
-      salary: 190000
-    },
-    {
-      id: 8,
-      name: 'Dr. Susan Mwangi',
-      specialization: 'Mental Health',
-      qualification: 'MD, Psychiatry',
-      experience: '16 years',
-      coursesTeaching: 1,
-      totalStudents: 180,
-      avgRating: 4.8,
-      email: 'susan.mwangi@medilink.com',
-      phone: '+254 789 012 345',
-      status: 'Active',
-      joinDate: '2018-05-30',
-      completedCourses: 28,
-      salary: 260000
+  const toLabel = (value, fallback = 'Unknown') => {
+    if (!value || String(value).trim() === '') return fallback;
+    const text = String(value).trim();
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
+  const buildCategoryRevenue = (courses) => {
+    const categoryMap = new Map();
+
+    courses.forEach((course) => {
+      const category = course.category || 'General';
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, { category, courses: 0, students: 0, revenue: 0 });
+      }
+
+      const row = categoryMap.get(category);
+      row.courses += 1;
+      row.students += toNumber(course.enrolledStudents, 0);
+      row.revenue += toNumber(course.revenue, 0);
+    });
+
+    return Array.from(categoryMap.values()).sort((a, b) => b.revenue - a.revenue);
+  };
+
+  const buildInstructorSummary = (courses) => {
+    const byName = new Map();
+
+    courses.forEach((course) => {
+      const key = course.instructor || 'Unassigned';
+      if (!byName.has(key)) {
+        byName.set(key, {
+          id: course.instructorId || key,
+          name: key,
+          specialization: course.category || 'General',
+          qualification: course._raw?.instructorQualification || 'Not provided',
+          experience: course._raw?.instructorExperience || 'N/A',
+          coursesTeaching: 0,
+          totalStudents: 0,
+          avgRating: 0,
+          email: course._raw?.instructorEmail || '-',
+          phone: course._raw?.instructorPhone || '-',
+          status: 'Inactive',
+          joinDate: course.createdDate || '',
+          completedCourses: 0,
+          salary: toNumber(course._raw?.instructorSalary, 0),
+          _ratingsTotal: 0,
+          _ratingsCount: 0,
+        });
+      }
+
+      const row = byName.get(key);
+      row.coursesTeaching += 1;
+      row.totalStudents += toNumber(course.enrolledStudents, 0);
+      row.completedCourses += course.completionRate >= 100 ? 1 : 0;
+      row.status = course.status === 'active' ? 'Active' : row.status;
+
+      const rating = toNumber(course.rating, 0);
+      if (rating > 0) {
+        row._ratingsTotal += rating;
+        row._ratingsCount += 1;
+      }
+    });
+
+    return Array.from(byName.values()).map((row) => ({
+      ...row,
+      avgRating: row._ratingsCount > 0 ? Number((row._ratingsTotal / row._ratingsCount).toFixed(1)) : 0,
+    }));
+  };
+
+  const buildEnrollmentTrends = (enrollments, priceByCourseId) => {
+    const byMonth = new Map();
+
+    enrollments.forEach((enrollment) => {
+      const sourceDate = enrollment.enrollmentDate || enrollment.lastActivity;
+      const date = sourceDate ? new Date(sourceDate) : null;
+      if (!date || Number.isNaN(date.getTime())) return;
+
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      if (!byMonth.has(monthKey)) {
+        byMonth.set(monthKey, { monthKey, enrollments: 0, revenue: 0 });
+      }
+
+      const row = byMonth.get(monthKey);
+      row.enrollments += 1;
+      row.revenue += toNumber(priceByCourseId.get(enrollment.courseId), 0);
+    });
+
+    return Array.from(byMonth.values())
+      .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
+      .slice(-6)
+      .map((row) => {
+        const [year, month] = row.monthKey.split('-').map(Number);
+        const labelDate = new Date(year, month - 1, 1);
+        return {
+          ...row,
+          month: labelDate.toLocaleString('en-KE', { month: 'short', year: 'numeric' }),
+        };
+      });
+  };
+
+  const fetchModules = async () => {
+    try {
+      setLoading(true);
+      setFetchError(null);
+
+      const modulesPayload = await trainingApi.list();
+      const rawModules = normalizeArrayPayload(modulesPayload);
+
+      let normalizedModules = rawModules.map((module) => ({
+        id: module.id,
+        title: module.courseName,
+        duration: module.duration,
+        level: module.courseLevel,
+        difficulty: toLabel(module.courseLevel, 'Beginner'),
+        description: module.description || '',
+        modules: module.courseModules || [],
+        certification: module.certification ? `${module.courseName} Certificate` : null,
+        participants: toNumber(module.enrolledCount, 0),
+        rating: toNumber(module.rating, 0),
+        status: module.isActive ? 'active' : 'inactive',
+        price: toNumber(module.price, 0),
+        revenue: toNumber(module.price, 0) * toNumber(module.enrolledCount, 0),
+        completionRate: toNumber(module.completionRate, 0),
+        instructor: module.instructorName || 'Unassigned',
+        instructorId: module.instructorId || null,
+        createdDate: module.createdAt || '',
+        lastUpdated: module.updatedAt || '',
+        category: module.primaryCategory || module.tags?.[0] || 'General',
+        enrolledStudents: toNumber(module.enrolledCount, 0),
+        maxStudents: toNumber(module.maxEnrollment, 0),
+        passRate: toNumber(module.passRate, 0),
+        certificateFee: toNumber(module.certificateFee, 0),
+        issuedCertificates: toNumber(module.issuedCertificates, 0),
+        pendingCertificates: toNumber(module.pendingCertificates, 0),
+        eligibleCertificates: toNumber(module.eligibleCertificates, 0),
+        tags: module.tags || [],
+        courseModules: module.courseModules || [],
+        isActive: Boolean(module.isActive),
+        enrollNowAvailable: Boolean(module.enrollNowAvailable),
+        _raw: module,
+      }));
+
+      const enrollmentResults = await Promise.allSettled(
+        normalizedModules.map((course) => trainingApi.getEnrollments(course.id))
+      );
+
+      const enrollmentsByCourse = new Map();
+      const normalizedEnrollments = [];
+
+      normalizedModules.forEach((course, index) => {
+        const result = enrollmentResults[index];
+        const rows = result?.status === 'fulfilled' ? normalizeArrayPayload(result.value) : [];
+
+        const mappedRows = rows.map((enrollment, rowIndex) => {
+          const rawStatus = String(enrollment.status || 'ACTIVE').toUpperCase();
+          const progress = toNumber(
+            enrollment.progressPercentage ?? enrollment.progress,
+            rawStatus === 'COMPLETED' ? 100 : 0
+          );
+
+          const mapped = {
+            id: enrollment.id || enrollment.enrollmentId || `${course.id}-${rowIndex}`,
+            name:
+              enrollment.fullName ||
+              enrollment.studentName ||
+              enrollment.chwName ||
+              enrollment.chwFullName ||
+              enrollment.name ||
+              enrollment.chw?.fullName ||
+              'Unknown Learner',
+            email: enrollment.email || enrollment.studentEmail || enrollment.chwEmail || enrollment.chw?.email || '-',
+            phone: enrollment.phone || enrollment.studentPhone || enrollment.chwPhone || enrollment.chw?.phone || '-',
+            courseId: course.id,
+            enrollmentDate: enrollment.enrollmentDate || enrollment.enrolledAt || enrollment.createdAt || '',
+            progress,
+            score: toNumber(enrollment.score ?? enrollment.assessmentScore ?? enrollment.finalScore, 0),
+            status:
+              rawStatus === 'COMPLETED'
+                ? 'Completed'
+                : rawStatus === 'ACTIVE' || rawStatus === 'ENROLLED'
+                  ? 'Active'
+                  : toLabel(rawStatus, 'Active'),
+            lastActivity:
+              enrollment.lastActivity ||
+              enrollment.lastAccessedAt ||
+              enrollment.updatedAt ||
+              enrollment.completedAt ||
+              enrollment.enrollmentDate ||
+              '',
+            _raw: enrollment,
+          };
+          return mapped;
+        });
+
+        enrollmentsByCourse.set(course.id, mappedRows);
+        normalizedEnrollments.push(...mappedRows);
+      });
+
+      normalizedModules = normalizedModules.map((course) => {
+        const courseEnrollments = enrollmentsByCourse.get(course.id) || [];
+        const completedRows = courseEnrollments.filter((row) => row.status === 'Completed');
+        const completionRate =
+          courseEnrollments.length > 0
+            ? Number(((completedRows.length / courseEnrollments.length) * 100).toFixed(1))
+            : course.completionRate;
+        const passingRows = completedRows.filter((row) => row.score >= 50);
+        const passRate =
+          completedRows.length > 0
+            ? Number(((passingRows.length / completedRows.length) * 100).toFixed(1))
+            : course.passRate;
+
+        const enrolledCount = courseEnrollments.length > 0 ? courseEnrollments.length : course.enrolledStudents;
+        return {
+          ...course,
+          participants: enrolledCount,
+          enrolledStudents: enrolledCount,
+          completionRate,
+          passRate,
+          revenue: toNumber(course.price, 0) * enrolledCount,
+        };
+      });
+
+      const priceByCourseId = new Map(normalizedModules.map((course) => [course.id, course.price]));
+
+      setTrainingCourses(normalizedModules);
+      setEnrolledStudents(normalizedEnrollments);
+      setRevenueByCategory(buildCategoryRevenue(normalizedModules));
+      setInstructors(buildInstructorSummary(normalizedModules));
+      setEnrollmentTrends(buildEnrollmentTrends(normalizedEnrollments, priceByCourseId));
+    } catch (error) {
+      setFetchError(error.message || 'Failed to load training modules');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
-  const enrollmentTrends = [
-    { month: 'Jun', enrollments: 180, revenue: 2850000 },
-    { month: 'Jul', enrollments: 220, revenue: 3640000 },
-    { month: 'Aug', enrollments: 280, revenue: 4320000 },
-    { month: 'Sep', enrollments: 310, revenue: 4980000 },
-    { month: 'Oct', enrollments: 145, revenue: 2450000 }
-  ];
+  useEffect(() => {
+    fetchModules();
+    // Initial bootstrap only; manual refresh uses fetchModules directly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const trainingOverview = useMemo(() => {
+    const totalCourses = trainingCourses.length;
+    const activeCourses = trainingCourses.filter((course) => course.status === 'active').length;
+    const totalStudents =
+      enrolledStudents.length > 0
+        ? enrolledStudents.length
+        : trainingCourses.reduce((sum, course) => sum + toNumber(course.participants, 0), 0);
+    const totalRevenue = trainingCourses.reduce((sum, course) => sum + toNumber(course.revenue, 0), 0);
+    const avgCompletionRate =
+      trainingCourses.length > 0
+        ? trainingCourses.reduce((sum, course) => sum + toNumber(course.completionRate, 0), 0) / trainingCourses.length
+        : 0;
+    const avgRating =
+      trainingCourses.length > 0
+        ? trainingCourses.reduce((sum, course) => sum + toNumber(course.rating, 0), 0) / trainingCourses.length
+        : 0;
+    const certificatesIssued = enrolledStudents.filter((row) => row.status === 'Completed').length;
+    const currentMonth = enrollmentTrends[enrollmentTrends.length - 1]?.enrollments || 0;
+    const previousMonth = enrollmentTrends[enrollmentTrends.length - 2]?.enrollments || 0;
+    const monthlyGrowth = previousMonth > 0 ? ((currentMonth - previousMonth) / previousMonth) * 100 : 0;
+
+    return {
+      totalCourses,
+      activeCourses,
+      totalStudents,
+      totalRevenue,
+      avgCompletionRate,
+      avgRating,
+      monthlyGrowth,
+      certificatesIssued,
+    };
+  }, [trainingCourses, enrolledStudents, enrollmentTrends]);
+
+  const filteredCourses = useMemo(() => {
+    const searchValue = searchTerm.trim().toLowerCase();
+    return trainingCourses.filter((course) => {
+      const matchesFilter = courseFilter === 'all' ? true : course.status === courseFilter;
+      const matchesSearch =
+        searchValue === '' ||
+        String(course.title || '').toLowerCase().includes(searchValue) ||
+        String(course.instructor || '').toLowerCase().includes(searchValue) ||
+        String(course.category || '').toLowerCase().includes(searchValue);
+      return matchesFilter && matchesSearch;
+    });
+  }, [trainingCourses, searchTerm, courseFilter]);
 
   const tabs = [
     { id: 'overview', label: 'Training Overview', icon: BarChart3 },
@@ -330,6 +417,8 @@ useEffect(() => { fetchModules(); }, []);
     switch (status) {
       case 'active':
         return 'text-green-800';
+      case 'inactive':
+        return 'text-gray-800';
       case 'paused':
         return 'text-yellow-800';
       case 'draft':
@@ -483,31 +572,20 @@ const handleEnrollStudent = (courseId) => {
   };
 
   const handleSaveEditedInstructor = (updatedInstructor) => {
-    setInstructors(prevInstructors => 
-      prevInstructors.map(instructor => 
-        instructor.id === updatedInstructor.id ? updatedInstructor : instructor
-      )
-    );
-    showFeedback('Instructor updated successfully!', 'success');
+    showFeedback('Instructor updates require a backend endpoint and were not saved.', 'warning');
+    setShowEditInstructorModal(false);
+    setSelectedInstructor(updatedInstructor || null);
   };
 
   const handleAddInstructor = (newInstructor) => {
-    setInstructors(prevInstructors => [...prevInstructors, newInstructor]);
-    showFeedback('Instructor added successfully!', 'success');
+    showFeedback('Instructor creation requires a backend endpoint and was not saved.', 'warning');
+    setShowAddInstructorModal(false);
+    setSelectedInstructor(newInstructor || null);
   };
 
   const handleDeleteInstructor = (instructor) => {
     setSelectedInstructor(instructor);
-    setConfirmationTitle('Delete Instructor');
-    setConfirmationMessage(`Are you sure you want to delete "${instructor.name}"? This action cannot be undone.`);
-    setConfirmationType('danger');
-    setConfirmationAction(() => () => {
-      setInstructors(prevInstructors => 
-        prevInstructors.filter(i => i.id !== instructor.id)
-      );
-      showFeedback('Instructor deleted successfully!', 'success');
-    });
-    setShowConfirmationModal(true);
+    showFeedback('Instructor deletion requires a backend endpoint and was not performed.', 'warning');
   };
 
   const renderOverview = () => (
@@ -622,7 +700,7 @@ const handleEnrollStudent = (courseId) => {
             {enrollmentTrends.map((trend, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium ">{trend.month} 2025</p>
+                  <p className="font-medium ">{trend.month}</p>
                   <p className="text-sm text-gray-600">{trend.enrollments} new students</p>
                 </div>
                 <div className="text-right">
@@ -631,6 +709,9 @@ const handleEnrollStudent = (courseId) => {
                 </div>
               </div>
             ))}
+            {enrollmentTrends.length === 0 && (
+              <p className="text-sm text-gray-500">No enrollment trend data available.</p>
+            )}
           </div>
         </div>
 
@@ -649,6 +730,9 @@ const handleEnrollStudent = (courseId) => {
                 </div>
               </div>
             ))}
+            {revenueByCategory.length === 0 && (
+              <p className="text-sm text-gray-500">No category revenue data available.</p>
+            )}
           </div>
         </div>
       </div>
@@ -677,8 +761,7 @@ const handleEnrollStudent = (courseId) => {
           >
             <option value="all">All Courses</option>
             <option value="active">Active</option>
-            <option value="paused">Paused</option>
-            <option value="draft">Draft</option>
+            <option value="inactive">Inactive</option>
           </select>
           <button 
             onClick={() => setShowCreateCourseModal(true)}
@@ -707,7 +790,7 @@ const handleEnrollStudent = (courseId) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {trainingCourses.map((course) => (
+            {filteredCourses.map((course) => (
               <tr key={course.id} className="hover:bg-gray-50">
                 <td className="px-4 py-4">
                   <div>
@@ -803,6 +886,13 @@ const handleEnrollStudent = (courseId) => {
                 </td>
               </tr>
             ))}
+            {filteredCourses.length === 0 && (
+              <tr>
+                <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={10}>
+                  No courses returned by backend data for the current filters.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -843,7 +933,9 @@ const handleEnrollStudent = (courseId) => {
             <CheckCircle className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Active Enrollments</p>
-              <p className="text-xl font-bold ">1,245</p>
+              <p className="text-xl font-bold ">
+                {enrolledStudents.filter((row) => row.status !== 'Completed').length}
+              </p>
             </div>
           </div>
         </div>
@@ -852,7 +944,7 @@ const handleEnrollStudent = (courseId) => {
             <Award className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Completed Courses</p>
-              <p className="text-xl font-bold ">856</p>
+              <p className="text-xl font-bold ">{trainingOverview.certificatesIssued}</p>
             </div>
           </div>
         </div>
@@ -904,7 +996,9 @@ const handleEnrollStudent = (courseId) => {
                     <td className="px-4 py-4 text-center">
                       <div className="flex items-center justify-center">
                         <Calendar className="w-4 h-4 text-gray-400 mr-1" />
-                        <span className="text-gray-700">{new Date(student.enrollmentDate).toLocaleDateString()}</span>
+                        <span className="text-gray-700">
+                          {student.enrollmentDate ? new Date(student.enrollmentDate).toLocaleDateString() : '-'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -951,6 +1045,13 @@ const handleEnrollStudent = (courseId) => {
                   </tr>
                 );
               })}
+            {enrolledStudents.length === 0 && (
+              <tr>
+                <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={9}>
+                  No enrollment records returned by the backend.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -977,7 +1078,11 @@ const handleEnrollStudent = (courseId) => {
             <div>
               <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Avg Revenue per Course</p>
               <p className="text-xl font-bold">
-                {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalCourses)}
+                {formatCurrency(
+                  trainingOverview.totalCourses > 0
+                    ? trainingOverview.totalRevenue / trainingOverview.totalCourses
+                    : 0
+                )}
               </p>
             </div>
             <div className="w-10 h-10  flex items-center justify-center">
@@ -991,7 +1096,11 @@ const handleEnrollStudent = (courseId) => {
             <div>
               <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">Avg Revenue per Student</p>
               <p className="text-xl font-bold">
-                {formatCurrency(trainingOverview.totalRevenue / trainingOverview.totalStudents)}
+                {formatCurrency(
+                  trainingOverview.totalStudents > 0
+                    ? trainingOverview.totalRevenue / trainingOverview.totalStudents
+                    : 0
+                )}
               </p>
             </div>
             <div className="w-10 h-10 flex items-center justify-center">
@@ -1044,23 +1153,40 @@ const handleEnrollStudent = (courseId) => {
                     <span className="font-semibold">{formatCurrency(category.revenue)}</span>
                   </td>
                   <td className="px-4 py-4 text-right">
-                    <span className="font-semibold">{formatCurrency(category.revenue / category.students)}</span>
+                    <span className="font-semibold">
+                      {formatCurrency(category.students > 0 ? category.revenue / category.students : 0)}
+                    </span>
                   </td>
                   <td className="px-4 py-4 text-center">
                     <span className="font-semibold">
-                      {((category.revenue / trainingOverview.totalRevenue) * 100).toFixed(1)}%
+                      {trainingOverview.totalRevenue > 0
+                        ? ((category.revenue / trainingOverview.totalRevenue) * 100).toFixed(1)
+                        : '0.0'}%
                     </span>
                   </td>
                   <td className="px-4 py-4">
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${(category.revenue / trainingOverview.totalRevenue) * 100}%` }}
+                        style={{
+                          width: `${
+                            trainingOverview.totalRevenue > 0
+                              ? (category.revenue / trainingOverview.totalRevenue) * 100
+                              : 0
+                          }%`
+                        }}
                       ></div>
                     </div>
                   </td>
                 </tr>
               ))}
+              {revenueByCategory.length === 0 && (
+                <tr>
+                  <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={7}>
+                    No revenue categories available from backend data.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -1100,7 +1226,9 @@ const handleEnrollStudent = (courseId) => {
             <div>
               <p className="">Pass Rate</p>
               <p className="text-xl font-bold">
-                {(trainingCourses.reduce((sum, course) => sum + course.passRate, 0) / trainingCourses.length).toFixed(1)}%
+                {trainingCourses.length > 0
+                  ? (trainingCourses.reduce((sum, course) => sum + course.passRate, 0) / trainingCourses.length).toFixed(1)
+                  : '0.0'}%
               </p>
             </div>
           </div>
@@ -1149,21 +1277,33 @@ const handleEnrollStudent = (courseId) => {
                 </td>
                 <td className="px-4 py-4 text-center">
                   <span className="font-medium">
-                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100))}
+                    {course.eligibleCertificates > 0
+                      ? course.eligibleCertificates
+                      : Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100))}
                   </span>
                 </td>
                 <td className="px-4 py-4 text-center">
                   <span className="font-medium">
-                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100) * 0.95)}
+                    {course.issuedCertificates > 0
+                      ? course.issuedCertificates
+                      : Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100))}
                   </span>
                 </td>
                 <td className="px-4 py-4 text-center">
                   <span className="font-medium">
-                    {Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100) * 0.05)}
+                    {course.pendingCertificates > 0
+                      ? course.pendingCertificates
+                      : Math.max(
+                          Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100)) -
+                            (course.issuedCertificates > 0
+                              ? course.issuedCertificates
+                              : Math.floor(course.enrolledStudents * (course.completionRate / 100) * (course.passRate / 100))),
+                          0
+                        )}
                   </span>
                 </td>
                 <td className="px-4 py-4 text-right">
-                  <span className="font-semibold">{formatCurrency(500)}</span>
+                  <span className="font-semibold">{formatCurrency(course.certificateFee || 0)}</span>
                 </td>
                 <td className="px-4 py-4 text-right">
                   <button 
@@ -1230,7 +1370,9 @@ const handleEnrollStudent = (courseId) => {
             <div>
               <p className="">Avg Rating</p>
               <p className="text-xl font-bold ">
-                {(instructors.reduce((sum, instructor) => sum + instructor.avgRating, 0) / instructors.length).toFixed(1)}
+                {instructors.length > 0
+                  ? (instructors.reduce((sum, instructor) => sum + instructor.avgRating, 0) / instructors.length).toFixed(1)
+                  : '0.0'}
               </p>
             </div>
           </div>
@@ -1328,6 +1470,13 @@ const handleEnrollStudent = (courseId) => {
                 </td>
               </tr>
             ))}
+            {instructors.length === 0 && (
+              <tr>
+                <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={9}>
+                  No instructors returned by backend data.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -1335,74 +1484,17 @@ const handleEnrollStudent = (courseId) => {
   );
 
   const renderReports = () => {
-    const reports = [
-      {
-        id: 1,
-        reportName: 'Monthly Course Enrollment Report',
-        category: 'Enrollment',
-        period: 'October 2025',
-        generatedDate: '2025-10-31',
-        totalStudents: 310,
-        totalRevenue: 4980000,
-        completionRate: 82,
-        status: 'Completed'
-      },
-      {
-        id: 2,
-        reportName: 'Instructor Performance Report',
-        category: 'Performance',
-        period: 'Q3 2025',
-        generatedDate: '2025-09-30',
-        totalStudents: 870,
-        totalRevenue: 14250000,
-        completionRate: 85,
-        status: 'Completed'
-      },
-      {
-        id: 3,
-        reportName: 'Certificate Issuance Report',
-        category: 'Certifications',
-        period: 'September 2025',
-        generatedDate: '2025-09-30',
-        totalStudents: 245,
-        totalRevenue: 122500,
-        completionRate: 94,
-        status: 'Completed'
-      },
-      {
-        id: 4,
-        reportName: 'Course Revenue Analysis',
-        category: 'Revenue',
-        period: 'August 2025',
-        generatedDate: '2025-08-31',
-        totalStudents: 280,
-        totalRevenue: 4320000,
-        completionRate: 78,
-        status: 'Completed'
-      },
-      {
-        id: 5,
-        reportName: 'Student Progress Report',
-        category: 'Progress',
-        period: 'July 2025',
-        generatedDate: '2025-07-31',
-        totalStudents: 220,
-        totalRevenue: 3640000,
-        completionRate: 88,
-        status: 'Completed'
-      },
-      {
-        id: 6,
-        reportName: 'Training Quality Assessment',
-        category: 'Quality',
-        period: 'Q2 2025',
-        generatedDate: '2025-06-30',
-        totalStudents: 650,
-        totalRevenue: 10850000,
-        completionRate: 86,
-        status: 'Completed'
-      }
-    ];
+    const reports = enrollmentTrends.map((trend, index) => ({
+      id: `${trend.monthKey || trend.month}-${index}`,
+      reportName: `Enrollment and Revenue Report - ${trend.month}`,
+      category: 'Enrollment',
+      period: trend.month,
+      generatedDate: new Date().toISOString().slice(0, 10),
+      totalStudents: trend.enrollments,
+      totalRevenue: trend.revenue,
+      completionRate: Number(trainingOverview.avgCompletionRate.toFixed(1)),
+      status: 'Generated',
+    }));
 
     return (
       <div className="space-y-4">
@@ -1458,7 +1550,9 @@ const handleEnrollStudent = (courseId) => {
               <div>
                 <p className="">Avg Completion</p>
                 <p className="text-xl font-bold">
-                  {(reports.reduce((sum, report) => sum + report.completionRate, 0) / reports.length).toFixed(1)}%
+                  {reports.length > 0
+                    ? (reports.reduce((sum, report) => sum + report.completionRate, 0) / reports.length).toFixed(1)
+                    : '0.0'}%
                 </p>
               </div>
             </div>
@@ -1526,6 +1620,13 @@ const handleEnrollStudent = (courseId) => {
                   </td>
                 </tr>
               ))}
+              {reports.length === 0 && (
+                <tr>
+                  <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={9}>
+                    No report data available from backend trends.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
