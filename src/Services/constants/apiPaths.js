@@ -73,6 +73,30 @@ export const API_PATHS = {
     onlineDoctors: "/api/telemedicine/sessions/doctors/online",
     history: "/api/telemedicine/sessions/history",
   },
+
+  training: {
+    base: '/api/training-modules',
+    byId: (id) => `/api/training-modules/${id}`,
+    active: '/api/training-modules/active',
+    topRated: '/api/training-modules/top-rated',
+    available: '/api/training-modules/available',
+    certification: '/api/training-modules/certification',
+    search: '/api/training-modules/search',
+    byLevel: (level) => `/api/training-modules/level/${level}`,
+    byInstructor: (name) => `/api/training-modules/instructor/${name}`,
+    byTag: (tag) => `/api/training-modules/tag/${tag}`,
+    byRating: (min) => `/api/training-modules/rating/${min}`,
+    activate: (id) => `/api/training-modules/${id}/activate`,
+    deactivate: (id) => `/api/training-modules/${id}/deactivate`,
+    rate: (id) => `/api/training-modules/${id}/rate`,
+    // Enrollments
+    enrollments: (moduleId) => `/api/training-modules/${moduleId}/enrollments`,
+    enrollmentsByChw: (chwId) => `/api/training-modules/enrollments/chw/${chwId}`,
+    enrollmentProgress: (enrollmentId) => `/api/training-modules/enrollments/${enrollmentId}/progress`,
+    enrollmentStatus: (enrollmentId) => `/api/training-modules/enrollments/${enrollmentId}/status`,
+    unenroll: (enrollmentId) => `/api/training-modules/enrollments/${enrollmentId}`,
+  },
+
   ambulance: {
     base: "/api/ambulances",
     dispatch: "/api/assist",

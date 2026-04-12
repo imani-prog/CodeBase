@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { trainingApi } from '../../API/endpoints/trainingApi.js';
+import { chwApi } from '../../API/endpoints/chwApi.js';
+import { LoadingSpinner, ErrorMessage } from '../../Components/Admin/DataState.jsx';
 import { 
   BookOpen, 
   Users, 
@@ -82,257 +85,53 @@ const TrainingManagement = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
 
-  // Sample training courses data with your provided structure
-  const [trainingCourses, setTrainingCourses] = useState([
-    {
-      id: 1,
-      title: "Community Health Worker Certification",
-      duration: "6 weeks",
-      level: "Beginner to Intermediate",
-      image: "/src/assets/CommunityHealthWorker.jpeg",
-      description: "Comprehensive training for Community Health Workers covering patient care, health education, and community outreach.",
-      modules: [
-        "Basic Health Assessment",
-        "Community Health Education",
-        "Patient Referral Systems",
-        "Health Data Collection",
-        "Emergency Response",
-        "Communication Skills",
-      ],
-      certification: "MediLink Certified CHW",
-      participants: 250,
-      rating: 4.8,
-      status: 'active',
-      price: 15000,
-      revenue: 3750000,
-      completionRate: 85,
-      instructor: 'Dr. Grace Achieng',
-      createdDate: '2024-06-15',
-      lastUpdated: '2024-10-01',
-      category: 'Community Health',
-      difficulty: 'Beginner',
-      enrolledStudents: 250,
-      maxStudents: 300,
-      passRate: 92
-    },
-    {
-      id: 2,
-      title: "Digital Health Technology Training",
-      duration: "4 weeks",
-      level: "Intermediate",
-      image: "/src/assets/ComponentsTechnology.jpeg",
-      description: "Learn to use modern healthcare technology, electronic health records, and telemedicine platforms.",
-      modules: [
-        "Electronic Health Records",
-        "Telemedicine Platforms",
-        "Mobile Health Apps",
-        "Data Security & Privacy",
-        "Technology Troubleshooting",
-        "Digital Communication",
-      ],
-      certification: "Digital Health Specialist",
-      participants: 180,
-      rating: 4.9,
-      status: 'active',
-      price: 12000,
-      revenue: 2160000,
-      completionRate: 78,
-      instructor: 'Dr. James Mwangi',
-      createdDate: '2024-07-20',
-      lastUpdated: '2024-09-28',
-      category: 'Technology',
-      difficulty: 'Intermediate',
-      enrolledStudents: 180,
-      maxStudents: 200,
-      passRate: 88
-    },
-    {
-      id: 3,
-      title: "Healthcare System Administration",
-      duration: "8 weeks",
-      level: "Advanced",
-      image: "/src/assets/SmartHealthcare.png",
-      description: "Advanced training for healthcare administrators and system managers.",
-      modules: [
-        "Healthcare Management",
-        "Quality Assurance",
-        "Budget Management",
-        "Staff Coordination",
-        "Compliance & Regulations",
-        "Strategic Planning",
-      ],
-      certification: "Healthcare Administrator",
-      participants: 95,
-      rating: 4.7,
-      status: 'active',
-      price: 25000,
-      revenue: 2375000,
-      completionRate: 72,
-      instructor: 'Dr. Sarah Mitchell',
-      createdDate: '2024-05-10',
-      lastUpdated: '2024-09-15',
-      category: 'Administration',
-      difficulty: 'Advanced',
-      enrolledStudents: 95,
-      maxStudents: 120,
-      passRate: 95
-    },
-    {
-      id: 4,
-      title: "Telemedicine & Remote Care",
-      duration: "5 weeks",
-      level: "Intermediate",
-      image: "/src/assets/TelemedicinePatients.jpeg",
-      description: "Master remote patient care, teleconsultation, and virtual health services with comprehensive hands-on training.",
-      modules: [
-        "Teleconsultation Techniques",
-        "Remote Monitoring",
-        "Virtual Triage",
-        "Patient Communication",
-        "Technology Setup",
-        "Emergency Protocols",
-      ],
-      certification: "Telemedicine Specialist",
-      participants: 140,
-      rating: 4.6,
-      status: 'paused',
-      price: 18000,
-      revenue: 2520000,
-      completionRate: 80,
-      instructor: 'Dr. Linda Chen',
-      createdDate: '2024-08-05',
-      lastUpdated: '2024-10-05',
-      category: 'Telemedicine',
-      difficulty: 'Intermediate',
-      enrolledStudents: 140,
-      maxStudents: 150,
-      passRate: 86
-    },
-    {
-      id: 5,
-      title: "Healthcare Data Analytics",
-      duration: "7 weeks",
-      level: "Advanced",
-      image: "/src/assets/HealthTechTraining.jpg",
-      description: "Learn to analyze healthcare data, create meaningful reports, and drive data-driven decisions in healthcare settings.",
-      modules: [
-        "Healthcare Data Fundamentals",
-        "Statistical Analysis in Healthcare",
-        "Data Visualization Tools",
-        "Predictive Analytics",
-        "Healthcare Metrics & KPIs",
-        "Regulatory Compliance",
-      ],
-      certification: "Healthcare Data Analyst",
-      participants: 85,
-      rating: 4.7,
-      status: 'draft',
-      price: 22000,
-      revenue: 1870000,
-      completionRate: 0,
-      instructor: 'Dr. Peter Njoroge',
-      createdDate: '2024-09-01',
-      lastUpdated: '2024-10-10',
-      category: 'Data Analytics',
-      difficulty: 'Advanced',
-      enrolledStudents: 85,
-      maxStudents: 100,
-      passRate: 0
-    },
-    {
-      id: 6,
-      title: "Maternal & Child Health Specialist",
-      duration: "8 weeks",
-      level: "Intermediate to Advanced",
-      image: "/src/assets/CommunityWorkerOutreach.jpeg",
-      description: "Specialized training focused on maternal and child health, including prenatal care, child development, and family planning.",
-      modules: [
-        "Prenatal & Postnatal Care",
-        "Child Development Milestones",
-        "Nutrition for Mothers & Children",
-        "Immunization Programs",
-        "Family Planning Counseling",
-        "Emergency Obstetric Care",
-      ],
-      certification: "Maternal & Child Health Specialist",
-      participants: 120,
-      rating: 4.9,
-      status: 'active',
-      price: 20000,
-      revenue: 2400000,
-      completionRate: 88,
-      instructor: 'Dr. Esther Nyambura',
-      createdDate: '2024-06-01',
-      lastUpdated: '2024-09-20',
-      category: 'Maternal Health',
-      difficulty: 'Advanced',
-      enrolledStudents: 120,
-      maxStudents: 150,
-      passRate: 94
-    },
-    {
-      id: 7,
-      title: "Healthcare Quality Improvement",
-      duration: "6 weeks",
-      level: "Intermediate",
-      image: "/src/assets/SmartHealthcare.png",
-      description: "Learn quality improvement methodologies, patient safety protocols, and healthcare accreditation standards.",
-      modules: [
-        "Quality Management Systems",
-        "Patient Safety Protocols",
-        "Healthcare Accreditation",
-        "Performance Measurement",
-        "Process Improvement",
-        "Risk Management",
-      ],
-      certification: "Healthcare Quality Specialist",
-      participants: 95,
-      rating: 4.6,
-      status: 'active',
-      price: 16000,
-      revenue: 1520000,
-      completionRate: 75,
-      instructor: 'Dr. Joseph Otieno',
-      createdDate: '2024-07-15',
-      lastUpdated: '2024-09-30',
-      category: 'Quality Management',
-      difficulty: 'Intermediate',
-      enrolledStudents: 95,
-      maxStudents: 120,
-      passRate: 89
-    },
-    {
-      id: 8,
-      title: "Mental Health First Aid",
-      duration: "3 weeks",
-      level: "Beginner",
-      image: "/src/assets/Workers.jpg",
-      description: "Essential mental health awareness and first aid skills for healthcare workers and community volunteers.",
-      modules: [
-        "Mental Health Awareness",
-        "Crisis Intervention",
-        "De-escalation Techniques",
-        "Referral Pathways",
-        "Self-Care for Caregivers",
-        "Community Mental Health",
-      ],
-      certification: "Mental Health First Aid Certificate",
-      participants: 180,
-      rating: 4.8,
-      status: 'active',
-      price: 8000,
-      revenue: 1440000,
-      completionRate: 90,
-      instructor: 'Dr. Susan Mwangi',
-      createdDate: '2024-08-20',
-      lastUpdated: '2024-10-08',
-      category: 'Mental Health',
-      difficulty: 'Beginner',
-      enrolledStudents: 180,
-      maxStudents: 200,
-      passRate: 96
-    }
-  ]);
+ const [trainingCourses, setTrainingCourses] = useState([]);
+const [loading, setLoading]                 = useState(true);
+const [fetchError, setFetchError]           = useState(null);
+
+const fetchModules = async () => {
+  try {
+    setLoading(true);
+    setFetchError(null);
+    const data = await trainingApi.list();
+    // Normalize backend fields to match your existing UI field names
+    const normalized = (Array.isArray(data) ? data : []).map(m => ({
+      id:               m.id,
+      title:            m.courseName,
+      duration:         m.duration,
+      level:            m.courseLevel,
+      difficulty:       m.courseLevel?.charAt(0) + m.courseLevel?.slice(1).toLowerCase(),
+      description:      m.description ?? '',
+      modules:          m.courseModules ?? [],
+      certification:    m.certification ? m.courseName + ' Certificate' : null,
+      participants:     m.enrolledCount ?? 0,
+      rating:           m.rating ?? 0,
+      status:           m.isActive ? 'active' : 'inactive',
+      price:            m.price ?? 0,
+      revenue:          (m.price ?? 0) * (m.enrolledCount ?? 0),
+      completionRate:   0,  // not returned by backend yet
+      instructor:       m.instructorName ?? '—',
+      createdDate:      m.createdAt?.slice(0, 10) ?? '',
+      lastUpdated:      m.updatedAt?.slice(0, 10) ?? '',
+      category:         (m.tags ?? []).join(', ') || 'General',
+      enrolledStudents: m.enrolledCount ?? 0,
+      maxStudents:      m.maxEnrollment ?? 0,
+      passRate:         0,  // not returned by backend yet
+      tags:             m.tags ?? [],
+      courseModules:    m.courseModules ?? [],
+      isActive:         m.isActive,
+      enrollNowAvailable: m.enrollNowAvailable,
+      _raw:             m,  // keep raw for modals that need backend fields
+    }));
+    setTrainingCourses(normalized);
+  } catch (err) {
+    setFetchError(err.message || 'Failed to load training modules');
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => { fetchModules(); }, []);
 
   // Student enrollment data
   const [enrolledStudents, _setEnrolledStudents] = useState([
@@ -564,44 +363,53 @@ const TrainingManagement = () => {
     }, 3000);
   };
 
-  const handleActivateCourse = (courseId) => {
-    const course = trainingCourses.find(c => c.id === courseId);
-    setSelectedCourse(course);
-    setConfirmationTitle('');
-    setConfirmationMessage('');
-    setConfirmationType('');
-    setConfirmationAction(() => () => {
-      setTrainingCourses(prevCourses => 
-        prevCourses.map(c => 
-          c.id === courseId ? { ...c, status: 'active' } : c
-        )
-      );
+ const handleActivateCourse = (courseId) => {
+  const course = trainingCourses.find(c => c.id === courseId);
+  setSelectedCourse(course);
+  setConfirmationTitle('Activate Course');
+  setConfirmationMessage(`Activate "${course?.title}"? It will become visible to students.`);
+  setConfirmationType('success');
+  setConfirmationAction(() => async () => {
+    try {
+      await trainingApi.activate(courseId);
+      fetchModules();
       showFeedback('Course activated successfully!', 'success');
-    });
-    setShowConfirmationModal(true);
-  };
+    } catch (err) {
+      showFeedback(err.message || 'Failed to activate', 'error');
+    }
+  });
+  setShowConfirmationModal(true);
+};
 
   const handlePauseCourse = (courseId) => {
-    const course = trainingCourses.find(c => c.id === courseId);
-    setSelectedCourse(course);
-    setConfirmationTitle('');
-    setConfirmationMessage('');
-    setConfirmationType('');
-    setConfirmationAction(() => () => {
-      setTrainingCourses(prevCourses => 
-        prevCourses.map(c => 
-          c.id === courseId ? { ...c, status: 'paused' } : c
-        )
-      );
-      showFeedback('Course paused successfully!', 'warning');
-    });
-    setShowConfirmationModal(true);
-  };
+  const course = trainingCourses.find(c => c.id === courseId);
+  setSelectedCourse(course);
+  setConfirmationTitle('Deactivate Course');
+  setConfirmationMessage(`Deactivate "${course?.title}"? Students won't be able to access it.`);
+  setConfirmationType('warning');
+  setConfirmationAction(() => async () => {
+    try {
+      await trainingApi.deactivate(courseId);
+      fetchModules();
+      showFeedback('Course deactivated successfully!', 'warning');
+    } catch (err) {
+      showFeedback(err.message || 'Failed to deactivate', 'error');
+    }
+  });
+  setShowConfirmationModal(true);
+};
 
-  const handleEnrollStudent = (courseId) => {
-    console.log('Enrolling student to course:', courseId);
-    setShowBulkEnrollmentModal(true);
-  };
+
+const [enrollTargetCourse, setEnrollTargetCourse] = useState(null);
+const [showEnrollCHWModal, setShowEnrollCHWModal] = useState(false);
+
+const handleEnrollStudent = (courseId) => {
+  const course = trainingCourses.find(c => c.id === courseId);
+  setEnrollTargetCourse(course);
+  setShowEnrollCHWModal(true);
+};
+
+
 
   const handleUpdateCourse = (courseId) => {
     const course = trainingCourses.find(c => c.id === courseId);
@@ -609,14 +417,29 @@ const TrainingManagement = () => {
     setShowEditCourseModal(true);
   };
 
-  const handleSaveEditedCourse = (updatedCourse) => {
-    setTrainingCourses(prevCourses => 
-      prevCourses.map(course => 
-        course.id === updatedCourse.id ? updatedCourse : course
-      )
-    );
+  const handleSaveEditedCourse = async (updatedCourse) => {
+  try {
+    await trainingApi.update(updatedCourse.id, {
+      courseName:         updatedCourse.title ?? updatedCourse.courseName,
+      courseLevel:        (updatedCourse.level ?? updatedCourse.courseLevel ?? 'BEGINNER').toUpperCase(),
+      duration:           updatedCourse.duration,
+      description:        updatedCourse.description,
+      instructorName:     updatedCourse.instructor ?? updatedCourse.instructorName,
+      certification:      !!updatedCourse.certification,
+      enrollNowAvailable: updatedCourse.enrollNowAvailable ?? true,
+      maxEnrollment:      updatedCourse.maxStudents ?? updatedCourse.maxEnrollment ?? null,
+      price:              updatedCourse.price ?? null,
+      prerequisites:      updatedCourse.prerequisites ?? '',
+      courseModules:      updatedCourse.modules ?? updatedCourse.courseModules ?? [],
+      tags:               updatedCourse.tags ?? [],
+      isActive:           updatedCourse.isActive ?? true,
+    });
+    fetchModules();
     showFeedback('Course updated successfully!', 'success');
-  };
+  } catch (err) {
+    showFeedback(err.message || 'Failed to update course', 'error');
+  }
+};
 
   const handleViewCourse = (courseId) => {
     const course = trainingCourses.find(c => c.id === courseId);
@@ -630,10 +453,23 @@ const TrainingManagement = () => {
     setShowStudentDetailsModal(true);
   };
 
-  const _handleDeleteCourse = (courseId) => {
-    console.log('Deleting course:', courseId);
-    // Implement course deletion logic
-  };
+  const _handleDeleteCourse = async (courseId) => {
+  const course = trainingCourses.find(c => c.id === courseId);
+  setSelectedCourse(course);
+  setConfirmationTitle('Delete Course');
+  setConfirmationMessage(`Permanently delete "${course?.title}"? This cannot be undone.`);
+  setConfirmationType('danger');
+  setConfirmationAction(() => async () => {
+    try {
+      await trainingApi.delete(courseId);
+      fetchModules();
+      showFeedback('Course deleted successfully!', 'success');
+    } catch (err) {
+      showFeedback(err.message || 'Failed to delete', 'error');
+    }
+  });
+  setShowConfirmationModal(true);
+};
 
   // Instructor handlers
   const handleViewInstructor = (instructor) => {
@@ -1698,10 +1534,38 @@ const TrainingManagement = () => {
   };
 
   // Modal handlers
-  const handleSaveCourse = (courseData) => {
-    console.log('New course created:', courseData);
-   
-  };
+  const handleSaveCourse = async (courseData) => {
+  try {
+    await trainingApi.create({
+      courseName:         courseData.title ?? courseData.courseName,
+      courseLevel:        (courseData.level ?? courseData.courseLevel ?? 'BEGINNER').toUpperCase(),
+      duration:           courseData.duration,
+      description:        courseData.description,
+      instructorName:     courseData.instructor ?? courseData.instructorName,
+      certification:      !!courseData.certification,
+      enrollNowAvailable: true,
+      maxEnrollment:      courseData.maxStudents ?? courseData.maxEnrollment ?? null,
+      price:              courseData.price ?? null,
+      prerequisites:      courseData.prerequisites ?? '',
+      courseModules:      courseData.modules ?? courseData.courseModules ?? [],
+      tags:               courseData.tags ?? [],
+      isActive:           true,
+    });
+    fetchModules();
+    showFeedback('Course created successfully!', 'success');
+  } catch (err) {
+    showFeedback(err.message || 'Failed to create course', 'error');
+  }
+};
+
+// const handleSaveEditedCourse = (updatedCourse) => {
+//   setTrainingCourses(prevCourses =>
+//     prevCourses.map(course =>
+//       course.id === updatedCourse.id ? updatedCourse : course
+//     )
+//   );
+//   showFeedback('Course updated successfully!', 'success');
+// };
 
   const handleBulkEnroll = (enrollmentData) => {
     console.log('Bulk enrollment:', enrollmentData);
@@ -1717,6 +1581,119 @@ const TrainingManagement = () => {
     console.log('Report exported:', reportData);
   
   };
+
+  const EnrollCHWModal = ({ course, onClose, onSaved }) => {
+  const [chws, setChws]             = useState([]);
+  const [search, setSearch]         = useState('');
+  const [selectedId, setSelectedId] = useState('');
+  const [notes, setNotes]           = useState('');
+  const [chwLoading, setChwLoading] = useState(true);
+  const [saving, setSaving]         = useState(false);
+  const [enrollError, setEnrollError] = useState(null);
+
+  useEffect(() => {
+    chwApi.list()
+      .then(data => setChws(Array.isArray(data) ? data : data?.content ?? []))
+      .catch(() => setEnrollError('Failed to load CHWs'))
+      .finally(() => setChwLoading(false));
+  }, []);
+
+  const filtered = chws.filter(c => {
+    const q = search.toLowerCase();
+    const name = `${c.firstName ?? ''} ${c.lastName ?? ''}`.toLowerCase();
+    return name.includes(q) || (c.code ?? '').toLowerCase().includes(q) || (c.region ?? '').toLowerCase().includes(q);
+  });
+
+  const handleSubmit = async () => {
+    if (!selectedId) { setEnrollError('Please select a CHW'); return; }
+    setSaving(true); setEnrollError(null);
+    try {
+      await trainingApi.enroll(course._raw?.id ?? course.id, {
+        chwId: Number(selectedId),
+        notes,
+      });
+      showFeedback(`CHW enrolled in "${course.title}" successfully!`, 'success');
+      onSaved();
+    } catch (err) {
+      setEnrollError(err.message || 'Enrollment failed');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!course) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="bg-white w-full max-w-lg border border-gray-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <div>
+            <h2 className="text-lg font-semibold">Enroll CHW</h2>
+            <p className="text-xs text-gray-500 mt-0.5">{course.title}</p>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-xl font-bold">✕</button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          {enrollError && (
+            <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+              {enrollError}
+            </div>
+          )}
+
+          <input type="text" placeholder="Search CHW by name, code or region..."
+            value={search} onChange={e => setSearch(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+          {chwLoading ? <LoadingSpinner /> : (
+            <div className="max-h-52 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+              {filtered.length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-6">No CHWs found.</p>
+              )}
+              {filtered.map(c => {
+                const name = `${c.firstName ?? ''} ${c.lastName ?? ''}`.trim() || c.code;
+                return (
+                  <label key={c.id}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 ${selectedId == c.id ? 'bg-blue-50' : ''}`}>
+                    <input type="radio" name="chw" value={c.id}
+                      checked={selectedId == c.id}
+                      onChange={() => setSelectedId(c.id)}
+                      className="w-4 h-4 text-blue-600" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900">{name}</p>
+                      <p className="text-xs text-gray-500">{c.code} · {c.region}</p>
+                    </div>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                      c.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                    }`}>{c.status}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Notes (optional)</label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
+              placeholder="e.g. Part of Q2 2026 training cohort"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 px-6 py-4 border-t">
+          <button onClick={onClose}
+            className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+            Cancel
+          </button>
+          <button onClick={handleSubmit} disabled={saving || !selectedId}
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+            {saving ? 'Enrolling...' : 'Enroll CHW'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 lg:p-5">
@@ -1811,6 +1788,14 @@ const TrainingManagement = () => {
         onAddInstructor={handleAddInstructor}
       />
 
+      {showEnrollCHWModal && enrollTargetCourse && (
+  <EnrollCHWModal
+    course={enrollTargetCourse}
+    onClose={() => { setShowEnrollCHWModal(false); setEnrollTargetCourse(null); }}
+    onSaved={() => { setShowEnrollCHWModal(false); setEnrollTargetCourse(null); fetchModules(); }}
+  />
+)}
+
       <div>
         <div>
           {/* Header Section */}
@@ -1850,17 +1835,15 @@ const TrainingManagement = () => {
 
           {/* Tab Content */}
           <div className="min-h-[560px] [&_table]:text-sm [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:py-2.5 [&_th]:px-3 [&_td]:py-2.5 [&_td]:px-3">
-            {activeTab === 'overview' && renderOverview()}
-            {activeTab === 'courses' && renderCourses()}
-            {activeTab === 'students' && renderStudents()}
-            {activeTab === 'revenue' && renderRevenue()}
-            {activeTab === 'certificates' && renderCertificates()}
-            {activeTab === 'instructors' && renderInstructors()}
-
-
-            {activeTab === 'reports' && renderReports()}
-
-            
+            {loading && <LoadingSpinner />}
+            {fetchError && <ErrorMessage message={fetchError} onRetry={fetchModules} />}
+            {!loading && !fetchError && activeTab === 'overview'          && renderOverview()}
+            {!loading && !fetchError && activeTab === 'courses'           && renderCourses()}
+            {!loading && !fetchError && activeTab === 'students'          && renderStudents()}
+            {!loading && !fetchError && activeTab === 'revenue'           && renderRevenue()}
+            {!loading && !fetchError && activeTab === 'certificates'      && renderCertificates()}
+            {!loading && !fetchError && activeTab === 'instructors'       && renderInstructors()}
+            {!loading && !fetchError && activeTab === 'reports'           && renderReports()}
           </div>
         </div>
       </div>
