@@ -146,6 +146,32 @@ const TelemedicineManagement = () => {
 
   const [settingsSaved, setSettingsSaved] = useState(false);
 
+
+const formatDateOnly = (dateString) => {
+  if (!dateString) return '—';
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-KE', {
+    year: 'numeric', month: 'short', day: 'numeric',
+  });
+};
+
+
+const formatIfDate = (value) => {
+  if (!value || typeof value !== 'string') return value;
+  return value.replace(
+    /\d{4}-\d{2}-\d{2}T[\d:.Z+%-]+/g,
+    (match) => {
+      const d = new Date(match);
+      if (isNaN(d.getTime())) return match;
+      return d.toLocaleString('en-KE', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true,
+      });
+    }
+  );
+};
+
   const handleSettingChange = (key, value) => {
     setPlatformSettings(prev => ({
       ...prev,
@@ -284,10 +310,10 @@ const TelemedicineManagement = () => {
     })();
 
     const backendId = parseBackendId(firstNonEmpty(row.id, row.sessionPk));
-    const displayId = String(firstNonEmpty(row.sessionId, row.id, `TM-${backendId || 'N/A'}`));
+    const displayId = firstNonEmpty(row.sessionId, backendId ? `TM-${backendId}` : null) ?? 'TM-N/A';
 
     return {
-      id: displayId,
+      id: String(displayId),
       backendId,
       patient: String(firstNonEmpty(row.patientName, patient.fullName, patient.name, 'Unknown Patient')),
       patientId: String(firstNonEmpty(row.patientId, patient.id, patient.patientId, 'N/A')),
@@ -308,7 +334,8 @@ const TelemedicineManagement = () => {
       prescription: firstNonEmpty(row.prescription, row.doctorNotes, null),
       rating: firstNonEmpty(row.rating, null),
       followUpRequired: Boolean(firstNonEmpty(row.followUpRequired, false)),
-      date: startTime ? new Date(startTime).toISOString().slice(0, 10) : '',
+      date: startTime ? formatDateOnly(startTime) : '—',
+    
     };
   }, [
     firstNonEmpty,
@@ -319,6 +346,7 @@ const TelemedicineManagement = () => {
     normalizePriority,
   ]);
 
+  
   const mapDoctorRow = useCallback((row = {}) => ({
     id: String(firstNonEmpty(row.id, row.doctorId, 'N/A')),
     backendId: parseBackendId(firstNonEmpty(row.doctorId, row.id)),
@@ -704,7 +732,7 @@ const TelemedicineManagement = () => {
 
   const handleExportReportsSubmit = (reportData) => {
     console.log('Exporting report:', reportData);
-    // Implement export logic
+    
     alert('Report exported successfully!');
   };
 
@@ -901,27 +929,26 @@ const TelemedicineManagement = () => {
             )}
           </div>
         </div>
-
-        <div className="bg-white border border-gray-200 p-4">
-          <h3 className="text-base font-semibold mb-3">Recent Activity</h3>
-          <div className="space-y-3">
-            {recentActivities.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-2.5">
-                <div className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-blue-600 mr-2" />
-                  <div>
-                    <p className="text-sm font-medium ">{item.title}</p>
-                    <p className="text-xs text-gray-600">{item.description}</p>
+            <div className="bg-white border border-gray-200 p-4">
+              <h3 className="text-base font-semibold mb-3">Recent Activity</h3>
+              <div className="space-y-3">
+                {recentActivities.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between p-2.5">
+                    <div className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-blue-600 mr-2" />
+                      <div>
+                        <p className="text-sm font-medium">{item.title}</p>
+                        <p className="text-xs text-gray-600">{formatIfDate(item.description)}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-500">{formatIfDate(item.timeAgo)}</span>
                   </div>
-                </div>
-                <span className="text-xs text-gray-500">{item.timeAgo}</span>
+                ))}
+                {recentActivities.length === 0 && (
+                  <p className="text-sm text-gray-500">No recent activity available.</p>
+                )}
               </div>
-            ))}
-            {recentActivities.length === 0 && (
-              <p className="text-sm text-gray-500">No recent activity available.</p>
-            )}
-          </div>
-        </div>
+            </div>
       </div>
     </div>
 
