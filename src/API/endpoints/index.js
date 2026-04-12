@@ -1,4 +1,5 @@
 export { adminApi } from "./adminApi.js";
+export { auditLogApi } from "./auditLogApi.js";
 export { ambulanceApi } from "./ambulanceApi.js";
 export { appointmentApi } from "./appointmentApi.js";
 export { assignmentApi } from "./assignmentApi.js";

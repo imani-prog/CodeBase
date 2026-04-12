@@ -84,4 +84,7 @@ export const API_PATHS = {
   reports: {
     base: "/api/reports",
   },
+  auditLogs: {
+    base: "/api/audit-logs",
+  },
 };

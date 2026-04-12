@@ -1,4 +1,5 @@
 export { adminService } from "./adminService.js";
+export { auditLogService } from "./auditLogService.js";
 export { ambulanceService } from "./ambulanceService.js";
 export { appointmentService } from "./appointmentService.js";
 export { assignmentService } from "./assignmentService.js";
