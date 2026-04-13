@@ -37,6 +37,7 @@ import {
 import {
   AreaChart,
   Area,
+  BarChart, Bar,
   PieChart as RechartsPieChart,
   Pie,
   Cell,
@@ -482,152 +483,136 @@ const FinancialManagement = () => {
         </div>
       </div>
 
+        {/* Revenue vs Expenses Chart */}
+        <div className="border border-gray-200 p-4 bg-white">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">Monthly Financial Trend</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Revenue, expenses and net profit by month</p>
+            </div>
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent text-sm"
+            >
+              <option value="this-month">This Month</option>
+              <option value="last-3-months">Last 3 Months</option>
+              <option value="last-6-months">Last 6 Months</option>
+              <option value="this-year">This Year</option>
+            </select>
+          </div>
 
+          {/* KPI Summary Row */}
+          <div className="grid grid-cols-5 gap-3 mb-4">
+            <div className="bg-white text-center border border-gray-300 p-3">
+              <p className="text-xs text-gray-700 font-semibold uppercase tracking-wide mb-1">Total Revenue</p>
+              <p className="text-lg font-bold text-gray-900">
+                {formatCurrency(monthlyTrendData.reduce((s, d) => s + d.revenue, 0))}
+              </p>
+              <p className="text-xs text-blue-500 mt-0.5">
+                Avg {formatCurrency(Math.round(monthlyTrendData.reduce((s, d) => s + d.revenue, 0) / monthlyTrendData.length))}/mo
+              </p>
+            </div>
+            <div className="bg-white text-center border border-gray-300 p-3">
+              <p className="text-xs text-gray-700 font-semibold uppercase tracking-wide mb-1">Total Expenses</p>
+              <p className="text-lg font-bold text-gray-900">
+                {formatCurrency(monthlyTrendData.reduce((s, d) => s + d.expenses, 0))}
+              </p>
+              <p className="text-xs text-red-500 mt-0.5">
+                Avg {formatCurrency(Math.round(monthlyTrendData.reduce((s, d) => s + d.expenses, 0) / monthlyTrendData.length))}/mo
+              </p>
+            </div>
+            <div className="bg-white text-center border border-gray-300 p-3">
+              <p className="text-xs text-gray-700 font-semibold uppercase tracking-wide mb-1">Net Profit</p>
+              <p className="text-lg font-bold text-gray-900">
+                {formatCurrency(monthlyTrendData.reduce((s, d) => s + d.profit, 0))}
+              </p>
+              <p className="text-xs text-green-500 mt-0.5">
+                Margin {(
+                  (monthlyTrendData.reduce((s, d) => s + d.profit, 0) /
+                  monthlyTrendData.reduce((s, d) => s + d.revenue, 0)) * 100
+                ).toFixed(1)}%
+              </p>
+            </div>
+          </div>
 
-      {/* Revenue vs Expenses Chart */}
-      <div className="border border-gray-200 p-4 bg-white">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-gray-900">Monthly Financial Trend</h3>
-          <select
-            value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-100 focus:border-transparent text-sm"
-          >
-            <option value="this-month">This Month</option>
-            <option value="last-3-months">Last 3 Months</option>
-            <option value="last-6-months">Last 6 Months</option>
-            <option value="this-year">This Year</option>
-          </select>
+          {/* Bar Chart */}
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart
+              data={monthlyTrendData}
+              margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+              barCategoryGap="20%"
+              barGap={2}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tick={{ fill: '#6b7280', fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fill: '#6b7280', fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
+                width={40}
+              />
+              <Tooltip
+                cursor={{ fill: '#f9fafb' }}
+                contentStyle={{
+                  backgroundColor: '#fff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  fontSize: '12px',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.08)',
+                }}
+                formatter={(value, name) => [
+                  formatCurrency(value),
+                  name.charAt(0).toUpperCase() + name.slice(1),
+                ]}
+              />
+              <Legend
+                iconType="square"
+                iconSize={10}
+                wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
+                formatter={(value) => (
+                  <span style={{ color: '#6b7280' }}>
+                    {value.charAt(0).toUpperCase() + value.slice(1)}
+                  </span>
+                )}
+              />
+              <Bar dataKey="revenue"  name="revenue"  fill="#1e40af" radius={[0, 0, 0, 0]} maxBarSize={18} />
+              <Bar dataKey="expenses" name="expenses" fill="#93c5fd" radius={[0, 0, 0, 0]} maxBarSize={18} />
+              <Bar dataKey="profit"   name="profit"   fill="#16a34a" radius={[0, 0, 0, 0]} maxBarSize={18} />
+            </BarChart>
+          </ResponsiveContainer>
+
+          {/* Month spotlight — highlights best profit month */}
+          {(() => {
+            const best = monthlyTrendData.reduce((a, b) => b.profit > a.profit ? b : a);
+            const worst = monthlyTrendData.reduce((a, b) => b.profit < a.profit ? b : a);
+            return (
+              <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span className="text-xs text-gray-500">
+                    Best month: <span className="font-semibold text-gray-800">{best.month}</span>
+                    {' '}— {formatCurrency(best.profit)} profit
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                  <span className="text-xs text-gray-500">
+                    Lowest margin: <span className="font-semibold text-gray-800">{worst.month}</span>
+                    {' '}— {formatCurrency(worst.profit)} profit
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
         </div>
-        
-        <ResponsiveContainer width="100%" height={320}>
-          <AreaChart 
-            data={monthlyTrendData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-          >
-            <defs>
-            
-            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#1e40af" stopOpacity={0.45} /> {/* blue-800 */}
-              <stop offset="100%" stopColor="#1e40af" stopOpacity={0.05} />
-            </linearGradient>
-
-            
-            <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} /> {/* blue-500 */}
-              <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.05} />
-            </linearGradient>
-
-           
-            <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#16a34a" stopOpacity={0.4} /> {/* green-600 */}
-              <stop offset="100%" stopColor="#16a34a" stopOpacity={0.05} />
-            </linearGradient>
-          </defs>
-
-
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-            <XAxis 
-              dataKey="month" 
-              stroke="#9ca3af"
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
-            />
-            <YAxis 
-              stroke="#9ca3af"
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
-              tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
-              domain={[0, 'dataMax + 200000']}
-              allowDataOverflow={false}
-            />
-            <Tooltip 
-              contentStyle={{
-                backgroundColor: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                padding: '12px',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-              }}
-              formatter={(value, name) => {
-                const formattedValue = new Intl.NumberFormat('en-KE', {
-                  style: 'currency',
-                  currency: 'KES',
-                  minimumFractionDigits: 0
-                }).format(value);
-                const label = name.charAt(0).toUpperCase() + name.slice(1);
-                return [formattedValue, label];
-              }}
-            />
-            <Legend 
-              wrapperStyle={{ paddingTop: '20px' }}
-              iconType="line"
-            />
-            <Area
-              type="monotone"
-              dataKey="revenue"
-              stroke="#1e3a8a"
-              strokeWidth={2.5}
-              fill="url(#colorRevenue)"
-              baseValue={0}
-              name="Revenue"
-            />
-
-            <Area
-              type="monotone"
-              dataKey="expenses"
-              stroke="#3b82f6"
-              strokeWidth={2.5}
-              fill="url(#colorExpenses)"
-              baseValue={0}
-              name="Expenses"
-            />
-
-            <Area
-              type="monotone"
-              dataKey="profit"
-              stroke="#16a34a"
-              strokeWidth={2.5}
-              fill="url(#colorProfit)"
-              baseValue={0}
-              name="Profit"
-            />
-
-          </AreaChart>
-        </ResponsiveContainer>
-        
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-gray-200">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <div className="w-3 h-3 rounded bg-blue-800 mr-2"></div>
-              <span className="text-xs text-gray-600">Latest Month Total</span>
-            </div>
-            <p className="text-xs text-gray-500">
-              Revenue: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].revenue)}</span>
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <div className="w-3 h-3 rounded bg-blue-500  mr-2"></div>
-              <span className="text-xs text-gray-600">Expenses</span>
-            </div>
-            <p className="text-xs text-gray-500">
-              Total: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].expenses)}</span>
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <div className="w-3 h-3 rounded bg-green-600 mr-2"></div>
-              <span className="text-xs text-gray-600">Net Profit</span>
-            </div>
-            <p className="text-xs text-gray-500">
-              Amount: <span className="font-semibold text-gray-900">{formatCurrency(monthlyTrendData[monthlyTrendData.length - 1].profit)}</span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      
 
     </div>
   );
