@@ -20,6 +20,9 @@ import AddAppointmentModal from '../../../Components/CHW/AddAppointmentModal';
 import EditAppointmentModal from '../../../Components/CHW/EditAppointmentModal';
 import CancelAppointmentModal from '../../../Components/CHW/CancelAppointmentModal';
 import { appointmentApi } from '../../../API/endpoints/appointmentApi.js';
+import { assignmentApi } from '../../../API/endpoints/assignmentApi.js';
+import { chwApi } from '../../../API/endpoints/chwApi.js';
+import { patientApi } from '../../../API/endpoints/patientApi.js';
 import {
   refreshAppointmentGovernanceSnapshot,
   transitionGovernanceAppointment,
@@ -62,8 +65,149 @@ function mapStatus(status) {
   const normalized = String(status || '').toUpperCase();
   if (normalized === 'COMPLETED') return 'completed';
   if (normalized === 'CANCELED' || normalized === 'CANCELLED') return 'cancelled';
-  if (normalized === 'BOOKED') return 'pending';
+  if (normalized === 'BOOKED' || normalized === 'SCHEDULED') return 'pending';
   return 'confirmed';
+}
+
+function toNumericId(value) {
+  if (value == null) return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const text = String(value).trim();
+  if (!text) return null;
+  const strict = Number(text);
+  if (Number.isFinite(strict)) return strict;
+  const match = text.match(/\d+/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getChwIdCandidates(user, discoveredChwId) {
+  const rawCandidates = [
+    discoveredChwId,
+    user?.chwId,
+    user?.providerId,
+    user?.employeeId,
+    toNumericId(discoveredChwId),
+    toNumericId(user?.chwId),
+    toNumericId(user?.providerId),
+    toNumericId(user?.employeeId),
+
+    // Keep auth user ids as last-resort fallback; these may not match CHW profile ids.
+    user?.id,
+    user?.userId,
+    toNumericId(user?.id),
+    toNumericId(user?.userId),
+  ];
+
+  const unique = new Set();
+  rawCandidates.forEach((value) => {
+    if (value == null) return;
+    const text = String(value).trim();
+    if (!text) return;
+    unique.add(text);
+  });
+
+  return Array.from(unique);
+}
+
+function extractTotalPages(payload) {
+  const candidates = [
+    payload?.totalPages,
+    payload?.data?.totalPages,
+    payload?.meta?.totalPages,
+    payload?.pagination?.totalPages,
+    payload?.pages,
+    payload?.data?.pages,
+  ];
+
+  for (const value of candidates) {
+    const num = Number(value);
+    if (Number.isFinite(num) && num > 0) return num;
+  }
+  return null;
+}
+
+async function fetchPatientsPaged() {
+  const aggregated = [];
+
+  // Try both zero-based and one-based page numbering.
+  const starts = [0, 1];
+  for (const startPage of starts) {
+    for (let i = 0; i < 25; i += 1) {
+      const page = startPage + i;
+      const payload = await patientApi.list({ page, size: 100 });
+      const rows = normalizeListPayload(payload);
+      if (!rows.length) {
+        if (i === 0) break;
+        break;
+      }
+
+      aggregated.push(...rows);
+
+      const totalPages = extractTotalPages(payload);
+      if (totalPages && i + 1 >= totalPages) break;
+      if (rows.length < 100) break;
+    }
+
+    if (aggregated.length > 1) break;
+  }
+
+  return aggregated;
+}
+
+function normalizeListPayload(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.rows)) return payload.rows;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (payload?.data && typeof payload.data === 'object') return normalizeListPayload(payload.data);
+  return [];
+}
+
+function resolvePatientName(row = {}) {
+  const nested = row.patient || row.user || {};
+  const direct =
+    row.patientName || row.fullName || row.name ||
+    nested.patientName || nested.fullName || nested.name;
+  if (direct) return String(direct).trim();
+  return [
+    row.firstName,
+    row.middleName,
+    row.lastName,
+    nested.firstName,
+    nested.middleName,
+    nested.lastName,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+}
+
+function toPatientOptions(rows = []) {
+  return rows
+    .map((row) => {
+      const rawId =
+        row.patientId ?? row.id ?? row.patient?.id ??
+        row.userId ?? row.user?.id ?? row.profileId;
+      const id = rawId === undefined || rawId === null ? '' : String(rawId).trim();
+      const name = resolvePatientName(row) || (id ? `Patient ${id}` : 'Unknown Patient');
+      return { id, name };
+    })
+    .filter((p) => p.id);
+}
+
+function mergePatientOptions(...groups) {
+  const merged = new Map();
+  groups.flat().forEach((p) => {
+    const id = String(p?.id || '').trim();
+    if (!id) return;
+    const name = String(p?.name || '').trim() || `Patient ${id}`;
+    if (!merged.has(id)) merged.set(id, { id, name });
+  });
+  return Array.from(merged.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function mapSnapshotToChwAppointments(rows = [], chwId) {
@@ -123,26 +267,76 @@ function toIsoWindow(date, time, durationText) {
   };
 }
 
+const CANONICAL_TYPES = new Set([
+  'CONSULTATION',
+  'FOLLOW_UP',
+  'HOME_VISIT',
+  'SURGERY',
+  'LAB_TEST',
+  'IMAGING',
+  'VACCINATION',
+  'TELEHEALTH',
+  'TELEMEDICINE',
+  'OTHER',
+]);
+
+function normalizeAppointmentType(value) {
+  const token = String(value || '').trim().toUpperCase();
+  if (!token) return 'OTHER';
+  if (CANONICAL_TYPES.has(token)) return token;
+
+  if (token === 'IN_PERSON' || token === 'CLINIC_VISIT') return 'CONSULTATION';
+  if (token === 'VIDEO_CALL') return 'TELEMEDICINE';
+  if (token === 'PHONE_CALL') return 'TELEHEALTH';
+
+  if (token.includes('HOME')) return 'HOME_VISIT';
+  if (token.includes('PHONE')) return 'TELEHEALTH';
+  if (token.includes('VIDEO') || token.includes('TELE')) return 'TELEMEDICINE';
+  return 'OTHER';
+}
+
 function buildChwPayload(appointment, chwId) {
-  const { startIso, endIso } = toIsoWindow(appointment.date, appointment.time, appointment.duration);
+  const patientId = Number(appointment.patientId);
+  if (!Number.isFinite(patientId)) {
+    throw new Error('Invalid patient id');
+  }
+
+  const existingStart = appointment.scheduledStart || appointment.startAt;
+  const existingEnd = appointment.scheduledEnd || appointment.endAt;
+
+  let startIso = existingStart;
+  let endIso = existingEnd;
+
+  if (!startIso || !endIso) {
+    const built = toIsoWindow(appointment.date, appointment.time, appointment.duration);
+    startIso = built.startIso;
+    endIso = built.endIso;
+  }
+
   if (!startIso || !endIso) {
     throw new Error('Invalid appointment date/time');
   }
 
+  const backendType = normalizeAppointmentType(appointment.type);
+
   return {
-    patientId: appointment.patientId,
-    chwId,
-    providerRole: 'CHW',
-    type: appointment.type,
-    appointmentType: appointment.type,
-    location: appointment.location,
+    patientId,
+    chwId: appointment.chwId ?? chwId,
+    providerRole: appointment.providerRole || 'CHW',
+    providerId: appointment.providerId ?? appointment.chwId ?? chwId,
+    doctorId: appointment.doctorId,
+    hospitalId: appointment.hospitalId,
+    type: backendType,
+    appointmentType: backendType,
+    location: appointment.location || ((backendType === 'TELEMEDICINE' || backendType === 'TELEHEALTH') ? 'Telemedicine' : 'Community Health Visit'),
     reason: appointment.reason,
     notes: appointment.notes,
+    reminderSent: Boolean(appointment.reminderSent),
     scheduledStart: startIso,
     scheduledEnd: endIso,
     startAt: startIso,
     endAt: endIso,
-    status: 'BOOKED',
+    status: appointment.status || 'SCHEDULED',
   };
 }
 
@@ -155,6 +349,37 @@ const CHWAppointments = () => {
   const [cancelAppointment, setCancelAppointment] = useState(null);
   const [toast, setToast] = useState(null);
   const [appointmentData, setAppointmentData] = useState(EMPTY_APPOINTMENTS);
+  const [backendPatients, setBackendPatients] = useState([]);
+  const [loadingPatients, setLoadingPatients] = useState(false);
+  const [discoveredChwId, setDiscoveredChwId] = useState(null);
+  const [resolvedChwId, setResolvedChwId] = useState(null);
+
+  const chwIdCandidates = useMemo(
+    () => getChwIdCandidates(user, discoveredChwId),
+    [user, discoveredChwId]
+  );
+  const primaryChwId = resolvedChwId ?? chwIdCandidates[0] ?? null;
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadChwProfile = async () => {
+      try {
+        const me = await chwApi.me();
+        const source =
+          me?.data || me?.chw || me?.profile || me?.result || me;
+        const found =
+          source?.id ?? source?.chwId ?? source?.providerId ?? source?.userId;
+        if (isMounted && found != null) {
+          setDiscoveredChwId(String(found));
+        }
+      } catch {
+        // Ignore and continue with auth-derived identifiers.
+      }
+    };
+
+    loadChwProfile();
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     if (!toast) return;
@@ -165,33 +390,130 @@ const CHWAppointments = () => {
   const showToast = (type, message) => setToast({ type, message });
 
   const loadAppointments = useCallback(async () => {
-    try {
-      const snapshot = await refreshAppointmentGovernanceSnapshot({
-        providerRole: 'CHW',
-        chwId: user?.id,
-      });
-      const nextData = mapSnapshotToChwAppointments(snapshot.appointments, user?.id);
-      setAppointmentData(nextData);
-      syncChwAppointmentWorkItems(snapshot.appointments);
-    } catch (error) {
-      setAppointmentData(EMPTY_APPOINTMENTS);
-      showToast('error', error?.message || 'Failed to load appointments.');
+    const candidates = chwIdCandidates.length > 0 ? chwIdCandidates : [null];
+    let lastError = null;
+
+    for (const candidate of candidates) {
+      try {
+        const snapshot = await refreshAppointmentGovernanceSnapshot({
+          providerRole: 'CHW',
+          chwId: candidate,
+        });
+        const nextData = mapSnapshotToChwAppointments(snapshot.appointments, candidate);
+        setAppointmentData(nextData);
+        syncChwAppointmentWorkItems(snapshot.appointments);
+        if (candidate != null) {
+          setResolvedChwId(String(candidate));
+        }
+        return;
+      } catch (error) {
+        lastError = error;
+        const message = String(error?.message || '').toLowerCase();
+        const looksLikeWrongChwId =
+          message.includes('chw') && message.includes('not found');
+        const looksLikeGenericMissingResource = message.includes('not found') || error?.status === 404;
+        if (candidate != null && (looksLikeWrongChwId || looksLikeGenericMissingResource)) {
+          continue;
+        }
+        break;
+      }
     }
-  }, [user?.id]);
+
+    setAppointmentData(EMPTY_APPOINTMENTS);
+    showToast('error', lastError?.message || 'Failed to load appointments.');
+  }, [chwIdCandidates]);
 
   useEffect(() => {
     loadAppointments();
   }, [loadAppointments]);
 
+  const loadPatientOptions = useCallback(async () => {
+    if (chwIdCandidates.length === 0 && !user?.id) {
+      setBackendPatients([]);
+      return;
+    }
+
+    setLoadingPatients(true);
+    try {
+      const patientRequests = [
+        patientApi.list(),
+        patientApi.list({ size: 500 }),
+        patientApi.list({ page: 0, size: 500 }),
+        patientApi.list({ limit: 500 }),
+        fetchPatientsPaged(),
+      ];
+
+      const assignmentRequests = chwIdCandidates.flatMap((chwId) => ([
+        assignmentApi.listByChw(chwId, { size: 500 }),
+        assignmentApi.list({ chwId, size: 500 }),
+      ]));
+
+      assignmentRequests.push(assignmentApi.list({ size: 500 }));
+
+      const appointmentRequests = [
+        appointmentApi.list({ size: 500 }),
+      ];
+
+      const [patientResults, assignmentResults, appointmentResults] = await Promise.all([
+        Promise.allSettled(patientRequests),
+        Promise.allSettled(assignmentRequests),
+        Promise.allSettled(appointmentRequests),
+      ]);
+
+      const patientRows = patientResults
+        .filter((result) => result.status === 'fulfilled')
+        .flatMap((result) => Array.isArray(result.value) ? result.value : normalizeListPayload(result.value));
+
+      const assignmentRows = assignmentResults
+        .filter((result) => result.status === 'fulfilled')
+        .flatMap((result) => normalizeListPayload(result.value));
+
+      const appointmentRows = appointmentResults
+        .filter((result) => result.status === 'fulfilled')
+        .flatMap((result) => normalizeListPayload(result.value));
+
+      const directPatients = toPatientOptions(patientRows);
+      const assignedPatients = toPatientOptions(
+        assignmentRows.map((row) => ({
+          patientId: row.patientId ?? row.patient?.id,
+          patientName: row.patientName ?? row.patient?.fullName ?? row.patient?.name,
+          firstName: row.patient?.firstName,
+          middleName: row.patient?.middleName,
+          lastName: row.patient?.lastName,
+        }))
+      );
+
+      const appointmentPatients = toPatientOptions(
+        appointmentRows.map((row) => ({
+          patientId: row.patientId ?? row.patient?.id,
+          patientName: row.patientName ?? row.patient?.fullName ?? row.patient?.name,
+          firstName: row.patient?.firstName,
+          middleName: row.patient?.middleName,
+          lastName: row.patient?.lastName,
+        }))
+      );
+
+      setBackendPatients(mergePatientOptions(directPatients, assignedPatients, appointmentPatients));
+    } catch {
+      setBackendPatients([]);
+    } finally {
+      setLoadingPatients(false);
+    }
+  }, [chwIdCandidates, user?.id]);
+
+  useEffect(() => {
+    loadPatientOptions();
+  }, [loadPatientOptions]);
+
   const handleAddSave = async (newAppt) => {
-    const payload = buildChwPayload(newAppt, user?.id);
+    const payload = buildChwPayload(newAppt, primaryChwId);
     await appointmentApi.create(payload);
     await loadAppointments();
     showToast('success', `Appointment for ${newAppt.patientName || 'patient'} scheduled successfully.`);
   };
 
   const handleEditSave = async (updated) => {
-    const payload = buildChwPayload(updated, user?.id);
+    const payload = buildChwPayload(updated, primaryChwId);
     await appointmentApi.update(updated.id, payload);
     await loadAppointments();
     setEditAppointment(null);
@@ -207,7 +529,7 @@ const CHWAppointments = () => {
     showToast('success', `Appointment for ${appt.patientName} has been cancelled.`);
   };
 
-  const patientOptions = useMemo(() => {
+  const appointmentPatientOptions = useMemo(() => {
     const uniquePatients = new Map();
     [...appointmentData.upcoming, ...appointmentData.completed, ...appointmentData.cancelled].forEach((item) => {
       const key = String(item.patientId || '').trim();
@@ -221,6 +543,11 @@ const CHWAppointments = () => {
     });
     return Array.from(uniquePatients.values());
   }, [appointmentData]);
+
+  const patientOptions = useMemo(
+    () => mergePatientOptions(backendPatients, appointmentPatientOptions),
+    [backendPatients, appointmentPatientOptions]
+  );
 
   const filterAppts = (list) => {
     if (!searchTerm.trim()) return list;
@@ -710,6 +1037,7 @@ const CHWAppointments = () => {
         onClose={() => setShowAddModal(false)}
         onSave={handleAddSave}
         patients={patientOptions}
+        isPatientsLoading={loadingPatients}
       />
       <EditAppointmentModal
         isOpen={!!editAppointment}
@@ -717,6 +1045,7 @@ const CHWAppointments = () => {
         onClose={() => setEditAppointment(null)}
         onSave={handleEditSave}
         patients={patientOptions}
+        isPatientsLoading={loadingPatients}
       />
       <CancelAppointmentModal
         isOpen={!!cancelAppointment}
