@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { 
   Phone, 
   MapPin, 
-  Navigation, 
   Users, 
   Ambulance,
   Clock,
@@ -10,14 +9,243 @@ import {
   CheckCircle,
   X,
   Map as MapIcon,
-  User,
   Star,
-  Activity,
-  Heart,
-  Shield
+  Activity
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import EmergencyFeatures from '../../../Components/Client/EmergencyFeatures';
+import { ambulanceApi } from '../../../API/endpoints/ambulanceApi.js';
+import { chwApi } from '../../../API/endpoints/chwApi.js';
+import { patientApi } from '../../../API/endpoints/patientApi.js';
+import LiveMap from '../../../Components/Client/LiveMap.jsx';
+
+const DEFAULT_LOCATION = { lat: -1.286389, lng: 36.817223 };
+
+const toArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (payload?.data && typeof payload.data === 'object') return toArray(payload.data);
+  return [];
+};
+
+const toNumberOrNull = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const titleCase = (value, fallback = 'N/A') => {
+  const text = String(value || '').trim();
+  if (!text) return fallback;
+  return text
+    .toLowerCase()
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const getVehicleIdentity = (row = {}) => {
+  const plate = String(
+    row.vehiclePlate
+    || row.vehicleNumber
+    || row.ambulanceVehiclePlate
+    || row.ambulance?.vehiclePlate
+    || ''
+  ).trim();
+  if (plate) return plate.toUpperCase();
+  if (row.id !== undefined && row.id !== null) return `ID:${row.id}`;
+  if (row.ambulanceId !== undefined && row.ambulanceId !== null) return `ID:${row.ambulanceId}`;
+  return '';
+};
+
+const getLocationFromRow = (row = {}) => {
+  const source = row.location || row.currentLocation || row.coordinates || null;
+  if (source && typeof source === 'object') {
+    const lat = toNumberOrNull(source.lat ?? source.latitude ?? source.currentLatitude);
+    const lng = toNumberOrNull(source.lng ?? source.longitude ?? source.lon ?? source.currentLongitude);
+    if (lat !== null && lng !== null) return { lat, lng };
+  }
+  const lat = toNumberOrNull(
+    row.latitude
+    ?? row.lat
+    ?? row.currentLatitude
+    ?? row.currentLat
+    ?? row.pickupLatitude
+    ?? row.gpsLatitude
+  );
+  const lng = toNumberOrNull(
+    row.longitude
+    ?? row.lng
+    ?? row.lon
+    ?? row.currentLongitude
+    ?? row.currentLng
+    ?? row.pickupLongitude
+    ?? row.gpsLongitude
+  );
+  if (lat !== null && lng !== null) return { lat, lng };
+
+  if (row.tracking && typeof row.tracking === 'object') {
+    const trackingLat = toNumberOrNull(
+      row.tracking.latitude
+      ?? row.tracking.lat
+      ?? row.tracking.currentLatitude
+    );
+    const trackingLng = toNumberOrNull(
+      row.tracking.longitude
+      ?? row.tracking.lng
+      ?? row.tracking.currentLongitude
+    );
+    if (trackingLat !== null && trackingLng !== null) return { lat: trackingLat, lng: trackingLng };
+  }
+
+  return null;
+};
+
+const mergeAmbulanceTracking = (ambulanceRows = [], trackingRows = []) => {
+  if (!Array.isArray(ambulanceRows) || ambulanceRows.length === 0) return [];
+  if (!Array.isArray(trackingRows) || trackingRows.length === 0) return ambulanceRows;
+
+  const trackingByVehicle = new Map();
+  trackingRows.forEach((row) => {
+    const vehicleKey = getVehicleIdentity(row);
+    if (vehicleKey) trackingByVehicle.set(vehicleKey, row);
+  });
+
+  return ambulanceRows.map((ambulanceRow) => {
+    const existingCoords = getLocationFromRow(ambulanceRow);
+    if (existingCoords) return ambulanceRow;
+
+    const vehicleKey = getVehicleIdentity(ambulanceRow);
+    const trackingRow = vehicleKey ? trackingByVehicle.get(vehicleKey) : null;
+    if (!trackingRow) return ambulanceRow;
+
+    const trackingCoords = getLocationFromRow(trackingRow);
+    if (!trackingCoords) return ambulanceRow;
+
+    return {
+      ...ambulanceRow,
+      currentLatitude: trackingCoords.lat,
+      currentLongitude: trackingCoords.lng,
+      currentLocation: trackingRow.locationAddress || trackingRow.currentLocation || ambulanceRow.currentLocation,
+      tracking: trackingRow,
+    };
+  });
+};
+
+const distanceKm = (a, b) => {
+  if (!a || !b) return null;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const lat1 = (a.lat * Math.PI) / 180;
+  const lat2 = (b.lat * Math.PI) / 180;
+  const hav =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return 6371 * (2 * Math.atan2(Math.sqrt(hav), Math.sqrt(1 - hav)));
+};
+
+const formatDistance = (rawDistance, userLocation, responderLocation) => {
+  const explicitDistance = toNumberOrNull(rawDistance);
+  if (explicitDistance !== null) return `${explicitDistance.toFixed(1)} km`;
+  const computed = distanceKm(userLocation, responderLocation);
+  if (computed === null) return 'Distance unavailable';
+  return `${computed.toFixed(1)} km`;
+};
+
+const normalizeChwStatus = (status) => String(status || '').trim().toUpperCase();
+
+const isChwAvailable = (status) => {
+  const normalized = normalizeChwStatus(status);
+  return !['OFFLINE', 'ON_LEAVE', 'INACTIVE'].includes(normalized);
+};
+
+const normalizeChw = (row = {}, userLocation) => {
+  const firstName = String(row.firstName || '').trim();
+  const middleName = String(row.middleName || '').trim();
+  const lastName = String(row.lastName || '').trim();
+  const fullName =
+    String(row.fullName || row.name || '').trim() ||
+    [firstName, middleName, lastName].filter(Boolean).join(' ').trim() ||
+    'Unknown CHW';
+  const status = normalizeChwStatus(row.status);
+  const ratingNumber = toNumberOrNull(row.rating ?? row.averageRating);
+
+  return {
+    id: row.id,
+    name: fullName,
+    phone: row.phone || row.phoneNumber || row.contactPhone || 'N/A',
+    specialization: row.specialization || 'Community Health Worker',
+    distance: formatDistance(row.distanceKm ?? row.distance, userLocation, getLocationFromRow(row)),
+    rating: ratingNumber !== null ? ratingNumber.toFixed(1) : 'N/A',
+    available: isChwAvailable(status),
+    location: getLocationFromRow(row),
+    responseTime:
+      row.responseTime ||
+      row.averageResponseTime ||
+      (status === 'BUSY' ? '10-20 min' : '5-15 min'),
+    status,
+  };
+};
+
+const normalizeAmbulanceStatus = (status) => String(status || '').trim().toUpperCase();
+
+const isAmbulanceAvailable = (status) => {
+  const normalized = normalizeAmbulanceStatus(status);
+  return ['AVAILABLE', 'ACTIVE', 'READY', 'IDLE'].includes(normalized);
+};
+
+const extractEquipment = (row = {}) => {
+  if (Array.isArray(row.equipmentList)) return row.equipmentList.map(String);
+  if (Array.isArray(row.equipment)) {
+    return row.equipment
+      .map((item) => item?.name || item?.equipmentName || String(item || ''))
+      .filter(Boolean);
+  }
+  return [];
+};
+
+const normalizeAmbulance = (row = {}, userLocation) => {
+  const status = normalizeAmbulanceStatus(row.status);
+  const vehiclePlate = row.vehiclePlate || row.vehicleNumber || row.registrationNumber || `AMB-${row.id ?? 'N/A'}`;
+  const type = titleCase(row.type, 'Ambulance');
+  const equipment = extractEquipment(row);
+  const etaMinutes = toNumberOrNull(row.averageResponseMinutes);
+  const formattedEta =
+    row.estimatedResponseTime ||
+    row.eta ||
+    row.averageResponseTime ||
+    (etaMinutes !== null ? `${etaMinutes} minutes` : 'Pending dispatch');
+  const numericCost = toNumberOrNull(row.cost ?? row.estimatedCost);
+
+  return {
+    id: row.id,
+    backendId: row.id,
+    name: row.name || `MediLink Ambulance ${vehiclePlate}`,
+    type,
+    distance: formatDistance(row.estimatedDistance ?? row.distanceKm ?? row.distance, userLocation, getLocationFromRow(row)),
+    eta: formattedEta,
+    available: isAmbulanceAvailable(status),
+    status,
+    location: getLocationFromRow(row),
+    equipment,
+    cost: numericCost !== null ? `Ksh ${numericCost}` : 'Ksh --',
+  };
+};
+
+const extractPatientName = (patient) => {
+  if (!patient) return '';
+  const fullName = String(patient.fullName || patient.name || '').trim();
+  if (fullName) return fullName;
+  return [patient.firstName, patient.middleName, patient.lastName]
+    .map((part) => String(part || '').trim())
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+};
 
 const Emergency = () => {
   const [activeTab, setActiveTab] = useState('ambulance');
@@ -28,106 +256,82 @@ const Emergency = () => {
   const [showCHWModal, setShowCHWModal] = useState(false);
   const [showAmbulanceModal, setShowAmbulanceModal] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
-  const [userLocation, setUserLocation] = useState({ lat: -1.286389, lng: 36.817223 }); // Default: Nairobi
+  const [userLocation, setUserLocation] = useState(DEFAULT_LOCATION);
+  const [chwRows, setChwRows] = useState([]);
+  const [ambulanceRows, setAmbulanceRows] = useState([]);
+  const [patientProfile, setPatientProfile] = useState(null);
+  const [loadingChw, setLoadingChw] = useState(true);
+  const [loadingAmbulances, setLoadingAmbulances] = useState(true);
+  const [chwError, setChwError] = useState('');
+  const [ambulanceError, setAmbulanceError] = useState('');
+  const [orderSubmitting, setOrderSubmitting] = useState(false);
+  const [orderError, setOrderError] = useState('');
 
-  // Sample CHW data
-  const communityHealthWorkers = [
-    {
-      id: 1,
-      name: 'Sarah Kamau',
-      phone: '+254712345678',
-      specialization: 'General Health',
-      distance: '0.5 km',
-      rating: 4.8,
-      available: true,
-      location: { lat: -1.286389, lng: 36.817223 },
-      responseTime: '5-10 min'
-    },
-    {
-      id: 2,
-      name: 'John Mwangi',
-      phone: '+254723456789',
-      specialization: 'First Aid',
-      distance: '1.2 km',
-      rating: 4.9,
-      available: true,
-      location: { lat: -1.290389, lng: 36.820223 },
-      responseTime: '10-15 min'
-    },
-    {
-      id: 3,
-      name: 'Grace Njeri',
-      phone: '+254734567890',
-      specialization: 'Maternal Health',
-      distance: '2.1 km',
-      rating: 4.7,
-      available: false,
-      location: { lat: -1.295389, lng: 36.825223 },
-      responseTime: '15-20 min'
-    },
-    {
-      id: 4,
-      name: 'David Ochieng',
-      phone: '+254745678901',
-      specialization: 'Emergency Response',
-      distance: '0.8 km',
-      rating: 5.0,
-      available: true,
-      location: { lat: -1.288389, lng: 36.819223 },
-      responseTime: '5-10 min'
-    }
-  ];
+  const communityHealthWorkers = useMemo(() => {
+    return toArray(chwRows)
+      .map((row) => normalizeChw(row, userLocation))
+      .sort((a, b) => Number(b.available) - Number(a.available));
+  }, [chwRows, userLocation]);
 
-  // Sample Ambulance data - Replace with actual API data
-  const ambulances = [
-    {
-      id: 1,
-      name: 'MediLink Ambulance KDH 556H',
-      type: 'Advanced Life Support',
-      distance: '2.3 km',
-      eta: '8 minutes',
-      available: true,
-      location: { lat: -1.289389, lng: 36.818223 },
-      equipment: ['Defibrillator', 'Oxygen', 'ECG Monitor'],
-      cost: 'Ksh 300'
-    },
-    {
-      id: 2,
-      name: 'MediLink Ambulance KDE 223E',
-      type: 'Basic Life Support',
-      distance: '3.5 km',
-      eta: '12 minutes',
-      available: true,
-      location: { lat: -1.292389, lng: 36.822223 },
-      equipment: ['First Aid Kit', 'Oxygen', 'Stretcher'],
-      cost: 'Ksh 350'
-    },
-    {
-      id: 3,
-      name: 'City Hospital KDB 456B',
-      type: 'Critical Care',
-      distance: '4.2 km',
-      eta: '15 minutes',
-      available: false,
-      location: { lat: -1.296389, lng: 36.826223 },
-      equipment: ['Ventilator', 'Defibrillator', 'IV Equipment'],
-      cost: 'Ksh 400'
-    },
-    {
-      id: 4,
-      name: 'Rescue Unit KBX 456B',
-      type: 'Advanced Life Support',
-      distance: '1.8 km',
-      eta: '6 minutes',
-      available: true,
-      location: { lat: -1.287389, lng: 36.816223 },
-      equipment: ['Defibrillator', 'Oxygen', 'Trauma Kit'],
-      cost: 'Ksh 150'
+  const ambulances = useMemo(() => {
+    return toArray(ambulanceRows)
+      .map((row) => normalizeAmbulance(row, userLocation))
+      .sort((a, b) => Number(b.available) - Number(a.available));
+  }, [ambulanceRows, userLocation]);
+
+  const fetchPatientProfile = useCallback(async () => {
+    try {
+      const profile = await patientApi.me();
+      setPatientProfile(profile || null);
+    } catch {
+      setPatientProfile(null);
     }
-  ];
+  }, []);
+
+  const fetchChwData = useCallback(async () => {
+    setLoadingChw(true);
+    setChwError('');
+    try {
+      const payload = await chwApi.list();
+      setChwRows(toArray(payload));
+    } catch (err) {
+      setChwRows([]);
+      setChwError(err?.message || 'Failed to load CHWs.');
+    } finally {
+      setLoadingChw(false);
+    }
+  }, []);
+
+  const fetchAmbulanceData = useCallback(async () => {
+    setLoadingAmbulances(true);
+    setAmbulanceError('');
+    try {
+      let payload;
+      try {
+        payload = await ambulanceApi.listAvailable();
+      } catch {
+        payload = await ambulanceApi.list();
+      }
+
+      let trackingPayload = [];
+      try {
+        trackingPayload = await ambulanceApi.listActiveTracking();
+      } catch {
+        trackingPayload = [];
+      }
+
+      const ambulancesFromApi = toArray(payload);
+      const trackingRows = toArray(trackingPayload);
+      setAmbulanceRows(mergeAmbulanceTracking(ambulancesFromApi, trackingRows));
+    } catch (err) {
+      setAmbulanceRows([]);
+      setAmbulanceError(err?.message || 'Failed to load ambulances.');
+    } finally {
+      setLoadingAmbulances(false);
+    }
+  }, []);
 
   useEffect(() => {
-    // Get user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -143,6 +347,12 @@ const Emergency = () => {
     }
   }, []);
 
+  useEffect(() => {
+    fetchPatientProfile();
+    fetchChwData();
+    fetchAmbulanceData();
+  }, [fetchPatientProfile, fetchChwData, fetchAmbulanceData]);
+
   const handleCallCHW = (chw) => {
     setSelectedCHW(chw);
     setShowCHWModal(true);
@@ -150,15 +360,52 @@ const Emergency = () => {
 
   const handleOrderAmbulance = (ambulance) => {
     setSelectedAmbulance(ambulance);
+    setOrderError('');
+    setOrderConfirmed(false);
     setShowAmbulanceModal(true);
   };
 
-  const confirmAmbulanceOrder = () => {
-    setOrderConfirmed(true);
-    setTimeout(() => {
-      setShowAmbulanceModal(false);
-      setOrderConfirmed(false);
-    }, 3000);
+  const confirmAmbulanceOrder = async () => {
+    if (!selectedAmbulance?.backendId || orderSubmitting) return;
+
+    const patientName = extractPatientName(patientProfile);
+    const payload = {
+      incidentType: 'MEDICAL_EMERGENCY',
+      priority: 'HIGH',
+      patientId: patientProfile?.id || null,
+      patientName: patientName || 'Portal Patient',
+      patientCondition: 'Emergency assistance requested from patient portal',
+      callerName: patientName || null,
+      callerPhone: patientProfile?.phone || patientProfile?.phoneNumber || null,
+      pickupAddressLine1:
+        patientProfile?.addressLine1 ||
+        patientProfile?.address ||
+        'Patient current location',
+      pickupCity: patientProfile?.city || null,
+      pickupCountry: patientProfile?.country || 'Kenya',
+      pickupLatitude: userLocation.lat,
+      pickupLongitude: userLocation.lng,
+      specialInstructions: 'Requested directly via patient emergency page.',
+      requiresStretcher: true,
+      ambulanceId: selectedAmbulance.backendId,
+    };
+
+    setOrderSubmitting(true);
+    setOrderError('');
+    try {
+      await ambulanceApi.requestAssistance(payload);
+      setOrderConfirmed(true);
+      await fetchAmbulanceData();
+
+      setTimeout(() => {
+        setShowAmbulanceModal(false);
+        setOrderConfirmed(false);
+      }, 3000);
+    } catch (err) {
+      setOrderError(err?.message || 'Failed to submit ambulance request.');
+    } finally {
+      setOrderSubmitting(false);
+    }
   };
 
   const tabs = [
@@ -286,17 +533,15 @@ const Emergency = () => {
                   </span>
                 </div>
               </div>
-              <iframe
-                src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
-                width="100%"
-                height="460"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="CHW Coverage Map"
+
+              <LiveMap
+                userLocation={userLocation}
+                ambulances={ambulances}
+                chws={communityHealthWorkers}
+                view="chw"
                 className="w-full h-[420px] xl:h-[500px]"
               />
+              
             </div>
 
             {/* CHW List */}
@@ -305,65 +550,85 @@ const Emergency = () => {
                 <Users className="w-4 h-4 mr-2 text-blue-600" />
                 Available Community Health Workers Near You
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
-                {communityHealthWorkers.map((chw) => (
-                  <div
-                    key={chw.id}
-                    className={`p-2 border-2 rounded-lg transition-all ${
-                      chw.available
-                        ? 'border-gray-200 hover:border-gray-300'
-                        : 'border-gray-200 bg-gray-50 opacity-60'
-                    }`}
+              {loadingChw ? (
+                <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">
+                  Loading active CHWs...
+                </div>
+              ) : chwError ? (
+                <div className="p-3 text-sm text-red-600 border border-red-200 rounded-lg flex items-center justify-between gap-3">
+                  <span>{chwError}</span>
+                  <button
+                    onClick={fetchChwData}
+                    className="px-2.5 py-1.5 text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-700 rounded"
                   >
-                    <div className="flex flex-col">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                          {chw.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-900">{chw.name}</h3>
-                          <p className="text-xs text-gray-600">{chw.specialization}</p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col space-y-1">
-                        <span className="flex items-center text-xs">
-                          <MapPin className="w-3 h-3 mr-0.5" />
-                          {chw.distance}
-                        </span>
-                        <span className="flex items-center text-xs">
-                          <Clock className="w-3 h-3 mr-0.5" />
-                          {chw.responseTime}
-                        </span>
-                        <span className="flex items-center text-xs text-blue-600">
-                          <Star className="w-3 h-3 mr-0.5 fill-current" />
-                          {chw.rating}
-                        </span>
-                      </div>
-                      <div className="mt-2">
-                        {chw.available ? (
-                          <div className="flex flex-col space-y-1 items-center">
-                            <span className="px-2 py-0.5 text-green-800 text-xs font-bold">
-                              Available
-                            </span>
-                            <a
-                              href={`tel:${chw.phone}`}
-                              className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors flex items-center space-x-1"
-                              onClick={() => handleCallCHW(chw)}
-                            >
-                              <Phone className="w-3 h-3" />
-                              <span>Call</span>
-                            </a>
+                    Retry
+                  </button>
+                </div>
+              ) : communityHealthWorkers.length === 0 ? (
+                <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">
+                  No CHWs are currently available.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
+                  {communityHealthWorkers.map((chw) => (
+                    <div
+                      key={chw.id}
+                      className={`p-2 border-2 rounded-lg transition-all ${
+                        chw.available
+                          ? 'border-gray-200 hover:border-gray-300'
+                          : 'border-gray-200 bg-gray-50 opacity-60'
+                      }`}
+                    >
+                      <div className="flex flex-col">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            {chw.name.split(' ').map((namePart) => namePart[0]).join('').slice(0, 2).toUpperCase()}
                           </div>
-                        ) : (
-                          <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full block text-center">
-                            Unavailable
+                          <div>
+                            <h3 className="text-sm font-semibold text-gray-900">{chw.name}</h3>
+                            <p className="text-xs text-gray-600">{chw.specialization}</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          <span className="flex items-center text-xs">
+                            <MapPin className="w-3 h-3 mr-0.5" />
+                            {chw.distance}
                           </span>
-                        )}
+                          <span className="flex items-center text-xs">
+                            <Clock className="w-3 h-3 mr-0.5" />
+                            {chw.responseTime}
+                          </span>
+                          <span className="flex items-center text-xs text-blue-600">
+                            <Star className="w-3 h-3 mr-0.5 fill-current" />
+                            {chw.rating}
+                          </span>
+                        </div>
+                        <div className="mt-2">
+                          {chw.available ? (
+                            <div className="flex flex-col space-y-1 items-center">
+                              <span className="px-2 py-0.5 text-green-800 text-xs font-bold">
+                                Available
+                              </span>
+                              <a
+                                href={`tel:${chw.phone}`}
+                                className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors flex items-center space-x-1"
+                                onClick={() => handleCallCHW(chw)}
+                              >
+                                <Phone className="w-3 h-3" />
+                                <span>Call</span>
+                              </a>
+                            </div>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full block text-center">
+                              Unavailable
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -397,16 +662,16 @@ const Emergency = () => {
                   </span>
                 </div>
               </div>
-             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d277.7549826743736!2d37.26242921919778!3d-1.5305180166278827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f87eeedd7e1cd%3A0x2bb0f6a2ec4c7859!2sMachakos%20University%20Administration!5e0!3m2!1sen!2ske!4v1774964157029!5m2!1sen!2ske"
-              width="100%"
-              height="260"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Supervisor Coverage Map"
-            />
+
+
+              
+              <LiveMap
+                userLocation={userLocation}
+                ambulances={ambulances}
+                chws={communityHealthWorkers}
+                view="ambulance"
+                className="w-full h-[420px] xl:h-[500px]"
+              />
             </div>
 
             {/* Ambulance List */}
@@ -415,73 +680,97 @@ const Emergency = () => {
                 <Ambulance className="w-4 h-4 mr-2 text-blue-600" />
                 Available Ambulances Near You
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
-                {ambulances.map((ambulance) => (
-                  <div
-                    key={ambulance.id}
-                    className={`p-2 border-2 rounded-lg transition-all ${
-                      ambulance.available
-                        ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
-                        : 'border-gray-200 bg-gray-50 opacity-60'
-                    }`}
+              {loadingAmbulances ? (
+                <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">
+                  Loading ambulances...
+                </div>
+              ) : ambulanceError ? (
+                <div className="p-3 text-sm text-red-600 border border-red-200 rounded-lg flex items-center justify-between gap-3">
+                  <span>{ambulanceError}</span>
+                  <button
+                    onClick={fetchAmbulanceData}
+                    className="px-2.5 py-1.5 text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-700 rounded"
                   >
-                    <div className="flex flex-col">
-                      <div className="flex items-center space-x-1 mb-1">
-                        <Ambulance className={`w-4 h-4 ${ambulance.available ? 'text-blue-600' : 'text-gray-400'}`} />
-                        <h3 className="text-xs font-bold text-gray-900">{ambulance.name}</h3>
-                      </div>
-                      {ambulance.available && (
-                        <span className="px-1.5 py-0.5 text-green-700 text-xs font-semibold rounded-full text-center mb-1">
-                          Available
-                        </span>
-                      )}
-                      <p className="text-xs text-gray-600 mb-2">{ambulance.type}</p>
-                      <div className="flex flex-col space-y-1 mb-2">
-                        <div className="flex items-center text-xs">
-                          <MapPin className="w-3 h-3 mr-1 text-gray-500" />
-                          <span className="font-semibold text-gray-700">{ambulance.distance}</span>
+                    Retry
+                  </button>
+                </div>
+              ) : ambulances.length === 0 ? (
+                <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">
+                  No ambulances are currently available.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
+                  {ambulances.map((ambulance) => (
+                    <div
+                      key={ambulance.id}
+                      className={`p-2 border-2 rounded-lg transition-all ${
+                        ambulance.available
+                          ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
+                          : 'border-gray-200 bg-gray-50 opacity-60'
+                      }`}
+                    >
+                      <div className="flex flex-col">
+                        <div className="flex items-center space-x-1 mb-1">
+                          <Ambulance className={`w-4 h-4 ${ambulance.available ? 'text-blue-600' : 'text-gray-400'}`} />
+                          <h3 className="text-xs font-bold text-gray-900">{ambulance.name}</h3>
                         </div>
-                        <div className="flex items-center text-xs">
-                          <Clock className="w-3 h-3 mr-1 text-blue-600" />
-                          <span className="font-bold">ETA: {ambulance.eta}</span>
-                        </div>
-                        <div className="flex items-center text-xs">
-                          <Activity className="w-3 h-3 mr-1 text-gray-500" />
-                          <span className="font-semibold text-gray-700">{ambulance.equipment.length} Equipment</span>
-                        </div>
-                        <div className="flex items-center text-xs">
-                          <span className="font-bold">{ambulance.cost}</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {ambulance.equipment.map((item, index) => (
-                          <span
-                            key={index}
-                            className="px-1.5 py-0.5  text-blue-600 text-xs"
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex justify-center">
                         {ambulance.available ? (
-                          <button
-                            onClick={() => handleOrderAmbulance(ambulance)}
-                            className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1"
-                          >
-                            <Ambulance className="w-3 h-3" />
-                            <span>Order</span>
-                          </button>
+                          <span className="px-1.5 py-0.5 text-green-700 text-xs font-semibold rounded-full text-center mb-1">
+                            Available
+                          </span>
                         ) : (
-                          <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-xs font-semibold">
-                            Unavailable
+                          <span className="px-1.5 py-0.5 text-gray-600 text-xs font-semibold rounded-full text-center mb-1">
+                            {titleCase(ambulance.status, 'Unavailable')}
                           </span>
                         )}
+                        <p className="text-xs text-gray-600 mb-2">{ambulance.type}</p>
+                        <div className="flex flex-col space-y-1 mb-2">
+                          <div className="flex items-center text-xs">
+                            <MapPin className="w-3 h-3 mr-1 text-gray-500" />
+                            <span className="font-semibold text-gray-700">{ambulance.distance}</span>
+                          </div>
+                          <div className="flex items-center text-xs">
+                            <Clock className="w-3 h-3 mr-1 text-blue-600" />
+                            <span className="font-bold">ETA: {ambulance.eta}</span>
+                          </div>
+                          <div className="flex items-center text-xs">
+                            <Activity className="w-3 h-3 mr-1 text-gray-500" />
+                            <span className="font-semibold text-gray-700">{ambulance.equipment.length} Equipment</span>
+                          </div>
+                          <div className="flex items-center text-xs">
+                            <span className="font-bold">{ambulance.cost}</span>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {ambulance.equipment.map((item, index) => (
+                            <span
+                              key={index}
+                              className="px-1.5 py-0.5 text-blue-600 text-xs"
+                            >
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="flex justify-center">
+                          {ambulance.available ? (
+                            <button
+                              onClick={() => handleOrderAmbulance(ambulance)}
+                              className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1"
+                            >
+                              <Ambulance className="w-3 h-3" />
+                              <span>Order</span>
+                            </button>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-xs font-semibold">
+                              Unavailable
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Emergency Tips */}
@@ -545,16 +834,12 @@ const Emergency = () => {
               Active responders
             </span>
           </div>
-          <iframe
-            src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
-            width="100%"
-            height="100%"
-            style={{ border: 0, flex: 1, display: 'block' }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Emergency Live Map"
-            className="flex-1 w-full"
+          <LiveMap
+            userLocation={userLocation}
+            ambulances={ambulances}
+            chws={communityHealthWorkers}
+            view={mapView}
+            className="flex-1 min-h-0 w-full"
           />
         </div>
       )}
@@ -574,7 +859,7 @@ const Emergency = () => {
             </div>
             <div className="text-center mb-4">
               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-3">
-                {selectedCHW.name.split(' ').map(n => n[0]).join('')}
+                {selectedCHW.name.split(' ').map((namePart) => namePart[0]).join('').slice(0, 2).toUpperCase()}
               </div>
               <h4 className="text-base font-semibold text-gray-900">{selectedCHW.name}</h4>
               <p className="text-sm text-gray-600">{selectedCHW.specialization}</p>
@@ -649,18 +934,23 @@ const Emergency = () => {
                 <div className="flex flex-col items-center space-y-2">
                   <button
                     onClick={confirmAmbulanceOrder}
-                    className="w-40 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors flex items-center justify-center space-x-2"
+                    disabled={orderSubmitting}
+                    className="w-40 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors flex items-center justify-center space-x-2"
                   >
                     <CheckCircle className="w-4 h-4" />
-                    <span>Confirm Order</span>
+                    <span>{orderSubmitting ? 'Submitting...' : 'Confirm Order'}</span>
                   </button>
                   <button
                     onClick={() => setShowAmbulanceModal(false)}
+                    disabled={orderSubmitting}
                     className="w-40 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
                   >
                     Cancel
                   </button>
                 </div>
+                {orderError && (
+                  <p className="mt-3 text-sm text-red-600 text-center">{orderError}</p>
+                )}
               </>
             ) : (
               <div className="text-center py-6">
@@ -684,7 +974,7 @@ const Emergency = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Link
           to="/client/patient/dashboard"
-          className="flex items-center justify-center space-x-2 p-3transition-colors"
+          className="flex items-center justify-center space-x-2 p-3 transition-colors"
         >
           <span className="hover:text-blue-600 font-bold">← Back to Dashboard</span>
         </Link>
