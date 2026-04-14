@@ -17,6 +17,7 @@ function normalizeType(value) {
   const text = String(value || '').toUpperCase();
   if (text === 'TELEMEDICINE' || text === 'TELEHEALTH') return 'Telemedicine';
   if (text === 'HOME_VISIT') return 'Home Visit';
+  if (text === 'CLINIC_VISIT' || text === 'IN_PERSON' || text === 'CONSULTATION') return 'Clinic Visit';
   return 'Clinic Visit';
 }
 
@@ -100,12 +101,12 @@ function buildCreatePayload(form, bookingType, patientId) {
   if (Number.isNaN(start.getTime())) throw new Error('Invalid date/time');
   const end = new Date(start.getTime() + 30 * 60 * 1000);
 
-  const typeMap = { telemedicine: 'TELEMEDICINE', home: 'HOME_VISIT', clinic: 'CONSULTATION' };
+  const typeMap = { telemedicine: 'TELEMEDICINE', home: 'HOME_VISIT', clinic: 'CLINIC_VISIT' };
   const roleMap = { telemedicine: 'DOCTOR',       home: 'CHW',        clinic: 'DOCTOR' };
 
   return {
     patientId,
-    type:         typeMap[bookingType] ?? 'CONSULTATION',
+    type:         typeMap[bookingType] ?? 'CLINIC_VISIT',
     providerRole: roleMap[bookingType] ?? 'DOCTOR',
     location:
       bookingType === 'telemedicine' ? 'Video Consultation'
