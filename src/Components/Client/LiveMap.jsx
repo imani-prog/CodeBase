@@ -76,10 +76,11 @@ const LiveMap = ({ userLocation, ambulances = [], chws = [], view = 'all', class
   }
 
   return (
-    <div className={className}>
+    <div className={`live-map-shell relative z-0 ${className}`}>
       <MapContainer
         center={[patientPoint.lat, patientPoint.lng]}
         zoom={13}
+        className="z-0"
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer

@@ -331,6 +331,20 @@ const normalizeDispatchStatus = (status) => String(status || 'REQUESTED').trim()
 
 const isActiveDispatch = (status) => ACTIVE_EMERGENCY_STATUSES.has(normalizeDispatchStatus(status));
 
+const dispatchStatusTone = (status) => {
+  const normalized = normalizeDispatchStatus(status);
+  if (['DISPATCHED', 'EN_ROUTE', 'ON_SCENE', 'IN_PROGRESS', 'ACCEPTED', 'ASSIGNED'].includes(normalized)) {
+    return 'bg-blue-50 text-blue-700 border border-blue-200';
+  }
+  if (['COMPLETED', 'RESOLVED', 'CLOSED'].includes(normalized)) {
+    return 'bg-green-50 text-green-700 border border-green-200';
+  }
+  if (['CANCELLED', 'REJECTED', 'FAILED'].includes(normalized)) {
+    return 'bg-red-50 text-red-700 border border-red-200';
+  }
+  return 'bg-amber-50 text-amber-700 border border-amber-200';
+};
+
 const Emergency = () => {
   const [activeTab, setActiveTab] = useState('ambulance');
   const [showMap, setShowMap] = useState(false);
@@ -660,7 +674,7 @@ const Emergency = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-gray-50">
       {/* Header */}
       <div className="rounded-lg p-2.5">
         <div className="flex items-center gap-2">
@@ -716,7 +730,7 @@ const Emergency = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center gap-2 ${
                   activeTab === tab.id
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-800 hover:text-gray-900 hover:border-gray-300'
@@ -746,7 +760,7 @@ const Emergency = () => {
             </div>
 
             {/* Live map view — desktop only (lg+) */}
-            <div className="hidden lg:block border border-gray-200 overflow-hidden">
+            <div className="hidden lg:block border border-gray-200 overflow-hidden relative z-0 rounded-lg">
               <div className="px-5 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -773,7 +787,7 @@ const Emergency = () => {
             </div>
 
             {/* CHW List */}
-            <div className="p-3">
+            <div className="p-3 border border-gray-200 rounded-lg bg-white">
               <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
                 <Users className="w-4 h-4 mr-2 text-blue-600" />
                 Available Community Health Workers Near You
@@ -864,46 +878,172 @@ const Emergency = () => {
         {/* Order Ambulance Tab */}
         {activeTab === 'ambulance' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-end lg:hidden">
-              <button
-                onClick={() => openMapOverlay('ambulance')}
-                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm"
-              >
-                <MapIcon className="w-4 h-4 text-blue-600" />
-                <span>Open Live Map</span>
-              </button>
-            </div>
+            {/* Live order tracking and history */}
+            <section className="p-4 grid grid-cols-1 gap-4 border border-gray-200 rounded-lg ">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">Your Emergency Orders</h3>
+                  <p className="text-xs text-gray-500">Track active and recent requests in one place.</p>
+                </div>
+                <button
+                  onClick={() => fetchDispatchData()}
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 rounded border border-gray-200"
+                >
+                  Refresh
+                </button>
+              </div>
 
-            {/* Live map view — desktop only (lg+) */}
-            <div className="hidden lg:block border border-gray-200 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-blue-600" />
-                      {mapMeta.ambulance.title}
-                    </h2>
-                    <p className="text-sm text-gray-500 mt-0.5">{mapMeta.ambulance.subtitle}</p>
+              {!dispatchLoading && !dispatchError && dispatchPermissionDenied && (
+                <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
+                  Live history access is restricted for this role. Showing your recently ordered ambulances.
+                </div>
+              )}
+
+              {dispatchLoading ? (
+                <div className="text-sm text-gray-500">Loading your emergency requests...</div>
+              ) : dispatchError ? (
+                <div className="text-sm text-red-600">{dispatchError}</div>
+              ) : patientDispatches.length === 0 ? (
+                <div className="text-sm text-gray-500">No emergency orders yet.</div>
+              ) : (
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                  <section className="space-y-2">
+                    <p className="text-xs uppercase tracking-wide font-semibold text-blue-700">Active Requests</p>
+                    {activeDispatches.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {activeDispatches.slice(0, 4).map((order, index) => (
+                          <article
+                            key={`active-${order.backendId || order.incidentId || index}`}
+                            className="rounded-lg border border-blue-200 bg-blue-50 p-3"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm font-semibold text-gray-900 leading-tight">
+                                {order.ambulanceName}
+                              </p>
+                              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>
+                                {order.statusLabel}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1">{order.incidentType}</p>
+                            <div className="mt-2 space-y-1 text-xs text-gray-700">
+                              <p>ETA: {order.estimatedResponse}</p>
+                              <p>{order.requestedAtLabel}</p>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-500">
+                        No active requests right now.
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-2">
+                    <p className="text-xs uppercase tracking-wide font-semibold text-gray-600">Recent Requests</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {patientDispatches.slice(0, 4).map((order, index) => (
+                        <article
+                          key={`history-${order.backendId || order.incidentId || index}`}
+                          className="rounded-lg border border-gray-200 bg-gray-50 p-3"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-sm font-semibold text-gray-900 leading-tight">
+                              {order.ambulanceName}
+                            </p>
+                            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>
+                              {order.statusLabel}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-600 mt-1">{order.incidentType}</p>
+                          <div className="mt-2 space-y-1 text-xs text-gray-700">
+                            <p>{order.requestedAtLabel}</p>
+                            <p className="truncate">Unit: {order.vehiclePlate || 'Pending assignment'}</p>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+              )}
+            </section>
+
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+              <div className="xl:col-span-8 space-y-4">
+                <div className="flex items-center justify-end lg:hidden">
+                  <button
+                    onClick={() => openMapOverlay('ambulance')}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                  >
+                    <MapIcon className="w-4 h-4 text-blue-600" />
+                    <span>Open Live Map</span>
+                  </button>
+                </div>
+
+                {/* Live map view — desktop only (lg+) */}
+                <div className="hidden lg:block border border-gray-200 overflow-hidden rounded-lg relative z-0">
+                  <div className="px-5 py-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-blue-600" />
+                          {mapMeta.ambulance.title}
+                        </h2>
+                        <p className="text-sm text-gray-500 mt-0.5">{mapMeta.ambulance.subtitle}</p>
+                      </div>
+                      <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+                        {mapMeta.ambulance.badgeLabel}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
-                    {mapMeta.ambulance.badgeLabel}
-                  </span>
+
+                  <LiveMap
+                    userLocation={userLocation}
+                    ambulances={ambulances}
+                    chws={communityHealthWorkers}
+                    view="ambulance"
+                    className="w-full h-[420px] xl:h-[500px]"
+                  />
                 </div>
               </div>
 
+              <aside className="xl:col-span-4 space-y-4">
+                <EmergencyFeatures
+                  dispatchHistory={patientDispatches}
+                  activeDispatches={activeDispatches}
+                  userLocation={userLocation}
+                />
 
-              
-              <LiveMap
-                userLocation={userLocation}
-                ambulances={ambulances}
-                chws={communityHealthWorkers}
-                view="ambulance"
-                className="w-full h-[420px] xl:h-[500px]"
-              />
+                {/* Emergency Tips */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <h3 className="text-sm font-bold text-yellow-900 mb-1.5 flex items-center">
+                    <AlertCircle className="w-3 h-3 mr-1.5" />
+                    While waiting for the ambulance:
+                  </h3>
+                  <ul className="space-y-1.5 text-xs text-yellow-800">
+                    <li className="flex items-start">
+                      <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
+                      <span>Stay calm and keep the patient comfortable</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
+                      <span>Keep your phone nearby for communication</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
+                      <span>Have someone wait outside to guide the ambulance</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
+                      <span>Gather any relevant medical documents or medications</span>
+                    </li>
+                  </ul>
+                </div>
+              </aside>
             </div>
 
             {/* Ambulance List */}
-            <div className="p-3">
+            <div className="p-3 border border-gray-200 rounded-lg ">
               <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
                 <Ambulance className="w-4 h-4 mr-2 text-blue-600" />
                 Available Ambulances Near You
@@ -927,7 +1067,7 @@ const Emergency = () => {
                   No ambulances are currently available.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2">
                   {ambulances.map((ambulance) => (
                     <div
                       key={ambulance.id}
@@ -1000,100 +1140,14 @@ const Emergency = () => {
                 </div>
               )}
             </div>
-
-            {/* Live order tracking and history */}
-            <div className="p-3 space-y-3 border border-gray-200 rounded-lg">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-bold text-gray-900">Your Emergency Orders</h3>
-                <button
-                  onClick={() => fetchDispatchData()}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 rounded border border-gray-200"
-                >
-                  Refresh
-                </button>
-              </div>
-
-              {!dispatchLoading && !dispatchError && dispatchPermissionDenied && (
-                <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
-                  Live history access is restricted for this role. Showing your recently ordered ambulances.
-                </div>
-              )}
-
-              {dispatchLoading ? (
-                <div className="text-sm text-gray-500">Loading your emergency requests...</div>
-              ) : dispatchError ? (
-                <div className="text-sm text-red-600">{dispatchError}</div>
-              ) : patientDispatches.length === 0 ? (
-                <div className="text-sm text-gray-500">No emergency orders yet.</div>
-              ) : (
-                <>
-                  {activeDispatches.length > 0 && (
-                    <div className="p-3 rounded-lg border border-blue-200 bg-blue-50">
-                      <p className="text-xs text-blue-700 font-semibold mb-1">Active Request</p>
-                      <p className="text-sm font-bold text-gray-900">{activeDispatches[0].ambulanceName}</p>
-                      <div className="mt-1 flex flex-wrap gap-2 text-xs text-gray-700">
-                        <span className="px-2 py-0.5 rounded bg-white border border-blue-100">{activeDispatches[0].statusLabel}</span>
-                        <span>ETA: {activeDispatches[0].estimatedResponse}</span>
-                        <span>{activeDispatches[0].requestedAtLabel}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    {patientDispatches.slice(0, 4).map((order) => (
-                      <div key={order.backendId || order.incidentId} className="p-2 border border-gray-200 rounded">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-semibold text-gray-900 truncate">{order.ambulanceName}</p>
-                          <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-gray-100 text-gray-700">{order.statusLabel}</span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-0.5">{order.incidentType} • {order.requestedAtLabel}</p>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Emergency Tips */}
-            <div className="bg-yellow-50 w-full lg:w-3/4 xl:w-1/2 border border-yellow-200 rounded-lg p-3">
-              <h3 className="text-sm font-bold text-yellow-900 mb-1.5 flex items-center">
-                <AlertCircle className="w-3 h-3 mr-1.5" />
-                While waiting for the ambulance:
-              </h3>
-              <ul className="space-y-1.5 text-xs text-yellow-800">
-                <li className="flex items-start">
-                  <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
-                  <span>Stay calm and keep the patient comfortable</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
-                  <span>Keep your phone nearby for communication</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
-                  <span>Have someone wait outside to guide the ambulance</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
-                  <span>Gather any relevant medical documents or medications</span>
-                </li>
-              </ul>
-            </div>
           </div>
         )}
       </div>
 
-      {/* Emergency Features Component */}
-      <EmergencyFeatures
-        dispatchHistory={patientDispatches}
-        activeDispatches={activeDispatches}
-        userLocation={userLocation}
-      />
-
       {/* Full-screen map overlay — mobile/tablet only */}
       {showMap && (
-        <div className="lg:hidden fixed inset-0 z-50 flex flex-col bg-white">
-          <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm shrink-0">
+        <div className="lg:hidden fixed inset-x-0 bottom-0 top-16 z-30 flex flex-col bg-white">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shadow-sm shrink-0">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-blue-600" />
               <div>
