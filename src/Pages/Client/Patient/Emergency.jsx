@@ -20,6 +20,17 @@ import { patientApi } from '../../../API/endpoints/patientApi.js';
 import LiveMap from '../../../Components/Client/LiveMap.jsx';
 
 const DEFAULT_LOCATION = { lat: -1.286389, lng: 36.817223 };
+const EMERGENCY_ORDERS_UPDATED_EVENT = 'patient-emergency-orders-updated';
+const PATIENT_EMERGENCY_ORDERS_STORAGE_KEY = 'patient-emergency-orders-v1';
+const ACTIVE_EMERGENCY_STATUSES = new Set([
+  'REQUESTED',
+  'ASSIGNED',
+  'DISPATCHED',
+  'EN_ROUTE',
+  'ON_SCENE',
+  'IN_PROGRESS',
+  'ACCEPTED',
+]);
 
 const toArray = (payload) => {
   if (Array.isArray(payload)) return payload;
@@ -29,6 +40,48 @@ const toArray = (payload) => {
   if (Array.isArray(payload?.results)) return payload.results;
   if (payload?.data && typeof payload.data === 'object') return toArray(payload.data);
   return [];
+};
+
+const readPersistedEmergencyOrders = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(PATIENT_EMERGENCY_ORDERS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writePersistedEmergencyOrders = (rows = []) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(
+      PATIENT_EMERGENCY_ORDERS_STORAGE_KEY,
+      JSON.stringify(Array.isArray(rows) ? rows.slice(0, 100) : [])
+    );
+  } catch {
+    // ignore persistence failures
+  }
+};
+
+const mergeDispatchRows = (primaryRows = [], secondaryRows = []) => {
+  const byKey = new Map();
+  [...toArray(secondaryRows), ...toArray(primaryRows)].forEach((row) => {
+    if (!row || typeof row !== 'object') return;
+    const key = String(row.id ?? row.incidentId ?? row.backendId ?? `${row.patientId || ''}-${row.createdAt || row.requestTime || ''}`);
+    if (!key) return;
+    byKey.set(key, row);
+  });
+  return Array.from(byKey.values());
+};
+
+const isPermissionDeniedError = (error) => {
+  const status = Number(error?.status || 0);
+  if (status === 401 || status === 403) return true;
+  const message = String(error?.message || '').toLowerCase();
+  return message.includes('access denied') || message.includes('forbidden') || message.includes('unauthorized');
 };
 
 const toNumberOrNull = (value) => {
@@ -224,6 +277,7 @@ const normalizeAmbulance = (row = {}, userLocation) => {
   return {
     id: row.id,
     backendId: row.id,
+    vehiclePlate,
     name: row.name || `MediLink Ambulance ${vehiclePlate}`,
     type,
     distance: formatDistance(row.estimatedDistance ?? row.distanceKm ?? row.distance, userLocation, getLocationFromRow(row)),
@@ -247,6 +301,36 @@ const extractPatientName = (patient) => {
     .trim();
 };
 
+const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
+
+const normalizeName = (value) =>
+  String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+
+const toTimestamp = (value) => {
+  const date = new Date(value || '');
+  const ms = date.getTime();
+  return Number.isNaN(ms) ? 0 : ms;
+};
+
+const formatDateTime = (value) => {
+  const date = new Date(value || '');
+  if (Number.isNaN(date.getTime())) return 'N/A';
+  return date.toLocaleString('en-KE', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const normalizeDispatchStatus = (status) => String(status || 'REQUESTED').trim().toUpperCase();
+
+const isActiveDispatch = (status) => ACTIVE_EMERGENCY_STATUSES.has(normalizeDispatchStatus(status));
+
 const Emergency = () => {
   const [activeTab, setActiveTab] = useState('ambulance');
   const [showMap, setShowMap] = useState(false);
@@ -266,6 +350,10 @@ const Emergency = () => {
   const [ambulanceError, setAmbulanceError] = useState('');
   const [orderSubmitting, setOrderSubmitting] = useState(false);
   const [orderError, setOrderError] = useState('');
+  const [dispatchRows, setDispatchRows] = useState(() => readPersistedEmergencyOrders());
+  const [dispatchLoading, setDispatchLoading] = useState(true);
+  const [dispatchError, setDispatchError] = useState('');
+  const [dispatchPermissionDenied, setDispatchPermissionDenied] = useState(false);
 
   const communityHealthWorkers = useMemo(() => {
     return toArray(chwRows)
@@ -278,6 +366,89 @@ const Emergency = () => {
       .map((row) => normalizeAmbulance(row, userLocation))
       .sort((a, b) => Number(b.available) - Number(a.available));
   }, [ambulanceRows, userLocation]);
+
+  const patientDispatches = useMemo(() => {
+    const profileId = patientProfile?.id ? String(patientProfile.id) : '';
+    const profilePhone = normalizePhone(patientProfile?.phone || patientProfile?.phoneNumber || '');
+    const profileName = normalizeName(extractPatientName(patientProfile));
+    const ambulanceNameById = new Map(ambulances.map((ambulance) => [String(ambulance.backendId), ambulance.name]));
+    const ambulanceStatusById = new Map(ambulances.map((ambulance) => [String(ambulance.backendId), normalizeDispatchStatus(ambulance.status)]));
+    const ambulanceStatusByPlate = new Map(ambulances.map((ambulance) => [String(ambulance.vehiclePlate || '').toUpperCase(), normalizeDispatchStatus(ambulance.status)]));
+
+    const normalized = toArray(dispatchRows)
+      .map((row) => {
+        const timestamp = row.requestTime || row.createdAt || row.updatedAt || row.dispatchTime;
+        const dispatchStatus = normalizeDispatchStatus(row.status);
+        const pickupAddress = [row.pickupAddressLine1, row.pickupAddressLine2, row.pickupCity]
+          .filter(Boolean)
+          .join(', ') || row.pickupLocation || row.location || 'N/A';
+        const vehiclePlate = row.vehiclePlate || row.ambulance?.vehiclePlate || row.ambulanceUnitId || 'Pending assignment';
+        const hasAssignedVehicle = vehiclePlate !== 'Pending assignment';
+        const matchedAmbulanceStatus =
+          ambulanceStatusById.get(String(row.ambulanceId || '')) ||
+          ambulanceStatusByPlate.get(String(vehiclePlate || '').toUpperCase()) ||
+          null;
+
+        const status =
+          matchedAmbulanceStatus && ['REQUESTED', 'PENDING'].includes(dispatchStatus)
+            ? matchedAmbulanceStatus
+            : dispatchStatus;
+
+        return {
+          backendId: row.id,
+          incidentId: row.incidentId || `EMG-${row.id}`,
+          status,
+          statusLabel: titleCase(status, 'Requested'),
+          priority: titleCase(row.priority || 'HIGH', 'High'),
+          patientId: row.patientId,
+          patientName: row.patientName || '',
+          callerName: row.callerName || '',
+          callerPhone: row.callerPhone || '',
+          incidentType: titleCase(row.incidentType || 'MEDICAL_EMERGENCY', 'Medical Emergency'),
+          requestedAt: timestamp,
+          requestedAtMs: toTimestamp(timestamp),
+          requestedAtLabel: formatDateTime(timestamp),
+          pickupAddress,
+          destination:
+            row.dropoffAddressLine1 ||
+            row.hospitalName ||
+            row.destination ||
+            'Nearest Hospital',
+          vehiclePlate,
+          ambulanceName:
+            ambulanceNameById.get(String(row.ambulanceId || '')) ||
+            row.ambulance?.name ||
+            row.ambulanceName ||
+            (hasAssignedVehicle
+              ? `Ambulance ${vehiclePlate}`
+              : `Status: ${titleCase(status, 'Requested')}`),
+          estimatedResponse: row.estimatedResponseTime || row.estimatedResponse || 'Pending',
+          estimatedDistance: row.estimatedDistance || '',
+          notes: row.specialInstructions || row.notes || '',
+          raw: row,
+        };
+      })
+      .filter((item) => {
+        if (!patientProfile) return true;
+        if (profileId && String(item.patientId || '') === profileId) return true;
+        const callerPhone = normalizePhone(item.callerPhone);
+        if (profilePhone && callerPhone && callerPhone.endsWith(profilePhone.slice(-9))) return true;
+
+        const patientName = normalizeName(item.patientName);
+        const callerName = normalizeName(item.callerName);
+        if (profileName && (patientName === profileName || callerName === profileName)) return true;
+
+        return false;
+      })
+      .sort((a, b) => b.requestedAtMs - a.requestedAtMs);
+
+    return normalized;
+  }, [dispatchRows, patientProfile, ambulances]);
+
+  const activeDispatches = useMemo(
+    () => patientDispatches.filter((item) => isActiveDispatch(item.status)),
+    [patientDispatches]
+  );
 
   const fetchPatientProfile = useCallback(async () => {
     try {
@@ -308,9 +479,9 @@ const Emergency = () => {
     try {
       let payload;
       try {
-        payload = await ambulanceApi.listAvailable();
-      } catch {
         payload = await ambulanceApi.list();
+      } catch {
+        payload = await ambulanceApi.listAvailable();
       }
 
       let trackingPayload = [];
@@ -328,6 +499,34 @@ const Emergency = () => {
       setAmbulanceError(err?.message || 'Failed to load ambulances.');
     } finally {
       setLoadingAmbulances(false);
+    }
+  }, []);
+
+  const fetchDispatchData = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) {
+      setDispatchLoading(true);
+      setDispatchError('');
+    }
+
+    try {
+      const payload = await ambulanceApi.listDispatches();
+      const mergedRows = mergeDispatchRows(toArray(payload), readPersistedEmergencyOrders());
+      setDispatchRows(mergedRows);
+      writePersistedEmergencyOrders(mergedRows);
+      setDispatchPermissionDenied(false);
+    } catch (err) {
+      if (isPermissionDeniedError(err)) {
+        const persisted = readPersistedEmergencyOrders();
+        setDispatchRows(persisted);
+        setDispatchPermissionDenied(true);
+        setDispatchError('');
+      } else {
+        setDispatchError(err?.message || 'Failed to load emergency requests.');
+      }
+    } finally {
+      if (!silent) {
+        setDispatchLoading(false);
+      }
     }
   }, []);
 
@@ -351,7 +550,8 @@ const Emergency = () => {
     fetchPatientProfile();
     fetchChwData();
     fetchAmbulanceData();
-  }, [fetchPatientProfile, fetchChwData, fetchAmbulanceData]);
+    fetchDispatchData();
+  }, [fetchPatientProfile, fetchChwData, fetchAmbulanceData, fetchDispatchData]);
 
   const handleCallCHW = (chw) => {
     setSelectedCHW(chw);
@@ -393,9 +593,37 @@ const Emergency = () => {
     setOrderSubmitting(true);
     setOrderError('');
     try {
-      await ambulanceApi.requestAssistance(payload);
+      const createdDispatch = await ambulanceApi.requestAssistance(payload);
+      const fallbackDispatch = {
+        id: createdDispatch?.id || `local-${Date.now()}`,
+        incidentId: createdDispatch?.incidentId,
+        status: createdDispatch?.status || 'REQUESTED',
+        patientId: payload.patientId,
+        patientName: payload.patientName,
+        callerName: payload.callerName,
+        callerPhone: payload.callerPhone,
+        incidentType: payload.incidentType,
+        vehiclePlate: selectedAmbulance.vehiclePlate || selectedAmbulance.backendId || 'Pending assignment',
+        ambulanceId: selectedAmbulance.backendId,
+        estimatedResponseTime: selectedAmbulance.eta,
+        estimatedDistance: selectedAmbulance.distance,
+        pickupAddressLine1: payload.pickupAddressLine1,
+        pickupCity: payload.pickupCity,
+        requestTime: createdDispatch?.requestTime || new Date().toISOString(),
+        createdAt: createdDispatch?.createdAt || new Date().toISOString(),
+      };
+
+      const mergedRows = mergeDispatchRows([createdDispatch || fallbackDispatch], dispatchRows);
+      setDispatchRows(mergedRows);
+      writePersistedEmergencyOrders(mergedRows);
+
       setOrderConfirmed(true);
       await fetchAmbulanceData();
+      await fetchDispatchData({ silent: true });
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(EMERGENCY_ORDERS_UPDATED_EVENT));
+      }
 
       setTimeout(() => {
         setShowAmbulanceModal(false);
@@ -773,6 +1001,59 @@ const Emergency = () => {
               )}
             </div>
 
+            {/* Live order tracking and history */}
+            <div className="p-3 space-y-3 border border-gray-200 rounded-lg">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-bold text-gray-900">Your Emergency Orders</h3>
+                <button
+                  onClick={() => fetchDispatchData()}
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 rounded border border-gray-200"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {!dispatchLoading && !dispatchError && dispatchPermissionDenied && (
+                <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
+                  Live history access is restricted for this role. Showing your recently ordered ambulances.
+                </div>
+              )}
+
+              {dispatchLoading ? (
+                <div className="text-sm text-gray-500">Loading your emergency requests...</div>
+              ) : dispatchError ? (
+                <div className="text-sm text-red-600">{dispatchError}</div>
+              ) : patientDispatches.length === 0 ? (
+                <div className="text-sm text-gray-500">No emergency orders yet.</div>
+              ) : (
+                <>
+                  {activeDispatches.length > 0 && (
+                    <div className="p-3 rounded-lg border border-blue-200 bg-blue-50">
+                      <p className="text-xs text-blue-700 font-semibold mb-1">Active Request</p>
+                      <p className="text-sm font-bold text-gray-900">{activeDispatches[0].ambulanceName}</p>
+                      <div className="mt-1 flex flex-wrap gap-2 text-xs text-gray-700">
+                        <span className="px-2 py-0.5 rounded bg-white border border-blue-100">{activeDispatches[0].statusLabel}</span>
+                        <span>ETA: {activeDispatches[0].estimatedResponse}</span>
+                        <span>{activeDispatches[0].requestedAtLabel}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {patientDispatches.slice(0, 4).map((order) => (
+                      <div key={order.backendId || order.incidentId} className="p-2 border border-gray-200 rounded">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{order.ambulanceName}</p>
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-gray-100 text-gray-700">{order.statusLabel}</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5">{order.incidentType} • {order.requestedAtLabel}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
             {/* Emergency Tips */}
             <div className="bg-yellow-50 w-full lg:w-3/4 xl:w-1/2 border border-yellow-200 rounded-lg p-3">
               <h3 className="text-sm font-bold text-yellow-900 mb-1.5 flex items-center">
@@ -803,7 +1084,11 @@ const Emergency = () => {
       </div>
 
       {/* Emergency Features Component */}
-      <EmergencyFeatures />
+      <EmergencyFeatures
+        dispatchHistory={patientDispatches}
+        activeDispatches={activeDispatches}
+        userLocation={userLocation}
+      />
 
       {/* Full-screen map overlay — mobile/tablet only */}
       {showMap && (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Calendar,
   Video,
@@ -20,6 +20,66 @@ import { httpClient } from '../../../API/clients/httpClient.js';
 const fetchMyProfile   = ()           => httpClient.get('/api/patients/me');
 const fetchAppointments = (patientId) => httpClient.get(`/api/appointments/patient/${patientId}`);
 const fetchHealthRecords = (patientId) => httpClient.get(`/api/health-records/patient/${patientId}`);
+const fetchEmergencyDispatches = ()    => httpClient.get('/api/assist');
+const EMERGENCY_ORDERS_UPDATED_EVENT = 'patient-emergency-orders-updated';
+const PATIENT_EMERGENCY_ORDERS_STORAGE_KEY = 'patient-emergency-orders-v1';
+
+const toArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (payload?.data && typeof payload.data === 'object') return toArray(payload.data);
+  return [];
+};
+
+const readPersistedEmergencyOrders = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(PATIENT_EMERGENCY_ORDERS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const mergeDispatchRows = (primaryRows = [], secondaryRows = []) => {
+  const byKey = new Map();
+  [...toArray(secondaryRows), ...toArray(primaryRows)].forEach((row) => {
+    if (!row || typeof row !== 'object') return;
+    const key = String(row.id ?? row.incidentId ?? `${row.patientId || ''}-${row.createdAt || row.requestTime || ''}`);
+    if (!key) return;
+    byKey.set(key, row);
+  });
+  return Array.from(byKey.values());
+};
+
+const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
+
+const normalizeName = (value) =>
+  String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+
+const extractPatientName = (patient) => {
+  if (!patient) return '';
+  const fullName = String(patient.fullName || patient.name || '').trim();
+  if (fullName) return fullName;
+  return [patient.firstName, patient.middleName, patient.lastName]
+    .map((part) => String(part || '').trim())
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+};
+
+const toTimestamp = (value) => {
+  const date = new Date(value || '');
+  const ms = date.getTime();
+  return Number.isNaN(ms) ? 0 : ms;
+};
 
 // ── Date helpers ───────────────────────────────────────────────────────
 const isUpcoming = (scheduledAt) => {
@@ -43,36 +103,45 @@ const PatientDashboard = () => {
   const [patient,     setPatient]     = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [healthRecords, setHealthRecords] = useState([]);
+  const [emergencyDispatches, setEmergencyDispatches] = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState(null);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const loadDashboard = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        // Step 1 — get patient profile
-        const patientData = await fetchMyProfile();
-        setPatient(patientData);
+      const patientData = await fetchMyProfile();
+      setPatient(patientData);
 
-        // Step 2 — fetch appointments + health records in parallel
-        const [apptData, recordsData] = await Promise.all([
-          fetchAppointments(patientData.id),
-          fetchHealthRecords(patientData.id),
-        ]);
+      const [apptData, recordsData, dispatchData] = await Promise.all([
+        fetchAppointments(patientData.id),
+        fetchHealthRecords(patientData.id),
+        fetchEmergencyDispatches().catch(() => []),
+      ]);
 
-        setAppointments(Array.isArray(apptData) ? apptData : []);
-        setHealthRecords(Array.isArray(recordsData) ? recordsData : []);
-      } catch (err) {
-        setError(err.message || 'Failed to load dashboard');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
+      setAppointments(Array.isArray(apptData) ? apptData : []);
+      setHealthRecords(Array.isArray(recordsData) ? recordsData : []);
+      setEmergencyDispatches(mergeDispatchRows(toArray(dispatchData), readPersistedEmergencyOrders()));
+    } catch (err) {
+      setError(err.message || 'Failed to load dashboard');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
+
+  useEffect(() => {
+    const onEmergencyOrderUpdated = () => {
+      loadDashboard();
+    };
+    window.addEventListener(EMERGENCY_ORDERS_UPDATED_EVENT, onEmergencyOrderUpdated);
+    return () => window.removeEventListener(EMERGENCY_ORDERS_UPDATED_EVENT, onEmergencyOrderUpdated);
+  }, [loadDashboard]);
 
   // ── Derived data ─────────────────────────────────────────────────────
 
@@ -89,11 +158,31 @@ const PatientDashboard = () => {
     r => (r.recordType ?? '').toLowerCase().includes('lab') && r.status === 'PENDING'
   ).length;
 
+  const patientDispatches = toArray(emergencyDispatches)
+    .filter((dispatch) => {
+      if (!patient) return false;
+      if (String(dispatch.patientId || '') === String(patient.id || '')) return true;
+
+      const patientPhone = normalizePhone(patient.phone || patient.phoneNumber || '');
+      const callerPhone = normalizePhone(dispatch.callerPhone || '');
+      if (patientPhone && callerPhone && callerPhone.endsWith(patientPhone.slice(-9))) return true;
+
+      const patientName = normalizeName(extractPatientName(patient));
+      const dispatchPatientName = normalizeName(dispatch.patientName || '');
+      const dispatchCallerName = normalizeName(dispatch.callerName || '');
+      if (patientName && (dispatchPatientName === patientName || dispatchCallerName === patientName)) return true;
+
+      return false;
+    })
+    .sort((a, b) => toTimestamp(b.requestTime || b.createdAt) - toTimestamp(a.requestTime || a.createdAt));
+
+  const emergencyOrdersCount = patientDispatches.length;
+
   const healthStats = [
     { label: 'Upcoming Visits',      value: upcomingAppointments.length, icon: Calendar },
     { label: 'Active Prescriptions', value: activePresciptions,          icon: Pill },
     { label: 'Pending Results',      value: pendingResults,              icon: Clock },
-    { label: 'Emergency Orders',     value: 0,                           icon: AlertCircle },
+    { label: 'Emergency Orders',     value: emergencyOrdersCount,         icon: AlertCircle },
   ];
 
   // Build recent activity from latest health records + appointments
@@ -111,6 +200,13 @@ const PatientDashboard = () => {
       text:  `Appointment ${(a.status ?? '').toLowerCase()} — ${a.providerName ?? a.doctorName ?? 'Provider'}`,
       time:  formatRelativeTime(a.createdAt ?? a.scheduledAt),
       color: 'text-blue-600',
+    })),
+    ...patientDispatches.slice(0, 2).map((dispatch) => ({
+      id: `emg-${dispatch.id}`,
+      icon: AlertCircle,
+      text: `Emergency request ${(dispatch.status ?? 'REQUESTED').toLowerCase()} — ${dispatch.vehiclePlate || dispatch.ambulanceUnitId || 'Ambulance pending'}`,
+      time: formatRelativeTime(dispatch.requestTime ?? dispatch.createdAt),
+      color: 'text-red-600',
     })),
   ]
     .filter(item => item.time)
