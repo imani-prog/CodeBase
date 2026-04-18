@@ -75,7 +75,7 @@ import ViewHistorySessionModal from '../../Components/Admin/ViewHistorySessionMo
 import ViewPrescriptionModal from '../../Components/Admin/ViewPrescriptionModal';
 import DownloadReportModal from '../../Components/Admin/DownloadReportModal';
 import { telemedicineService } from '../../Services/domain/telemedicineService.js';
-
+import JitsiCallModal from '../../Components/JitsiCallModal';
 
 const TelemedicineManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -100,6 +100,14 @@ const TelemedicineManagement = () => {
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [showDownloadReportModal, setShowDownloadReportModal] = useState(false);
   const [selectedHistorySession, setSelectedHistorySession] = useState(null);
+
+  const [showJitsiCall, setShowJitsiCall] = useState(false);
+  const [jitsiSession, setJitsiSession]   = useState(null);
+
+  const handleJoinLiveSession = (session) => {
+  setJitsiSession(session);
+  setShowJitsiCall(true);
+};
 
   // Platform settings state
   const [platformSettings, setPlatformSettings] = useState({
@@ -1070,6 +1078,16 @@ const formatIfDate = (value) => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
+{!isEnded && (
+  <button
+    onClick={() => handleJoinLiveSession(session)}
+    className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+    title="Join live call"
+  >
+    <Video className="w-4 h-4" />
+  </button>
+)}
+
                       {!isEnded && (
                         isPaused ? (
                           <button
@@ -2010,6 +2028,21 @@ const formatIfDate = (value) => {
         onClose={() => { setShowDownloadReportModal(false); setSelectedHistorySession(null); }}
         session={selectedHistorySession}
       />
+
+      <JitsiCallModal
+  isOpen={showJitsiCall}
+  onClose={() => {
+    setShowJitsiCall(false);
+    setJitsiSession(null);
+  }}
+  roomName={jitsiSession?.id}
+  userInfo={{ displayName: 'Doctor / Admin' }}
+  title={
+    jitsiSession
+      ? `${jitsiSession.patient} · ${jitsiSession.doctor}`
+      : ''
+  }
+/>
     </div>
   );
 };

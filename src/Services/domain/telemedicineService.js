@@ -3,6 +3,7 @@ import { telemedicineApi } from "../../API/endpoints/telemedicineApi.js";
 export const telemedicineService = {
   createSession: (payload) => telemedicineApi.createSession(payload),
   listSessions: (params = {}) => telemedicineApi.listSessions(params),
+  getSessionsByPatient: (patientId, params = {}) => telemedicineApi.getSessionsByPatient(patientId, params),
   getSessionById: (id) => telemedicineApi.getSessionById(id),
   getSessionBySessionId: (sessionId) => telemedicineApi.getSessionBySessionId(sessionId),
   updateSession: (id, payload) => telemedicineApi.updateSession(id, payload),

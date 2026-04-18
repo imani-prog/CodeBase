@@ -60,6 +60,7 @@ export const API_PATHS = {
   },
   telemedicine: {
     sessions: "/api/telemedicine/sessions",
+    byPatient: (patientId) => `/api/telemedicine/sessions/by-patient/${patientId}`,
     filter: "/api/telemedicine/sessions/filter",
     byStatus: (status) => `/api/telemedicine/sessions/by-status/${status}`,
     byPlatform: (platform) => `/api/telemedicine/sessions/by-platform/${platform}`,
