@@ -1,6 +1,7 @@
 import { API_PATHS } from "../../Services/constants/apiPaths.js";
 import { httpClient } from "../clients/httpClient.js";
 
+
 export const healthRecordApi = {
   list: (params = {}) => httpClient.get(API_PATHS.healthRecords.base, { query: params }),
   getById: (id) => httpClient.get(`${API_PATHS.healthRecords.base}/${id}`),
