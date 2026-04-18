@@ -1,5 +1,12 @@
 import { useContext, createContext, useEffect, useState } from 'react';
-import { authApi, configureHttpClientHandlers, clearTokens, getRefreshToken } from '../API/index.js';
+import {
+  authApi,
+  configureHttpClientHandlers,
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+} from '../API/index.js';
 
 const AuthContext = createContext();
 const AUTH_USER_KEY = 'authUser';
@@ -9,7 +16,44 @@ const readStoredAuthUser = () => {
     const raw = window.localStorage.getItem(AUTH_USER_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
+    try {
+      window.localStorage.removeItem(AUTH_USER_KEY);
+    } catch {
+      // ignore
+    }
     return null;
+  }
+};
+
+const mapProfileToAuthUser = (profile) => {
+  const root = profile?.data ?? profile?.user ?? profile;
+  const role = String(root?.role ?? '').toLowerCase();
+  return {
+    id: root?.id ?? root?.userId ?? null,
+    username: root?.username ?? root?.fullName ?? root?.name ?? 'User',
+    role,
+    email: root?.email ?? '',
+    token: getAccessToken() ?? '',
+  };
+};
+
+const refreshAccessToken = async () => {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return false;
+
+  try {
+    const payload = await authApi.refresh({ refreshToken });
+    const nextAccessToken = payload?.accessToken || payload?.token;
+    if (!nextAccessToken) return false;
+
+    setTokens({
+      accessToken: nextAccessToken,
+      refreshToken: payload?.refreshToken || refreshToken,
+    });
+    return true;
+  } catch {
+    clearTokens();
+    return false;
   }
 };
 
@@ -30,12 +74,38 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     configureHttpClientHandlers({
+      refresh: refreshAccessToken,
       onUnauthorized: () => {
-        logout();
+        setUser(null);
+        clearTokens();
+        window.localStorage.removeItem(AUTH_USER_KEY);
         window.location.href = '/login';
       },
     });
   }, []);
+
+  useEffect(() => {
+    // Rehydrate user after reload/tab switch when token exists but authUser is missing/stale.
+    if (user || !getAccessToken()) return;
+
+    let active = true;
+    (async () => {
+      try {
+        const profile = await authApi.me();
+        if (!active) return;
+        setUser(mapProfileToAuthUser(profile));
+      } catch {
+        // If token cannot load profile, clear stale auth state.
+        if (!active) return;
+        clearTokens();
+        window.localStorage.removeItem(AUTH_USER_KEY);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   useEffect(() => {
     try {

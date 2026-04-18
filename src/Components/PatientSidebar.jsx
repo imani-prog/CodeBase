@@ -42,11 +42,11 @@ const sidebarLinks = [
     label: 'Health Records',
     icon: <FileText className="w-5 h-5 mr-3" />,
   },
-  {
-    to: '/client/patient/prescriptions',
-    label: 'Prescriptions',
-    icon: <Pill className="w-5 h-5 mr-3" />,
-  },
+  // {
+  //   to: '/client/patient/prescriptions',
+  //   label: 'Prescriptions',
+  //   icon: <Pill className="w-5 h-5 mr-3" />,
+  // },
   {
     to: '/client/patient/insurance',
     label: 'Insurance & Billing',

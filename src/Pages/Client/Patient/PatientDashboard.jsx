@@ -255,13 +255,13 @@ const PatientDashboard = () => {
         <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
           Dashboard
         </h1>
-        {patient && (
+        {/* {patient && (
           <p className="text-sm text-gray-500">
             Welcome back, <span className="font-medium text-gray-700">
               {patient.firstName ?? patient.user?.fullName ?? 'Patient'}
             </span>
           </p>
-        )}
+        )} */}
       </div>
 
       {/* Health Stats */}
