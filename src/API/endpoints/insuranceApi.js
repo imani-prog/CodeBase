@@ -2,6 +2,11 @@ import { API_PATHS } from "../../Services/constants/apiPaths.js";
 import { httpClient } from "../clients/httpClient.js";
 
 export const insuranceApi = {
+  listProviders: (params = {}) => httpClient.get(API_PATHS.insurance.providers, { query: params }),
+  getProviderById: (id) => httpClient.get(`${API_PATHS.insurance.providers}/${id}`),
+  createProvider: (payload) => httpClient.post(API_PATHS.insurance.providers, payload),
+  updateProvider: (id, payload) => httpClient.put(`${API_PATHS.insurance.providers}/${id}`, payload),
+  deleteProvider: (id) => httpClient.delete(`${API_PATHS.insurance.providers}/${id}`),
   listPlansByProvider: (providerId) => httpClient.get(`${API_PATHS.insurance.plans}/provider/${providerId}`),
   listPlansByProviderAndStatus: (providerId, status) => httpClient.get(`${API_PATHS.insurance.plans}/provider/${providerId}/status/${status}`),
   createPlan: (payload) => httpClient.post(API_PATHS.insurance.plans, payload),
