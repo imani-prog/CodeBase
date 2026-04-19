@@ -7,6 +7,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth.jsx';
 import { chwService } from '../../../Services/domain/chwService.js';
+import { auditLogService } from '../../../Services/domain/auditLogService.js';
+import { assignmentService } from '../../../Services/domain/assignmentService.js';
+import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
+import { appointmentApi } from '../../../API/endpoints/appointmentApi.js';
 
 /* ─────────────────────────────────────────
    Helpers
@@ -32,6 +36,160 @@ function statusMeta(status = '') {
   if (s === 'AVAILABLE') return { label: 'Active', colour: 'bg-green-400' };
   if (s === 'BUSY')      return { label: 'Busy',   colour: 'bg-amber-400' };
   return                         { label: 'Offline', colour: 'bg-gray-400' };
+}
+
+function toDisplayLabel(value) {
+  if (!value) return 'Action';
+  return String(value)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatRelativeTime(dateValue) {
+  if (!dateValue) return '—';
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return String(dateValue);
+
+  const diffMs = Date.now() - date.getTime();
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+
+  if (diffMs < minute) return 'Just now';
+  if (diffMs < hour) return `${Math.floor(diffMs / minute)} min ago`;
+  if (diffMs < day) return `${Math.floor(diffMs / hour)} hrs ago`;
+  return `${Math.floor(diffMs / day)} days ago`;
+}
+
+function parseLogDetails(log = {}) {
+  const raw = log.details ?? log.eventDetails ?? log.metadata;
+  if (!raw) return {};
+  if (typeof raw === 'object') return raw;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+function buildActivityAction(log = {}) {
+  const details = parseLogDetails(log);
+  if (details.action) return String(details.action);
+  if (details.message) return String(details.message);
+  if (log.description) return String(log.description);
+
+  const event = toDisplayLabel(log.eventType || 'ACTION');
+  const entity = log.entityType && log.entityType !== '-' ? ` ${toDisplayLabel(log.entityType)}` : '';
+  const entityId = log.entityId && log.entityId !== '-' ? ` #${log.entityId}` : '';
+  return `${event}${entity}${entityId}`;
+}
+
+function buildLoginDevice(log = {}) {
+  const details = parseLogDetails(log);
+  return details.device || details.deviceName || details.userAgent || 'Unknown device';
+}
+
+function buildLoginLocation(log = {}) {
+  const details = parseLogDetails(log);
+  const detailLocation = details.location
+    || [details.city, details.country].filter(Boolean).join(', ')
+    || [log.city, log.country].filter(Boolean).join(', ');
+  if (detailLocation) return detailLocation;
+  return log.ipAddress && log.ipAddress !== '-' ? log.ipAddress : 'Unknown location';
+}
+
+function normalizeListPayload(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.rows)) return payload.rows;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (payload?.data && typeof payload.data === 'object') return normalizeListPayload(payload.data);
+  return [];
+}
+
+function toNumericId(value) {
+  if (value == null) return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const text = String(value).trim();
+  if (!text) return null;
+  const strict = Number(text);
+  if (Number.isFinite(strict)) return strict;
+  const match = text.match(/\d+/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getChwIdCandidates(user, chwProfile) {
+  const rawCandidates = [
+    chwProfile?.id,
+    chwProfile?.chwId,
+    chwProfile?.user?.id,
+    user?.chwId,
+    user?.providerId,
+    user?.employeeId,
+    user?.id,
+    user?.userId,
+    toNumericId(chwProfile?.id),
+    toNumericId(chwProfile?.user?.id),
+    toNumericId(user?.chwId),
+    toNumericId(user?.providerId),
+    toNumericId(user?.employeeId),
+    toNumericId(user?.id),
+    toNumericId(user?.userId),
+  ];
+
+  const unique = new Set();
+  rawCandidates.forEach((value) => {
+    if (value == null) return;
+    const text = String(value).trim();
+    if (!text) return;
+    unique.add(text);
+  });
+
+  return Array.from(unique);
+}
+
+function getPatientDisplayName(row = {}) {
+  return row.patientName || row.patient?.fullName || row.patient?.name || 'patient';
+}
+
+function toTs(value) {
+  const ts = Date.parse(value || '');
+  return Number.isNaN(ts) ? 0 : ts;
+}
+
+function dedupeActivities(items = []) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = `${item.action}__${item.timestamp}__${item.source || 'unknown'}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function isChwAppointmentRow(row = {}, chwIdCandidates = []) {
+  const role = String(row.providerRole || row.provider?.role || '').toUpperCase();
+  const providerId = row.providerId ?? row.chwId ?? row.provider?.id ?? row.chw?.id;
+
+  if (role && role !== 'CHW') return false;
+  if (!chwIdCandidates.length) return role === 'CHW' || providerId != null;
+
+  return chwIdCandidates.some((id) => String(id) === String(providerId));
+}
+
+function toActivityFeed(entries = [], limit = 5) {
+  return dedupeActivities(entries)
+    .sort((a, b) => toTs(b.timestamp) - toTs(a.timestamp))
+    .slice(0, limit)
+    .map((entry) => ({
+      action: entry.action,
+      time: formatRelativeTime(entry.timestamp),
+    }));
 }
 
 /* ─────────────────────────────────────────
@@ -119,9 +277,188 @@ const CHWProfile = () => {
   /* Form / UI state */
   const [form, setForm]       = useState({});
   const [editMode, setEditMode]             = useState(false);
-  const [showPassword, setShowPassword]     = useState(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [notifications, setNotifications]  = useState({ email: true, sms: false, push: true, alerts: true });
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [loginSessions, setLoginSessions]   = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError]     = useState('');
+
+  const loadAuditHistory = useCallback(async (chwProfile) => {
+    setHistoryLoading(true);
+    setHistoryError('');
+
+    const chwIdCandidates = getChwIdCandidates(user, chwProfile);
+    const primaryChwId = chwIdCandidates[0] ?? null;
+
+    try {
+      const [auditResult, assignmentResult, homeVisitResult, appointmentResult] = await Promise.allSettled([
+        auditLogService.listAuditLogs({ page: 0, size: 300, sort: 'eventTime,desc' }),
+        primaryChwId != null
+          ? assignmentService.listAssignmentsByChw(primaryChwId, { size: 200 })
+          : assignmentService.listAssignments({ size: 200 }),
+        homeVisitService.listHomeVisits(primaryChwId != null ? { chwId: primaryChwId } : { size: 200 }),
+        appointmentApi.list({ size: 300 }),
+      ]);
+
+      const sourceFailures = [auditResult, assignmentResult, homeVisitResult, appointmentResult]
+        .filter((result) => result.status === 'rejected');
+      if (sourceFailures.length === 4) {
+        const reason = sourceFailures[0]?.reason;
+        setHistoryError(reason?.message || 'Unable to load activity history right now.');
+      }
+
+      const logs = auditResult.status === 'fulfilled' && Array.isArray(auditResult.value?.items)
+        ? auditResult.value.items
+        : [];
+      const assignments = assignmentResult.status === 'fulfilled' && Array.isArray(assignmentResult.value)
+        ? assignmentResult.value
+        : [];
+      const homeVisits = homeVisitResult.status === 'fulfilled' && Array.isArray(homeVisitResult.value)
+        ? homeVisitResult.value
+        : [];
+      const appointmentRows = appointmentResult.status === 'fulfilled'
+        ? normalizeListPayload(appointmentResult.value)
+        : [];
+
+      const candidateNames = [
+        user?.username,
+        chwProfile?.name,
+        [chwProfile?.firstName, chwProfile?.lastName].filter(Boolean).join(' '),
+      ]
+        .filter(Boolean)
+        .map((v) => String(v).toLowerCase());
+
+      const ownLogs = logs.filter((log) => {
+        const logUserId = log?.userId ?? null;
+        const logEntityId = log?.entityId ?? null;
+        const logRole = String(log?.userRole || '').toUpperCase();
+        const logEntityType = String(log?.entityType || '').toUpperCase();
+        const logChwCode = String(log?.details || '').toLowerCase();
+
+        if (user?.id != null && logUserId != null && String(user.id) === String(logUserId)) return true;
+        if (chwProfile?.user?.id != null && logUserId != null && String(chwProfile.user.id) === String(logUserId)) return true;
+        if (chwProfile?.id != null && logEntityId != null && String(chwProfile.id) === String(logEntityId)) return true;
+        if (logRole === 'CHW') return true;
+        if (logEntityType === 'CHW') return true;
+        if (chwProfile?.code && logChwCode.includes(String(chwProfile.code).toLowerCase())) return true;
+
+        const logIdentity = `${log?.username || ''} ${log?.fullName || ''} ${log?.userName || ''}`.toLowerCase();
+        return candidateNames.some((name) => name && logIdentity.includes(name));
+      });
+
+      const sourceLogs = ownLogs;
+
+      const accountActivities = sourceLogs
+        .filter((log) => {
+          const eventType = String(log?.eventType || '').toUpperCase();
+          const entityType = String(log?.entityType || '').toUpperCase();
+          if (['LOGIN', 'LOGOUT'].includes(eventType)) return false;
+          // Avoid noisy self-profile read events flooding activity cards.
+          if (eventType === 'READ' && entityType === 'CHW') return false;
+          return true;
+        })
+        .map((log) => ({
+          action: buildActivityAction(log),
+          timestamp: log?.performedAt || log?.eventTime || log?.updatedAt,
+          source: 'account',
+        }));
+
+      const assignmentActivities = assignments.map((item) => {
+        const status = String(item?.status || 'ASSIGNED').toUpperCase();
+        const patientName = item?.patientName || (item?.patientId ? `patient #${item.patientId}` : 'patient');
+
+        let action = `Updated assignment for ${patientName}`;
+        if (status === 'ASSIGNED') action = `Received assignment for ${patientName}`;
+        if (status === 'IN_PROGRESS' || status === 'STARTED') action = `Started assignment for ${patientName}`;
+        if (status === 'COMPLETED') action = `Completed assignment for ${patientName}`;
+        if (status === 'CANCELED' || status === 'CANCELLED') action = `Canceled assignment for ${patientName}`;
+
+        return {
+          action,
+          timestamp: item?.completedAt || item?.startedAt || item?.updatedAt || item?.assignedAt || item?.createdAt,
+          source: 'assignment',
+        };
+      });
+
+      const homeVisitActivities = homeVisits.map((visit) => {
+        const status = String(visit?.status || 'SCHEDULED').toUpperCase();
+        const patientName = visit?.patientName || (visit?.patientId ? `patient #${visit.patientId}` : 'patient');
+        const visitType = String(visit?.visitType || 'home visit').toLowerCase();
+
+        let action = `Updated ${visitType} for ${patientName}`;
+        if (status === 'SCHEDULED') action = `Scheduled ${visitType} for ${patientName}`;
+        if (status === 'IN_PROGRESS') action = `Started ${visitType} for ${patientName}`;
+        if (status === 'COMPLETED') action = `Completed ${visitType} for ${patientName}`;
+        if (status === 'CANCELED' || status === 'CANCELLED' || status === 'NO_SHOW') action = `Canceled ${visitType} for ${patientName}`;
+
+        return {
+          action,
+          timestamp: visit?.completedAt || visit?.canceledAt || visit?.updatedAt || visit?.scheduledAt || visit?.createdAt,
+          source: 'home-visit',
+        };
+      });
+
+      const appointmentActivities = appointmentRows
+        .filter((row) => isChwAppointmentRow(row, chwIdCandidates))
+        .map((row) => {
+          const status = String(row?.status || '').toUpperCase();
+          const patientName = getPatientDisplayName(row);
+
+          let action = `Updated appointment for ${patientName}`;
+          if (status === 'BOOKED' || status === 'SCHEDULED' || status === 'CONFIRMED') action = `Scheduled appointment for ${patientName}`;
+          if (status === 'COMPLETED' || status === 'CHECKED_OUT') action = `Completed appointment for ${patientName}`;
+          if (status === 'CANCELED' || status === 'CANCELLED') action = `Canceled appointment for ${patientName}`;
+          if (status === 'CHECKED_IN') action = `Checked in appointment for ${patientName}`;
+
+          return {
+            action,
+            timestamp: row?.updatedAt || row?.completedAt || row?.scheduledAt || row?.scheduledStart || row?.createdAt,
+            source: 'appointment',
+          };
+        });
+
+      const mergedActivities = [
+        ...assignmentActivities,
+        ...homeVisitActivities,
+        ...appointmentActivities,
+        ...accountActivities,
+      ].filter((entry) => entry.timestamp);
+
+      const feed = toActivityFeed(mergedActivities, 5);
+      if (feed.length > 0) {
+        setRecentActivity(feed);
+      } else {
+        // Fallback to audit-derived actions so the card is never empty when logs exist.
+        setRecentActivity(toActivityFeed(
+          sourceLogs.map((log) => ({
+            action: buildActivityAction(log),
+            timestamp: log?.performedAt || log?.eventTime || log?.updatedAt,
+            source: 'audit-fallback',
+          })),
+          5,
+        ));
+      }
+
+      const loginLogs = sourceLogs
+        .filter((log) => ['LOGIN', 'LOGOUT'].includes(String(log?.eventType || '').toUpperCase()))
+        .slice(0, 5);
+
+      setLoginSessions(
+        loginLogs.map((log, index) => {
+          const isActive = String(log?.eventType || '').toUpperCase() === 'LOGIN'
+            && String(log?.status || '').toUpperCase() === 'SUCCESS';
+
+          return {
+            device: buildLoginDevice(log),
+            location: buildLoginLocation(log),
+            time: index === 0 && isActive ? 'Current session' : formatRelativeTime(log?.performedAt || log?.eventTime),
+            status: isActive ? 'active' : 'inactive',
+          };
+        })
+      );
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, [user]);
 
   /* ── Fetch ── */
   const fetchProfile = useCallback(async () => {
@@ -139,6 +476,11 @@ const CHWProfile = () => {
   }, []);
 
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
+
+  useEffect(() => {
+    if (!chw) return;
+    loadAuditHistory(chw);
+  }, [chw, loadAuditHistory]);
 
   /* ── Field change ── */
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
@@ -200,21 +542,6 @@ const CHWProfile = () => {
     .filter(Boolean).map((w) => w[0].toUpperCase()).join('') || '??';
 
   const { label: statusLabel, colour: statusColour } = statusMeta(chw?.status);
-
-  /* Static demo data (replace with real API calls when endpoints exist) */
-  const recentActivity = [
-    { action: 'Completed home visit for patient #0234', time: '1 hr ago' },
-    { action: 'Updated health record for Mary Otieno', time: '3 hrs ago' },
-    { action: 'Submitted monthly report', time: '1 day ago' },
-    { action: 'Completed Maternal Health training module', time: '2 days ago' },
-    { action: 'Registered new patient in coverage area', time: '3 days ago' },
-  ];
-
-  const loginSessions = [
-    { device: 'Android Phone', location: 'Nairobi, Kenya', time: 'Current session', status: 'active' },
-    { device: 'Shared Tablet', location: 'Kibera Health Centre', time: '5 hrs ago', status: 'active' },
-    { device: 'Windows PC', location: 'Nairobi, Kenya', time: '2 days ago', status: 'inactive' },
-  ];
 
   const performanceStats = chw ? [
     { label: 'Assigned Patients', value: chw.assignedPatients, icon: Users },
@@ -521,7 +848,7 @@ const CHWProfile = () => {
           </div> */}
 
           {/* ── Activity & History ── */}
-          <div className="border border-gray-200 overflow-hidden bg-white">
+          {/* <div className="border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={Activity} title="Activity & History" subtitle="Recent actions and login records" />
             <div className="p-4 space-y-4">
               <div>
@@ -532,13 +859,25 @@ const CHWProfile = () => {
                   </button>
                 </div>
                 <div className="space-y-1.5">
-                  {recentActivity.map((a, i) => (
+                  {historyLoading ? (
+                    <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500">
+                      Loading recent activity...
+                    </div>
+                  ) : historyError ? (
+                    <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+                      {historyError}
+                    </div>
+                  ) : recentActivity.length ? recentActivity.map((a, i) => (
                     <div key={i} className="flex items-start gap-2.5 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
                       <span className="w-2 h-2 rounded-full flex-shrink-0 bg-blue-400 mt-1.5" />
                       <p className="flex-1 text-xs sm:text-sm text-gray-800 leading-snug">{a.action}</p>
                       <p className="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">{a.time}</p>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500">
+                      No recent activity found.
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -554,7 +893,15 @@ const CHWProfile = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {loginSessions.map((s, i) => (
+                      {historyLoading ? (
+                        <tr>
+                          <td colSpan={4} className="py-3 text-xs text-gray-500">Loading login history...</td>
+                        </tr>
+                      ) : historyError ? (
+                        <tr>
+                          <td colSpan={4} className="py-3 text-xs text-red-700">{historyError}</td>
+                        </tr>
+                      ) : loginSessions.length ? loginSessions.map((s, i) => (
                         <tr key={i} className="border-b border-gray-100">
                           <td className="py-2 text-xs text-gray-700 whitespace-nowrap">{s.time}</td>
                           <td className="py-2 text-xs text-gray-700">{s.device}</td>
@@ -563,12 +910,24 @@ const CHWProfile = () => {
                             <span className={`text-xs font-medium ${s.status === 'active' ? 'text-green-700' : 'text-gray-600'}`}>{s.status}</span>
                           </td>
                         </tr>
-                      ))}
+                      )) : (
+                        <tr>
+                          <td colSpan={4} className="py-3 text-xs text-gray-500">No login history found.</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
                 <div className="sm:hidden space-y-2">
-                  {loginSessions.map((s, i) => (
+                  {historyLoading ? (
+                    <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500">
+                      Loading login history...
+                    </div>
+                  ) : historyError ? (
+                    <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+                      {historyError}
+                    </div>
+                  ) : loginSessions.length ? loginSessions.map((s, i) => (
                     <div key={i} className="flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg gap-2">
                       <div className="min-w-0">
                         <p className="text-xs font-medium text-gray-800 truncate">{s.device}</p>
@@ -578,11 +937,15 @@ const CHWProfile = () => {
                         {s.status}
                       </span>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500">
+                      No login history found.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
         </div>
       </div>
