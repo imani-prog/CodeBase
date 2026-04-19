@@ -17,17 +17,25 @@ import {
   FileText,
   Save
 } from 'lucide-react';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { refreshAppointmentGovernanceSnapshot } from '../../../Services/appointmentGovernanceStore';
 import { syncHomeVisitWorkItems } from '../../../Services/chwAssignmentsStore';
 import { syncHomeVisitGovernance } from '../../../Services/homeVisitGovernanceStore';
+import { chwService } from '../../../Services/domain/chwService.js';
 import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
 import { useAuth } from '../../../hooks/useAuth';
 
 const DEFAULT_CHW_META = {
-  chwId: 1,
-  chwCode: 'CHW-001',
-  chwName: 'Grace Akinyi Achieng',
-  serviceZone: 'Machakos',
+  chwId: null,
+  chwCode: 'CHW',
+  chwName: 'Community Health Worker',
+  serviceZone: 'Assigned area',
 };
+
+const EMPTY_VISITS = { upcoming: [], completed: [], cancelled: [] };
+const FALLBACK_MAP_CENTER = { lat: -1.286389, lng: 36.817223 };
 
 function toNumericId(value) {
   if (value == null) return null;
@@ -54,14 +62,66 @@ function resolveChwMeta(user) {
     toNumericId(user?.id) ||
     toNumericId(user?.userId) ||
     toNumericId(user?.employeeId) ||
-    DEFAULT_CHW_META.chwId;
+    null;
 
   return {
     chwId: numericId,
-    chwCode: user?.chwCode || user?.code || user?.employeeId || `CHW-${numericId}`,
+    chwCode: user?.chwCode || user?.code || user?.employeeId || (numericId != null ? `CHW-${numericId}` : DEFAULT_CHW_META.chwCode),
     chwName: name,
     serviceZone: user?.region || user?.county || DEFAULT_CHW_META.serviceZone,
   };
+}
+
+function isHomeVisitAppointment(value) {
+  const text = String(value || '').toUpperCase();
+  return text.includes('HOME') && text.includes('VISIT');
+}
+
+function mapAppointmentHomeVisits(rows = []) {
+  return rows.reduce(
+    (acc, row) => {
+      const when = row?.scheduledAt ? new Date(row.scheduledAt) : null;
+      const date = when && !Number.isNaN(when.getTime())
+        ? when.toISOString().slice(0, 10)
+        : '';
+      const time = when && !Number.isNaN(when.getTime())
+        ? when.toLocaleTimeString('en-KE', { hour: 'numeric', minute: '2-digit', hour12: true })
+        : '';
+
+      const mapped = {
+        id: `appt-${row?.id}`,
+        patientName: row?.patientName || 'Unknown Patient',
+        patientId: row?.patientId != null ? `PT-${row.patientId}` : 'N/A',
+        phone: '',
+        date,
+        time,
+        location: row?.facility || 'Community Health Visit',
+        coordinates: null,
+        type: 'Home Visit',
+        priority: 'normal',
+        notes: row?.reason || '',
+        reason: row?.cancellationReason || '',
+        outcome: row?.reason || '',
+        completionEvidence: null,
+        scheduledAt: row?.scheduledAt || null,
+        chwId: row?.providerId ?? null,
+        chwName: row?.providerName || '',
+        rescheduleHistory: [],
+        reassignmentHistory: [],
+      };
+
+      const status = String(row?.status || '').toUpperCase();
+      if (status === 'COMPLETED') {
+        acc.completed.push({ ...mapped, status: 'completed' });
+      } else if (status === 'CANCELED' || status === 'NO_SHOW') {
+        acc.cancelled.push({ ...mapped, status: 'cancelled', reasonType: status === 'NO_SHOW' ? 'NO_SHOW' : undefined });
+      } else {
+        acc.upcoming.push(mapped);
+      }
+      return acc;
+    },
+    { upcoming: [], completed: [], cancelled: [] }
+  );
 }
 
 function calculateNotesQuality(outcomeText) {
@@ -77,9 +137,61 @@ function calculateNotesQuality(outcomeText) {
   return words.length > 0 ? 20 : 0;
 }
 
+const createVisitPinIcon = (label, color) =>
+  L.divIcon({
+    className: 'leaflet-custom-pin',
+    html: `<div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:${color};color:#fff;font-weight:700;font-size:11px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)">${label}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -12],
+  });
+
+const VISIT_ICONS = {
+  upcoming: createVisitPinIcon('U', '#2563eb'),
+  completed: createVisitPinIcon('C', '#16a34a'),
+  cancelled: createVisitPinIcon('X', '#ef4444'),
+};
+
+function toVisitMapPoint(visit, status) {
+  const lat = Number(visit?.coordinates?.lat ?? visit?.latitude);
+  const lng = Number(visit?.coordinates?.lng ?? visit?.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+  return {
+    id: `${status}-${visit?.id}`,
+    lat,
+    lng,
+    status,
+    patientName: visit?.patientName || 'Patient',
+    location: visit?.location || 'Unknown location',
+    type: visit?.type || 'Home Visit',
+    date: visit?.date || '',
+    time: visit?.time || '',
+  };
+}
+
+const FitMapToVisitPoints = ({ points = [] }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!Array.isArray(points) || points.length === 0) return;
+
+    if (points.length === 1) {
+      map.setView([points[0].lat, points[0].lng], 14, { animate: true });
+      return;
+    }
+
+    const bounds = L.latLngBounds(points.map((point) => [point.lat, point.lng]));
+    map.fitBounds(bounds, { padding: [35, 35], maxZoom: 14, animate: true });
+  }, [map, points]);
+
+  return null;
+};
+
 const HomeVisits = () => {
   const { user } = useAuth();
   const chwMeta = useMemo(() => resolveChwMeta(user), [user]);
+  const [resolvedChwId, setResolvedChwId] = useState(null);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showMap, setShowMap] = useState(false);
   const [isLoadingVisits, setIsLoadingVisits] = useState(true);
@@ -115,6 +227,7 @@ const HomeVisits = () => {
   const [scheduleModal, setScheduleModal] = useState({ open: false });
   const [scheduleForm, setScheduleForm] = useState(emptyScheduleForm);
   const [scheduleErrors, setScheduleErrors] = useState({});
+  const activeChwId = resolvedChwId ?? chwMeta?.chwId;
 
   const openScheduleModal = () => {
     setScheduleForm(emptyScheduleForm);
@@ -146,11 +259,11 @@ const HomeVisits = () => {
     if (Object.keys(errs).length > 0) { setScheduleErrors(errs); return; }
 
     const backendPatientId = toStrictNumericId(scheduleForm.patientId);
-    if (backendPatientId && chwMeta?.chwId) {
+    if (backendPatientId && activeChwId) {
       try {
         await homeVisitService.createHomeVisit({
           patientId: backendPatientId,
-          chwId: chwMeta.chwId,
+          chwId: activeChwId,
           visitType: scheduleForm.type,
           priority: String(scheduleForm.priority || 'NORMAL').toUpperCase(),
           scheduledAt: new Date(`${scheduleForm.date}T${scheduleForm.time}:00`).toISOString(),
@@ -191,122 +304,79 @@ const HomeVisits = () => {
     setScheduleModal({ open: false });
   };
 
-  const [visits, setVisits] = useState({
-    upcoming: [
-      {
-        id: 1,
-        patientName: 'Sarah Wanjiru',
-        patientId: 'PT-2023-001',
-        phone: '+254790383295',
-        date: '2024-10-25',
-        time: '10:00 AM',
-        location: 'Katoloni AIC Church, House 23',
-        coordinates: { lat: -1.3139, lng: 36.7890 },
-        type: 'Follow-up Visit',
-        priority: 'normal',
-        notes: 'Check blood pressure and review medication'
-      },
-      {
-        id: 2,
-        patientName: 'John Kamau',
-        patientId: 'PT-2023-045',
-        phone: '+254723456789',
-        date: '2024-10-25',
-        time: '2:00 PM',
-        location: 'Kathemboni Mosque',
-        coordinates: { lat: -1.2627, lng: 36.8598 },
-        type: 'Initial Assessment',
-        priority: 'urgent',
-        notes: 'New patient - comprehensive health assessment needed'
-      },
-      {
-        id: 3,
-        patientName: 'Mary Njoki',
-        patientId: 'PT-2023-089',
-        phone: '+254734567890',
-        date: '2024-10-26',
-        time: '9:00 AM',
-        location: 'Kathayoni Primary School',
-        coordinates: { lat: -1.2921, lng: 36.7561 },
-        type: 'Prenatal Checkup',
-        priority: 'high',
-        notes: 'Second trimester checkup - monitor fetal development'
-      },
-      {
-        id: 4,
-        patientName: 'Peter Ochieng',
-        patientId: 'PT-2023-112',
-        phone: '+254745678901',
-        date: '2024-10-27',
-        time: '11:00 AM',
-        location: 'Muthini Estate,',
-        coordinates: { lat: -1.2921, lng: 36.7561 },
-        type: 'Medication Review',
-        priority: 'normal',
-        notes: 'Review diabetes medication and diet plan'
+  const [visits, setVisits] = useState(EMPTY_VISITS);
+
+  const mapVisitPoints = useMemo(() => {
+    const points = [
+      ...visits.upcoming.map((visit) => toVisitMapPoint(visit, 'upcoming')),
+      ...visits.completed.map((visit) => toVisitMapPoint(visit, 'completed')),
+      ...visits.cancelled.map((visit) => toVisitMapPoint(visit, 'cancelled')),
+    ].filter(Boolean);
+
+    return points;
+  }, [visits]);
+
+  const mapCenter = useMemo(() => {
+    if (mapVisitPoints.length > 0) {
+      return { lat: mapVisitPoints[0].lat, lng: mapVisitPoints[0].lng };
+    }
+    return FALLBACK_MAP_CENTER;
+  }, [mapVisitPoints]);
+
+  useEffect(() => {
+    let active = true;
+    const resolveBackendChwId = async () => {
+      try {
+        const me = await chwService.getMe();
+        const id = toNumericId(me?.id ?? me?.chwId ?? me?.providerId ?? me?.user?.id);
+        if (active && id != null) setResolvedChwId(id);
+      } catch {
+        // Keep auth-derived identifier fallback.
       }
-    ],
-    completed: [
-      {
-        id: 5,
-        patientName: 'Grace Akinyi',
-        patientId: 'PT-2023-156',
-        phone: '+254756789012',
-        date: '2024-10-22',
-        time: '10:30 AM',
-        location: 'Mathare, House 45',
-        type: 'Nutrition Assessment',
-        status: 'completed',
-        outcome: 'Patient improving - continue current plan'
-      },
-      {
-        id: 6,
-        patientName: 'David Mwangi',
-        patientId: 'PT-2023-201',
-        phone: '+254767890123',
-        date: '2024-10-21',
-        time: '2:00 PM',
-        location: 'Kawangware, Block A',
-        type: 'Follow-up Visit',
-        status: 'completed',
-        outcome: 'Blood pressure stable - medication working well'
-      }
-    ],
-    cancelled: [
-      {
-        id: 7,
-        patientName: 'Jane Wambui',
-        patientId: 'PT-2023-178',
-        phone: '+254778901234',
-        date: '2024-10-20',
-        time: '3:00 PM',
-        location: 'Muthini Estate, House 5',
-        coordinates: { lat: -1.3100, lng: 36.7910 },
-        type: 'Follow-up Visit',
-        status: 'cancelled',
-        reason: 'Patient not available - rescheduled'
-      }
-    ]
-  });
+    };
+
+    resolveBackendChwId();
+    return () => { active = false; };
+  }, []);
 
   const loadHomeVisits = useCallback(async () => {
     setIsLoadingVisits(true);
     setVisitsError('');
 
     try {
-      const query = chwMeta?.chwId ? { chwId: chwMeta.chwId } : {};
+      const query = activeChwId ? { chwId: activeChwId } : {};
       const list = await homeVisitService.listHomeVisits(query);
-      const grouped = homeVisitService.groupHomeVisitsByTab(list);
+      let grouped = homeVisitService.groupHomeVisitsByTab(list);
+
+      const groupedCount = grouped.upcoming.length + grouped.completed.length + grouped.cancelled.length;
+      if (groupedCount === 0 && activeChwId) {
+        try {
+          const snapshot = await refreshAppointmentGovernanceSnapshot({ providerRole: 'CHW', chwId: activeChwId });
+          const appointments = Array.isArray(snapshot?.appointments) ? snapshot.appointments : [];
+          const homeVisitAppointments = appointments.filter((row) => (
+            String(row?.providerRole || '').toUpperCase() === 'CHW'
+            && String(row?.providerId ?? '') === String(activeChwId)
+            && isHomeVisitAppointment(row?.appointmentType)
+          ));
+
+          if (homeVisitAppointments.length > 0) {
+            grouped = mapAppointmentHomeVisits(homeVisitAppointments);
+          }
+        } catch {
+          // Ignore fallback failures and keep grouped home-visit records.
+        }
+      }
+
       setVisits(grouped);
       setHasHydratedVisits(true);
     } catch (error) {
       setVisitsError(error?.message || 'Failed to fetch home visits from backend.');
-      setVisits({ upcoming: [], completed: [], cancelled: [] });
+      setVisits(EMPTY_VISITS);
       setHasHydratedVisits(false);
     } finally {
       setIsLoadingVisits(false);
     }
-  }, [chwMeta]);
+  }, [activeChwId]);
 
   useEffect(() => {
     loadHomeVisits();
@@ -556,17 +626,44 @@ const HomeVisits = () => {
             </div>
           </div>
         </div>
-        <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d277.7549826743736!2d37.26242921919778!3d-1.5305180166278827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f87eeedd7e1cd%3A0x2bb0f6a2ec4c7859!2sMachakos%20University%20Administration!5e0!3m2!1sen!2ske!4v1774964157029!5m2!1sen!2ske"
-            width="100%"
-            height="260"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Supervisor Coverage Map"
-          />
-          
+        <div className="h-[300px] live-map-shell relative">
+          <MapContainer
+            center={[mapCenter.lat, mapCenter.lng]}
+            zoom={12}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <FitMapToVisitPoints points={mapVisitPoints} />
+            {mapVisitPoints.map((point) => (
+              <Marker
+                key={point.id}
+                position={[point.lat, point.lng]}
+                icon={VISIT_ICONS[point.status] || VISIT_ICONS.upcoming}
+              >
+                <Popup>
+                  <div className="text-sm">
+                    <p className="font-semibold">{point.patientName}</p>
+                    <p>{point.type}</p>
+                    <p>{point.location}</p>
+                    <p>{point.date} {point.time ? `• ${point.time}` : ''}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+
+          {!mapVisitPoints.length && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-2 text-center">
+              <span className="inline-block px-2 py-1 text-xs text-gray-600 bg-white/90 border border-gray-200 rounded-md">
+                No visit coordinates available yet.
+              </span>
+            </div>
+          )}
+        </div>
+
       </div>
     
 
@@ -605,18 +702,35 @@ const HomeVisits = () => {
               Cancelled
             </span>
           </div>
-          {/* Map fills the rest of the screen */}
-          <iframe
-            src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
-            width="100%"
-            height="100%"
-            style={{ border: 0, flex: 1, display: 'block' }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Home Visits Map"
-            className="flex-1 w-full"
-          />
+          <div className="flex-1 w-full live-map-shell">
+            <MapContainer
+              center={[mapCenter.lat, mapCenter.lng]}
+              zoom={12}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <FitMapToVisitPoints points={mapVisitPoints} />
+              {mapVisitPoints.map((point) => (
+                <Marker
+                  key={`mobile-${point.id}`}
+                  position={[point.lat, point.lng]}
+                  icon={VISIT_ICONS[point.status] || VISIT_ICONS.upcoming}
+                >
+                  <Popup>
+                    <div className="text-sm">
+                      <p className="font-semibold">{point.patientName}</p>
+                      <p>{point.type}</p>
+                      <p>{point.location}</p>
+                      <p>{point.date} {point.time ? `• ${point.time}` : ''}</p>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
         </div>
       )}
 
