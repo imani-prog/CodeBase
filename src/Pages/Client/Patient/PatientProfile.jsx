@@ -17,6 +17,37 @@ const formatGender = (g) => g
   ? g.charAt(0) + g.slice(1).toLowerCase()
   : '—';
 
+const formatMaritalStatus = (status) => status
+  ? status.charAt(0) + status.slice(1).toLowerCase()
+  : '—';
+
+const GENDER_OPTIONS = [
+  { value: 'MALE', label: 'Male' },
+  { value: 'FEMALE', label: 'Female' },
+  { value: 'OTHER', label: 'Other' },
+  { value: 'UNKNOWN', label: 'Unknown' },
+];
+
+const BLOOD_TYPE_OPTIONS = [
+  { value: 'A_POS', label: 'A+' },
+  { value: 'A_NEG', label: 'A-' },
+  { value: 'B_POS', label: 'B+' },
+  { value: 'B_NEG', label: 'B-' },
+  { value: 'AB_POS', label: 'AB+' },
+  { value: 'AB_NEG', label: 'AB-' },
+  { value: 'O_POS', label: 'O+' },
+  { value: 'O_NEG', label: 'O-' },
+];
+
+const MARITAL_STATUS_OPTIONS = [
+  { value: 'SINGLE', label: 'Single' },
+  { value: 'MARRIED', label: 'Married' },
+  { value: 'DIVORCED', label: 'Divorced' },
+  { value: 'WIDOWED', label: 'Widowed' },
+  { value: 'SEPARATED', label: 'Separated' },
+  { value: 'OTHER', label: 'Other' },
+];
+
 /* ── Section header ── */
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-200">
@@ -37,6 +68,8 @@ const EditableField = ({
   type = 'text',
   editMode,
   displayValue,
+  options,
+  placeholder,
 }) => (
   <div>
     <label className="flex items-center text-xs font-medium text-gray-500 mb-1">
@@ -44,12 +77,25 @@ const EditableField = ({
       {label}
     </label>
     {editMode ? (
-      <input
-        type={type}
-        value={value ?? ''}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-      />
+      options ? (
+        <select
+          value={value ?? ''}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:border-blue-500"
+        >
+          {placeholder && <option value="">{placeholder}</option>}
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      ) : (
+        <input
+          type={type}
+          value={value ?? ''}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+        />
+      )
     ) : (
       <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 break-words">
         {displayValue || value || '—'}
@@ -277,11 +323,32 @@ const PatientProfile = () => {
                 <EditableField label="Phone Number"    icon={Phone} type="tel"   value={src?.phone}  onChange={(v) => set('phone', v)}  editMode={editMode} />
                 <EditableField label="Secondary Phone" icon={Phone} type="tel"   value={src?.secondaryPhone} onChange={(v) => set('secondaryPhone', v)} editMode={editMode} />
                 <EditableField label="Date of Birth"   type="date" value={src?.dateOfBirth} onChange={(v) => set('dateOfBirth', v)} editMode={editMode} />
-                <EditableField label="Gender"          value={src?.gender} onChange={(v) => set('gender', v)} editMode={editMode} displayValue={formatGender(src?.gender)} />
-                <EditableField label="Blood Type"      value={src?.bloodType} onChange={(v) => set('bloodType', v)} editMode={editMode} displayValue={formatBloodType(src?.bloodType)} />
-                <EditableField label="Marital Status"  value={src?.maritalStatus} onChange={(v) => set('maritalStatus', v)} editMode={editMode} displayValue={src?.maritalStatus
-                  ? src.maritalStatus.charAt(0) + src.maritalStatus.slice(1).toLowerCase()
-                  : '—'} />
+                <EditableField
+                  label="Gender"
+                  value={src?.gender}
+                  onChange={(v) => set('gender', v)}
+                  editMode={editMode}
+                  options={GENDER_OPTIONS}
+                  displayValue={formatGender(src?.gender)}
+                />
+                <EditableField
+                  label="Blood Type"
+                  value={src?.bloodType}
+                  onChange={(v) => set('bloodType', v || null)}
+                  editMode={editMode}
+                  options={BLOOD_TYPE_OPTIONS}
+                  placeholder="Select blood type"
+                  displayValue={formatBloodType(src?.bloodType)}
+                />
+                <EditableField
+                  label="Marital Status"
+                  value={src?.maritalStatus}
+                  onChange={(v) => set('maritalStatus', v || null)}
+                  editMode={editMode}
+                  options={MARITAL_STATUS_OPTIONS}
+                  placeholder="Select marital status"
+                  displayValue={formatMaritalStatus(src?.maritalStatus)}
+                />
                 <EditableField label="National ID"     value={src?.nationalId} onChange={(v) => set('nationalId', v)} editMode={editMode} />
               </div>
             </div>
