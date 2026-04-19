@@ -2,9 +2,20 @@ import { useEffect, useState } from 'react';
 import {
   User, Mail, Phone, MapPin, Shield,
   Heart, AlertCircle,
-  Edit3, Save, X, Camera, Check, LogOut,
+  Edit3, Save, X, Camera, Check, LogOut, Loader2,
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth.jsx';
+import { patientApi } from '../../../API/endpoints/patientApi.js'; // adjust path as needed
+
+/* ── helpers ── */
+const formatBloodType = (bt) => {
+  if (!bt) return '—';
+  return bt.replace('_POS', '+').replace('_NEG', '-').replace('_', '');
+};
+
+const formatGender = (g) => g
+  ? g.charAt(0) + g.slice(1).toLowerCase()
+  : '—';
 
 /* ── Section header ── */
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
@@ -17,18 +28,16 @@ const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   </div>
 );
 
-/* ── Read-only field ── */
-const Field = ({ label, value }) => (
-  <div>
-    <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
-    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 break-words">
-      {value || '—'}
-    </p>
-  </div>
-);
-
 /* ── Editable field ── */
-const EditableField = ({ label, icon: Icon, value, onChange, type = 'text', editMode }) => (
+const EditableField = ({
+  label,
+  icon: Icon,
+  value,
+  onChange,
+  type = 'text',
+  editMode,
+  displayValue,
+}) => (
   <div>
     <label className="flex items-center text-xs font-medium text-gray-500 mb-1">
       {Icon && <Icon className="w-3.5 h-3.5 mr-1 text-blue-600 flex-shrink-0" />}
@@ -37,19 +46,19 @@ const EditableField = ({ label, icon: Icon, value, onChange, type = 'text', edit
     {editMode ? (
       <input
         type={type}
-        value={value}
+        value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
         className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
       />
     ) : (
       <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 break-words">
-        {value || '—'}
+        {displayValue || value || '—'}
       </p>
     )}
   </div>
 );
 
-/* ── Info / Warning note ── */
+/* ── Note ── */
 const Note = ({ type = 'info', title, message }) => {
   const isWarning = type === 'warning';
   return (
@@ -65,69 +74,105 @@ const Note = ({ type = 'info', title, message }) => {
   );
 };
 
-/* ── Defaults ── */
-const defaultProfile = {
-  firstName: '', lastName: '',
-  email: '', phone: '',
-  dateOfBirth: '2003-06-15', gender: 'Male', bloodType: 'O+',
-  street: '123 Health Street', city: 'Machakos',
-  state: 'Machakos County', zipCode: '02101', country: 'Kenya',
-  emergencyName: 'Sarah Imani', emergencyRelation: 'Spouse',
-  emergencyPhone: '+25443669252',
-  height: "5'10\"", weight: '175 lbs',
-  allergies: 'Penicillin, Peanuts',
-  medications: 'Lisinopril 10mg daily',
-  conditions: 'Hypertension',
-  insuranceProvider: 'Social Health Insurance Fund',
-  policyNumber: 'BCBS-123456789', groupNumber: 'GRP-987654',
-  memberSince: 'January 15, 2023',
-  userId: '', status: 'Active',
-};
-
-const mapUserToProfile = (user = {}) => {
-  const baseName = user.name || user.username || '';
-  const [firstName = '', ...rest] = baseName.split(' ').filter(Boolean);
-  return {
-    ...defaultProfile,
-    firstName,
-    lastName: rest.join(' '),
-    email: user.email || '',
-    phone: user.phone || '',
-    userId: user.patientId || user.userId || '',
-  };
-};
-
 /* ── Main Component ── */
 const PatientProfile = () => {
-  const { user, setUser } = useAuth();
-  const [profile, setProfile] = useState(() => mapUserToProfile(user));
-  const [editMode, setEditMode] = useState(false);
+  const { setUser } = useAuth();
+  const [profile, setProfile]     = useState(null);
+  const [editData, setEditData]   = useState({});   // draft while editing
+  const [editMode, setEditMode]   = useState(false);
+  const [loading, setLoading]     = useState(true);
+  const [saving, setSaving]       = useState(false);
+  const [error, setError]         = useState(null);
 
-  useEffect(() => { setProfile(mapUserToProfile(user)); }, [user]);
+  /* ── Fetch from backend on mount ── */
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await patientApi.me();   // GET /api/patients/me
+        setProfile(data);
+      } catch (err) {
+        setError(err?.message || 'Failed to load profile.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
 
-  const set = (key, val) => setProfile((p) => ({ ...p, [key]: val }));
+  /* ── Enter edit mode — clone current profile into draft ── */
+  const handleEdit = () => {
+    setEditData({ ...profile });
+    setEditMode(true);
+  };
 
-  const handleSave = () => {
-    const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim();
-
-    setUser((prev) => ({
-      ...prev,
-      name: fullName || prev?.name,
-      email: profile.email,
-      phone: profile.phone,
-      userId: profile.userId,
-      patientId: profile.userId,
-      initials: [profile.firstName, profile.lastName]
-        .filter(Boolean)
-        .map((w) => w[0].toUpperCase())
-        .join('') || prev?.initials,
-    }));
+  const handleCancel = () => {
+    setEditData({});
     setEditMode(false);
   };
 
-  const initials = [profile.firstName, profile.lastName]
-    .filter(Boolean).map((w) => w[0].toUpperCase()).join('');
-  const fullName = `${profile.firstName} ${profile.lastName}`;
+  /* ── Field setter for draft ── */
+  const set = (key, val) => setEditData((p) => ({ ...p, [key]: val }));
+
+  /* ── Save draft to backend via PUT ── */
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      const updated = await patientApi.update(profile.id, editData); // PUT /api/patients/{id}
+      setProfile(updated);
+
+      // Keep auth context in sync
+      setUser((prev) => ({
+        ...prev,
+        name: `${updated.firstName ?? ''} ${updated.lastName ?? ''}`.trim() || prev?.name,
+        email: updated.email || prev?.email,
+        phone: updated.phone || prev?.phone,
+        initials: [updated.firstName, updated.lastName]
+          .filter(Boolean).map((w) => w[0].toUpperCase()).join('') || prev?.initials,
+      }));
+
+      setEditMode(false);
+    } catch (err) {
+      setError(err?.message || 'Failed to save changes.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ── Derived display values ── */
+  const src = editMode ? editData : profile;
+  const initials = [src?.firstName, src?.lastName]
+    .filter(Boolean).map((w) => w[0].toUpperCase()).join('') || '?';
+  const fullName = [src?.firstName, src?.middleName, src?.lastName].filter(Boolean).join(' ');
+
+  /* ── Loading state ── */
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3 text-gray-500">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <p className="text-sm">Loading your profile…</p>
+      </div>
+    </div>
+  );
+
+  /* ── Error state ── */
+  if (error && !profile) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="bg-white border border-red-200 rounded-xl p-6 text-center max-w-sm w-full">
+        <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+        <p className="text-sm font-semibold text-red-700 mb-1">Could not load profile</p>
+        <p className="text-xs text-red-500 mb-4">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -135,31 +180,38 @@ const PatientProfile = () => {
 
         {/* ── Page Header ── */}
         <div className="flex items-start justify-between gap-2 mb-4 px-4 sm:px-0">
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">My Profile</h1>
-            
-          </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">My Profile</h1>
+
+          {/* Inline save error */}
+          {error && editMode && (
+            <p className="text-xs text-red-600 flex-1 text-center mt-1">{error}</p>
+          )}
+
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {editMode ? (
               <>
                 <button
-                  onClick={() => setEditMode(false)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700"
+                  onClick={handleCancel}
+                  disabled={saving}
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700 disabled:opacity-50"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Cancel</span>
                 </button>
                 <button
                   onClick={handleSave}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  disabled={saving}
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60"
                 >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Save</span>
+                  {saving
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <Save className="w-3.5 h-3.5" />}
+                  <span>{saving ? 'Saving…' : 'Save'}</span>
                 </button>
               </>
             ) : (
               <button
-                onClick={() => setEditMode(true)}
+                onClick={handleEdit}
                 className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -176,7 +228,7 @@ const PatientProfile = () => {
         <div className="space-y-2 sm:space-y-4">
 
           {/* ── Personal Information ── */}
-          <div className="border-y sm:border border-gray-200 overflow-hidden">
+          <div className="border-y sm:border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={User} title="Personal Information" subtitle="Your personal contact details" />
             <div className="p-4">
               {/* Avatar row */}
@@ -190,104 +242,118 @@ const PatientProfile = () => {
                   </button>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm leading-tight">{fullName}</p>
+                  <p className="font-semibold text-gray-900 text-sm leading-tight">{fullName || '—'}</p>
                   <p className="text-xs text-blue-600 leading-tight mt-0.5">Patient</p>
                   <div className="flex items-center gap-1 mt-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block flex-shrink-0" />
-                    <span className="text-xs text-gray-400">{profile.status}</span>
+                    <span className={`w-1.5 h-1.5 rounded-full inline-block flex-shrink-0 ${
+                      src?.status === 'ACTIVE' ? 'bg-green-400' : 'bg-gray-300'
+                    }`} />
+                    <span className="text-xs text-gray-400 capitalize">
+                      {src?.status?.toLowerCase() ?? 'active'}
+                    </span>
                   </div>
                 </div>
                 <div className="text-right text-xs text-gray-500 flex-shrink-0 hidden sm:block">
-                  <p className="font-mono font-medium text-gray-700">{profile.userId}</p>
-                  <p className="mt-0.5">Joined {profile.memberSince}</p>
+                  <p className="font-mono font-medium text-gray-700">#{profile?.id}</p>
+                  <p className="mt-0.5">
+                    {profile?.createdAt
+                      ? `Joined ${new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
+                      : ''}
+                  </p>
                 </div>
               </div>
 
-              {/* ID pill — mobile only */}
+              {/* ID pill — mobile */}
               <div className="sm:hidden flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg mb-3">
                 <span className="text-xs text-gray-500">Patient ID</span>
-                <span className="text-xs font-mono font-medium text-gray-700">{profile.userId}</span>
+                <span className="text-xs font-mono font-medium text-gray-700">#{profile?.id}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <EditableField label="First Name" icon={User} value={profile.firstName} onChange={(v) => set('firstName', v)} editMode={editMode} />
-                <EditableField label="Last Name" icon={User} value={profile.lastName} onChange={(v) => set('lastName', v)} editMode={editMode} />
-                <EditableField label="Email Address" icon={Mail} type="email" value={profile.email} onChange={(v) => set('email', v)} editMode={editMode} />
-                <EditableField label="Phone Number" icon={Phone} type="tel" value={profile.phone} onChange={(v) => set('phone', v)} editMode={editMode} />
-                <Field label="Date of Birth" value={profile.dateOfBirth} />
-                <Field label="Gender" value={profile.gender} />
-                <Field label="Blood Type" value={profile.bloodType} />
+                <EditableField label="First Name"      icon={User}  value={src?.firstName}   onChange={(v) => set('firstName', v)}   editMode={editMode} />
+                <EditableField label="Last Name"       icon={User}  value={src?.lastName}    onChange={(v) => set('lastName', v)}    editMode={editMode} />
+                <EditableField label="Middle Name"     icon={User}  value={src?.middleName}  onChange={(v) => set('middleName', v)}  editMode={editMode} />
+                <EditableField label="Email Address"   icon={Mail}  type="email" value={src?.email}  onChange={(v) => set('email', v)}  editMode={editMode} />
+                <EditableField label="Phone Number"    icon={Phone} type="tel"   value={src?.phone}  onChange={(v) => set('phone', v)}  editMode={editMode} />
+                <EditableField label="Secondary Phone" icon={Phone} type="tel"   value={src?.secondaryPhone} onChange={(v) => set('secondaryPhone', v)} editMode={editMode} />
+                <EditableField label="Date of Birth"   type="date" value={src?.dateOfBirth} onChange={(v) => set('dateOfBirth', v)} editMode={editMode} />
+                <EditableField label="Gender"          value={src?.gender} onChange={(v) => set('gender', v)} editMode={editMode} displayValue={formatGender(src?.gender)} />
+                <EditableField label="Blood Type"      value={src?.bloodType} onChange={(v) => set('bloodType', v)} editMode={editMode} displayValue={formatBloodType(src?.bloodType)} />
+                <EditableField label="Marital Status"  value={src?.maritalStatus} onChange={(v) => set('maritalStatus', v)} editMode={editMode} displayValue={src?.maritalStatus
+                  ? src.maritalStatus.charAt(0) + src.maritalStatus.slice(1).toLowerCase()
+                  : '—'} />
+                <EditableField label="National ID"     value={src?.nationalId} onChange={(v) => set('nationalId', v)} editMode={editMode} />
               </div>
             </div>
           </div>
 
           {/* ── Address ── */}
-          <div className="border-y sm:border border-gray-200 overflow-hidden">
+          <div className="border-y sm:border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={MapPin} title="Address" subtitle="Your residential address" />
             <div className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <EditableField label="Street Address" icon={MapPin} value={profile.street} onChange={(v) => set('street', v)} editMode={editMode} />
+                  <EditableField label="Street Address (Line 1)" icon={MapPin} value={src?.addressLine1} onChange={(v) => set('addressLine1', v)} editMode={editMode} />
                 </div>
-                <EditableField label="City" value={profile.city} onChange={(v) => set('city', v)} editMode={editMode} />
-                <EditableField label="State / County" value={profile.state} onChange={(v) => set('state', v)} editMode={editMode} />
-                <EditableField label="Postal Code" value={profile.zipCode} onChange={(v) => set('zipCode', v)} editMode={editMode} />
-                <Field label="Country" value={profile.country} />
+                <div className="sm:col-span-2">
+                  <EditableField label="Street Address (Line 2)" value={src?.addressLine2} onChange={(v) => set('addressLine2', v)} editMode={editMode} />
+                </div>
+                <EditableField label="City"          value={src?.city}       onChange={(v) => set('city', v)}       editMode={editMode} />
+                <EditableField label="State / County" value={src?.state}     onChange={(v) => set('state', v)}      editMode={editMode} />
+                <EditableField label="Postal Code"   value={src?.postalCode} onChange={(v) => set('postalCode', v)} editMode={editMode} />
+                <EditableField label="Country"       value={src?.country} onChange={(v) => set('country', v)} editMode={editMode} />
               </div>
             </div>
           </div>
 
           {/* ── Medical Information ── */}
-          <div className="border-y sm:border border-gray-200 overflow-hidden">
+          <div className="border-y sm:border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={Heart} title="Medical Information" subtitle="Your health and medical details" />
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label="Height" value={profile.height} />
-                <Field label="Weight" value={profile.weight} />
                 <div className="sm:col-span-2">
-                  <EditableField label="Allergies" value={profile.allergies} onChange={(v) => set('allergies', v)} editMode={editMode} />
+                  <EditableField label="Allergies"          value={src?.allergies}         onChange={(v) => set('allergies', v)}         editMode={editMode} />
                 </div>
                 <div className="sm:col-span-2">
-                  <EditableField label="Current Medications" value={profile.medications} onChange={(v) => set('medications', v)} editMode={editMode} />
+                  <EditableField label="Current Medications" value={src?.medications}      onChange={(v) => set('medications', v)}        editMode={editMode} />
                 </div>
                 <div className="sm:col-span-2">
-                  <EditableField label="Medical Conditions" value={profile.conditions} onChange={(v) => set('conditions', v)} editMode={editMode} />
+                  <EditableField label="Chronic Conditions" value={src?.chronicConditions} onChange={(v) => set('chronicConditions', v)} editMode={editMode} />
                 </div>
               </div>
               <Note type="info" title="Keep Information Current"
-                message="Accurate medical information helps healthcare providers deliver better care. Please update any changes to your medications or conditions." />
+                message="Accurate medical information helps healthcare providers deliver better care." />
             </div>
           </div>
 
           {/* ── Emergency Contact ── */}
-          <div className="border-y sm:border border-gray-200 overflow-hidden">
+          <div className="border-y sm:border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={AlertCircle} title="Emergency Contact" subtitle="This person will be contacted in a medical emergency" />
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <EditableField label="Contact Name" icon={User} value={profile.emergencyName} onChange={(v) => set('emergencyName', v)} editMode={editMode} />
-                <EditableField label="Relationship" value={profile.emergencyRelation} onChange={(v) => set('emergencyRelation', v)} editMode={editMode} />
+                <EditableField label="Contact Name"   icon={User}  value={src?.emergencyContactName}     onChange={(v) => set('emergencyContactName', v)}     editMode={editMode} />
+                <EditableField label="Relationship"              value={src?.emergencyContactRelation}  onChange={(v) => set('emergencyContactRelation', v)}  editMode={editMode} />
                 <div className="sm:col-span-2">
-                  <EditableField label="Phone Number" icon={Phone} type="tel" value={profile.emergencyPhone} onChange={(v) => set('emergencyPhone', v)} editMode={editMode} />
+                  <EditableField label="Phone Number" icon={Phone} type="tel" value={src?.emergencyContactPhone} onChange={(v) => set('emergencyContactPhone', v)} editMode={editMode} />
                 </div>
               </div>
               <Note type="warning" title="Important"
-                message="Make sure your emergency contact is always up to date. This person should be able to make medical decisions on your behalf if needed." />
+                message="Make sure your emergency contact is always up to date and can make medical decisions on your behalf." />
             </div>
           </div>
 
           {/* ── Insurance ── */}
-          <div className="border-y sm:border border-gray-200 overflow-hidden">
+          <div className="border-y sm:border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={Shield} title="Insurance" subtitle="Your insurance coverage details" />
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <EditableField label="Insurance Provider" icon={Shield} value={profile.insuranceProvider} onChange={(v) => set('insuranceProvider', v)} editMode={editMode} />
+                  <EditableField label="Insurance Provider" icon={Shield} value={src?.insuranceProviderName} onChange={(v) => set('insuranceProviderName', v)} editMode={editMode} />
                 </div>
-                <EditableField label="Policy Number" value={profile.policyNumber} onChange={(v) => set('policyNumber', v)} editMode={editMode} />
-                <EditableField label="Group Number" value={profile.groupNumber} onChange={(v) => set('groupNumber', v)} editMode={editMode} />
+                <EditableField label="Member / Policy ID" value={src?.insuranceMemberId} onChange={(v) => set('insuranceMemberId', v)} editMode={editMode} />
               </div>
               <Note type="info" title="Insurance Coverage"
-                message="Your insurance information is securely stored and encrypted. Please verify this with your insurance provider to ensure accuracy." />
+                message="Your insurance information is securely stored and encrypted." />
             </div>
           </div>
 

@@ -1011,17 +1011,7 @@ const Insurance = () => {
       {/* Finances Tab */}
       {activeTab === 'finances' && (
         <div className="space-y-4">
-          <div className="bg-green-50 border border-green-200 rounded p-3">
-            <div className="flex items-start gap-2">
-              <Phone className="w-4 h-4 text-green-700 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="text-xs font-semibold text-green-900">M-Pesa Payments Only</h3>
-                <p className="text-xs text-green-800 mt-0.5">
-                  All financial transactions on this page are processed through M-Pesa only.
-                </p>
-              </div>
-            </div>
-          </div>
+         
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="bg-white rounded border border-gray-200 p-3">
