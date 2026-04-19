@@ -1,13 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   User, Mail, Phone, MapPin, Briefcase, Award, Users,
   Activity, Shield, Settings, Save, Edit3,
   X, Camera, Check, Download, LogOut, Eye, EyeOff,
-  Monitor, MapPinned
+  Monitor, MapPinned, Loader2, AlertCircle, RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth.jsx';
+import { chwService } from '../../../Services/domain/chwService.js';
 
-/* ── Section header ── */
+/* ─────────────────────────────────────────
+   Helpers
+───────────────────────────────────────── */
+
+/** Format a date string or LocalDate to a readable label */
+function formatDate(val) {
+  if (!val) return '—';
+  try { return new Date(val).toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' }); }
+  catch { return val; }
+}
+
+/** Format OffsetDateTime to "Month DD, YYYY" */
+function formatJoined(val) {
+  if (!val) return '—';
+  try { return new Date(val).toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' }); }
+  catch { return val; }
+}
+
+/** Map backend Status enum → display + colour */
+function statusMeta(status = '') {
+  const s = status.toUpperCase();
+  if (s === 'AVAILABLE') return { label: 'Active', colour: 'bg-green-400' };
+  if (s === 'BUSY')      return { label: 'Busy',   colour: 'bg-amber-400' };
+  return                         { label: 'Offline', colour: 'bg-gray-400' };
+}
+
+/* ─────────────────────────────────────────
+   Sub-components (unchanged from original)
+───────────────────────────────────────── */
+
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-200 bg-white">
     {Icon && <Icon className="w-4 h-4 text-blue-600 flex-shrink-0" />}
@@ -18,15 +48,13 @@ const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   </div>
 );
 
-/* ── Read-only field ── */
 const Field = ({ label, value }) => (
   <div>
     <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
-    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 break-words">{value}</p>
+    <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 break-words">{value || '—'}</p>
   </div>
 );
 
-/* ── Editable field ── */
 const EditableField = ({ label, icon: Icon, value, onChange, type = 'text', editMode }) => (
   <div>
     <label className="flex items-center text-xs font-medium text-gray-500 mb-1">
@@ -36,17 +64,16 @@ const EditableField = ({ label, icon: Icon, value, onChange, type = 'text', edit
     {editMode ? (
       <input
         type={type}
-        value={value}
+        value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
       />
     ) : (
-      <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 break-words">{value}</p>
+      <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 break-words">{value || '—'}</p>
     )}
   </div>
 );
 
-/* ── Info note ── */
 const InfoNote = ({ title, message }) => (
   <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
     <Check className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -57,62 +84,124 @@ const InfoNote = ({ title, message }) => (
   </div>
 );
 
-const defaultProfile = {
-  firstName: '', lastName: '',
-  email: '', phone: '',
-  dateOfBirth: '1988-03-20', gender: 'Female',
-  street: '45 Kenyatta Avenue', city: 'Nairobi',
-  county: 'Nairobi County', postalCode: '00100', country: 'Kenya',
-  userId: '', chwLevel: 'Community Health Worker',
-  specialization: '', yearsOfExperience: '',
-  coverageArea: 'Kibera Sub-County', assignedFacility: 'Kibera Health Centre',
-  certifications: 'Basic Life Support (BLS), First Aid, Maternal Health',
-  trainingCompleted: '15 courses', lastTraining: '2024-11-15',
-  supervisorName: 'Dr. Peter Kamau', supervisorPhone: '+254 722 123 456',
-  supervisorEmail: 'p.kamau@health.go.ke',
-  totalPatients: '142', homeVisitsCompleted: '87', activePatients: '65',
-  memberSince: 'January 15, 2023', status: 'Active',
-};
+/* Skeleton shimmer */
+const Shimmer = ({ className = '' }) => (
+  <div className={`animate-pulse bg-gray-200 rounded-lg ${className}`} />
+);
 
-const mapUserToProfile = (user = {}) => {
-  const baseName = user.name || user.username || '';
-  const [firstName = '', ...rest] = baseName.split(' ').filter(Boolean);
-  return {
-    ...defaultProfile,
-    firstName,
-    lastName: rest.join(' '),
-    email: user.email || '',
-    phone: user.phone || '',
-    userId: user.employeeId || user.userId || '',
-    chwLevel: user.chwLevel || user.title || 'Community Health Worker',
-    specialization: user.specialization || '',
-  };
-};
+/* Full-page error banner */
+const ErrorBanner = ({ message, onRetry }) => (
+  <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+    <AlertCircle className="w-8 h-8 text-red-400" />
+    <p className="text-sm text-gray-600">{message}</p>
+    <button
+      onClick={onRetry}
+      className="flex items-center gap-1.5 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+    >
+      <RefreshCw className="w-3.5 h-3.5" /> Retry
+    </button>
+  </div>
+);
 
+/* ─────────────────────────────────────────
+   Main component
+───────────────────────────────────────── */
 const CHWProfile = () => {
   const { user, setUser } = useAuth();
-  const [profile, setProfile] = useState(() => mapUserToProfile(user));
-  const [editMode, setEditMode] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+
+  /* Remote data state */
+  const [chw, setChw]         = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+  const [saving, setSaving]   = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
+  /* Form / UI state */
+  const [form, setForm]       = useState({});
+  const [editMode, setEditMode]             = useState(false);
+  const [showPassword, setShowPassword]     = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [notifications, setNotifications] = useState({ email: true, sms: false, push: true, alerts: true });
+  const [notifications, setNotifications]  = useState({ email: true, sms: false, push: true, alerts: true });
 
-  useEffect(() => { setProfile(mapUserToProfile(user)); }, [user]);
+  /* ── Fetch ── */
+  const fetchProfile = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await chwService.getMe();
+      setChw(data);
+      setForm(data);                    // seed form with live data
+    } catch (err) {
+      setError(err?.message || 'Failed to load profile. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const set = (key, val) => setProfile((p) => ({ ...p, [key]: val }));
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
-  const handleSave = () => {
-    const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim();
-    setUser((prev) => ({
-      ...prev, name: fullName || prev?.name,
-      email: profile.email, phone: profile.phone,
-      userId: profile.userId, employeeId: profile.userId,
-      chwLevel: profile.chwLevel, specialization: profile.specialization,
-      initials: [profile.firstName, profile.lastName].filter(Boolean).map((w) => w[0].toUpperCase()).join('') || prev?.initials,
-    }));
+  /* ── Field change ── */
+  const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
+
+  /* ── Save ── */
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      // Build backend payload from form values (matches CommunityHealthWorkers entity)
+      const payload = {
+        firstName:    form.firstName,
+        lastName:     form.lastName,
+        email:        form.email,
+        phone:        form.phone,
+        addressLine1: form.street,
+        city:         form.city,
+        state:        form.county,
+        postalCode:   form.postalCode,
+        country:      form.country,
+        region:       form.region,
+        specialization: form.specialization,
+      };
+
+      const updated = await chwService.updateChw(chw.id, payload);
+      setChw(updated);
+      setForm(updated);
+
+      // Keep auth context in sync
+      setUser((prev) => ({
+        ...prev,
+        name:  [updated.firstName, updated.lastName].filter(Boolean).join(' ') || prev?.name,
+        email: updated.email,
+        phone: updated.phone,
+        initials: [updated.firstName, updated.lastName]
+          .filter(Boolean).map((w) => w[0].toUpperCase()).join('') || prev?.initials,
+      }));
+
+      setEditMode(false);
+    } catch (err) {
+      setSaveError(err?.message || 'Failed to save changes. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setForm(chw);       // revert unsaved changes
+    setSaveError(null);
     setEditMode(false);
   };
 
+  /* ── Derived values ── */
+  const fullName = form.firstName || form.lastName
+    ? [form.firstName, form.lastName].filter(Boolean).join(' ')
+    : chw?.name || '—';
+
+  const initials = [form.firstName, form.lastName]
+    .filter(Boolean).map((w) => w[0].toUpperCase()).join('') || '??';
+
+  const { label: statusLabel, colour: statusColour } = statusMeta(chw?.status);
+
+  /* Static demo data (replace with real API calls when endpoints exist) */
   const recentActivity = [
     { action: 'Completed home visit for patient #0234', time: '1 hr ago' },
     { action: 'Updated health record for Mary Otieno', time: '3 hrs ago' },
@@ -127,41 +216,75 @@ const CHWProfile = () => {
     { device: 'Windows PC', location: 'Nairobi, Kenya', time: '2 days ago', status: 'inactive' },
   ];
 
-  const fullName = `${profile.firstName} ${profile.lastName}`;
-  const initials = [profile.firstName, profile.lastName].filter(Boolean).map((w) => w[0].toUpperCase()).join('');
+  const performanceStats = chw ? [
+    { label: 'Assigned Patients', value: chw.assignedPatients, icon: Users },
+    { label: 'Monthly Visits',    value: chw.monthlyVisits,    icon: MapPinned },
+    { label: 'Success Rate',      value: chw.successRate != null ? `${chw.successRate}%` : '—', icon: Activity },
+    { label: 'Rating',            value: chw.rating != null ? `${chw.rating}/5` : '—', icon: Award },
+  ] : [];
 
-  const performanceStats = [
-    { label: 'Total Patients', value: profile.totalPatients, icon: Users },
-    { label: 'Home Visits', value: profile.homeVisitsCompleted, icon: MapPinned },
-    { label: 'Active Patients', value: profile.activePatients, icon: Activity },
-    { label: 'Trainings', value: profile.trainingCompleted, icon: Award },
-  ];
+  /* ── Render: loading ── */
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 space-y-4">
+        <Shimmer className="h-8 w-40" />
+        <div className="border border-gray-200 bg-white rounded-lg p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <Shimmer className="w-11 h-11 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <Shimmer className="h-4 w-32" />
+              <Shimmer className="h-3 w-24" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => <Shimmer key={i} className="h-10" />)}
+          </div>
+        </div>
+        <div className="border border-gray-200 bg-white rounded-lg p-4 space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => <Shimmer key={i} className="h-10" />)}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
+  /* ── Render: error ── */
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+        <ErrorBanner message={error} onRetry={fetchProfile} />
+      </div>
+    );
+  }
+
+  /* ── Render: profile ── */
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="w-full px-0 sm:px-4 py-4 sm:py-6">
 
-        {/* ── Page Header ── */}
+        {/* Page header */}
         <div className="flex items-start justify-between gap-2 mb-4">
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">My Profile</h1>
-            
-          </div>
-          {/* Buttons — compact on mobile */}
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">My Profile</h1>
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {editMode ? (
               <>
                 <button
-                  onClick={() => setEditMode(false)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700"
+                  onClick={handleCancel}
+                  disabled={saving}
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700 disabled:opacity-50"
                 >
                   <X className="w-3.5 h-3.5" /><span className="hidden sm:inline">Cancel</span>
                 </button>
                 <button
                   onClick={handleSave}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  disabled={saving}
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60"
                 >
-                  <Save className="w-3.5 h-3.5" /><span>Save</span>
+                  {saving
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <Save className="w-3.5 h-3.5" />}
+                  <span>{saving ? 'Saving…' : 'Save'}</span>
                 </button>
               </>
             ) : (
@@ -178,13 +301,19 @@ const CHWProfile = () => {
           </div>
         </div>
 
+        {/* Save error */}
+        {saveError && (
+          <div className="flex items-center gap-2 p-3 mb-4 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />{saveError}
+          </div>
+        )}
+
         <div className="space-y-3 sm:space-y-4">
 
           {/* ── Personal Information ── */}
           <div className="border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={User} title="Personal Information" subtitle="Your account details and contact information" />
             <div className="p-4">
-
               {/* Avatar row */}
               <div className="flex items-start gap-3 pb-4 mb-4 border-b border-gray-100">
                 <div className="relative flex-shrink-0">
@@ -197,33 +326,32 @@ const CHWProfile = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 text-sm leading-tight">{fullName}</p>
-                  <p className="text-xs text-blue-600 leading-tight mt-0.5 truncate">{profile.chwLevel}</p>
-                  <p className="text-xs text-gray-500 leading-tight truncate">{profile.specialization}</p>
+                  <p className="text-xs text-blue-600 leading-tight mt-0.5 truncate">{chw?.user?.role || 'Community Health Worker'}</p>
+                  <p className="text-xs text-gray-500 leading-tight truncate">{chw?.specialization}</p>
                   <div className="flex items-center gap-1 mt-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block flex-shrink-0" />
-                    <span className="text-xs text-gray-400">{profile.status}</span>
+                    <span className={`w-1.5 h-1.5 rounded-full inline-block flex-shrink-0 ${statusColour}`} />
+                    <span className="text-xs text-gray-400">{statusLabel}</span>
                   </div>
                 </div>
-                
                 <div className="text-right text-xs text-gray-500 flex-shrink-0 hidden sm:block">
-                  <p className="font-mono font-medium text-gray-700">{profile.userId}</p>
-                  <p className="mt-0.5">Joined {profile.memberSince}</p>
+                  <p className="font-mono font-medium text-gray-700">{chw?.code}</p>
+                  <p className="mt-0.5">Joined {formatJoined(chw?.createdAt)}</p>
                 </div>
               </div>
 
-              {/* ID pill — mobile only */}
+              {/* Mobile: code pill */}
               <div className="sm:hidden flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg mb-3">
-                <span className="text-xs text-gray-500">Employee ID</span>
-                <span className="text-xs font-mono font-medium text-gray-700">{profile.userId}</span>
+                <span className="text-xs text-gray-500">CHW Code</span>
+                <span className="text-xs font-mono font-medium text-gray-700">{chw?.code}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <EditableField label="First Name" icon={User} value={profile.firstName} onChange={(v) => set('firstName', v)} editMode={editMode} />
-                <EditableField label="Last Name" icon={User} value={profile.lastName} onChange={(v) => set('lastName', v)} editMode={editMode} />
-                <EditableField label="Email Address" icon={Mail} type="email" value={profile.email} onChange={(v) => set('email', v)} editMode={editMode} />
-                <EditableField label="Phone Number" icon={Phone} type="tel" value={profile.phone} onChange={(v) => set('phone', v)} editMode={editMode} />
-                <Field label="Date of Birth" value={profile.dateOfBirth} />
-                <Field label="Gender" value={profile.gender} />
+                <EditableField label="First Name" icon={User} value={form.firstName} onChange={(v) => set('firstName', v)} editMode={editMode} />
+                <EditableField label="Last Name"  icon={User} value={form.lastName}  onChange={(v) => set('lastName', v)}  editMode={editMode} />
+                <EditableField label="Email Address" icon={Mail}  type="email" value={form.email} onChange={(v) => set('email', v)} editMode={editMode} />
+                <EditableField label="Phone Number"  icon={Phone} type="tel"   value={form.phone} onChange={(v) => set('phone', v)} editMode={editMode} />
+                <Field label="Start Date" value={formatDate(chw?.startDate)} />
+                <Field label="Response Time" value={chw?.responseTime} />
               </div>
             </div>
           </div>
@@ -234,12 +362,12 @@ const CHWProfile = () => {
             <div className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <EditableField label="Street Address" icon={MapPin} value={profile.street} onChange={(v) => set('street', v)} editMode={editMode} />
+                  <EditableField label="Street Address" icon={MapPin} value={form.street} onChange={(v) => set('street', v)} editMode={editMode} />
                 </div>
-                <Field label="City" value={profile.city} />
-                <Field label="County" value={profile.county} />
-                <Field label="Postal Code" value={profile.postalCode} />
-                <Field label="Country" value={profile.country} />
+                <EditableField label="City"        icon={MapPin} value={form.city}       onChange={(v) => set('city', v)}       editMode={editMode} />
+                <EditableField label="County"      icon={MapPin} value={form.county}     onChange={(v) => set('county', v)}     editMode={editMode} />
+                <EditableField label="Postal Code" icon={MapPin} value={form.postalCode} onChange={(v) => set('postalCode', v)} editMode={editMode} />
+                <EditableField label="Country"     icon={MapPin} value={form.country}    onChange={(v) => set('country', v)}    editMode={editMode} />
               </div>
             </div>
           </div>
@@ -249,48 +377,38 @@ const CHWProfile = () => {
             <SectionHeader icon={Briefcase} title="Work Information" subtitle="Your professional details and coverage area" />
             <div className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label="CHW ID" value={profile.userId} />
-                <Field label="CHW Level" value={profile.chwLevel} />
-                <EditableField label="Specialization" icon={Activity} value={profile.specialization} onChange={(v) => set('specialization', v)} editMode={editMode} />
-                <Field label="Years of Experience" value={profile.yearsOfExperience} />
-                <EditableField label="Coverage Area" icon={MapPinned} value={profile.coverageArea} onChange={(v) => set('coverageArea', v)} editMode={editMode} />
-                <Field label="Assigned Facility" value={profile.assignedFacility} />
+                <Field label="CHW Code"           value={chw?.code} />
+                <Field label="Assigned Facility"  value={chw?.hospital?.name} />
+                <EditableField label="Specialization" icon={Activity}  value={form.specialization} onChange={(v) => set('specialization', v)} editMode={editMode} />
+                <EditableField label="Region / Coverage Area" icon={MapPinned} value={form.region} onChange={(v) => set('region', v)} editMode={editMode} />
+                <Field label="Assigned Patients"  value={chw?.assignedPatients} />
+                <Field label="Status"             value={statusLabel} />
               </div>
             </div>
           </div>
 
-          {/* ── Certifications & Training ── */}
+          {/* ── Performance Overview ── */}
           <div className="border border-gray-200 overflow-hidden bg-white">
-            <SectionHeader icon={Award} title="Certifications & Training" subtitle="Your certifications and training history" />
+            <SectionHeader icon={Activity} title="Performance Overview" subtitle="Your field performance and patient statistics" />
             <div className="p-4 space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="sm:col-span-2">
-                  <Field label="Certifications Held" value={profile.certifications} />
-                </div>
-                <Field label="Training Courses Completed" value={profile.trainingCompleted} />
-                <Field label="Last Training Date" value={profile.lastTraining} />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                {performanceStats.map((stat) => {
+                  const Icon = stat.icon;
+                  return (
+                    <div key={stat.label} className="px-3 py-3 bg-gray-50 border border-gray-200 rounded-lg text-center">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mx-auto mb-1" />
+                      <p className="text-lg sm:text-xl font-bold text-blue-600">{stat.value ?? '—'}</p>
+                      <p className="text-xs text-gray-500 mt-0.5 leading-tight">{stat.label}</p>
+                    </div>
+                  );
+                })}
               </div>
-              <InfoNote title="Continue Learning" message="Keep your certifications up to date. Visit Resources & Training to access new courses." />
-            </div>
-          </div>
-
-          {/* ── Supervisor Contact ── */}
-          <div className="border border-gray-200 overflow-hidden bg-white">
-            <SectionHeader icon={Users} title="Supervisor Contact" subtitle="Your supervisor and emergency contact details" />
-            <div className="p-4 space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <EditableField label="Supervisor Name" icon={User} value={profile.supervisorName} onChange={(v) => set('supervisorName', v)} editMode={editMode} />
-                <EditableField label="Supervisor Phone" icon={Phone} type="tel" value={profile.supervisorPhone} onChange={(v) => set('supervisorPhone', v)} editMode={editMode} />
-                <div className="sm:col-span-2">
-                  <EditableField label="Supervisor Email" icon={Mail} type="email" value={profile.supervisorEmail} onChange={(v) => set('supervisorEmail', v)} editMode={editMode} />
-                </div>
-              </div>
-              <InfoNote title="Support Available" message="Contact your supervisor for work-related concerns or support during field visits." />
+              <InfoNote title="Track Your Progress" message="View detailed performance reports in the Reports & Analytics section." />
             </div>
           </div>
 
           {/* ── Security Settings ── */}
-          <div className="border border-gray-200 overflow-hidden bg-white">
+          {/* <div className="border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={Shield} title="Security Settings" subtitle="Password, 2FA and active sessions" />
             <div className="p-4 space-y-4">
               <div>
@@ -363,10 +481,10 @@ const CHWProfile = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* ── Preferences ── */}
-          <div className="border border-gray-200 overflow-hidden bg-white">
+          {/* <div className="border border-gray-200 overflow-hidden bg-white">
             <SectionHeader icon={Settings} title="Preferences" subtitle="Notification settings and regional preferences" />
             <div className="p-4 space-y-4">
               <div>
@@ -400,27 +518,7 @@ const CHWProfile = () => {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* ── Performance Overview ── */}
-          <div className="border border-gray-200 overflow-hidden bg-white">
-            <SectionHeader icon={Activity} title="Performance Overview" subtitle="Your field performance and patient statistics" />
-            <div className="p-4 space-y-3">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                {performanceStats.map((stat) => {
-                  const Icon = stat.icon;
-                  return (
-                    <div key={stat.label} className="px-3 py-3 bg-gray-50 border border-gray-200 rounded-lg text-center">
-                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mx-auto mb-1" />
-                      <p className="text-lg sm:text-xl font-bold text-blue-600">{stat.value}</p>
-                      <p className="text-xs text-gray-500 mt-0.5 leading-tight">{stat.label}</p>
-                    </div>
-                  );
-                })}
-              </div>
-              <InfoNote title="Track Your Progress" message="View detailed performance reports in the Reports & Analytics section." />
-            </div>
-          </div>
+          </div> */}
 
           {/* ── Activity & History ── */}
           <div className="border border-gray-200 overflow-hidden bg-white">
@@ -446,7 +544,6 @@ const CHWProfile = () => {
 
               <div className="border-t border-gray-100 pt-4">
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Login History</h3>
-                {/* Table on sm+, cards on mobile */}
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full">
                     <thead>
