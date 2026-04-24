@@ -657,11 +657,11 @@ const CHWDashboard = () => {
             <span className="font-semibold text-gray-700 group-hover:text-blue-700">Add Task</span>
           </Link>
           <Link
-            to="/client/chw/health-assessments"
+            to="/client/chw/appointments"
             className="flex items-center space-x-3 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
           >
             <Heart className="w-6 h-6 text-gray-600 group-hover:text-blue-600" />
-            <span className="font-semibold text-gray-700 group-hover:text-blue-700">New Assessment</span>
+            <span className="font-semibold text-gray-700 group-hover:text-blue-700">New Appointment</span>
           </Link>
           <Link
             to="/client/chw/reports"
