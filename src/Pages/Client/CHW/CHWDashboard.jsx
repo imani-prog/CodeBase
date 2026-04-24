@@ -11,12 +11,10 @@ import {
   Heart,
   AlertCircle,
   RefreshCw,
-  Loader2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { chwService } from '../../../Services/domain/chwService.js';
-import { homeVisitApi } from '../../../API/endpoints/homeVisitApi.js';
-import { patientApi } from '../../../API/endpoints/patientApi.js';
+import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -46,16 +44,20 @@ function formatRelativeTime(iso) {
   return diffDays === 1 ? 'Yesterday' : `${diffDays}d ago`;
 }
 
-// Map HomeVisitResponse fields → UI shape
+// Map a post-grouped visit (output of groupHomeVisitsByTab) → dashboard UI shape.
+// groupHomeVisitsByTab already reshapes fields: patientId → patientIdText, visitType → type, etc.
 function mapVisit(v) {
+  const priorityUpper = String(v.priority || '').toUpperCase();
   return {
     id: v.id,
     patientName: v.patientName || 'Unknown Patient',
-    patientId: v.patientId ? `PT-${v.patientId}` : '—',
+    // groupHomeVisitsByTab sets patientId = visit.patientIdText (already a string like "PT-123")
+    patientId: v.patientId || '—',
     time: formatScheduledAt(v.scheduledAt),
     location: v.location || '—',
-    type: v.visitType || 'Home Visit',
-    urgent: String(v.priority || '').toUpperCase() === 'HIGH' || String(v.priority || '').toUpperCase() === 'URGENT',
+    // groupHomeVisitsByTab sets type = visit.visitType
+    type: v.type || 'Home Visit',
+    urgent: priorityUpper === 'HIGH' || priorityUpper === 'URGENT',
     status: String(v.status || '').toUpperCase(),
     scheduledAt: v.scheduledAt,
     updatedAt: v.updatedAt,
@@ -137,9 +139,6 @@ const CHWDashboard = () => {
   const [recentActivity, setRecentActivity] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
 
-  // Patient count (independent of profile so we get a live number)
-  const [patientCount, setPatientCount] = useState(null);
-  const [patientCountLoading, setPatientCountLoading] = useState(true);
 
   // ── Fetchers ───────────────────────────────────────────────────────────────
 
@@ -158,117 +157,70 @@ const CHWDashboard = () => {
 
   const fetchVisits = useCallback(async (chwId) => {
     setVisitsLoading(true);
+    setActivityLoading(true);
     setVisitsError(null);
     try {
-      // Fetch SCHEDULED visits for upcoming section
-      const params = { status: 'SCHEDULED' };
-      if (chwId) params.chwId = chwId;
-      const raw = await homeVisitApi.list(params);
-      const list = Array.isArray(raw) ? raw : (raw?.content ?? raw?.data ?? []);
+      // Mirror the HomeVisits page exactly: fetch ALL visits, group client-side.
+      // Passing status as a query param is unreliable — the backend may ignore it
+      // or use different enum casing. groupHomeVisitsByTab is the single source of truth.
+      const query = chwId ? { chwId } : {};
+      const list = await homeVisitService.listHomeVisits(query);
+      const grouped = homeVisitService.groupHomeVisitsByTab(list);
 
-      // Sort by scheduledAt ascending, take next 5
-      const sorted = list
+      // Upcoming: sort by scheduledAt asc, show next 5
+      const sorted = (grouped.upcoming ?? [])
         .map(mapVisit)
         .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))
         .slice(0, 5);
       setUpcomingVisits(sorted);
-    } catch (err) {
-      setVisitsError(err?.message || 'Failed to load home visits');
-    } finally {
-      setVisitsLoading(false);
-    }
-  }, []);
 
-  const fetchRecentActivity = useCallback(async (chwId) => {
-    setActivityLoading(true);
-    try {
-      // Pull recently completed/cancelled visits as activity feed
-      const params = {};
-      if (chwId) params.chwId = chwId;
-
-      const [completedRaw, cancelledRaw] = await Promise.allSettled([
-        homeVisitApi.list({ ...params, status: 'COMPLETED' }),
-        homeVisitApi.list({ ...params, status: 'CANCELLED' }),
-      ]);
-
-      const toList = (result) => {
-        if (result.status !== 'fulfilled') return [];
-        const r = result.value;
-        return Array.isArray(r) ? r : (r?.content ?? r?.data ?? []);
-      };
-
-      const completed = toList(completedRaw).map((v) => ({
+      // Activity feed: completed + cancelled, sorted by updatedAt desc
+      const completed = (grouped.completed ?? []).map((v) => ({
         ...mapVisit(v),
         action: 'Completed home visit',
         icon: CheckCircle,
-        color: 'green',
       }));
-
-      const cancelled = toList(cancelledRaw).map((v) => ({
+      const cancelled = (grouped.cancelled ?? []).map((v) => ({
         ...mapVisit(v),
         action: 'Visit cancelled',
         icon: AlertCircle,
-        color: 'red',
       }));
-
-      const combined = [...completed, ...cancelled]
+      const activity = [...completed, ...cancelled]
         .filter((v) => v.updatedAt)
         .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
         .slice(0, 5);
-
-      setRecentActivity(combined);
-    } catch {
-      // Non-critical — silently degrade
+      setRecentActivity(activity);
+    } catch (err) {
+      setVisitsError(err?.message || 'Failed to load home visits');
       setRecentActivity([]);
     } finally {
+      setVisitsLoading(false);
       setActivityLoading(false);
     }
   }, []);
 
-  const fetchPatientCount = useCallback(async () => {
-    setPatientCountLoading(true);
-    try {
-      // patientApi.list returns array or paged result; we just need the count
-      const raw = await patientApi.list({ size: 1 });
-      if (Array.isArray(raw)) {
-        setPatientCount(raw.length);
-      } else {
-        // Spring Page: { totalElements, content, ... }
-        setPatientCount(raw?.totalElements ?? raw?.total ?? raw?.content?.length ?? null);
-      }
-    } catch {
-      setPatientCount(null);
-    } finally {
-      setPatientCountLoading(false);
-    }
-  }, []);
 
   // ── Bootstrap ──────────────────────────────────────────────────────────────
 
   useEffect(() => {
     fetchProfile();
-    fetchPatientCount();
-  }, [fetchProfile, fetchPatientCount]);
+  }, [fetchProfile]);
 
-  // Once we have the CHW id, fire the visit + activity fetches
+  // Once profile resolves, fetch visits (which also populates activity feed)
   useEffect(() => {
-    if (profileLoading) return; // wait for profile
-    const chwId = profile?.id ?? null;
-    fetchVisits(chwId);
-    fetchRecentActivity(chwId);
-  }, [profile, profileLoading, fetchVisits, fetchRecentActivity]);
+    if (profileLoading) return;
+    fetchVisits(profile?.id ?? null);
+  }, [profile, profileLoading, fetchVisits]);
 
   // ── Derived stats ──────────────────────────────────────────────────────────
 
   const stats = [
     {
       label: 'Assigned Patients',
-      value: profileLoading || patientCountLoading
-        ? null
-        : (patientCount ?? profile?.assignedPatients ?? '—'),
-      change: profile?.assignedPatients ? `${profile.assignedPatients} assigned to you` : null,
+      value: profile?.assignedPatients ?? null,
+      change: profile?.region ? `Region: ${profile.region}` : null,
       icon: Users,
-      loading: profileLoading && patientCountLoading,
+      loading: profileLoading,
       error: profileError,
     },
     {
@@ -315,10 +267,7 @@ const CHWDashboard = () => {
           )}
         </div>
         <button
-          onClick={() => {
-            fetchProfile();
-            fetchPatientCount();
-          }}
+          onClick={fetchProfile}
           className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-600 transition-colors"
           title="Refresh dashboard"
         >
