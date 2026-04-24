@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, createElement } from 'react';
 import {
   Users,
   Calendar,
@@ -15,8 +15,12 @@ import {
 import { Link } from 'react-router-dom';
 import { chwService } from '../../../Services/domain/chwService.js';
 import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
+import { assignmentService } from '../../../Services/domain/assignmentService.js';
+import { refreshAppointmentGovernanceSnapshot } from '../../../Services/appointmentGovernanceStore';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
+
+
 
 function formatScheduledAt(iso) {
   if (!iso) return '—';
@@ -44,6 +48,56 @@ function formatRelativeTime(iso) {
   return diffDays === 1 ? 'Yesterday' : `${diffDays}d ago`;
 }
 
+function toNumericId(value) {
+  if (value == null) return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const match = String(value).trim().match(/\d+/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function isHomeVisitAppointment(value) {
+  const text = String(value || '').toUpperCase();
+  return text.includes('HOME') && text.includes('VISIT');
+}
+
+function mapAppointmentHomeVisits(rows = []) {
+  return rows.reduce(
+    (acc, row) => {
+      const mapped = {
+        id: `appt-${row?.id}`,
+        patientName: row?.patientName || 'Unknown Patient',
+        patientId: row?.patientId != null ? `PT-${row.patientId}` : 'N/A',
+        location: row?.facility || 'Community Health Visit',
+        type: 'Home Visit',
+        priority: 'normal',
+        notes: row?.reason || '',
+        reason: row?.cancellationReason || '',
+        outcome: row?.reason || '',
+        scheduledAt: row?.scheduledAt || null,
+        updatedAt: row?.updatedAt || row?.scheduledAt || null,
+      };
+
+      const status = String(row?.status || '').toUpperCase();
+      if (status === 'COMPLETED') {
+        acc.completed.push({ ...mapped, status: 'completed' });
+      } else if (status === 'CANCELED' || status === 'NO_SHOW') {
+        acc.cancelled.push({
+          ...mapped,
+          status: 'cancelled',
+          reasonType: status === 'NO_SHOW' ? 'NO_SHOW' : undefined,
+        });
+      } else {
+        acc.upcoming.push(mapped);
+      }
+
+      return acc;
+    },
+    { upcoming: [], completed: [], cancelled: [] }
+  );
+}
+
 // Map a post-grouped visit (output of groupHomeVisitsByTab) → dashboard UI shape.
 // groupHomeVisitsByTab already reshapes fields: patientId → patientIdText, visitType → type, etc.
 function mapVisit(v) {
@@ -64,30 +118,103 @@ function mapVisit(v) {
   };
 }
 
+function mapAppointmentToActivity(appointment) {
+  const status = String(appointment?.status || '').toUpperCase();
+
+  let action = 'Scheduled appointment';
+  let icon = Calendar;
+  if (status === 'COMPLETED') {
+    action = 'Completed appointment';
+    icon = CheckCircle;
+  } else if (status === 'CANCELED' || status === 'NO_SHOW') {
+    action = 'Cancelled appointment';
+    icon = AlertCircle;
+  } else if (status === 'ARRIVED' || status === 'IN_PROGRESS') {
+    action = 'Checked in appointment';
+    icon = Clock;
+  }
+
+  return {
+    id: `appointment-${appointment?.id || appointment?.sourceAppointmentId || 'unknown'}`,
+    action,
+    icon,
+    patientName: appointment?.patientName || 'Unknown Patient',
+    sourceLabel: 'Appointments',
+    activityAt: appointment?.updatedAt || appointment?.scheduledAt || null,
+  };
+}
+
+function mapTaskAssignmentToActivity(taskAssignment) {
+  const status = String(taskAssignment?.status || '').toUpperCase();
+
+  let action = 'Assigned task';
+  let icon = ClipboardList;
+  if (status === 'IN_PROGRESS') {
+    action = 'Started task';
+    icon = Clock;
+  } else if (status === 'COMPLETED') {
+    action = 'Completed task';
+    icon = CheckCircle;
+  } else if (status === 'CANCELED' || status === 'CANCELLED') {
+    action = 'Cancelled task';
+    icon = AlertCircle;
+  }
+
+  return {
+    id: `task-${taskAssignment?.id || 'unknown'}`,
+    action,
+    icon,
+    patientName: taskAssignment?.patientName || 'Unknown Patient',
+    sourceLabel: 'Tasks & Follow-ups',
+    activityAt:
+      taskAssignment?.updatedAt
+      || taskAssignment?.completedAt
+      || taskAssignment?.startedAt
+      || taskAssignment?.assignedAt
+      || taskAssignment?.createdAt
+      || null,
+  };
+}
+
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function StatCard({ label, value, change, icon: Icon, loading, error }) {
+// trend: 'up' | 'warn' | 'neutral' | null
+function StatCard({ label, value, change, icon: Icon, loading, error, trend, trendLabel }) {
+  const badge = {
+    up:      'text-green-700',
+    warn:    'text-yellow-700',
+    neutral: 'text-gray-500',
+  }[trend] ?? null;
+
+  const TrendIcon = trend === 'up' ? TrendingUp : trend === 'warn' ? AlertCircle : null;
+
+  const iconColor = trend === 'warn' ? 'text-yellow-600' : 'text-blue-600';
+
   return (
-    <div className="bg-white p-3 sm:p-4 border border-gray-200 hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between mb-3">
-        <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center text-blue-600">
-          <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-        </div>
-        {!loading && !error && value !== null && (
-          <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+    <div className="bg-white border border-gray-200 p-3.5 flex flex-row items-center gap-3.5 min-w-0 overflow-hidden">
+      
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`}>
+        <Icon className={`w-5 h-5 ${iconColor}`} />
+      </div>
+      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+        {loading ? (
+          <div className="h-6 w-12 bg-gray-100 rounded animate-pulse" />
+        ) : error ? (
+          <p className="text-sm text-red-500">—</p>
+        ) : (
+          <p className="text-xl font-bold text-blue-600 leading-tight">{value ?? '—'}</p>
+        )}
+        <p className="text-xs font-bold text-gray-700 ">{label}</p>
+        {!loading && !error && change && (
+          <p className="text-[11px] text-gray-600 truncate">{change}</p>
+        )}
+        {!loading && !error && badge && trendLabel && (
+          <span className={`inline-flex items-center gap-1 text-[11px] font-medium rounded px-1.5 py-0.5 w-fit mt-0.5 ${badge}`}>
+            {TrendIcon && <TrendIcon className="w-3 h-3" />}
+            {trendLabel}
+          </span>
         )}
       </div>
-      {loading ? (
-        <div className="h-8 w-16 bg-gray-100 rounded animate-pulse mb-1" />
-      ) : error ? (
-        <p className="text-sm text-red-500">—</p>
-      ) : (
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{value ?? '—'}</h3>
-      )}
-      <p className="text-xs sm:text-sm text-gray-600 mt-1">{label}</p>
-      {!loading && !error && change && (
-        <p className="text-xs text-gray-500 mt-1 sm:mt-2">{change}</p>
-      )}
     </div>
   );
 }
@@ -134,8 +261,10 @@ const CHWDashboard = () => {
   const [upcomingVisits, setUpcomingVisits] = useState([]);
   const [visitsLoading, setVisitsLoading] = useState(true);
   const [visitsError, setVisitsError] = useState(null);
+  const [monthlyVisitsCount, setMonthlyVisitsCount] = useState(0);
+  const [openTasksCount, setOpenTasksCount] = useState(0);
 
-  // Recent activity = recently updated visits (completed/cancelled)
+  // Recent activity across CHW portal modules
   const [recentActivity, setRecentActivity] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
 
@@ -163,9 +292,36 @@ const CHWDashboard = () => {
       // Mirror the HomeVisits page exactly: fetch ALL visits, group client-side.
       // Passing status as a query param is unreliable — the backend may ignore it
       // or use different enum casing. groupHomeVisitsByTab is the single source of truth.
-      const query = chwId ? { chwId } : {};
+      const normalizedChwId = toNumericId(chwId);
+      const query = normalizedChwId != null ? { chwId: normalizedChwId } : {};
       const list = await homeVisitService.listHomeVisits(query);
-      const grouped = homeVisitService.groupHomeVisitsByTab(list);
+      let grouped = homeVisitService.groupHomeVisitsByTab(list);
+
+      let appointmentRows = [];
+      if (normalizedChwId != null) {
+        try {
+          const snapshot = await refreshAppointmentGovernanceSnapshot({
+            providerRole: 'CHW',
+            chwId: normalizedChwId,
+          });
+          appointmentRows = Array.isArray(snapshot?.appointments) ? snapshot.appointments : [];
+        } catch {
+          appointmentRows = [];
+        }
+      }
+
+      const groupedCount = grouped.upcoming.length + grouped.completed.length + grouped.cancelled.length;
+      if (groupedCount === 0 && normalizedChwId != null) {
+        const homeVisitAppointments = appointmentRows.filter((row) => (
+            String(row?.providerRole || '').toUpperCase() === 'CHW'
+            && String(row?.providerId ?? '') === String(normalizedChwId)
+            && isHomeVisitAppointment(row?.appointmentType)
+        ));
+
+        if (homeVisitAppointments.length > 0) {
+          grouped = mapAppointmentHomeVisits(homeVisitAppointments);
+        }
+      }
 
       // Upcoming: sort by scheduledAt asc, show next 5
       const sorted = (grouped.upcoming ?? [])
@@ -174,24 +330,105 @@ const CHWDashboard = () => {
         .slice(0, 5);
       setUpcomingVisits(sorted);
 
-      // Activity feed: completed + cancelled, sorted by updatedAt desc
-      const completed = (grouped.completed ?? []).map((v) => ({
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+      const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
+      const isCurrentMonth = (iso) => {
+        if (!iso) return false;
+        const ts = Date.parse(iso);
+        if (Number.isNaN(ts)) return false;
+        return ts >= monthStart && ts < nextMonthStart;
+      };
+
+      // Monthly visits = all non-cancelled visits scheduled in the current calendar month.
+      const monthlyVisitTotal = [
+        ...(grouped.upcoming ?? []),
+        ...(grouped.completed ?? []),
+      ].filter((visit) => isCurrentMonth(visit?.scheduledAt)).length;
+      setMonthlyVisitsCount(monthlyVisitTotal);
+
+      // Activity feed: home visits + appointments + tasks.
+      const visitCompleted = (grouped.completed ?? []).map((v) => ({
         ...mapVisit(v),
+        id: `visit-completed-${v.id}`,
         action: 'Completed home visit',
         icon: CheckCircle,
+        sourceLabel: 'Home Visits',
+        activityAt: v.updatedAt || v.scheduledAt || null,
       }));
-      const cancelled = (grouped.cancelled ?? []).map((v) => ({
+      const visitCancelled = (grouped.cancelled ?? []).map((v) => ({
         ...mapVisit(v),
+        id: `visit-cancelled-${v.id}`,
         action: 'Visit cancelled',
         icon: AlertCircle,
+        sourceLabel: 'Home Visits',
+        activityAt: v.updatedAt || v.scheduledAt || null,
       }));
-      const activity = [...completed, ...cancelled]
-        .filter((v) => v.updatedAt)
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      const visitScheduled = (grouped.upcoming ?? []).map((v) => ({
+        ...mapVisit(v),
+        id: `visit-scheduled-${v.id}`,
+        action: 'Visit scheduled',
+        icon: Calendar,
+        sourceLabel: 'Home Visits',
+        activityAt: v.updatedAt || v.scheduledAt || null,
+      }));
+
+      const appointmentActivity = appointmentRows
+        .filter((row) => String(row?.providerRole || '').toUpperCase() === 'CHW')
+        .filter((row) => (
+          normalizedChwId == null
+          || String(row?.providerId ?? '') === String(normalizedChwId)
+        ))
+        .filter((row) => !isHomeVisitAppointment(row?.appointmentType))
+        .map(mapAppointmentToActivity);
+
+      let taskAssignments = [];
+      if (normalizedChwId != null) {
+        try {
+          taskAssignments = await assignmentService.listAssignmentsByChw(normalizedChwId, { size: 300 });
+        } catch (taskByChwError) {
+          if (![404].includes(taskByChwError?.status)) {
+            taskAssignments = [];
+          }
+        }
+      }
+
+      if (!taskAssignments.length) {
+        try {
+          const allAssignments = await assignmentService.listAssignments({ size: 300 });
+          taskAssignments = normalizedChwId == null
+            ? allAssignments
+            : allAssignments.filter((row) => String(row?.chwId ?? '') === String(normalizedChwId));
+        } catch {
+          taskAssignments = [];
+        }
+      }
+
+      const taskActivity = taskAssignments
+        .filter((row) => String(row?.assignmentType || '').toUpperCase() === 'TASK')
+        .map(mapTaskAssignmentToActivity);
+
+      const openTaskTotal = taskAssignments
+        .filter((row) => String(row?.assignmentType || '').toUpperCase() === 'TASK')
+        .filter((row) => !['COMPLETED', 'CANCELED', 'CANCELLED'].includes(String(row?.status || '').toUpperCase()))
+        .length;
+      setOpenTasksCount(openTaskTotal);
+
+      const activity = [
+        ...visitCompleted,
+        ...visitCancelled,
+        ...visitScheduled,
+        ...appointmentActivity,
+        ...taskActivity,
+      ]
+        .filter((v) => v.activityAt)
+        .sort((a, b) => new Date(b.activityAt) - new Date(a.activityAt))
         .slice(0, 5);
       setRecentActivity(activity);
     } catch (err) {
       setVisitsError(err?.message || 'Failed to load home visits');
+      setMonthlyVisitsCount(0);
+      setOpenTasksCount(0);
       setRecentActivity([]);
     } finally {
       setVisitsLoading(false);
@@ -225,13 +462,11 @@ const CHWDashboard = () => {
     },
     {
       label: 'Monthly Visits',
-      value: profile?.monthlyVisits ?? null,
-      change: profile?.successRate != null
-        ? `${Number(profile.successRate).toFixed(0)}% success rate`
-        : null,
+      value: visitsLoading ? null : monthlyVisitsCount,
+      change: `${new Date().toLocaleDateString('en-KE', { month: 'long' })} schedule`,
       icon: MapPin,
-      loading: profileLoading,
-      error: profileError,
+      loading: visitsLoading,
+      error: visitsError,
     },
     {
       label: 'Upcoming Visits',
@@ -242,12 +477,12 @@ const CHWDashboard = () => {
       error: visitsError,
     },
     {
-      label: 'Rating',
-      value: profile?.rating != null ? `${Number(profile.rating).toFixed(1)} ★` : null,
-      change: profile?.responseTime ? `Avg response: ${profile.responseTime}` : null,
-      icon: Activity,
-      loading: profileLoading,
-      error: profileError,
+      label: 'Open Tasks',
+      value: visitsLoading ? null : openTasksCount,
+      change: 'Pending and in progress',
+      icon: ClipboardList,
+      loading: visitsLoading,
+      error: visitsError,
     },
   ];
 
@@ -260,20 +495,20 @@ const CHWDashboard = () => {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
           {profile && (
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm font-medium mt-0.5">
               Welcome back, {profile.username || profile.name}
               {profile.region ? ` · ${profile.region}` : ''}
             </p>
           )}
         </div>
-        <button
+        {/* <button
           onClick={fetchProfile}
           className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-600 transition-colors"
           title="Refresh dashboard"
         >
           <RefreshCw className={`w-4 h-4 ${profileLoading ? 'animate-spin' : ''}`} />
           <span className="hidden sm:inline">Refresh</span>
-        </button>
+        </button> */}
       </div>
 
       {/* Profile error banner */}
@@ -390,9 +625,9 @@ const CHWDashboard = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold">{item.action}</p>
-                      <p className="text-sm text-gray-600 truncate">{item.patientName}</p>
+                      <p className="text-sm text-gray-600 truncate">{item.patientName} · {item.sourceLabel}</p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {formatRelativeTime(item.updatedAt)}
+                        {formatRelativeTime(item.activityAt || item.updatedAt)}
                       </p>
                     </div>
                   </div>
@@ -437,6 +672,8 @@ const CHWDashboard = () => {
           </Link>
         </div>
       </div>
+
+      
     </div>
   );
 };

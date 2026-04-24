@@ -556,9 +556,7 @@ const TasksFollowups = () => {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tasks &amp; Follow-ups</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {isLoading ? 'Syncing tasks from backend...' : `Live backend tasks for CHW ${activeChwId ?? 'N/A'}`}
-          </p>
+          
           {tasksError && <p className="text-sm text-red-700 mt-1">{tasksError}</p>}
         </div>
         <button
