@@ -425,7 +425,7 @@ const SystemLogs = () => {
                     <td className="px-6 py-4">
                       <div>
                         <p className="text-sm font-bold">{log.entityType}</p>
-                        <p className="text-xs text-gray-500">ID: {log.entityId || '-'}</p>
+                        {/* <p className="text-xs text-gray-500">ID: {log.entityId || '-'}</p> */}
                       </div>
                     </td>
                     <td className="px-6 py-4">
