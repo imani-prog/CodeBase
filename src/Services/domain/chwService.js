@@ -9,14 +9,12 @@ function mapChwToUi(row = {}) {
   return {
     id: row.id ?? null,
     code: row.code || "",
-    // Split mapped fields for form binding
     firstName: safeString(row.firstName),
     middleName: safeString(row.middleName),
     lastName: safeString(row.lastName),
     name: fullName || "Unknown CHW",
     email: safeString(row.email),
     phone: safeString(row.phone),
-    // Address
     street: safeString(row.addressLine1),
     addressLine2: safeString(row.addressLine2),
     city: safeString(row.city),
@@ -26,21 +24,17 @@ function mapChwToUi(row = {}) {
     // Location
     latitude: row.latitude ?? null,
     longitude: row.longitude ?? null,
-    // Work
     region: safeString(row.region),
     specialization: safeString(row.specialization),
     status: safeString(row.status).toUpperCase(),
     assignedPatients: row.assignedPatients ?? 0,
     startDate: row.startDate || null,
-    // Performance
     monthlyVisits: row.monthlyVisits ?? 0,
     successRate: row.successRate ?? 0,
     responseTime: safeString(row.responseTime),
     rating: row.rating ?? 0,
-    // Linked entities
     hospital: row.hospital ?? null,
     user: row.user ?? null,
-    // Audit
     createdAt: row.createdAt || null,
     updatedAt: row.updatedAt || null,
     raw: row,
