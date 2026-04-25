@@ -11,6 +11,7 @@ import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
 import { assignmentService } from '../../../Services/domain/assignmentService.js';
 import { chwService } from '../../../Services/domain/chwService.js';
 import { refreshAppointmentGovernanceSnapshot } from '../../../Services/appointmentGovernanceStore';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
 Chart.register(...registerables);
 
@@ -101,6 +102,62 @@ function safePatientKey(...values) {
     return text.toLowerCase();
   }
   return null;
+}
+
+function getChwIdCandidates(user, chwProfile) {
+  const rawCandidates = [
+    chwProfile?.id,
+    chwProfile?.chwId,
+    chwProfile?.user?.id,
+    user?.chwId,
+    user?.providerId,
+    user?.employeeId,
+    user?.id,
+    user?.userId,
+    toNumericId(chwProfile?.id),
+    toNumericId(chwProfile?.user?.id),
+    toNumericId(user?.chwId),
+    toNumericId(user?.providerId),
+    toNumericId(user?.employeeId),
+    toNumericId(user?.id),
+    toNumericId(user?.userId),
+  ];
+
+  const unique = new Set();
+  rawCandidates.forEach((value) => {
+    if (value == null) return;
+    const text = String(value).trim();
+    if (!text) return;
+    unique.add(text);
+
+    const numeric = toNumericId(text);
+    if (numeric != null) unique.add(String(numeric));
+  });
+
+  return Array.from(unique);
+}
+
+function hasAnyIdentifier(...values) {
+  return values.some((value) => {
+    if (value == null) return false;
+    return String(value).trim().length > 0;
+  });
+}
+
+function hasAnyChwIdMatch(chwIdLookup, ...values) {
+  if (!chwIdLookup || chwIdLookup.size === 0) return false;
+
+  for (const value of values) {
+    if (value == null) continue;
+    const text = String(value).trim();
+    if (!text) continue;
+    if (chwIdLookup.has(text)) return true;
+
+    const numeric = toNumericId(text);
+    if (numeric != null && chwIdLookup.has(String(numeric))) return true;
+  }
+
+  return false;
 }
 
 function buildDelta(current, previous, higherIsBetter = true) {
@@ -299,10 +356,19 @@ function PatientCategoryChart({ categories }) {
 
 /* ══ MAIN ══ */
 export default function ReportsAnalytics() {
+  const { user } = useAuth();
+
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState('');
   const [operationError, setOperationError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const sourceCacheRef = useRef({
+    homeVisits: [],
+    assignments: [],
+    appointments: [],
+    reports: [],
+  });
 
   const [metrics, setMetrics] = useState({
     patientsServed: 0,
@@ -508,12 +574,30 @@ export default function ReportsAnalytics() {
     setIsLoading(true);
     setFetchError('');
 
+    let chwProfile = null;
     let normalizedChwId = null;
     try {
-      const me = await chwService.getMe();
-      normalizedChwId = toNumericId(me?.id ?? me?.chwId ?? me?.providerId ?? me?.user?.id);
+      chwProfile = await chwService.getMe();
+      normalizedChwId = toNumericId(chwProfile?.id ?? chwProfile?.chwId ?? chwProfile?.providerId ?? chwProfile?.user?.id);
     } catch {
       // Continue without resolved CHW id.
+    }
+
+    const chwIdCandidates = getChwIdCandidates(user, chwProfile);
+    if (normalizedChwId != null) {
+      const normalizedText = String(normalizedChwId);
+      if (!chwIdCandidates.includes(normalizedText)) chwIdCandidates.push(normalizedText);
+    }
+
+    if (normalizedChwId == null && chwIdCandidates.length > 0) {
+      normalizedChwId = toNumericId(chwIdCandidates[0]);
+    }
+
+    const chwIdLookup = new Set(chwIdCandidates);
+    if (chwIdLookup.size === 0) {
+      setFetchError('Could not resolve your CHW identity for scoped analytics. Please sign in again.');
+      setIsLoading(false);
+      return;
     }
 
     const loadAssignments = async () => {
@@ -538,26 +622,50 @@ export default function ReportsAnalytics() {
       reportService.listReports({ size: 50 }),
     ]);
 
-    const homeVisits = homeVisitsResult.status === 'fulfilled' && Array.isArray(homeVisitsResult.value)
-      ? homeVisitsResult.value
-      : [];
+    if (homeVisitsResult.status === 'fulfilled' && Array.isArray(homeVisitsResult.value)) {
+      sourceCacheRef.current.homeVisits = homeVisitsResult.value;
+    }
+    if (assignmentsResult.status === 'fulfilled' && Array.isArray(assignmentsResult.value)) {
+      sourceCacheRef.current.assignments = assignmentsResult.value;
+    }
+    if (appointmentsResult.status === 'fulfilled') {
+      sourceCacheRef.current.appointments = normalizeListPayload(appointmentsResult.value?.appointments || appointmentsResult.value);
+    }
+    if (reportsResult.status === 'fulfilled') {
+      sourceCacheRef.current.reports = normalizeListPayload(reportsResult.value);
+    }
 
-    const assignments = assignmentsResult.status === 'fulfilled' && Array.isArray(assignmentsResult.value)
-      ? assignmentsResult.value
-      : [];
+    const homeVisits = sourceCacheRef.current.homeVisits.filter((visit) => {
+      const identifiers = [visit?.chwId, visit?.raw?.chwId, visit?.raw?.chw?.id, visit?.chwCode, visit?.raw?.chwCode];
+      if (hasAnyChwIdMatch(chwIdLookup, ...identifiers)) return true;
+      return normalizedChwId != null && !hasAnyIdentifier(...identifiers);
+    });
 
-    const appointmentRows = appointmentsResult.status === 'fulfilled'
-      ? normalizeListPayload(appointmentsResult.value?.appointments || appointmentsResult.value)
-      : [];
+    const assignments = sourceCacheRef.current.assignments.filter((row) => {
+      const identifiers = [row?.chwId, row?.raw?.chwId, row?.raw?.chw?.id, row?.raw?.chwCode];
+      if (hasAnyChwIdMatch(chwIdLookup, ...identifiers)) return true;
+      return normalizedChwId != null && !hasAnyIdentifier(...identifiers);
+    });
+
+    const appointmentRows = sourceCacheRef.current.appointments;
 
     const appointments = appointmentRows.filter((row) => {
       if (String(row?.providerRole || '').toUpperCase() !== 'CHW') return false;
-      if (normalizedChwId == null) return true;
-      return String(row?.providerId ?? '') === String(normalizedChwId);
+      const identifiers = [row?.providerId, row?.chwId, row?.provider?.id, row?.chw?.id, row?.raw?.providerId, row?.raw?.chwId];
+      if (hasAnyChwIdMatch(chwIdLookup, ...identifiers)) return true;
+      return normalizedChwId != null && !hasAnyIdentifier(...identifiers);
     });
 
-    const reportsPayload = reportsResult.status === 'fulfilled' ? reportsResult.value : [];
-    const reports = normalizeListPayload(reportsPayload)
+    const reports = sourceCacheRef.current.reports
+      .filter((row) => {
+        const moduleLabel = String(row?.module || '').toUpperCase();
+        if (moduleLabel && moduleLabel !== 'CHW') return false;
+
+        const ownerIdentifiers = [row?.chwId, row?.providerId, row?.createdBy, row?.userId];
+        if (!hasAnyIdentifier(...ownerIdentifiers)) return true;
+
+        return hasAnyChwIdMatch(chwIdLookup, ...ownerIdentifiers);
+      })
       .map((row, index) => mapReportRow(row, index))
       .sort((a, b) => (safeTime(b.generated) || 0) - (safeTime(a.generated) || 0))
       .slice(0, 20);
@@ -654,7 +762,12 @@ export default function ReportsAnalytics() {
       return rows.reduce((sum, value) => sum + value, 0) / rows.length;
     };
 
-    const currentPatientsServed = patientSetCurrent.size;
+    const assignedPatients = Number(chwProfile?.assignedPatients);
+    const hasAssignedPatients = Number.isFinite(assignedPatients) && assignedPatients >= 0;
+
+    const currentPatientsServed = patientSetCurrent.size > 0
+      ? patientSetCurrent.size
+      : (hasAssignedPatients ? assignedPatients : 0);
     const previousPatientsServed = patientSetPrevious.size;
     const currentVisitsCompleted = completedVisitsCurrent.length;
     const previousVisitsCompleted = completedVisitsPrevious.length;
@@ -725,10 +838,12 @@ export default function ReportsAnalytics() {
 
     if (totalFailures === 4) {
       setFetchError('Failed to load analytics from backend. Please retry.');
+    } else if (totalFailures > 0) {
+      setFetchError('Some analytics sources failed to refresh. Showing last synced values where possible.');
     }
 
     setIsLoading(false);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchLiveData();
