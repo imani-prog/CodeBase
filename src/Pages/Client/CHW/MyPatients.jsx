@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Users, Search, Filter, MapPin, Phone, Mail, Droplet,
-  Eye, Edit, Plus, Download, RefreshCw,
+  Eye, Edit, Plus, Download,
 } from 'lucide-react';
 import AddPatientModal    from '../../../Components/Admin/AddPatientModal';
 import EditPatientModal   from '../../../Components/Admin/EditPatientModal';
@@ -10,7 +10,6 @@ import { patientApi } from '../../../API/endpoints/patientApi.js';
 import { assignmentService } from '../../../Services/domain/assignmentService.js';
 import { chwService } from '../../../Services/domain/chwService.js';
 import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
-import { refreshAppointmentGovernanceSnapshot } from '../../../Services/appointmentGovernanceStore';
 import { useAuth } from '../../../hooks/useAuth.jsx';
 
 
@@ -51,7 +50,33 @@ const normalizeListPayload = (payload) => {
   if (Array.isArray(payload?.items)) return payload.items;
   if (Array.isArray(payload?.results)) return payload.results;
   if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.rows)) return payload.rows;
+  if (Array.isArray(payload?.patients)) return payload.patients;
+  if (Array.isArray(payload?.data?.content)) return payload.data.content;
+  if (Array.isArray(payload?.data?.items)) return payload.data.items;
+  if (Array.isArray(payload?.data?.results)) return payload.data.results;
+  if (Array.isArray(payload?.data?.rows)) return payload.data.rows;
+  if (Array.isArray(payload?.data?.patients)) return payload.data.patients;
   return [];
+};
+
+const unwrapEntityPayload = (payload) => {
+  if (!payload || Array.isArray(payload)) return payload;
+
+  const candidates = [
+    payload?.data,
+    payload?.item,
+    payload?.result,
+    payload?.patient,
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+      return candidate;
+    }
+  }
+
+  return payload;
 };
 
 const toNumericId = (value) => {
@@ -62,9 +87,15 @@ const toNumericId = (value) => {
   if (!text) return null;
   if (/^\d+$/.test(text)) return Number(text);
 
-  const match = text.match(/\d+/);
-  if (!match) return null;
-  const parsed = Number(match[0]);
+  const prefixedMatch = text.match(/^[A-Za-z]{1,10}[-_#](\d+)$/);
+  if (prefixedMatch) {
+    const parsedPrefixed = Number(prefixedMatch[1]);
+    return Number.isFinite(parsedPrefixed) ? parsedPrefixed : null;
+  }
+
+  const urlMatch = text.match(/\/(\d+)$/);
+  if (!urlMatch) return null;
+  const parsed = Number(urlMatch[1]);
   return Number.isFinite(parsed) ? parsed : null;
 };
 
@@ -84,6 +115,8 @@ const toChronicConditions = (value) => {
   return String(value || '').trim();
 };
 
+const TERMINAL_ASSIGNMENT_STATUSES = new Set(['COMPLETED', 'CANCELED', 'CANCELLED', 'REJECTED', 'UNASSIGNED', 'CLOSED']);
+
 const splitName = (value) => {
   const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return { firstName: '', middleName: '', lastName: '' };
@@ -96,40 +129,37 @@ const splitName = (value) => {
   };
 };
 
-const isHomeVisitAppointment = (value) => {
-  const text = String(value || '').toUpperCase();
-  return text.includes('HOME') && text.includes('VISIT');
-};
-
 const normalizePatientRecord = (row = {}, fallbackId = null) => {
-  const fullName = row.name || row.fullName || row.patientName || '';
+  const source = unwrapEntityPayload(row) || {};
+
+  const fullName = source.name || source.fullName || source.patientName || '';
   const parts = splitName(fullName);
 
-  const firstName = String(row.firstName || parts.firstName || '').trim();
-  const middleName = String(row.middleName || parts.middleName || '').trim();
-  const lastName = String(row.lastName || parts.lastName || '').trim();
+  const firstName = String(source.firstName || parts.firstName || '').trim();
+  const middleName = String(source.middleName || parts.middleName || '').trim();
+  const lastName = String(source.lastName || parts.lastName || '').trim();
 
-  const rawId = row.id ?? row.patientId ?? fallbackId ?? row.nationalId ?? row.email ?? row.phone ?? null;
-  const stableId = rawId == null ? `${firstName}-${lastName}-${row.dateOfBirth || 'unknown'}` : rawId;
+  const rawId = source.id ?? source.patientId ?? fallbackId ?? source.nationalId ?? source.email ?? source.phone ?? null;
+  const stableId = rawId == null ? `${firstName}-${lastName}-${source.dateOfBirth || 'unknown'}` : rawId;
 
   return {
-    ...row,
+    ...source,
     id: stableId,
     firstName,
     middleName,
     lastName,
-    gender: String(row.gender || 'OTHER').toUpperCase(),
-    dateOfBirth: row.dateOfBirth || row.dob || row.birthDate || null,
-    phone: row.phone || row.primaryPhone || row.mobilePhone || '',
-    email: row.email || '',
-    addressLine1: row.addressLine1 || row.street || row.address?.line1 || '',
-    city: row.city || row.town || row.address?.city || '',
-    country: row.country || row.address?.country || '',
-    nationalId: row.nationalId || row.idNumber || row.nationalIdentifier || '',
-    chronicConditions: toChronicConditions(row.chronicConditions || row.conditions || row.condition),
-    bloodType: row.bloodType || row.bloodGroup || row.blood_group || '',
-    status: toStatus(row.status || row.patientStatus || 'ACTIVE'),
-    maritalStatus: row.maritalStatus || row.civilStatus || '',
+    gender: String(source.gender || 'OTHER').toUpperCase(),
+    dateOfBirth: source.dateOfBirth || source.dob || source.birthDate || source.date_of_birth || source.dobDate || null,
+    phone: source.phone || source.phoneNumber || source.contactPhone || source.primaryPhone || source.mobilePhone || source.contact?.phone || source.user?.phone || '',
+    email: source.email || source.emailAddress || source.contactEmail || source.contact?.email || source.user?.email || '',
+    addressLine1: source.addressLine1 || source.address1 || source.street || source.address?.line1 || source.address?.addressLine1 || source.address?.street || source.address || '',
+    city: source.city || source.town || source.county || source.address?.city || source.address?.town || source.address?.county || '',
+    country: source.country || source.address?.country || '',
+    nationalId: source.nationalId || source.idNumber || source.nationalIdentifier || source.nationalNo || source.national_id || '',
+    chronicConditions: toChronicConditions(source.chronicConditions || source.chronicCondition || source.conditions || source.condition || source.medicalCondition || source.diagnosis),
+    bloodType: source.bloodType || source.bloodGroup || source.blood_group || source.bloodTypeName || source.blood_type || '',
+    status: toStatus(source.status || source.patientStatus || 'ACTIVE'),
+    maritalStatus: source.maritalStatus || source.civilStatus || '',
   };
 };
 
@@ -140,6 +170,33 @@ const sortPatientsByName = (rows = []) => {
     return nameA.localeCompare(nameB);
   });
 };
+
+const toPatientNameKey = (row = {}) => {
+  const fullName = `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''}`
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+  if (fullName) return fullName;
+  return String(row.fullName || row.name || row.patientName || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+};
+
+const mergeMissingPatientDetails = (baseRow = {}, detailsRow = {}) => ({
+  ...detailsRow,
+  ...baseRow,
+  phone: baseRow.phone || detailsRow.phone || '',
+  email: baseRow.email || detailsRow.email || '',
+  addressLine1: baseRow.addressLine1 || detailsRow.addressLine1 || '',
+  city: baseRow.city || detailsRow.city || '',
+  country: baseRow.country || detailsRow.country || '',
+  nationalId: baseRow.nationalId || detailsRow.nationalId || '',
+  chronicConditions: baseRow.chronicConditions || detailsRow.chronicConditions || '',
+  bloodType: baseRow.bloodType || detailsRow.bloodType || '',
+  dateOfBirth: baseRow.dateOfBirth || detailsRow.dateOfBirth || null,
+  gender: (baseRow.gender && baseRow.gender !== 'OTHER') ? baseRow.gender : (detailsRow.gender || baseRow.gender || 'OTHER'),
+});
 
 
 const MyPatients = () => {
@@ -154,14 +211,17 @@ const MyPatients = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [resolvedChwId, setResolvedChwId] = useState(null);
+  const [chwResolutionReady, setChwResolutionReady] = useState(false);
+  const latestLoadIdRef = useRef(0);
+  // CHW users are typically blocked from /api/patients*; avoid repeated 403 calls in load flow.
+  const patientApiForbiddenRef = useRef(true);
 
   const activeChwId = useMemo(() => (
     resolvedChwId
     ?? toNumericId(user?.chwId)
     ?? toNumericId(user?.providerId)
-    ?? toNumericId(user?.id)
     ?? null
-  ), [resolvedChwId, user?.chwId, user?.providerId, user?.id]);
+  ), [resolvedChwId, user?.chwId, user?.providerId]);
 
   const chwNameCandidates = useMemo(
     () => [user?.username, user?.name]
@@ -171,14 +231,34 @@ const MyPatients = () => {
   );
 
   const loadPatients = useCallback(async () => {
+    if (!chwResolutionReady) return;
+    const loadId = Date.now();
+    latestLoadIdRef.current = loadId;
+
     setIsLoading(true);
     setError('');
 
     try {
+      const canUsePatientApi = !patientApiForbiddenRef.current;
       const patientKeys = new Set();
       const embeddedById = new Map();
       const fallbackRows = [];
       const fallbackLookup = new Set();
+      let globalPatientsCatalog = [];
+      const homeVisitDetailsById = new Map();
+      const homeVisitDetailsByName = new Map();
+
+      if (canUsePatientApi) {
+        try {
+          const payload = await patientApi.list();
+          globalPatientsCatalog = normalizeListPayload(payload).map((row) => normalizePatientRecord(unwrapEntityPayload(row)));
+        } catch (patientCatalogError) {
+          if (patientCatalogError?.status === 403) {
+            patientApiForbiddenRef.current = true;
+          }
+          globalPatientsCatalog = [];
+        }
+      }
 
       const registerPatient = ({ rawPatientId, rawPatient, patientName, phone, city, addressLine1 }) => {
         const numeric = toNumericId(rawPatientId);
@@ -190,6 +270,9 @@ const MyPatients = () => {
 
         if (rawPatient) {
           const embeddedKey = key || String(rawPatient?.id ?? rawPatient?.patientId ?? '').trim() || null;
+          if (embeddedKey) {
+            patientKeys.add(embeddedKey);
+          }
           if (embeddedKey && !embeddedById.has(embeddedKey)) {
             embeddedById.set(embeddedKey, normalizePatientRecord(rawPatient, embeddedKey));
           }
@@ -213,61 +296,17 @@ const MyPatients = () => {
         }
       };
 
-      let homeVisits = [];
-      try {
-        const query = activeChwId != null ? { chwId: activeChwId } : {};
-        homeVisits = await homeVisitService.listHomeVisits(query);
-      } catch {
-        homeVisits = [];
-      }
-
-      homeVisits.forEach((visit) => {
-        registerPatient({
-          rawPatientId: visit?.patientId,
-          rawPatient: visit?.raw?.patient,
-          patientName: visit?.patientName,
-          phone: visit?.phone,
-          city: visit?.city,
-          addressLine1: visit?.location,
-        });
-      });
-
-      let appointmentRows = [];
-      try {
-        const snapshot = await refreshAppointmentGovernanceSnapshot(
-          activeChwId != null
-            ? { providerRole: 'CHW', chwId: activeChwId }
-            : { providerRole: 'CHW' }
-        );
-
-        const rows = Array.isArray(snapshot?.appointments) ? snapshot.appointments : [];
-        appointmentRows = rows
-          .filter((row) => String(row?.providerRole || '').toUpperCase() === 'CHW')
-          .filter((row) => (activeChwId == null || String(row?.providerId ?? '') === String(activeChwId)))
-          .filter((row) => isHomeVisitAppointment(row?.appointmentType));
-      } catch {
-        appointmentRows = [];
-      }
-
-      appointmentRows.forEach((row) => {
-        registerPatient({
-          rawPatientId: row?.patientId,
-          patientName: row?.patientName,
-          addressLine1: row?.facility,
-        });
-      });
-
       let assignments = [];
       if (activeChwId != null) {
         try {
-          assignments = await assignmentService.listAssignmentsByChw(activeChwId, { size: 500 });
+          assignments = await assignmentService.listAssignmentsByChw(activeChwId, { size: 1000 });
         } catch (fetchError) {
           if (![404].includes(fetchError?.status)) throw fetchError;
         }
       }
 
       if (!assignments.length) {
-        const allAssignments = await assignmentService.listAssignments({ size: 500 });
+        const allAssignments = await assignmentService.listAssignments({ size: 1000 });
         assignments = allAssignments.filter((row) => {
           const identifiers = [
             row?.chwId,
@@ -294,43 +333,96 @@ const MyPatients = () => {
         });
       }
 
-      assignments.forEach((row) => {
+      const activeAssignments = assignments.filter((row) => {
+        const status = String(row?.status || row?.raw?.status || '').toUpperCase();
+        if (!status) return true;
+        return !TERMINAL_ASSIGNMENT_STATUSES.has(status);
+      });
+
+      activeAssignments.forEach((row) => {
         registerPatient({
           rawPatientId: row?.patientId ?? row?.raw?.patientId,
-          rawPatient: row?.raw?.patient,
-          patientName: row?.patientName,
+          rawPatient: row?.raw?.patient ?? row?.patient ?? row?.raw?.patientDetails ?? row?.raw?.patientProfile,
+          patientName: row?.patientName ?? row?.raw?.patientName,
+          phone: row?.raw?.patientPhone ?? row?.raw?.phone ?? row?.raw?.phoneNumber ?? row?.phone,
+          city: row?.raw?.patientCity ?? row?.raw?.city ?? row?.city,
+          addressLine1: row?.raw?.patientAddress ?? row?.raw?.addressLine1 ?? row?.raw?.location,
         });
       });
 
+      let directlyAssignedPatients = [];
+      if (canUsePatientApi && activeChwId != null && patientKeys.size === 0 && fallbackRows.length === 0) {
+        const directQueries = [
+          { assignedChwId: activeChwId, size: 1000 },
+          { chwId: activeChwId, size: 1000 },
+          { providerId: activeChwId, size: 1000 },
+        ];
+
+        for (const query of directQueries) {
+          try {
+            const payload = await patientApi.list(query);
+            const list = normalizeListPayload(payload).map((row) => normalizePatientRecord(unwrapEntityPayload(row)));
+            if (list.length) {
+              directlyAssignedPatients = list;
+              break;
+            }
+          } catch (directPatientsError) {
+            if (directPatientsError?.status === 403) {
+              patientApiForbiddenRef.current = true;
+              break;
+            }
+            // Continue trying alternate backend query keys.
+          }
+        }
+      }
+
       const hydratedFromList = new Map();
-      if (patientKeys.size > 0) {
+      if (canUsePatientApi && patientKeys.size > 0) {
         try {
           const payload = await patientApi.list({ size: 1000 });
           const listed = normalizeListPayload(payload);
           listed.forEach((row) => {
-            const candidates = [row?.id, row?.patientId, row?.raw?.id, row?.raw?.patientId];
+            const unwrappedRow = unwrapEntityPayload(row);
+            const candidates = [unwrappedRow?.id, unwrappedRow?.patientId, unwrappedRow?.raw?.id, unwrappedRow?.raw?.patientId];
             for (const candidate of candidates) {
               const numeric = toNumericId(candidate);
               const key = numeric != null ? String(numeric) : (candidate != null ? String(candidate) : null);
               if (key && patientKeys.has(key)) {
-                hydratedFromList.set(key, normalizePatientRecord(row, key));
+                hydratedFromList.set(key, normalizePatientRecord(unwrappedRow, key));
                 break;
               }
             }
           });
-        } catch {
+        } catch (hydrateFromListError) {
+          if (hydrateFromListError?.status === 403) {
+            patientApiForbiddenRef.current = true;
+          }
           // Continue with direct by-id hydration.
         }
       }
 
       const hydratedById = await Promise.all(
         Array.from(patientKeys).map(async (key) => {
-          if (embeddedById.has(key)) return embeddedById.get(key);
-          if (hydratedFromList.has(key)) return hydratedFromList.get(key);
+          const embedded = embeddedById.get(key) || null;
+          const listed = hydratedFromList.get(key) || null;
+
+          if (!canUsePatientApi) {
+            return embedded || listed || null;
+          }
+
           try {
             const payload = await patientApi.getById(key);
-            return normalizePatientRecord(payload, key);
-          } catch {
+            const byId = normalizePatientRecord(unwrapEntityPayload(payload), key);
+            if (embedded || listed) {
+              return mergeMissingPatientDetails(byId, embedded || listed);
+            }
+            return byId;
+          } catch (hydrateByIdError) {
+            if (hydrateByIdError?.status === 403) {
+              patientApiForbiddenRef.current = true;
+            }
+            if (embedded) return embedded;
+            if (listed) return listed;
             return null;
           }
         })
@@ -338,44 +430,138 @@ const MyPatients = () => {
 
       const patientRows = hydratedById.filter(Boolean);
 
-      // Fallback: try direct patient endpoint queries when assignment links are missing.
-      if (!patientRows.length && fallbackRows.length === 0 && activeChwId != null) {
-        const queries = [
-          { chwId: activeChwId, size: 500 },
-          { assignedChwId: activeChwId, size: 500 },
-          { providerId: activeChwId, size: 500 },
-        ];
-
-        for (const query of queries) {
-          try {
-            const payload = await patientApi.list(query);
-            const list = normalizeListPayload(payload).map((row) => normalizePatientRecord(row));
-            if (list.length) {
-              setPatients(sortPatientsByName(list));
-              setIsLoading(false);
-              return;
-            }
-          } catch {
-            // Continue trying alternate query shapes.
-          }
-        }
-      }
-
       const deduped = Array.from(
-        [...patientRows, ...fallbackRows].reduce((acc, row) => {
+        [...patientRows, ...directlyAssignedPatients, ...fallbackRows].reduce((acc, row) => {
           acc.set(String(row.id), row);
           return acc;
         }, new Map()).values()
       );
 
-      setPatients(sortPatientsByName(deduped));
+      if (activeChwId != null) {
+        try {
+          const visits = await homeVisitService.listHomeVisits({ chwId: activeChwId });
+          visits.forEach((visit) => {
+            const patientSource = visit?.raw?.patient
+              ? visit.raw.patient
+              : {
+                  id: visit?.patientId,
+                  patientId: visit?.patientId,
+                  fullName: visit?.patientName,
+                  phone: visit?.phone,
+                  city: visit?.raw?.patientCity || visit?.raw?.city || '',
+                  addressLine1: visit?.location || '',
+                };
+
+            const normalized = normalizePatientRecord(patientSource, visit?.patientId ?? null);
+
+            const idCandidates = [normalized?.id, normalized?.patientId, visit?.patientId];
+            idCandidates.forEach((candidate) => {
+              if (candidate == null) return;
+              const key = String(candidate).trim();
+              if (key && !homeVisitDetailsById.has(key)) {
+                homeVisitDetailsById.set(key, normalized);
+              }
+
+              const numeric = toNumericId(candidate);
+              if (numeric != null && !homeVisitDetailsById.has(String(numeric))) {
+                homeVisitDetailsById.set(String(numeric), normalized);
+              }
+            });
+
+            const nameKey = toPatientNameKey(normalized);
+            if (nameKey && !homeVisitDetailsByName.has(nameKey)) {
+              homeVisitDetailsByName.set(nameKey, normalized);
+            }
+          });
+        } catch {
+          // Keep assignment-derived rows only.
+        }
+      }
+
+      const catalogById = new Map();
+      const catalogByName = new Map();
+
+      globalPatientsCatalog.forEach((row) => {
+        const rawCandidates = [row?.id, row?.patientId];
+        rawCandidates.forEach((candidate) => {
+          if (candidate == null) return;
+          const key = String(candidate).trim();
+          if (key && !catalogById.has(key)) {
+            catalogById.set(key, row);
+          }
+
+          const numeric = toNumericId(candidate);
+          if (numeric != null && !catalogById.has(String(numeric))) {
+            catalogById.set(String(numeric), row);
+          }
+        });
+
+        const nameKey = toPatientNameKey(row);
+        if (nameKey && !catalogByName.has(nameKey)) {
+          catalogByName.set(nameKey, row);
+        }
+      });
+
+      const enriched = deduped.map((row) => {
+        const rawCandidates = [row?.id, row?.patientId];
+        let matched = null;
+
+        for (const candidate of rawCandidates) {
+          if (candidate == null) continue;
+          const key = String(candidate).trim();
+          if (key && catalogById.has(key)) {
+            matched = catalogById.get(key);
+            break;
+          }
+
+          const numeric = toNumericId(candidate);
+          if (numeric != null && catalogById.has(String(numeric))) {
+            matched = catalogById.get(String(numeric));
+            break;
+          }
+        }
+
+        if (!matched) {
+          const nameKey = toPatientNameKey(row);
+          matched = nameKey ? catalogByName.get(nameKey) : null;
+        }
+
+        if (!matched) {
+          for (const candidate of rawCandidates) {
+            if (candidate == null) continue;
+            const key = String(candidate).trim();
+            if (key && homeVisitDetailsById.has(key)) {
+              matched = homeVisitDetailsById.get(key);
+              break;
+            }
+
+            const numeric = toNumericId(candidate);
+            if (numeric != null && homeVisitDetailsById.has(String(numeric))) {
+              matched = homeVisitDetailsById.get(String(numeric));
+              break;
+            }
+          }
+        }
+
+        if (!matched) {
+          const nameKey = toPatientNameKey(row);
+          matched = nameKey ? homeVisitDetailsByName.get(nameKey) : null;
+        }
+
+        return matched ? mergeMissingPatientDetails(row, matched) : row;
+      });
+
+      if (latestLoadIdRef.current !== loadId) return;
+      setPatients(sortPatientsByName(enriched));
     } catch (fetchError) {
-      setPatients([]);
+      if (latestLoadIdRef.current !== loadId) return;
       setError(fetchError?.message || 'Failed to fetch linked patients from backend.');
     } finally {
-      setIsLoading(false);
+      if (latestLoadIdRef.current === loadId) {
+        setIsLoading(false);
+      }
     }
-  }, [activeChwId, chwNameCandidates]);
+  }, [activeChwId, chwNameCandidates, chwResolutionReady]);
 
   useEffect(() => {
     let active = true;
@@ -389,6 +575,10 @@ const MyPatients = () => {
         }
       } catch {
         // Continue with identifiers from auth user.
+      } finally {
+        if (active) {
+          setChwResolutionReady(true);
+        }
       }
     };
 
@@ -397,8 +587,9 @@ const MyPatients = () => {
   }, []);
 
   useEffect(() => {
+    if (!chwResolutionReady) return;
     loadPatients();
-  }, [loadPatients]);
+  }, [loadPatients, chwResolutionReady]);
 
  
   const handleAddSave = async (form) => {
@@ -486,14 +677,6 @@ const MyPatients = () => {
           <p className="text-sm text-gray-500 mt-1">Showing patients linked to your signed-in CHW account.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={loadPatients}
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow"
