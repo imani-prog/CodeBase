@@ -791,7 +791,7 @@ const ResourcesTraining = () => {
           </div>
           <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-gray-700 whitespace-nowrap shrink-0">
             <Filter className="w-4 h-4" />
-            <span>Filter</span>
+            <span>Filter</span>e
           </button>
         </div>
       </div>
@@ -842,8 +842,8 @@ const ResourcesTraining = () => {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Status</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Duration</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Modules</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Enrolled</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Rating</th>
+                  {/* <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Enrolled</th> */}
+                  {/* <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Rating</th> */}
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide w-36">Progress</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wide">Action</th>
                 </tr>
@@ -879,18 +879,18 @@ const ResourcesTraining = () => {
                         {course.modules}
                       </div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    {/* <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center text-xs text-gray-700">
                         <Users className="w-3 h-3 mr-1 text-blue-600 shrink-0" />
                         {course.enrolled}
                       </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    </td> */}
+                    {/* <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-1">
                         <Star className="w-3.5 h-3.5 text-blue-500 fill-blue-500 shrink-0" />
                         <span className="text-sm font-semibold text-gray-800">{course.rating.toFixed(1)}</span>
                       </div>
-                    </td>
+                    </td> */}
                     <td className="px-4 py-3 w-36">
                       {course.progress > 0 ? (
                         <div>
@@ -934,7 +934,7 @@ const ResourcesTraining = () => {
                       ) : course.status === 'enrolled' ? (
                         <button
                           onClick={() => handleStartCourse(course)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-xs font-medium transition-colors"
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
                         >
                           <Play className="w-3 h-3" />
                           <span>Start</span>
@@ -1034,7 +1034,7 @@ const ResourcesTraining = () => {
                   ) : course.status === 'enrolled' ? (
                     <button
                       onClick={() => handleStartCourse(course)}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-xs font-medium transition-colors"
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
                     >
                       <Play className="w-3 h-3" />
                       <span>Start Course</span>

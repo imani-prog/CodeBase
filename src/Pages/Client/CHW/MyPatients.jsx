@@ -129,6 +129,76 @@ const splitName = (value) => {
   };
 };
 
+const hasMeaningfulValue = (value) => {
+  if (Array.isArray(value)) return value.length > 0;
+  if (value == null) return false;
+  if (typeof value === 'object') return Object.keys(value).length > 0;
+  return String(value).trim() !== '';
+};
+
+const firstNonEmpty = (...values) => {
+  for (const value of values) {
+    if (hasMeaningfulValue(value)) return value;
+  }
+  return null;
+};
+
+const buildPatientSeedFromAssignment = (row = {}) => {
+  const raw = row?.raw && typeof row.raw === 'object' ? row.raw : {};
+
+  const fullName = firstNonEmpty(
+    raw.patientName,
+    row.patientName,
+    raw.patientFullName,
+    row.patientFullName,
+    raw.fullName,
+    raw.name,
+    row.fullName,
+    row.name,
+    raw.patient?.fullName,
+    raw.patient?.name,
+    row.patient?.fullName,
+    row.patient?.name
+  );
+
+  const firstName = firstNonEmpty(raw.patientFirstName, row.patientFirstName, raw.firstName, row.firstName);
+  const middleName = firstNonEmpty(raw.patientMiddleName, row.patientMiddleName, raw.middleName, row.middleName);
+  const lastName = firstNonEmpty(raw.patientLastName, row.patientLastName, raw.lastName, row.lastName);
+
+  return {
+    id: firstNonEmpty(row?.patientId, raw?.patientId, raw?.patient?.id, row?.patient?.id),
+    patientId: firstNonEmpty(row?.patientId, raw?.patientId, raw?.patient?.id, row?.patient?.id),
+    fullName,
+    firstName,
+    middleName,
+    lastName,
+    phone: firstNonEmpty(raw.patientPhone, row.patientPhone, raw.phoneNumber, row.phoneNumber, raw.phone, row.phone),
+    email: firstNonEmpty(raw.patientEmail, row.patientEmail, raw.emailAddress, row.emailAddress, raw.email, row.email),
+    city: firstNonEmpty(raw.patientCity, row.patientCity, raw.city, row.city),
+    addressLine1: firstNonEmpty(raw.patientAddress, row.patientAddress, raw.addressLine1, row.addressLine1, raw.location, row.location),
+    nationalId: firstNonEmpty(raw.patientNationalId, row.patientNationalId, raw.nationalId, row.nationalId, raw.idNumber, row.idNumber),
+    dateOfBirth: firstNonEmpty(raw.patientDateOfBirth, row.patientDateOfBirth, raw.patientDob, row.patientDob, raw.dateOfBirth, row.dateOfBirth),
+    gender: firstNonEmpty(raw.patientGender, row.patientGender, raw.gender, row.gender),
+    bloodType: firstNonEmpty(raw.patientBloodType, row.patientBloodType, raw.bloodType, row.bloodType, raw.bloodGroup, row.bloodGroup),
+    chronicConditions: firstNonEmpty(
+      raw.patientChronicConditions,
+      row.patientChronicConditions,
+      raw.patientCondition,
+      row.patientCondition,
+      raw.chronicConditions,
+      row.chronicConditions,
+      raw.condition,
+      row.condition,
+      raw.medicalCondition,
+      row.medicalCondition,
+      raw.diagnosis,
+      row.diagnosis
+    ),
+    status: firstNonEmpty(raw.patientStatus, row.patientStatus, raw.status, row.status),
+    country: firstNonEmpty(raw.patientCountry, row.patientCountry, raw.country, row.country),
+  };
+};
+
 const normalizePatientRecord = (row = {}, fallbackId = null) => {
   const source = unwrapEntityPayload(row) || {};
 
@@ -214,7 +284,7 @@ const MyPatients = () => {
   const [chwResolutionReady, setChwResolutionReady] = useState(false);
   const latestLoadIdRef = useRef(0);
   // CHW users are typically blocked from /api/patients*; avoid repeated 403 calls in load flow.
-  const patientApiForbiddenRef = useRef(true);
+  const patientApiForbiddenRef = useRef(false);
 
   const activeChwId = useMemo(() => (
     resolvedChwId
@@ -260,7 +330,22 @@ const MyPatients = () => {
         }
       }
 
-      const registerPatient = ({ rawPatientId, rawPatient, patientName, phone, city, addressLine1 }) => {
+      const registerPatient = ({
+        rawPatientId,
+        rawPatient,
+        patientName,
+        phone,
+        city,
+        addressLine1,
+        email,
+        nationalId,
+        dateOfBirth,
+        gender,
+        bloodType,
+        chronicConditions,
+        country,
+        status,
+      }) => {
         const numeric = toNumericId(rawPatientId);
         const key = numeric != null ? String(numeric) : (rawPatientId != null ? String(rawPatientId) : null);
 
@@ -289,9 +374,16 @@ const MyPatients = () => {
             id: fallbackId,
             fullName: patientName,
             phone: phone || '',
+            email: email || '',
             city: city || '',
             addressLine1: addressLine1 || '',
-            status: 'ACTIVE',
+            nationalId: nationalId || '',
+            dateOfBirth: dateOfBirth || null,
+            gender: gender || 'OTHER',
+            bloodType: bloodType || '',
+            chronicConditions: chronicConditions || '',
+            country: country || '',
+            status: status || 'ACTIVE',
           }, key || fallbackId));
         }
       };
@@ -340,13 +432,29 @@ const MyPatients = () => {
       });
 
       activeAssignments.forEach((row) => {
+        const seededPatient = buildPatientSeedFromAssignment(row);
+        const embeddedPatient = row?.raw?.patient ?? row?.patient ?? row?.raw?.patientDetails ?? row?.raw?.patientProfile ?? null;
+
+        const combinedPatient = {
+          ...(embeddedPatient && typeof embeddedPatient === 'object' ? embeddedPatient : {}),
+          ...seededPatient,
+        };
+
         registerPatient({
-          rawPatientId: row?.patientId ?? row?.raw?.patientId,
-          rawPatient: row?.raw?.patient ?? row?.patient ?? row?.raw?.patientDetails ?? row?.raw?.patientProfile,
-          patientName: row?.patientName ?? row?.raw?.patientName,
-          phone: row?.raw?.patientPhone ?? row?.raw?.phone ?? row?.raw?.phoneNumber ?? row?.phone,
-          city: row?.raw?.patientCity ?? row?.raw?.city ?? row?.city,
-          addressLine1: row?.raw?.patientAddress ?? row?.raw?.addressLine1 ?? row?.raw?.location,
+          rawPatientId: seededPatient?.patientId ?? row?.patientId ?? row?.raw?.patientId,
+          rawPatient: Object.values(combinedPatient).some(hasMeaningfulValue) ? combinedPatient : null,
+          patientName: seededPatient?.fullName ?? row?.patientName ?? row?.raw?.patientName,
+          phone: seededPatient?.phone ?? row?.raw?.patientPhone ?? row?.raw?.phone ?? row?.raw?.phoneNumber ?? row?.phone,
+          city: seededPatient?.city ?? row?.raw?.patientCity ?? row?.raw?.city ?? row?.city,
+          addressLine1: seededPatient?.addressLine1 ?? row?.raw?.patientAddress ?? row?.raw?.addressLine1 ?? row?.raw?.location,
+          email: seededPatient?.email,
+          nationalId: seededPatient?.nationalId,
+          dateOfBirth: seededPatient?.dateOfBirth,
+          gender: seededPatient?.gender,
+          bloodType: seededPatient?.bloodType,
+          chronicConditions: seededPatient?.chronicConditions,
+          country: seededPatient?.country,
+          status: seededPatient?.status,
         });
       });
 
