@@ -76,6 +76,7 @@ import ViewPrescriptionModal from '../../Components/Admin/ViewPrescriptionModal'
 import DownloadReportModal from '../../Components/Admin/DownloadReportModal';
 import { telemedicineService } from '../../Services/domain/telemedicineService.js';
 import JitsiCallModal from '../../Components/JitsiCallModal';
+import { patientApi } from '../../API/endpoints/patientApi.js';
 
 const TelemedicineManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -103,11 +104,32 @@ const TelemedicineManagement = () => {
 
   const [showJitsiCall, setShowJitsiCall] = useState(false);
   const [jitsiSession, setJitsiSession]   = useState(null);
+  const [joiningSession, setJoiningSession] = useState(false);
 
-  const handleJoinLiveSession = (session) => {
-  setJitsiSession(session);
-  setShowJitsiCall(true);
-};
+  const handleJoinLiveSession = async (session) => {
+    if (!session?.backendId || !session?.patientId || session?.patientId === 'N/A') {
+      window.alert('Please select a valid patient-linked session before joining.');
+      return;
+    }
+
+    setJoiningSession(true);
+    try {
+      if (session.status === 'scheduled') {
+        await telemedicineService.startSession(session.backendId);
+        setReloadToken((prev) => prev + 1);
+      } else if (session.status === 'paused') {
+        await telemedicineService.resumeSession(session.backendId);
+        setReloadToken((prev) => prev + 1);
+      }
+
+      setJitsiSession(session);
+      setShowJitsiCall(true);
+    } catch (error) {
+      window.alert(error?.message || 'Failed to start the session.');
+    } finally {
+      setJoiningSession(false);
+    }
+  };
 
   // Platform settings state
   const [platformSettings, setPlatformSettings] = useState({
@@ -219,6 +241,9 @@ const formatIfDate = (value) => {
   const [dataLoading, setDataLoading] = useState(false);
   const [dataError, setDataError] = useState('');
   const [reloadToken, setReloadToken] = useState(0);
+  const [patients, setPatients] = useState([]);
+  const [patientsLoading, setPatientsLoading] = useState(false);
+  const [patientsError, setPatientsError] = useState('');
 
   const firstNonEmpty = useCallback((...values) => {
     for (const value of values) {
@@ -318,10 +343,12 @@ const formatIfDate = (value) => {
     })();
 
     const backendId = parseBackendId(firstNonEmpty(row.id, row.sessionPk));
-    const displayId = firstNonEmpty(row.sessionId, backendId ? `TM-${backendId}` : null) ?? 'TM-N/A';
+    const sessionId = firstNonEmpty(row.sessionId, row.sessionCode, backendId ? `TM-${backendId}` : null);
+    const displayId = sessionId ?? 'TM-N/A';
 
     return {
       id: String(displayId),
+      sessionId: sessionId ?? null,
       backendId,
       patient: String(firstNonEmpty(row.patientName, patient.fullName, patient.name, 'Unknown Patient')),
       patientId: String(firstNonEmpty(row.patientId, patient.id, patient.patientId, 'N/A')),
@@ -343,6 +370,7 @@ const formatIfDate = (value) => {
       rating: firstNonEmpty(row.rating, null),
       followUpRequired: Boolean(firstNonEmpty(row.followUpRequired, false)),
       date: startTime ? formatDateOnly(startTime) : '—',
+      meetingLink: firstNonEmpty(row.meetingLink, row.meetingUrl, null),
     
     };
   }, [
@@ -374,6 +402,24 @@ const formatIfDate = (value) => {
       : String(firstNonEmpty(row.languages, 'English')).split(',').map((item) => item.trim()).filter(Boolean),
     location: String(firstNonEmpty(row.location, row.city, 'Nairobi')),
   }), [firstNonEmpty, parseBackendId, toNumber]);
+
+  const mapPatientRow = useCallback((row = {}) => {
+    const name = String(firstNonEmpty(
+      row.fullName,
+      row.name,
+      [row.firstName, row.middleName, row.lastName].filter(Boolean).join(' '),
+      'Unknown Patient'
+    ));
+    const id = String(firstNonEmpty(row.id, row.patientId, row.patient_id, ''));
+
+    return {
+      id,
+      patientId: String(firstNonEmpty(row.patientId, row.patient_id, row.id, '')),
+      name,
+      email: String(firstNonEmpty(row.email, row.patientEmail, '')),
+      phone: String(firstNonEmpty(row.phone, row.patientPhone, '')),
+    };
+  }, [firstNonEmpty]);
 
   const mapHistoryRow = useCallback((row = {}) => {
     const mapped = mapSessionRow(row);
@@ -605,6 +651,24 @@ const formatIfDate = (value) => {
     usageListFromSessions,
   ]);
 
+  useEffect(() => {
+    const loadPatients = async () => {
+      setPatientsLoading(true);
+      setPatientsError('');
+      try {
+        const payload = await patientApi.list({ page: 0, size: 200, sort: 'createdAt,desc' });
+        const rows = normalizePagedContent(payload);
+        setPatients(rows.map(mapPatientRow).filter((p) => p.id));
+      } catch (error) {
+        setPatientsError(error?.message || 'Failed to load patients.');
+      } finally {
+        setPatientsLoading(false);
+      }
+    };
+
+    loadPatients();
+  }, [mapPatientRow, normalizePagedContent]);
+
   const tabs = [
     { id: 'overview', label: 'Overview & Active Sessions', icon: Monitor },
     { id: 'doctors', label: 'Online Doctors', icon: UserCheck },
@@ -707,9 +771,17 @@ const formatIfDate = (value) => {
     const durationMins = Number(sessionData.duration) || 30;
     const end = new Date(start.getTime() + durationMins * 60 * 1000);
 
+    const parsedPatientId = parseId(sessionData.patientId);
+    if (!parsedPatientId) {
+      window.alert('Please select a valid patient for this session.');
+      return;
+    }
+
+    const selectedPatient = patients.find((patient) => String(patient.id) === String(sessionData.patientId));
+
     const payload = {
-      patientId: parseId(sessionData.patientId),
-      patientName: sessionData.patientName,
+      patientId: parsedPatientId,
+      patientName: sessionData.patientName || selectedPatient?.name,
       doctorId: parseId(sessionData.doctorId),
       doctorName: sessionData.doctorName,
       sessionType: sessionTypeMap[sessionData.sessionType] || String(sessionData.sessionType || '').toUpperCase(),
@@ -1009,6 +1081,7 @@ const formatIfDate = (value) => {
             {filteredActiveSessions.map((session, index) => {
               const isPaused = session.status === 'paused';
               const isEnded = ['terminated', 'completed', 'cancelled'].includes(session.status);
+              const canJoin = !isEnded && Boolean(session.backendId) && session.patientId && session.patientId !== 'N/A';
               return (
                 <tr
                   key={session.id}
@@ -1078,15 +1151,16 @@ const formatIfDate = (value) => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-{!isEnded && (
-  <button
-    onClick={() => handleJoinLiveSession(session)}
-    className="p-1.5 text-green-600 hover:bg-green-50 rounded"
-    title="Join live call"
-  >
-    <Video className="w-4 h-4" />
-  </button>
-)}
+                      {canJoin && (
+                        <button
+                          onClick={() => handleJoinLiveSession(session)}
+                          className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+                          title="Join live call"
+                          disabled={joiningSession}
+                        >
+                          <Video className="w-4 h-4" />
+                        </button>
+                      )}
 
                       {!isEnded && (
                         isPaused ? (
@@ -1939,6 +2013,11 @@ const formatIfDate = (value) => {
                 Loading telemedicine data from backend...
               </div>
             )}
+            {patientsError && (
+              <div className="mb-3 px-3 py-2 bg-yellow-50 border border-yellow-200 text-sm text-yellow-700">
+                {patientsError}
+              </div>
+            )}
             {activeTab === 'overview' && renderOverviewAndActiveSessions()}
             {activeTab === 'doctors' && renderOnlineDoctors()}
             {activeTab === 'session-history' && renderSessionHistory()}
@@ -1953,6 +2032,9 @@ const formatIfDate = (value) => {
         isOpen={showScheduleModal}
         onClose={() => setShowScheduleModal(false)}
         onSchedule={handleScheduleSessionSubmit}
+        patients={patients}
+        doctors={onlineDoctors}
+        patientsLoading={patientsLoading}
       />
 
       <ExportReportsModal
@@ -2030,19 +2112,19 @@ const formatIfDate = (value) => {
       />
 
       <JitsiCallModal
-  isOpen={showJitsiCall}
-  onClose={() => {
-    setShowJitsiCall(false);
-    setJitsiSession(null);
-  }}
-  roomName={jitsiSession?.id}
-  userInfo={{ displayName: 'Doctor / Admin' }}
-  title={
-    jitsiSession
-      ? `${jitsiSession.patient} · ${jitsiSession.doctor}`
-      : ''
-  }
-/>
+        isOpen={showJitsiCall}
+        onClose={() => {
+          setShowJitsiCall(false);
+          setJitsiSession(null);
+        }}
+        roomName={jitsiSession?.sessionId ?? jitsiSession?.id}
+        userInfo={{ displayName: 'Doctor / Admin' }}
+        title={
+          jitsiSession
+            ? `${jitsiSession.patient} · ${jitsiSession.doctor}`
+            : ''
+        }
+      />
     </div>
   );
 };

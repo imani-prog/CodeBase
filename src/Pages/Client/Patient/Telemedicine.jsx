@@ -285,6 +285,14 @@ const Telemedicine = () => {
     })();
   }, [patientId, reloadToken]);
 
+  useEffect(() => {
+    if (!patientId) return;
+    const interval = setInterval(() => {
+      setReloadToken((t) => t + 1);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [patientId]);
+
   
   const [activeTab, setActiveTab]               = useState('upcoming');
   const [showBookingModal, setShowBookingModal] = useState(false);
