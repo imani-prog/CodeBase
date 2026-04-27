@@ -56,7 +56,6 @@ const refreshAccessToken = async () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => readStoredAuthUser());
 
-
   const onUnauthorizedRef = useRef(null);
   onUnauthorizedRef.current = () => {
     setUser(null);
@@ -72,7 +71,6 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
-
   useEffect(() => {
     if (user || !getAccessToken()) return;
 
@@ -85,7 +83,6 @@ export const AuthProvider = ({ children }) => {
         setUser(mapProfileToAuthUser(profile));
       } catch (err) {
         if (!active) return;
-
         if (err?.status === 401) {
           clearTokens();
           window.localStorage.removeItem(AUTH_USER_KEY);
@@ -95,7 +92,6 @@ export const AuthProvider = ({ children }) => {
 
     return () => { active = false; };
   }, [user]);
-
 
   useEffect(() => {
     try {
@@ -107,20 +103,34 @@ export const AuthProvider = ({ children }) => {
     } catch { /* ignore quota/security errors */ }
   }, [user]);
 
-
+  // ✅ FIXED: try refresh before logging out on tab focus
   useEffect(() => {
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = async () => {
       if (document.visibilityState !== 'visible') return;
 
       const token = getAccessToken();
 
-
       if (!token && user) {
+        const refreshToken = getRefreshToken();
+        if (refreshToken) {
+          const refreshed = await refreshAccessToken();
+          if (refreshed) {
+            authApi.me()
+              .then((profile) => setUser(mapProfileToAuthUser(profile)))
+              .catch(() => {
+                setUser(null);
+                clearTokens();
+                window.localStorage.removeItem(AUTH_USER_KEY);
+              });
+            return;
+          }
+        }
+        // No refresh token or refresh failed — now safe to log out
         setUser(null);
+        clearTokens();
         window.localStorage.removeItem(AUTH_USER_KEY);
         return;
       }
-
 
       if (token && !user) {
         authApi.me()
