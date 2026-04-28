@@ -374,9 +374,9 @@ const AdminDashboard = () => {
             <canvas ref={patientTrendCanvasRef} />
           </div>
           <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-800 flex-wrap">
-            <span>New Today <span className="font-semibold text-blue-700">+84</span></span>
-            <span>High Risk <span className="font-semibold text-blue-700">152</span></span>
-            <span>Recovered <span className="font-semibold text-blue-700">71</span></span>
+            <span>New Today <span className="font-semibold text-blue-700">4</span></span>
+            <span>High Risk <span className="font-semibold text-blue-700">2</span></span>
+            <span>Recovered <span className="font-semibold text-blue-700">1</span></span>
           </div>
         </article>
 
