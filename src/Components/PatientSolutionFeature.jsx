@@ -125,7 +125,7 @@ function PatientSolutionFeature() {
       </div>
 
       {/* Internal Animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeSlide {
           0% {
             opacity: 0;

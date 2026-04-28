@@ -90,7 +90,7 @@ const AdminSidebar = () => (
       </div>
     </div>
     <nav className="flex-1 space-y-2 overflow-y-auto pr-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-      <style jsx>{`
+      <style>{`
         nav::-webkit-scrollbar {
           display: none;
         }
