@@ -28,26 +28,27 @@ const ActivePatients = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  // ================= NORMALIZE =================
+  const normalizePatient = (p) => ({
+    ...p,
+    name: [p.firstName, p.lastName].filter(Boolean).join(' ') || 'Unknown',
+    age: p.dateOfBirth
+      ? Math.floor((Date.now() - new Date(p.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
+      : null,
+    condition: p.chronicConditions || p.condition || 'N/A',
+    avatar:
+      p.firstName && p.lastName
+        ? `${p.firstName[0]}${p.lastName[0]}`
+        : 'NA',
+  });
+
   // ================= FETCH =================
   useEffect(() => {
     const fetchPatients = async () => {
       try {
         setLoading(true);
         const data = await patientApi.list();
-
-        const normalized = data.map(p => ({
-          ...p,
-          name: [p.firstName, p.lastName].filter(Boolean).join(' ') || 'Unknown',
-          age: p.dateOfBirth
-            ? Math.floor((Date.now() - new Date(p.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
-            : null,
-          condition: p.chronicConditions || p.condition || 'N/A',
-          avatar: p.firstName && p.lastName
-            ? `${p.firstName[0]}${p.lastName[0]}`
-            : 'NA'
-        }));
-
-        setPatients(normalized);
+        setPatients(data.map(normalizePatient));
       } catch (err) {
         setError(err.message || 'Failed to load patients');
       } finally {
@@ -67,9 +68,9 @@ const ActivePatients = () => {
 
   // ================= FILTER + SORT =================
   const filteredAndSortedPatients = useMemo(() => {
-    let filtered = patients.filter(patient => {
+    let filtered = patients.filter((patient) => {
       const matchesSearch =
-        patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (patient.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (patient.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (patient.condition || '').toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -129,7 +130,7 @@ const ActivePatients = () => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -140,20 +141,22 @@ const ActivePatients = () => {
 
   // ================= CRUD =================
   const handleSavePatient = async (updatedPatient) => {
-    await patientApi.update(updatedPatient.id, updatedPatient);
-    setPatients(prev => prev.map(p => p.id === updatedPatient.id ? updatedPatient : p));
+    const saved = await patientApi.update(updatedPatient.id, updatedPatient);
+    const normalized = normalizePatient(saved || updatedPatient);
+    setPatients((prev) => prev.map((p) => (p.id === normalized.id ? normalized : p)));
   };
 
   const handleAddNewPatient = async (newPatient) => {
     const saved = await patientApi.create(newPatient);
-    setPatients(prev => [...prev, saved]);
+    const normalized = normalizePatient(saved);
+    setPatients((prev) => [...prev, normalized]);
     setShowAddModal(false);
   };
 
   const handleDeletePatient = async (patient) => {
     if (!window.confirm(`Delete ${patient.name}?`)) return;
     await patientApi.delete(patient.id);
-    setPatients(prev => prev.filter(p => p.id !== patient.id));
+    setPatients((prev) => prev.filter((p) => p.id !== patient.id));
   };
 
   const handleViewPatient = (patient) => {
@@ -167,53 +170,50 @@ const ActivePatients = () => {
   };
 
   const handleAddPatient = () => {
-  setShowAddModal(true);
-};
+    setShowAddModal(true);
+  };
 
-const handleExport = () => {
-  const csvContent = [
-    [
-      'Name',
-      'Email',
-      'Phone',
-      'Status',
-      'Age',
-      'Gender',
-      'City',
-      'Condition',
-      'Last Visit',
-      'Next Appointment'
-    ],
-    ...filteredAndSortedPatients.map(p => [
-      p.name,
-      p.email || '',
-      p.phone || '',
-      p.status || '',
-      p.age || '',
-      p.gender || '',
-      p.city || '',
-      p.condition || '',
-      p.lastVisit || '',
-      p.nextAppointment || ''
-    ])
-  ]
-    .map(row => row.join(','))
-    .join('\n');
+  const handleExport = () => {
+    const csvContent = [
+      [
+        'Name',
+        'Email',
+        'Phone',
+        'Status',
+        'Age',
+        'Gender',
+        'City',
+        'Condition',
+        'Last Visit',
+        'Next Appointment',
+      ],
+      ...filteredAndSortedPatients.map((p) => [
+        p.name,
+        p.email || '',
+        p.phone || '',
+        p.status || '',
+        p.age || '',
+        p.gender || '',
+        p.city || '',
+        p.condition || '',
+        p.lastVisit || '',
+        p.nextAppointment || '',
+      ]),
+    ]
+      .map((row) => row.join(','))
+      .join('\n');
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
 
-  link.setAttribute('href', url);
-  link.setAttribute(
-    'download',
-    `patients-${new Date().toISOString().split('T')[0]}.csv`
-  );
+    link.setAttribute('href', url);
+    link.setAttribute('download', `patients-${new Date().toISOString().split('T')[0]}.csv`);
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // ================= STATES =================
   if (loading) return <LoadingSpinner />;
@@ -222,16 +222,15 @@ const handleExport = () => {
   return (
     <div className="p-2 bg-gray-50 min-h-screen">
 
-    {/* Header Section */}
+      {/* Header Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-3xl font-bold">Active Patients</h1>
-            
           </div>
 
           <div className="flex space-x-3">
-            <button 
+            <button
               onClick={handleAddPatient}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
             >
@@ -240,7 +239,7 @@ const handleExport = () => {
               </svg>
               <span>Add Patient</span>
             </button>
-            <button 
+            <button
               onClick={handleExport}
               className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
             >
@@ -250,7 +249,6 @@ const handleExport = () => {
               <span>Export</span>
             </button>
           </div>
-          
         </div>
 
         {/* Stats Cards */}
@@ -265,7 +263,9 @@ const handleExport = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Active</p>
-                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'ACTIVE' || p.status === 'Active').length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {patients.filter((p) => p.status === 'ACTIVE' || p.status === 'Active').length}
+                </p>
               </div>
             </div>
           </div>
@@ -279,11 +279,12 @@ const handleExport = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Critical/Inactive</p>
-                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'INACTIVE' || p.status === 'Critical').length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {patients.filter((p) => p.status === 'INACTIVE' || p.status === 'Critical').length}
+                </p>
               </div>
             </div>
           </div>
-
 
           <div className="p-2 bg-white border border-gray-200">
             <div className="flex items-center">
@@ -298,7 +299,7 @@ const handleExport = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="p-4 bg-white border border-gray-200">
             <div className="flex items-center">
               <div className="p-2">
@@ -358,8 +359,10 @@ const handleExport = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('name')}>
+                <th
+                  className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('name')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Patient</span>
                     {sortField === 'name' && (
@@ -369,8 +372,10 @@ const handleExport = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('age')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('age')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Age</span>
                     {sortField === 'age' && (
@@ -380,8 +385,10 @@ const handleExport = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('gender')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('gender')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Gender</span>
                     {sortField === 'gender' && (
@@ -393,8 +400,10 @@ const handleExport = () => {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">National ID</th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Blood Type</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('condition')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('condition')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Condition</span>
                     {sortField === 'condition' && (
@@ -406,8 +415,10 @@ const handleExport = () => {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">City</th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Phone</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('status')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('status')}
+                >
                   <div className="flex items-center space-x-1">
                     <span className="font-bold text-black">Status</span>
                     {sortField === 'status' && (
@@ -417,8 +428,10 @@ const handleExport = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('lastVisit')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('lastVisit')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Last Visit</span>
                     {sortField === 'lastVisit' && (
@@ -437,11 +450,6 @@ const handleExport = () => {
                 <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      {/* <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-800">{patient.avatar}</span>
-                        </div>
-                      </div> */}
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{patient.name}</div>
                       </div>
@@ -451,18 +459,30 @@ const handleExport = () => {
                     <div className="text-sm text-gray-900">{patient.age} years</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.gender === 'MALE' ? 'Male' : patient.gender === 'FEMALE' ? 'Female' : patient.gender === 'OTHER' ? 'Other' : patient.gender}</div>
+                    <div className="text-sm text-gray-900">
+                      {patient.gender === 'MALE'
+                        ? 'Male'
+                        : patient.gender === 'FEMALE'
+                        ? 'Female'
+                        : patient.gender === 'OTHER'
+                        ? 'Other'
+                        : patient.gender}
+                    </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-600 font-mono">{patient.nationalId || 'N/A'}</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-700">
-                      {patient.bloodType ? patient.bloodType.replace('_POS', '+').replace('_NEG', '-') : 'N/A'}
+                      {patient.bloodType
+                        ? patient.bloodType.replace('_POS', '+').replace('_NEG', '-')
+                        : 'N/A'}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.condition || patient.chronicConditions || 'N/A'}</div>
+                    <div className="text-sm text-gray-900">
+                      {patient.condition || patient.chronicConditions || 'N/A'}
+                    </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{patient.city || 'N/A'}</div>
@@ -472,7 +492,11 @@ const handleExport = () => {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getStatusBadge(patient.status)}`}>
-                      {patient.status === 'ACTIVE' ? 'Active' : patient.status === 'INACTIVE' ? 'Inactive' : patient.status}
+                      {patient.status === 'ACTIVE'
+                        ? 'Active'
+                        : patient.status === 'INACTIVE'
+                        ? 'Inactive'
+                        : patient.status}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -483,7 +507,7 @@ const handleExport = () => {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button 
+                      <button
                         onClick={() => handleViewPatient(patient)}
                         className="text-blue-600 hover:text-blue-900 transition-colors"
                         title="View Patient Details"
@@ -493,7 +517,7 @@ const handleExport = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleEditPatient(patient)}
                         className="text-green-600 hover:text-green-900 transition-colors"
                         title="Edit Patient"
@@ -502,16 +526,7 @@ const handleExport = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
-                      <button 
-                        onClick={() => handleContactPatient(patient)}
-                        className="text-blue-600 hover:text-blue-900 transition-colors"
-                        title="Contact Patient"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </button>
-                      <button 
+                      <button
                         onClick={() => handleDeletePatient(patient)}
                         className="text-red-600 hover:text-red-900 transition-colors"
                         title="Delete Patient"
@@ -531,7 +546,7 @@ const handleExport = () => {
 
       {/* Pagination */}
       {filteredAndSortedPatients.length > 0 && (
-        <Pagination 
+        <Pagination
           currentPage={currentPage}
           totalItems={filteredAndSortedPatients.length}
           itemsPerPage={itemsPerPage}
@@ -548,13 +563,13 @@ const handleExport = () => {
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">No patients found</h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== 'all' 
-              ? 'Try adjusting your search or filter criteria.' 
+            {searchTerm || statusFilter !== 'all'
+              ? 'Try adjusting your search or filter criteria.'
               : 'Get started by adding your first patient.'}
           </p>
-          {(!searchTerm && statusFilter === 'all') && (
+          {!searchTerm && statusFilter === 'all' && (
             <div className="mt-6">
-              <button 
+              <button
                 onClick={handleAddPatient}
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
               >
@@ -566,26 +581,25 @@ const handleExport = () => {
       )}
 
       {/* Modals */}
-      <PatientDetailsModal 
+      <PatientDetailsModal
         patient={selectedPatient}
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
       />
-      
-      <EditPatientModal 
+
+      <EditPatientModal
         patient={selectedPatient}
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSave={handleSavePatient}
       />
 
-      <AddPatientModal 
+      <AddPatientModal
         showModal={showAddModal}
         setShowModal={setShowAddModal}
         onSavePatient={handleAddNewPatient}
       />
     </div>
-    
   );
 };
 
