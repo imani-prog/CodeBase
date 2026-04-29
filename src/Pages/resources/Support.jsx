@@ -27,15 +27,15 @@ const Support = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50">
       
       
       {/* Hero Section */}
       <section className="relative py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           
-          <h1 className="text-5xl md:text-6xl font-extrabold font-serif text-blue-900 mb-4 leading-tight">
-            Support <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Desk</span>
+          <h1 className="text-5xl md:text-6xl font-extrabold font-serif text-blue-700 mb-4 leading-tight">
+            Support Desk
           </h1>
           <p className="text-xl max-w-2xl mx-auto mb-8">
             We're here to help you resolve issues quickly and get back to better health.

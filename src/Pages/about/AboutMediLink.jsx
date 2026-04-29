@@ -5,7 +5,7 @@ import Workers from "../../assets/Workers.jpg";
 
 const AboutMediLink = () => {
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans relative bg-blue-50 overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col font-sans relative bg-gray-50 overflow-x-hidden">
 
       <main className="flex flex-col items-center w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-[1200px] mx-auto">
         <section className="w-full flex flex-col items-center mb-6 sm:mb-8">
@@ -13,7 +13,7 @@ const AboutMediLink = () => {
           {/* Healthcare Illustration Image */}
       
         </section>
-        <section className="mb-6 sm:mb-8 md:mb-10 w-full bg-blue-50 p-3 sm:p-4 text-left">
+        <section className="mb-6 sm:mb-8 md:mb-10 w-full bg-gray-50 p-3 sm:p-4 text-left">
           <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-blue-800 font-serif mb-3 sm:mb-4 px-2">Who We Are</h2>
           <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6 md:gap-8">
             <div className="flex-1">

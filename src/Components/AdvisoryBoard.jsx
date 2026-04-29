@@ -1,6 +1,6 @@
 const AdvisoryBoard = () => {
   return (
-    <section className="mb-0 w-full bg-blue-50 text-left">
+    <section className="mb-0 w-full bg-gray-50 text-left">
       <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold font-serif text-blue-800 mb-3 sm:mb-4 text-center px-2">
         Advisory Board
       </h2>

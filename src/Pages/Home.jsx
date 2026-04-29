@@ -26,7 +26,7 @@ const Home = () => {
 
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50 overflow-x-hidden">
       
       
 

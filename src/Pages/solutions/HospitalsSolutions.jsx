@@ -78,7 +78,7 @@ const features = [
 ];
 
 const Hospitals = () => (
-  <div className="min-h-screen w-full flex flex-col font-sans bg-gradient-to-br from-blue-50 via-white to-blue-100 overflow-x-hidden">
+  <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50 overflow-x-hidden">
 
     <main className="max-w-7xl mx-auto px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-12">
       <div className="text-center mb-6 sm:mb-8 md:mb-10">
