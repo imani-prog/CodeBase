@@ -244,6 +244,43 @@ const HospitalManagement = () => {
     }
   };
 
+  {/* ── Local helper components (place outside the main return or in a separate file) ── */}
+const Section = ({ title, children }) => (
+  <div>
+    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{title}</h3>
+    {children}
+  </div>
+);
+ 
+const Grid = ({ children }) => (
+  <div className="grid grid-cols-2 gap-x-6 gap-y-4">{children}</div>
+);
+ 
+const Field = ({ label, value, children }) => (
+  <div>
+    <p className="text-xs text-gray-400 mb-0.5">{label}</p>
+    {children ?? <p className="text-sm font-medium text-gray-800">{value || '—'}</p>}
+  </div>
+);
+ 
+const Divider = () => <hr className="border-gray-100" />;
+ 
+const TagList = ({ items, color = 'blue' }) => {
+  const colors = {
+    blue:   'bg-blue-50 text-blue-700 border-blue-100',
+    purple: 'bg-purple-50 text-purple-700 border-purple-100',
+  };
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item, i) => (
+        <span key={i} className={`px-2 py-1 text-xs font-medium border rounded ${colors[color]}`}>
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+};
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
@@ -542,281 +579,200 @@ const HospitalManagement = () => {
           itemName="hospitals"
         />
 
-        {/* /* View Modal */ }
-        {showViewModal && selectedHospital && (
-          <div className="flex items-center justify-center z-50 p-4 fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div className="relative bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              
-              <div className="relative px-8 py-6 bg-blue-950 text-white">
-                <button 
-                  onClick={() => setShowViewModal(false)}
-                  className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
-                >
-                  <XCircle className="w-5 h-5" />
-                </button>
 
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
-                      <Building2 className="w-8 h-8 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h2 className="text-2xl font-bold">{selectedHospital.name}</h2>
-                      <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full border border-white/30">
-                        {selectedHospital.code}
-                      </span>
-                    </div>
-                    <p className="text-sm text-white/80">{selectedHospital.type.replace('_', ' ')} • {selectedHospital.city}</p>
-                  </div>
-                </div>
-              </div>
 
-              <div className="p-6 space-y-6">
-                {/* Basic Info */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Basic Information</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="font-bold">Type</p>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(selectedHospital.type)} mt-1`}>
-                        {selectedHospital.type.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-bold">Status</p>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedHospital.status)} mt-1`}>
-                        {selectedHospital.status}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-bold">Registration Number</p>
-                      <p className="text-sm font-medium mt-1">{selectedHospital.registrationNumber}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold">Tax ID</p>
-                      <p className="text-sm font-medium mt-1">{selectedHospital.taxId}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Information */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Contact Information</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-3">
-                      <Phone className="w-5 h-5 " />
-                      <div>
-                        <p className="font-bold">Main Phone</p>
-                        <p className="text-sm font-medium mt-1">{selectedHospital.mainPhone}</p>
-                      </div>
-                    </div>
-                    {selectedHospital.altPhone && (
-                      <div className="flex items-center space-x-3">
-                        <Phone className="w-5 h-5 " />
-                        <div>
-                          <p className="font-bold">Alternative Phone</p>
-                          <p className="text-sm font-medium mt-1">{selectedHospital.altPhone}</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center space-x-3">
-                      <Mail className="w-5 h-5 " />
-                      <div>
-                        <p className="font-bold">Email</p>
-                        <p className="text-sm font-medium mt-1">{selectedHospital.email}</p>
-                      </div>
-                    </div>
-                    {selectedHospital.website && (
-                      <div className="flex items-center space-x-3">
-                        <Globe className="w-5 h-5 " />
-                        <div>
-                          <p className="font-bold">Website</p>
-                          <p className="text-sm font-medium text-blue-600">{selectedHospital.website}</p>
-                        </div>
-                      </div>
-                    )}
-                    {selectedHospital.fax && (
-                      <div className="flex items-center space-x-3">
-                        <Phone className="w-5 h-5 " />
-                        <div>
-                          <p className="font-bold">Fax</p>
-                          <p className="text-sm font-medium mt-1">{selectedHospital.fax}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Administrative Contact */}
-                {(selectedHospital.adminContactName || selectedHospital.adminContactEmail || selectedHospital.adminContactPhone) && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Administrative Contact</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {selectedHospital.adminContactName && (
-                        <div className="flex items-center space-x-3">
-                          <User className="w-5 h-5 " />
-                          <div>
-                            <p className="font-bold">Contact Name</p>
-                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactName}</p>
-                          </div>
-                        </div>
-                      )}
-                      {selectedHospital.adminContactEmail && (
-                        <div className="flex items-center space-x-3">
-                          <Mail className="w-5 h-5 " />
-                          <div>
-                            <p className="font-bold">Contact Email</p>
-                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactEmail}</p>
-                          </div>
-                        </div>
-                      )}
-                      {selectedHospital.adminContactPhone && (
-                        <div className="flex items-center space-x-3">
-                          <Phone className="w-5 h-5 " />
-                          <div>
-                            <p className="font-bold">Contact Phone</p>
-                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactPhone}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Address */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Address</h3>
-                  <div className="flex items-start space-x-3">
-                    <MapPin className="w-5 h-5 mt-1" />
-                    <div>
-                      <p className="text-sm font-medium ">{selectedHospital.addressLine1}</p>
-                      {selectedHospital.addressLine2 && (
-                        <p className="text-sm ">{selectedHospital.addressLine2}</p>
-                      )}
-                      <p className="text-sm ">
-                        {selectedHospital.city}, {selectedHospital.state} {selectedHospital.postalCode}
-                      </p>
-                      <p className="text-sm ">{selectedHospital.country}</p>
-                      <p className="text-xs mt-2">
-                        Coordinates: {selectedHospital.latitude}, {selectedHospital.longitude}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Capacity */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Capacity</h3>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="border border-gray-200 shadow-md p-4">
-                      <Bed className="w-8 h-8 text-blue-600 mb-2" />
-                      <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfBeds}</p>
-                      <p className="text-sm text-gray-600">Total Beds</p>
-                    </div>
-                    <div className="border border-gray-200 shadow-md p-4">
-                      <Heart className="w-8 h-8 text-blue-600 mb-2" />
-                      <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfIcuBeds}</p>
-                      <p className="text-sm text-gray-600">ICU Beds</p>
-                    </div>
-                    <div className="border border-gray-200 shadow-md p-4">
-                      <Truck className="w-8 h-8 text-blue-600 mb-2" />
-                      <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfAmbulances}</p>
-                      <p className="text-sm text-gray-600">Ambulances</p>
-                    </div>
-                  </div>
-                  {selectedHospital.operatingHours && (
-                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="font-bold text-gray-900 mb-1">Operating Hours</p>
-                      <p className="text-sm text-gray-700">{selectedHospital.operatingHours}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Departments */}
-                {selectedHospital.departments && selectedHospital.departments.trim() && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Hospital Departments</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedHospital.departments.split(', ').map((department, index) => (
-                        <span key={index} className="px-3 py-1 bg-purple-50 border border-purple-200 text-purple-800 rounded-full font-medium">
-                          {department}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Services Offered */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Services Offered</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedHospital.servicesOffered.split(', ').map((service, index) => (
-                      <span key={index} className="px-3 py-1  border border-blue-200 text-blue-800 rounded-full font-medium">
-                        {service}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Facilities */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Facilities Available</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {selectedHospital.facilities.split(', ').map((facility, index) => (
-                      <div key={index} className="flex items-center space-x-2 text-sm text-gray-700">
-                        <CheckCircle className="w-4 h-4 text-blue-600" />
-                        <span>{facility}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Insurance Providers */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Insurance Providers Accepted</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedHospital.acceptedInsurance.split(', ').map((provider, index) => (
-                      <span key={index} className="px-3 py-1 border border-blue-200 text-blue-800 rounded-full font-medium flex items-center space-x-1">
-                        <Shield className="w-3 h-3" />
-                        <span>{provider}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Notes */}
-                {selectedHospital.notes && selectedHospital.notes.trim() && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Notes</h3>
-                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedHospital.notes}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
-                <button 
-                  onClick={() => setShowViewModal(false)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
-                >
-                  Close
-                </button>
-                <button 
-                  onClick={() => {
-                    setShowViewModal(false);
-                    handleEditHospital(selectedHospital);
-                  }}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-                >
-                  Edit Hospital
-                </button>
-              </div>
-            </div>
+{showViewModal && selectedHospital && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur p-4">
+    <div className="bg-white w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col">
+ 
+      {/* ── Header ── */}
+      <div className="flex items-start justify-between px-6 py-5 border-b border-gray-200">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-xl font-bold text-gray-900">{selectedHospital.name}</h2>
+            <span className="px-2 py-0.5 text-xs font-semibold bg-gray-100 text-gray-600 rounded">
+              {selectedHospital.code}
+            </span>
           </div>
+          <p className="text-sm text-gray-500">
+            {selectedHospital.type.replace('_', ' ')} &middot; {selectedHospital.city}
+          </p>
+        </div>
+        <button
+          onClick={() => setShowViewModal(false)}
+          className="text-gray-400 hover:text-gray-600 transition-colors mt-0.5"
+        >
+          <XCircle className="w-5 h-5" />
+        </button>
+      </div>
+ 
+      {/* ── Body ── */}
+      <div className="px-6 py-5 space-y-6 flex-1">
+ 
+        {/* Basic Info */}
+        <Section title="Basic Information">
+          <Grid>
+            <Field label="Type">
+              <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${getTypeColor(selectedHospital.type)}`}>
+                {selectedHospital.type.replace('_', ' ')}
+              </span>
+            </Field>
+            <Field label="Status">
+              <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(selectedHospital.status)}`}>
+                {selectedHospital.status}
+              </span>
+            </Field>
+            <Field label="Registration Number" value={selectedHospital.registrationNumber} />
+            <Field label="Tax ID" value={selectedHospital.taxId} />
+          </Grid>
+        </Section>
+ 
+        <Divider />
+ 
+        {/* Contact */}
+        <Section title="Contact Information">
+          <Grid>
+            <Field label="Main Phone" value={selectedHospital.mainPhone} />
+            {selectedHospital.altPhone && <Field label="Alternative Phone" value={selectedHospital.altPhone} />}
+            <Field label="Email" value={selectedHospital.email} />
+            {selectedHospital.website && <Field label="Website" value={selectedHospital.website} />}
+            {selectedHospital.fax && <Field label="Fax" value={selectedHospital.fax} />}
+          </Grid>
+        </Section>
+ 
+        {/* Admin Contact */}
+        {(selectedHospital.adminContactName || selectedHospital.adminContactEmail || selectedHospital.adminContactPhone) && (
+          <>
+            <Divider />
+            <Section title="Administrative Contact">
+              <Grid>
+                {selectedHospital.adminContactName  && <Field label="Name"  value={selectedHospital.adminContactName} />}
+                {selectedHospital.adminContactEmail && <Field label="Email" value={selectedHospital.adminContactEmail} />}
+                {selectedHospital.adminContactPhone && <Field label="Phone" value={selectedHospital.adminContactPhone} />}
+              </Grid>
+            </Section>
+          </>
         )}
+ 
+        <Divider />
+ 
+        {/* Address */}
+        <Section title="Address">
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {selectedHospital.addressLine1}
+            {selectedHospital.addressLine2 && <>, {selectedHospital.addressLine2}</>}<br />
+            {selectedHospital.city}, {selectedHospital.state} {selectedHospital.postalCode}<br />
+            {selectedHospital.country}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {selectedHospital.latitude}, {selectedHospital.longitude}
+          </p>
+        </Section>
+ 
+        <Divider />
+ 
+        {/* Capacity */}
+        <Section title="Capacity">
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { icon: <Bed className="w-5 h-5 text-blue-500" />,   label: 'Total Beds',  value: selectedHospital.numberOfBeds },
+              { icon: <Heart className="w-5 h-5 text-blue-500" />, label: 'ICU Beds',    value: selectedHospital.numberOfIcuBeds },
+              { icon: <Truck className="w-5 h-5 text-blue-500" />, label: 'Ambulances',  value: selectedHospital.numberOfAmbulances },
+            ].map(({ icon, label, value }) => (
+              <div key={label} className="border border-gray-200 p-4 text-center">
+                <div className="flex justify-center mb-1">{icon}</div>
+                <p className="text-2xl font-bold text-gray-900">{value}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+              </div>
+            ))}
+          </div>
+          {selectedHospital.operatingHours && (
+            <div className="mt-3 px-4 py-3 bg-gray-50 border border-gray-200">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Operating Hours</span>
+              <p className="text-sm text-gray-700 mt-0.5">{selectedHospital.operatingHours}</p>
+            </div>
+          )}
+        </Section>
+ 
+        {/* Departments */}
+        {selectedHospital.departments && selectedHospital.departments.trim() && (
+          <>
+            <Divider />
+            <Section title="Departments">
+              <TagList items={selectedHospital.departments.split(', ')} color="purple" />
+            </Section>
+          </>
+        )}
+ 
+        <Divider />
+ 
+        {/* Services */}
+        <Section title="Services Offered">
+          <TagList items={selectedHospital.servicesOffered.split(', ')} color="blue" />
+        </Section>
+ 
+        <Divider />
+ 
+        {/* Facilities */}
+        <Section title="Facilities">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {selectedHospital.facilities.split(', ').map((f, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                <CheckCircle className="w-4 h-4 text-blue-500 shrink-0" />
+                <span>{f}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+ 
+        <Divider />
+ 
+        {/* Insurance */}
+        <Section title="Accepted Insurance">
+          <div className="flex flex-wrap gap-2">
+            {selectedHospital.acceptedInsurance.split(', ').map((p, i) => (
+              <span key={i} className="flex items-center gap-1 px-2 py-1 border border-gray-200 text-xs text-gray-700 rounded">
+                <Shield className="w-3 h-3 text-gray-400" />
+                {p}
+              </span>
+            ))}
+          </div>
+        </Section>
+ 
+        {/* Notes */}
+        {selectedHospital.notes && selectedHospital.notes.trim() && (
+          <>
+            <Divider />
+            <Section title="Notes">
+              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {selectedHospital.notes}
+              </p>
+            </Section>
+          </>
+        )}
+      </div>
+ 
+      {/* ── Footer ── */}
+      <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 bg-gray-50">
+        <button
+          onClick={() => setShowViewModal(false)}
+          className="px-4 py-2 text-sm text-gray-600 border border-gray-300 hover:bg-gray-100 transition-colors"
+        >
+          Close
+        </button>
+        <button
+          onClick={() => { setShowViewModal(false); handleEditHospital(selectedHospital); }}
+          className="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+        >
+          Edit Hospital
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+ 
+
+ 
 
         {/* Add/Edit Modal */}
         {(showAddModal || showEditModal) && (
