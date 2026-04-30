@@ -963,12 +963,141 @@ const AmbulanceManagement = () => {
       || (driver.location || '').toLowerCase().includes(query);
   });
 
-  const _filteredDispatches = emergencyCalls.filter((dispatch) => {
+  const filteredDispatches = emergencyCalls.filter((dispatch) => {
     const query = searchTerm.toLowerCase();
     return (dispatch.callId || dispatch.id || '').toLowerCase().includes(query)
       || (dispatch.patientName || '').toLowerCase().includes(query)
       || (dispatch.pickupLocation || dispatch.location || '').toLowerCase().includes(query);
   });
+
+  const filteredTracking = useMemo(() => {
+    const query = searchTerm.toLowerCase();
+    return Object.values(trackingData).filter((unit) => {
+      if (!query) return true;
+      return (unit.vehicleId || '').toLowerCase().includes(query)
+        || (unit.locationAddress || '').toLowerCase().includes(query)
+        || String(unit.connectionStatus || '').toLowerCase().includes(query);
+    });
+  }, [searchTerm, trackingData]);
+
+  const handleExport = useCallback(() => {
+    const exportDate = new Date().toISOString().slice(0, 10);
+    let rows = [];
+    let filename = '';
+
+    if (activeTab === 'ambulances') {
+      if (filteredAmbulances.length === 0) {
+        window.alert('No ambulance records available to export.');
+        return;
+      }
+
+      rows = [
+        [
+          'Vehicle Plate',
+          'Registration Number',
+          'Year',
+          'Type',
+          'Status',
+          'Driver',
+          'Medic',
+          'Trips',
+          'Average Response',
+          'Insurance Provider',
+          'Policy Number',
+        ],
+        ...filteredAmbulances.map((item) => [
+          item.vehiclePlate,
+          item.registrationNumber,
+          item.year,
+          item.type,
+          item.status,
+          item.driverName,
+          item.medicName,
+          item.totalDispatches,
+          item.averageResponseTime,
+          item.insuranceProvider,
+          item.insurancePolicyNumber,
+        ]),
+      ];
+      filename = `ambulances-${exportDate}.csv`;
+    } else if (activeTab === 'drivers') {
+      if (filteredDrivers.length === 0) {
+        window.alert('No driver records available to export.');
+        return;
+      }
+
+      rows = [
+        ['Name', 'License Number', 'Phone', 'Email', 'Status', 'Current Vehicle', 'Experience', 'Total Trips', 'Rating'],
+        ...filteredDrivers.map((item) => [
+          item.name,
+          item.licenseNumber,
+          item.phone,
+          item.email,
+          String(item.status || '').replace(/_/g, ' ').toUpperCase(),
+          item.currentVehicle,
+          item.experience,
+          item.totalTrips,
+          item.rating,
+        ]),
+      ];
+      filename = `drivers-${exportDate}.csv`;
+    } else if (activeTab === 'dispatch') {
+      if (filteredDispatches.length === 0) {
+        window.alert('No dispatch records available to export.');
+        return;
+      }
+
+      rows = [
+        ['Call ID', 'Patient Name', 'Priority', 'Status', 'Ambulance', 'Pickup Location', 'Destination', 'Requested At'],
+        ...filteredDispatches.map((item) => [
+          item.callId || item.id,
+          item.patientName,
+          item.priority,
+          item.status,
+          item.assignedAmbulance || item.vehiclePlate,
+          item.pickupLocation || item.location,
+          item.destination,
+          formatDateTime(item.requestTime || item.callTime),
+        ]),
+      ];
+      filename = `dispatches-${exportDate}.csv`;
+    } else if (activeTab === 'tracking') {
+      if (filteredTracking.length === 0) {
+        window.alert('No tracking records available to export.');
+        return;
+      }
+
+      rows = [
+        ['Vehicle', 'Latitude', 'Longitude', 'Speed', 'Heading', 'Battery Level', 'Signal Strength', 'Status', 'Last Update'],
+        ...filteredTracking.map((item) => [
+          item.vehicleId,
+          item.latitude,
+          item.longitude,
+          item.speed,
+          item.heading,
+          item.batteryLevel,
+          item.signalStrength,
+          item.connectionStatus,
+          formatDateTime(item.lastUpdate),
+        ]),
+      ];
+      filename = `tracking-${exportDate}.csv`;
+    }
+
+    if (rows.length === 0 || !filename) {
+      window.alert('No records available to export.');
+      return;
+    }
+
+    const csv = buildCsv(rows);
+    downloadTextFile(filename, `\uFEFF${csv}`, 'text/csv;charset=utf-8');
+  }, [
+    activeTab,
+    filteredAmbulances,
+    filteredDispatches,
+    filteredDrivers,
+    filteredTracking,
+  ]);
 
   // Paginated data
   const paginatedAmbulances = useMemo(() => {
@@ -1364,15 +1493,27 @@ const AmbulanceManagement = () => {
         }
         case 'print': {
           const latest = normalizeAmbulance(await ambulanceService.getAmbulanceById(ambulance.id));
-          const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=700');
-          if (!printWindow) {
+          const iframe = document.createElement('iframe');
+          iframe.style.position = 'fixed';
+          iframe.style.right = '0';
+          iframe.style.bottom = '0';
+          iframe.style.width = '0';
+          iframe.style.height = '0';
+          iframe.style.border = '0';
+          iframe.setAttribute('aria-hidden', 'true');
+          document.body.appendChild(iframe);
+
+          const printDoc = iframe.contentWindow?.document;
+          if (!printDoc) {
+            iframe.remove();
             return {
               type: 'error',
-              message: 'Popup blocked. Allow popups to print the report.',
+              message: 'Could not prepare print report. Please try again.',
             };
           }
 
-          printWindow.document.write(`
+          printDoc.open();
+          printDoc.write(`
             <html>
               <head>
                 <title>Ambulance Report - ${latest.vehiclePlate}</title>
@@ -1402,9 +1543,22 @@ const AmbulanceManagement = () => {
               </body>
             </html>
           `);
-          printWindow.document.close();
-          printWindow.focus();
-          printWindow.print();
+          printDoc.close();
+
+          const runPrint = () => {
+            try {
+              iframe.contentWindow?.focus();
+              iframe.contentWindow?.print();
+            } finally {
+              setTimeout(() => iframe.remove(), 1000);
+            }
+          };
+
+          if (iframe.contentWindow?.document?.readyState === 'complete') {
+            runPrint();
+          } else {
+            iframe.onload = runPrint;
+          }
 
           return {
             type: 'success',
@@ -1646,14 +1800,17 @@ const AmbulanceManagement = () => {
                 </div>
 
                 <div className="flex  space-x-3">
-                  <button
+                  {/* <button
                     onClick={() => refreshDashboardData({ silent: true })}
                     className="flex items-center px-4 py-2 border border-gray-300  text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Refresh
-                  </button>
-                  <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                  </button> */}
+                  <button
+                    onClick={handleExport}
+                    className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     <Download className="w-4 h-4 mr-2" />
                     Export
                   </button>
