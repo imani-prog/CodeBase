@@ -18,7 +18,7 @@ function mapChwToUi(row = {}) {
     street: safeString(row.addressLine1),
     addressLine2: safeString(row.addressLine2),
     city: safeString(row.city),
-    county: safeString(row.state),       // "state" maps to "county" in Kenya context
+    county: safeString(row.state),      // "state" maps to "county" in Kenya context
     postalCode: safeString(row.postalCode),
     country: safeString(row.country),
     // Location
