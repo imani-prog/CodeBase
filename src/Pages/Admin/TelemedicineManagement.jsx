@@ -543,7 +543,11 @@ const formatIfDate = (value) => {
           telemedicineService.getRecentActivity({ limit: 10 }),
           telemedicineService.getOnlineDoctors(),
           telemedicineService.getSessionHistory({ period: selectedPeriod }),
+          
         ]);
+// Inside your useEffect, after the Promise.all resolves
+console.log('RAW historyPayload:', JSON.stringify(historyPayload, null, 2));
+console.log('EXTRACTED history rows:', extractListPayload(historyPayload, ['history', 'sessionHistory']));
 
         setPlatformOverview({
           totalSessions: toNumber(firstNonEmpty(overviewPayload?.totalSessions, overviewPayload?.sessionsTotal), 0),
@@ -625,7 +629,11 @@ const formatIfDate = (value) => {
             .map(mapRecentActivityRow)
         );
         setOnlineDoctors(extractListPayload(doctorsPayload, ['doctors', 'onlineDoctors']).map(mapDoctorRow));
-        setSessionHistory(extractListPayload(historyPayload, ['history', 'sessionHistory']).map(mapHistoryRow));
+        const historyStatuses = ['completed', 'terminated', 'cancelled'];
+        const mappedHistory = normalizePagedContent(sessionsPayload)
+          .map(mapHistoryRow)
+          .filter(session => historyStatuses.includes(session.status));
+        setSessionHistory(mappedHistory);
       } catch (error) {
         setDataError(error?.message || 'Failed to load telemedicine data from backend.');
       } finally {
@@ -1270,15 +1278,15 @@ const formatIfDate = (value) => {
                 <td className="px-3 py-2.5">
                   <div className="flex items-center">
                     <div className="relative flex-shrink-0">
-                      <img
+                      {/* <img
                         src={doctor.photo}
                         alt={doctor.name}
                         className="w-8 h-8 rounded-full object-cover"
-                      />
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
+                      /> */}
+                      {/* <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
                         doctor.currentStatus === 'available' ? 'bg-green-500' :
                         doctor.currentStatus === 'busy' ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}></div>
+                      }`}></div> */}
                     </div>
                     <div className="ml-2">
                       <span className="font-semibold text-sm">{doctor.name}</span>

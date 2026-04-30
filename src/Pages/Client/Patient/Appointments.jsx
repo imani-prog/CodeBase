@@ -101,12 +101,18 @@ function buildCreatePayload(form, bookingType, patientId) {
   if (Number.isNaN(start.getTime())) throw new Error('Invalid date/time');
   const end = new Date(start.getTime() + 30 * 60 * 1000);
 
-  const typeMap = { telemedicine: 'TELEMEDICINE', home: 'HOME_VISIT', clinic: 'CLINIC_VISIT' };
+  const typeMap = { telemedicine: 'TELEMEDICINE', home: 'HOME_VISIT', clinic: 'CONSULTATION' };
   const roleMap = { telemedicine: 'DOCTOR',       home: 'CHW',        clinic: 'DOCTOR' };
 
+  const normalizedPatientId = Number(patientId);
+  if (!Number.isFinite(normalizedPatientId)) {
+    throw new Error('Invalid patient id');
+  }
+
   return {
-    patientId,
-    type:         typeMap[bookingType] ?? 'CLINIC_VISIT',
+    patientId:    normalizedPatientId,
+    type:         typeMap[bookingType] ?? 'CONSULTATION',
+    appointmentType: typeMap[bookingType] ?? 'CONSULTATION',
     providerRole: roleMap[bookingType] ?? 'DOCTOR',
     location:
       bookingType === 'telemedicine' ? 'Video Consultation'
@@ -116,6 +122,8 @@ function buildCreatePayload(form, bookingType, patientId) {
     notes:         `Insurance: ${form.insurance}`,
     scheduledStart: start.toISOString(),
     scheduledEnd:   end.toISOString(),
+    startAt:        start.toISOString(),
+    endAt:          end.toISOString(),
     status:        'SCHEDULED',
   };
 }
