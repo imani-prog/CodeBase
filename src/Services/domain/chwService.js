@@ -21,7 +21,6 @@ function mapChwToUi(row = {}) {
     county: safeString(row.state),      // "state" maps to "county" in Kenya context
     postalCode: safeString(row.postalCode),
     country: safeString(row.country),
-    // Location
     latitude: row.latitude ?? null,
     longitude: row.longitude ?? null,
     region: safeString(row.region),

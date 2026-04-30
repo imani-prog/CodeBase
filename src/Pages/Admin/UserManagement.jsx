@@ -6,12 +6,10 @@ import {
   Users,
   UserPlus,
   Search,
-  MoreHorizontal,
   Edit3,
   Shield,
   Eye,
   Phone,
-  MapPin,
   CheckCircle,
   XCircle,
   AlertCircle,
@@ -24,17 +22,33 @@ import {
   Activity,
 } from 'lucide-react';
 
+import {
+  AddUserModal,
+  ViewUserModal,
+  EditUserModal,
+  ChangeRoleModal,
+  ChangeStatusModal,
+  DeleteUserModal,
+  ActionsDropdown,
+} from './components/Usermanagementmodals.jsx';
+
 const UserManagement = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRole, setSelectedRole] = useState('all');
+  const [searchTerm, setSearchTerm]       = useState('');
+  const [selectedRole, setSelectedRole]   = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [_viewMode, _setViewMode] = useState('table');
+  const [_viewMode, _setViewMode]         = useState('table');
 
-  const [users, setUsers] = useState([]);
+  const [users, setUsers]   = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError]   = useState(null);
 
+  /* ── modal state ── */
+  const [modal, setModal] = useState({ type: null, user: null });
+  const openModal  = (type, user = null) => setModal({ type, user });
+  const closeModal = ()                   => setModal({ type: null, user: null });
+
+  /* ── data fetching ── */
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -42,14 +56,14 @@ const UserManagement = () => {
       const data = await userApi.list();
       const normalized = (Array.isArray(data) ? data : []).map(user => ({
         ...user,
-        name: user.fullName ?? user.username ?? '—',
-        status: (user.status ?? 'ACTIVE').toLowerCase(),
-        role: (user.role ?? 'PATIENT').toLowerCase(),
-        lastLogin: user.lastLoginAt ?? null,
+        name:            user.fullName ?? user.username ?? '—',
+        status:          (user.status ?? 'ACTIVE').toLowerCase(),
+        role:            (user.role   ?? 'PATIENT').toLowerCase(),
+        lastLogin:       user.lastLoginAt ?? null,
         patientsManaged: user.patientsManaged ?? 0,
-        department: user.department ?? null,
-        specialization: user.specialization ?? null,
-        location: user.location ?? null,
+        department:      user.department    ?? null,
+        specialization:  user.specialization ?? null,
+        location:        user.location      ?? null,
       }));
       setUsers(normalized);
     } catch (err) {
@@ -61,12 +75,13 @@ const UserManagement = () => {
 
   useEffect(() => { fetchUsers(); }, []);
 
+  /* ── filter options ── */
   const roleOptions = [
-    { value: 'all',     label: 'All Roles',       count: users.length },
-    { value: 'admin',   label: 'Administrators',   count: users.filter(u => u.role === 'admin').length },
-    { value: 'doctor',  label: 'Doctors',          count: users.filter(u => u.role === 'doctor').length },
-    { value: 'chw',     label: 'CHWs',             count: users.filter(u => u.role === 'chw').length },
-    { value: 'patient', label: 'Patients',         count: users.filter(u => u.role === 'patient').length },
+    { value: 'all',     label: 'All Roles',     count: users.length },
+    { value: 'admin',   label: 'Administrators', count: users.filter(u => u.role === 'admin').length },
+    { value: 'doctor',  label: 'Doctors',        count: users.filter(u => u.role === 'doctor').length },
+    { value: 'chw',     label: 'CHWs',           count: users.filter(u => u.role === 'chw').length },
+    { value: 'patient', label: 'Patients',       count: users.filter(u => u.role === 'patient').length },
   ];
 
   const statusOptions = [
@@ -76,17 +91,19 @@ const UserManagement = () => {
     { value: 'pending',  label: 'Pending',    count: users.filter(u => u.status === 'pending').length },
   ];
 
+  /* ── filtered rows ── */
   const filteredUsers = users.filter(user => {
     const matchesSearch =
-      (user.name        || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.email       || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.username    || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.phone       || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (user.name     || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.email    || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.phone    || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole   = selectedRole   === 'all' || user.role   === selectedRole;
     const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus;
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  /* ── role / status helpers ── */
   const getRoleIcon = (role) => {
     switch (role) {
       case 'admin':      return <Shield      className="w-5 h-5 text-blue-600" />;
@@ -99,47 +116,38 @@ const UserManagement = () => {
     }
   };
 
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'admin':
-      case 'doctor':
-      case 'nurse':
-      case 'chw':
-      case 'technician':
-      case 'patient':    return 'text-blue-800 border-blue-200';
-      default:           return 'text-gray-800 border-gray-200';
-    }
-  };
+  const getRoleColor = (_role) => 'text-blue-800 border-blue-200';
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'active':   return <CheckCircle  className="w-4 h-4 text-green-500" />;
-      case 'inactive': return <XCircle      className="w-4 h-4 text-red-500" />;
-      case 'pending':  return <Clock        className="w-4 h-4 text-yellow-500" />;
-      default:         return <AlertCircle  className="w-4 h-4 text-gray-500" />;
+      case 'active':   return <CheckCircle className="w-4 h-4 text-green-500"  />;
+      case 'inactive': return <XCircle     className="w-4 h-4 text-red-500"    />;
+      case 'pending':  return <Clock       className="w-4 h-4 text-yellow-500" />;
+      default:         return <AlertCircle className="w-4 h-4 text-gray-500"   />;
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'active':   return 'text-green-800 border-green-200';
-      case 'inactive': return 'text-red-800 border-red-200';
+      case 'active':   return 'text-green-800  border-green-200';
+      case 'inactive': return 'text-red-800    border-red-200';
       case 'pending':  return 'text-yellow-800 border-yellow-200';
-      default:         return 'text-gray-800 border-gray-200';
+      default:         return 'text-gray-800   border-gray-200';
     }
   };
 
-  const toggleSelectUser = (userId) => {
+  /* ── selection helpers ── */
+  const toggleSelectUser = (userId) =>
     setSelectedUsers(prev =>
-      prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
     );
-  };
 
-  const handleBulkAction = (action) => {
-    console.log(`Bulk ${action} for users:`, selectedUsers);
+  /* ── bulk status update ── */
+  const handleBulkAction = async (action) => {
+    const status = action === 'activate' ? 'ACTIVE' : 'INACTIVE';
+    await Promise.allSettled(selectedUsers.map(id => userApi.updateStatus(id, status)));
     setSelectedUsers([]);
+    fetchUsers();
   };
 
   if (loading) return <LoadingSpinner />;
@@ -147,19 +155,53 @@ const UserManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 lg:p-5">
-      {/* Header Section */}
+
+      {/* ── Modals ── */}
+      <AddUserModal
+        open={modal.type === 'add'}
+        onClose={closeModal}
+        onSuccess={fetchUsers}
+      />
+      <ViewUserModal
+        open={modal.type === 'view'}
+        onClose={closeModal}
+        user={modal.user}
+      />
+      <EditUserModal
+        open={modal.type === 'edit'}
+        onClose={closeModal}
+        user={modal.user}
+        onSuccess={fetchUsers}
+      />
+      <ChangeRoleModal
+        open={modal.type === 'role'}
+        onClose={closeModal}
+        user={modal.user}
+        onSuccess={fetchUsers}
+      />
+      <ChangeStatusModal
+        open={modal.type === 'status'}
+        onClose={closeModal}
+        user={modal.user}
+        onSuccess={fetchUsers}
+      />
+      <DeleteUserModal
+        open={modal.type === 'delete'}
+        onClose={closeModal}
+        user={modal.user}
+        onSuccess={fetchUsers}
+      />
+
+      {/* ── Header ── */}
       <div className="mb-4">
-        <div className="">
-          <div className="flex justify-between items-center mb-4">
-            <div className="items-center space-x-4">
-              <h1 className="text-2xl font-bold mb-1">User Management</h1>
-              <div className=""></div>
-            </div>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">User Management</h1>
           </div>
         </div>
       </div>
 
-      {/* Summary Statistics */}
+      {/* ── Summary Statistics ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div className="bg-white border border-gray-200 p-4">
           <div className="flex items-center justify-between">
@@ -220,10 +262,9 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* Controls Section */}
+      {/* ── Controls ── */}
       <div className="mb-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* Search and Filters */}
           <div className="flex flex-col sm:flex-row gap-4 flex-1">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -263,7 +304,6 @@ const UserManagement = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center space-x-3">
             {selectedUsers.length > 0 && (
               <>
@@ -295,7 +335,10 @@ const UserManagement = () => {
               Import
             </button>
 
-            <button className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+              onClick={() => openModal('add')}
+              className="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               <UserPlus className="w-4 h-4 mr-2" />
               Add User
             </button>
@@ -303,7 +346,7 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* Users Table */}
+      {/* ── Users Table ── */}
       <div className="bg-white border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -348,14 +391,9 @@ const UserManagement = () => {
 
                   {/* User */}
                   <td className="px-3 py-2.5">
-                    <div className="">
-                      <div className="">
-                        
-                      </div>
-                      <div className="ml-3">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-xs text-gray-500">{user.email}</div>
-                      </div>
+                    <div className="ml-3">
+                      <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                      <div className="text-xs text-gray-500">{user.email}</div>
                     </div>
                   </td>
 
@@ -418,15 +456,31 @@ const UserManagement = () => {
                   {/* Actions */}
                   <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900 transition-colors">
+                      {/* Eye — View */}
+                      <button
+                        onClick={() => openModal('view', user)}
+                        className="text-blue-600 hover:text-blue-900 transition-colors"
+                      >
                         <Eye className="w-3.5 h-3.5" />
                       </button>
-                      <button className="text-green-600 hover:text-green-900 transition-colors">
+
+                      {/* Edit3 — Edit */}
+                      <button
+                        onClick={() => openModal('edit', user)}
+                        className="text-green-600 hover:text-green-900 transition-colors"
+                      >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
-                      <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                        <MoreHorizontal className="w-3.5 h-3.5" />
-                      </button>
+
+                      {/* MoreHorizontal — dropdown with role / status / delete */}
+                      <ActionsDropdown
+                        user={user}
+                        onView={(u)         => openModal('view',   u)}
+                        onEdit={(u)         => openModal('edit',   u)}
+                        onChangeRole={(u)   => openModal('role',   u)}
+                        onChangeStatus={(u) => openModal('status', u)}
+                        onDelete={(u)       => openModal('delete', u)}
+                      />
                     </div>
                   </td>
 
