@@ -33,6 +33,9 @@ const normalizeCHWRecord = (record) => {
     lastName,
     name,
     avatar,
+    patients: Number(record.assignedPatients) || 0, 
+    monthlyVisits: Number(record.monthlyVisits) || 0,
+    rating: Number(record.rating) || 0,
     status: normalizeCHWStatus(record.status),
     coverageArea: record.coverageArea || record.region || 'Unassigned Coverage Area',
     assignedFacility: record.assignedFacility || record.hospitalName || 'Unassigned Facility',
@@ -40,7 +43,6 @@ const normalizeCHWRecord = (record) => {
     supervisorPhone: record.supervisorPhone || 'N/A',
   };
 };
-
 
 
 const ActiveCHW = () => {
@@ -72,6 +74,10 @@ const fetchCHWs = async () => {
     const data = await chwApi.list();
     const list = Array.isArray(data?.content) ? data.content
       : Array.isArray(data) ? data : [];
+
+    // ADD THIS to see the raw field names
+    console.log('Raw CHW record sample:', list[0]);
+
     setCHWs(list.map(normalizeCHWRecord));
   } catch (err) {
     setError(err.message || 'Failed to load CHWs');
@@ -314,7 +320,7 @@ const handleDeleteCHW = async (chw) => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Patients</p>
-                <p className="text-2xl font-bold text-gray-900">{chws.reduce((sum, chw) => sum + chw.patients, 0)}</p>
+                <p className="text-2xl font-bold text-gray-900">{chws.reduce((sum, chw) => sum + (Number(chw.patients) || 0), 0)}</p>
               </div>
             </div>
           </div>
