@@ -192,7 +192,10 @@ function groupHomeVisitsByTab(homeVisits = []) {
   return homeVisits.reduce(
     (acc, visit) => {
       const normalizedVisit = {
-        id: visit.id,
+        id: `${visit.chwId}:${visit.id}`,
+        backendId: visit.id, 
+        
+        // backendId: Number(visit.id),
         patientName: visit.patientName,
         patientId: visit.patientIdText,
         phone: visit.phone,
@@ -214,11 +217,11 @@ function groupHomeVisitsByTab(homeVisits = []) {
       };
 
       if (visit.status === "COMPLETED") {
-        acc.completed.push({ ...normalizedVisit, status: "completed" });
+        acc.completed.push({ ...normalizedVisit, status: "COMPLETED"});
       } else if (["CANCELED", "NO_SHOW"].includes(visit.status)) {
         acc.cancelled.push({
           ...normalizedVisit,
-          status: "cancelled",
+          status: "CANCELED",
           reasonType: visit.status === "NO_SHOW" ? "NO_SHOW" : undefined,
         });
       } else {

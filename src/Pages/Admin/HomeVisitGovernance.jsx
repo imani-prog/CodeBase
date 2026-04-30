@@ -67,6 +67,23 @@ function downloadCsv(rows, fileName) {
   URL.revokeObjectURL(url);
 }
 
+function resolveBackendVisitId(visit) {
+  const candidate = visit?.backendId ?? visit?.sourceVisitId ?? visit?.id ?? null;
+  if (candidate == null) return null;
+  if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
+
+  const text = String(candidate);
+  if (text.includes(':')) {
+    const parts = text.split(':');
+    const tail = parts[1] ?? '';
+    const parsed = Number(tail);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  const parsed = Number(text);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 const HomeVisitGovernance = () => {
   const [snapshot, setSnapshot] = useState(getHomeVisitGovernanceSnapshot());
   const [isSyncing, setIsSyncing] = useState(true);
@@ -106,11 +123,17 @@ const HomeVisitGovernance = () => {
     };
   }, [refreshFromBackend]);
 
-  const recentCompleted = useMemo(() => {
-    return snapshot.visits
-      .filter((visit) => visit.status === 'COMPLETED')
-      .slice(0, 8);
-  }, [snapshot.visits]);
+  // const recentCompleted = useMemo(() => {
+  //   return snapshot.visits
+  //     .filter((visit) => visit.status === 'COMPLETED')
+  //     .slice(0, 8);
+  // }, [snapshot.visits]);
+
+const recentCompleted = useMemo(() => {
+  return snapshot.visits
+    .filter((visit) => visit.status === 'COMPLETED')
+    .slice(0, 8);
+}, [snapshot.visits]);
 
   const noShowQueue = useMemo(() => {
     return snapshot.visits.filter((visit) => visit.status === 'NO_SHOW');
@@ -122,6 +145,7 @@ const HomeVisitGovernance = () => {
       .slice(0, 12);
   }, [snapshot.visits]);
 
+
   const maxReasonCount = useMemo(() => {
     const all = [
       ...snapshot.reasonAnalytics.noShowReasons,
@@ -132,67 +156,187 @@ const HomeVisitGovernance = () => {
 
   const refreshSnapshot = () => setSnapshot(getHomeVisitGovernanceSnapshot());
 
-  const handleEvidenceReview = (visit, decision) => {
-    const note = window.prompt(
-      decision === 'VERIFIED' ? 'Verification note (optional)' : 'Rejection reason',
-      decision === 'VERIFIED' ? 'Evidence reviewed and accepted' : 'Incomplete documentation'
-    );
-    if (note === null) return;
+  // const handleEvidenceReview = (visit, decision) => {
+  //   const note = window.prompt(
+  //     decision === 'VERIFIED' ? 'Verification note (optional)' : 'Rejection reason',
+  //     decision === 'VERIFIED' ? 'Evidence reviewed and accepted' : 'Incomplete documentation'
+  //   );
+  //   if (note === null) return;
 
-    const result = reviewCompletionEvidence(
-      visit.id,
-      decision,
-      'Dr. Timothy Imani',
-      note.trim()
-    );
+  //   const result = reviewCompletionEvidence(
+  //     visit.id,
+  //     decision,
+  //     'Dr. Timothy Imani',
+  //     note.trim()
+  //   );
 
-    if (!result.ok) {
-      window.alert(result.reason || 'Could not update evidence review');
-      return;
+  //   if (!result.ok) {
+  //     window.alert(result.reason || 'Could not update evidence review');
+  //     return;
+  //   }
+
+  //   refreshSnapshot();
+  // };
+
+  // const handleResolveNoShow = (visit) => {
+  //   const resolution = window.prompt('No-show resolution', 'FOLLOW_UP_SCHEDULED');
+  //   if (resolution === null) return;
+  //   const comment = window.prompt('Supervisor comment', 'Patient to be contacted within 24 hours');
+  //   if (comment === null) return;
+  //   const followUpDueAt = window.prompt('Follow-up due date (YYYY-MM-DD)', '2026-03-25');
+  //   if (followUpDueAt === null) return;
+
+  //   const result = resolveNoShowVisit(visit.id, resolution.trim(), comment.trim(), followUpDueAt.trim());
+  //   if (!result.ok) {
+  //     window.alert(result.reason || 'Could not resolve no-show visit');
+  //     return;
+  //   }
+
+  //   refreshSnapshot();
+  // };
+
+const handleEvidenceReview = async (visit, decision) => {
+  const note = window.prompt(
+    decision === 'VERIFIED'
+      ? 'Verification note (optional)'
+      : 'Rejection reason',
+    decision === 'VERIFIED'
+      ? 'Evidence reviewed and accepted'
+      : 'Incomplete documentation'
+  );
+  if (note === null) return;
+
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+
+  const result = reviewCompletionEvidence(
+    visit.id,
+    decision,
+    currentUser?.fullName || "System",
+    note.trim()
+  );
+
+  if (!result.ok) {
+    window.alert(result.reason || 'Could not update evidence review');
+    return;
+  }
+
+  try {
+    const backendId = resolveBackendVisitId(visit);
+    if (!backendId) {
+      throw new Error('Home visit id is missing. Please refresh and try again.');
     }
 
-    refreshSnapshot();
-  };
+    await homeVisitService.updateHomeVisit(backendId, {
+      status: decision === 'VERIFIED' ? 'COMPLETED' : 'SCHEDULED',
+      notes: note.trim(),
+    });
+  } catch (err) {
+    window.alert(err?.message || 'Failed to update home visit on server');
+    return;
+  }
 
-  const handleResolveNoShow = (visit) => {
-    const resolution = window.prompt('No-show resolution', 'FOLLOW_UP_SCHEDULED');
-    if (resolution === null) return;
-    const comment = window.prompt('Supervisor comment', 'Patient to be contacted within 24 hours');
-    if (comment === null) return;
-    const followUpDueAt = window.prompt('Follow-up due date (YYYY-MM-DD)', '2026-03-25');
-    if (followUpDueAt === null) return;
+  refreshSnapshot();
+};
 
-    const result = resolveNoShowVisit(visit.id, resolution.trim(), comment.trim(), followUpDueAt.trim());
-    if (!result.ok) {
-      window.alert(result.reason || 'Could not resolve no-show visit');
-      return;
+const handleResolveNoShow = async (visit) => {
+  const resolution = window.prompt('No-show resolution', 'FOLLOW_UP_SCHEDULED');
+  if (resolution === null) return;
+  const comment = window.prompt('Supervisor comment', 'Patient to be contacted within 24 hours');
+  if (comment === null) return;
+  const followUpDueAt = window.prompt('Follow-up due date (YYYY-MM-DD)', '2026-03-25');
+  if (followUpDueAt === null) return;
+
+  const result = resolveNoShowVisit(
+    visit.id,
+    resolution.trim(),
+    comment.trim(),
+    followUpDueAt.trim()
+  );
+
+  if (!result.ok) {
+    window.alert(result.reason || 'Could not resolve no-show visit');
+    return;
+  }
+
+  try {
+    const backendId = resolveBackendVisitId(visit);
+    if (!backendId) {
+      throw new Error('Home visit id is missing. Please refresh and try again.');
     }
 
-    refreshSnapshot();
-  };
+    await homeVisitService.updateHomeVisit(backendId, {
+      status: 'SCHEDULED',
+      notes: comment.trim(),
+      reason: resolution.trim(),
+    });
+  } catch (err) {
+    window.alert(err?.message || 'Failed to update home visit on server');
+    return;
+  }
 
-  const handleReassignVisit = (visit) => {
-    const nextChwName = window.prompt('Reassign to CHW name', visit.chwName || '');
-    if (nextChwName === null) return;
-    const nextChwId = window.prompt('Reassign to CHW ID', visit.chwId || 'CHW-001');
-    if (nextChwId === null) return;
-    const reason = window.prompt('Reassignment reason', 'Coverage balancing');
-    if (reason === null) return;
+  refreshSnapshot();
+};
 
-    const result = reassignHomeVisitOwner(
-      visit.id,
-      nextChwId.trim() || visit.chwId,
-      nextChwName.trim() || visit.chwName,
-      reason.trim() || 'Coverage balancing'
-    );
+const handleReassignVisit = async (visit) => {
+  const nextChwName = window.prompt('Reassign to CHW name', visit.chwName || '');
+  if (nextChwName === null) return;
+  const nextChwId = window.prompt('Reassign to CHW ID', visit.chwId || 'CHW-001');
+  if (nextChwId === null) return;
+  const reason = window.prompt('Reassignment reason', 'Coverage balancing');
+  if (reason === null) return;
 
-    if (!result.ok) {
-      window.alert(result.reason || 'Could not reassign visit');
-      return;
+  const result = reassignHomeVisitOwner(
+    visit.id,
+    nextChwId.trim() || visit.chwId,
+    nextChwName.trim() || visit.chwName,
+    reason.trim() || 'Coverage balancing'
+  );
+
+  if (!result.ok) {
+    window.alert(result.reason || 'Could not reassign visit');
+    return;
+  }
+
+  try {
+    const backendId = resolveBackendVisitId(visit);
+    if (!backendId) {
+      throw new Error('Home visit id is missing. Please refresh and try again.');
     }
 
-    refreshSnapshot();
-  };
+    await homeVisitService.updateHomeVisit(backendId, {
+      chwId: nextChwId.trim() || visit.chwId,
+      notes: reason.trim() || 'Coverage balancing',
+    });
+  } catch (err) {
+    window.alert(err?.message || 'Failed to reassign home visit on server');
+    return;
+  }
+
+  refreshSnapshot();
+};
+
+  // const handleReassignVisit = (visit) => {
+  //   const nextChwName = window.prompt('Reassign to CHW name', visit.chwName || '');
+  //   if (nextChwName === null) return;
+  //   const nextChwId = window.prompt('Reassign to CHW ID', visit.chwId || 'CHW-001');
+  //   if (nextChwId === null) return;
+  //   const reason = window.prompt('Reassignment reason', 'Coverage balancing');
+  //   if (reason === null) return;
+
+  //   const result = reassignHomeVisitOwner(
+  //     visit.id,
+  //     nextChwId.trim() || visit.chwId,
+  //     nextChwName.trim() || visit.chwName,
+  //     reason.trim() || 'Coverage balancing'
+  //   );
+
+  //   if (!result.ok) {
+  //     window.alert(result.reason || 'Could not reassign visit');
+  //     return;
+  //   }
+
+  //   refreshSnapshot();
+  // };
 
   const handleExportCsv = () => {
     const rows = snapshot.visits.map((visit) => ({
@@ -318,6 +462,9 @@ const HomeVisitGovernance = () => {
                               onClick={() => handleEvidenceReview(visit, 'VERIFIED')}
                               className="px-2 py-1 text-xs font-semibold text-green-700 hover:bg-green-50"
                             >
+
+
+
                               Verify
                             </button>
                             <button
