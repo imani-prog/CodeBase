@@ -88,6 +88,7 @@ const HomeVisitGovernance = () => {
   const [snapshot, setSnapshot] = useState(getHomeVisitGovernanceSnapshot());
   const [isSyncing, setIsSyncing] = useState(true);
   const [syncError, setSyncError] = useState('');
+  const [notification, setNotification] = useState(null);
 
   const refreshFromBackend = useCallback(async () => {
     setIsSyncing(true);
@@ -307,6 +308,12 @@ const handleReassignVisit = async (visit) => {
       chwId: nextChwId.trim() || visit.chwId,
       notes: reason.trim() || 'Coverage balancing',
     });
+
+    setNotification({
+      type: 'success',
+      message: `Visit reassigned to ${nextChwName}. CHW portal will update within 20 seconds.`,
+    });
+    setTimeout(() => setNotification(null), 4000);
   } catch (err) {
     window.alert(err?.message || 'Failed to reassign home visit on server');
     return;
@@ -357,6 +364,15 @@ const handleReassignVisit = async (visit) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen space-y-6">
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium z-50 ${
+          notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        }`}>
+          {notification.message}
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Home Visit Governance</h1>

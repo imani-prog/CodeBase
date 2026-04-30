@@ -380,9 +380,14 @@ const HomeVisits = () => {
 
   useEffect(() => {
     loadHomeVisits();
-    const timer = window.setInterval(loadHomeVisits, 45000);
+    const timer = window.setInterval(loadHomeVisits, 20000);
     return () => window.clearInterval(timer);
   }, [loadHomeVisits]);
+
+  const handleManualRefresh = async () => {
+    setIsLoadingVisits(true);
+    await loadHomeVisits();
+  };
 
   useEffect(() => {
     if (!hasHydratedVisits) return;
@@ -576,6 +581,15 @@ const HomeVisits = () => {
           {visitsError && <p className="text-sm text-red-700 mt-1">{visitsError}</p>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {/* Manual refresh button for reassigned visits */}
+          <button
+            onClick={handleManualRefresh}
+            disabled={isLoadingVisits}
+            title="Refresh to see reassigned visits"
+            className="px-3 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          >
+            {isLoadingVisits ? '⟳' : '⟳'}
+          </button>
           {/* Mobile-only: open map overlay */}
           <button
             onClick={() => setShowMap(true)}
