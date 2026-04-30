@@ -216,10 +216,6 @@ const HomeVisitGovernance = () => {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Home Visit Governance</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {isSyncing ? 'Syncing home visits from backend...' : `Last sync: ${new Date(snapshot.updatedAt).toLocaleString('en-KE')}`}
-          </p>
-          {syncError && <p className="text-sm text-red-700 mt-1">{syncError}</p>}
         </div>
         <button
           type="button"
@@ -520,20 +516,6 @@ const HomeVisitGovernance = () => {
                 )}
               </tbody>
             </table>
-          </div>
-          <div className="p-4 border-t border-gray-100">
-           
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d277.7549826743736!2d37.26242921919778!3d-1.5305180166278827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f87eeedd7e1cd%3A0x2bb0f6a2ec4c7859!2sMachakos%20University%20Administration!5e0!3m2!1sen!2ske!4v1774964157029!5m2!1sen!2ske"
-            width="100%"
-            height="260"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Supervisor Coverage Map"
-          />
-
           </div>
         </section>
 
