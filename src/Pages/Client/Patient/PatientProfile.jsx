@@ -122,7 +122,7 @@ const Note = ({ type = 'info', title, message }) => {
 
 /* ── Main Component ── */
 const PatientProfile = () => {
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
   const [profile, setProfile]     = useState(null);
   const [editData, setEditData]   = useState({});   // draft while editing
   const [editMode, setEditMode]   = useState(false);
@@ -136,7 +136,7 @@ const PatientProfile = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await patientApi.me();   // GET /api/patients/me
+        const data = await patientApi.me({ fallbackUserId: user?.id });
         setProfile(data);
       } catch (err) {
         setError(err?.message || 'Failed to load profile.');
@@ -145,7 +145,7 @@ const PatientProfile = () => {
       }
     };
     load();
-  }, []);
+  }, [user?.id]);
 
   /* ── Enter edit mode — clone current profile into draft ── */
   const handleEdit = () => {

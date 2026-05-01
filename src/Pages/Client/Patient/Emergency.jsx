@@ -18,6 +18,7 @@ import { ambulanceApi } from '../../../API/endpoints/ambulanceApi.js';
 import { chwApi } from '../../../API/endpoints/chwApi.js';
 import { patientApi } from '../../../API/endpoints/patientApi.js';
 import LiveMap from '../../../Components/Client/LiveMap.jsx';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
 const DEFAULT_LOCATION = { lat: -1.286389, lng: 36.817223 };
 const EMERGENCY_ORDERS_UPDATED_EVENT = 'patient-emergency-orders-updated';
@@ -357,6 +358,7 @@ const Emergency = () => {
   const [userLocation, setUserLocation] = useState(DEFAULT_LOCATION);
   const [chwRows, setChwRows] = useState([]);
   const [ambulanceRows, setAmbulanceRows] = useState([]);
+  const { user } = useAuth();
   const [patientProfile, setPatientProfile] = useState(null);
   const [loadingChw, setLoadingChw] = useState(true);
   const [loadingAmbulances, setLoadingAmbulances] = useState(true);
@@ -466,12 +468,12 @@ const Emergency = () => {
 
   const fetchPatientProfile = useCallback(async () => {
     try {
-      const profile = await patientApi.me();
+      const profile = await patientApi.me({ fallbackUserId: user?.id });
       setPatientProfile(profile || null);
     } catch {
       setPatientProfile(null);
     }
-  }, []);
+  }, [user?.id]);
 
   const fetchChwData = useCallback(async () => {
     setLoadingChw(true);

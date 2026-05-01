@@ -511,7 +511,7 @@ const Insurance = () => {
     setBillingLoadError('');
 
     try {
-      const resolvedPatientId = patientId || (await patientApi.me())?.id;
+      const resolvedPatientId = patientId || (await patientApi.resolveMyPatientId(user?.id));
       if (!resolvedPatientId) {
         throw new Error('Patient profile not found for this account.');
       }

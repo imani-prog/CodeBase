@@ -346,7 +346,6 @@ export function ViewUserModal({ open, onClose, user }) {
   );
 }
 
-
 export function EditUserModal({ open, onClose, user, onSuccess }) {
   const [form, setForm]     = useState({ fullName: '', email: '', phone: '', password: '' });
   const [errors, setErrors] = useState({});

@@ -10,10 +10,7 @@ let authHandlers = {
   onUnauthorized: null,
 };
 
-// ─── Refresh queue ────────────────────────────────────────────────────────────
-// Ensures only ONE refresh call is in-flight at a time.
-// All 401s that arrive while a refresh is pending are queued and retried
-// (or rejected) once the single refresh settles.
+
 let isRefreshing = false;
 let refreshQueue = []; // Array of { resolve, reject }
 
@@ -23,7 +20,7 @@ function processQueue(succeeded) {
   );
   refreshQueue = [];
 }
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 function buildUrl(path, query) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -82,7 +79,7 @@ export function configureHttpClientHandlers(handlers = {}) {
 }
 
 async function executeRefresh() {
-  // If a refresh is already running, queue this caller and wait.
+
   if (isRefreshing) {
     return new Promise((resolve, reject) => {
       refreshQueue.push({ resolve, reject });
@@ -131,14 +128,14 @@ export async function request(path, options = {}) {
   });
 
   if (response.status === 401 && retryOn401 && typeof authHandlers.refresh === "function") {
-    const refreshed = await executeRefresh(); // ← queued, not parallel
+    const refreshed = await executeRefresh(); 
 
     if (refreshed) {
-      // Re-read the new token that executeRefresh stored
+     
       return request(path, { ...options, retryOn401: false });
     }
 
-    // Refresh failed — log out once, not N times
+    
     if (typeof authHandlers.onUnauthorized === "function") {
       authHandlers.onUnauthorized();
     }

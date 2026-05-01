@@ -212,7 +212,7 @@ const Telemedicine = () => {
         const profile = await userApi.me();
         let resolved = extractPatientId(profile);
         if (!resolved) {
-          const patientProfile = await patientApi.me();
+          const patientProfile = await patientApi.me({ fallbackUserId: user?.id });
           resolved = extractPatientId(patientProfile) ?? patientProfile?.id ?? null;
           setPatientName(extractPatientName(patientProfile));
         } else {
@@ -226,7 +226,7 @@ const Telemedicine = () => {
         }
       } catch (err) {
         try {
-          const patientProfile = await patientApi.me();
+          const patientProfile = await patientApi.me({ fallbackUserId: user?.id });
           const resolved = extractPatientId(patientProfile) ?? patientProfile?.id ?? null;
           if (resolved) {
             setPatientId(resolved);

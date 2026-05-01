@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { authApi } from '../API/endpoints/authApi.js';
+import { setTokens } from '../API/index.js';
 
 const Login = () => {
   const [role, setRole] = useState('');
@@ -15,47 +16,59 @@ const Login = () => {
   const { setUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
-    if (!role) {
-      return setError('Please select your role');
+  if (!role) {
+    return setError('Please select your role');
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await authApi.login({
+      username: username.trim(),
+      password: password.trim(),
+      role: role.toUpperCase(),
+    });
+
+    console.log('Login response:', response);
+
+    // ✅ was response.role.toLowerCase() — crashes if role is null
+    const returnedRole = (response.role ?? '').toLowerCase();
+
+    if (!returnedRole) {
+      throw new Error('Account has no role assigned. Contact support.');
     }
 
-    setLoading(true);
-
-    try {
-      const response = await authApi.login({
-        username: username.trim(),
-        password: password.trim(),
-        role: role.toUpperCase(),
-      });
-
-      if (response.role.toLowerCase() !== role.toLowerCase()) {
-        throw new Error('Selected role does not match your account');
-      }
-
-      setUser({
-        id: response.id,
-        username: response.username,
-        role: response.role.toLowerCase(),
-        token: response.token,
-      });
-
-      const userRole = response.role.toLowerCase();
-
-      if (userRole === 'admin') navigate('/admin/dashboard');
-      else if (userRole === 'chw') navigate('/client/chw/dashboard');
-      else if (userRole === 'patient') navigate('/client/patient/emergency');
-      else setError('Unknown role. Please contact support.');
-    } catch (err) {
-      setError(err.message || 'Login failed. Check your credentials.');
-    } finally {
-      setLoading(false);
+    if (returnedRole !== role.toLowerCase()) {
+      throw new Error('Selected role does not match your account');
     }
-  };
 
+    setTokens({
+      accessToken:  response.accessToken,
+      refreshToken: response.refreshToken,
+    });
+
+    setUser({
+      id:       response.userId,
+      username: response.username,
+      role:     returnedRole,
+      token:    response.accessToken,
+    });
+
+    if (returnedRole === 'admin')        navigate('/admin/dashboard');
+    else if (returnedRole === 'chw')     navigate('/client/chw/dashboard');
+    else if (returnedRole === 'patient') navigate('/client/patient/emergency');
+    else setError('Unknown role. Please contact support.');
+
+  } catch (err) {
+    setError(err.message || 'Login failed. Check your credentials.');
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-sm">

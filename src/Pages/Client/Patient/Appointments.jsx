@@ -171,7 +171,7 @@ const Appointments = () => {
     setLoadingAppointments(true);
     setLoadError('');
     try {
-      const resolvedPatientId = patientId || (await patientApi.me())?.id;
+      const resolvedPatientId = patientId || (await patientApi.resolveMyPatientId(user?.id));
       if (!resolvedPatientId) {
         throw new Error('Patient profile not found for this account.');
       }
@@ -243,7 +243,7 @@ const Appointments = () => {
     }
     setBookingError('');
     try {
-      const resolvedPatientId = patientId || (await patientApi.me())?.id;
+      const resolvedPatientId = patientId || (await patientApi.resolveMyPatientId(user?.id));
       if (!resolvedPatientId) {
         throw new Error('Patient profile not found for this account.');
       }

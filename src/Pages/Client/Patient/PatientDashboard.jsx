@@ -13,11 +13,13 @@ import {
   Activity,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../../hooks/useAuth.jsx';
+import { patientApi } from '../../../API/endpoints/patientApi.js';
 
 import { httpClient } from '../../../API/clients/httpClient.js';
 
 // ── API helpers ────────────────────────────────────────────────────────
-const fetchMyProfile   = ()           => httpClient.get('/api/patients/me');
+const fetchMyProfile   = (userId)     => patientApi.me({ fallbackUserId: userId });
 const fetchAppointments = (patientId) => httpClient.get(`/api/appointments/patient/${patientId}`);
 const fetchHealthRecords = (patientId) => httpClient.get(`/api/health-records/patient/${patientId}`);
 const fetchEmergencyDispatches = ()    => httpClient.get('/api/assist');
@@ -100,6 +102,7 @@ const formatRelativeTime = (dateString) => {
 
 // ── Component ──────────────────────────────────────────────────────────
 const PatientDashboard = () => {
+  const { user } = useAuth();
   const [patient,     setPatient]     = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [healthRecords, setHealthRecords] = useState([]);
@@ -112,7 +115,7 @@ const PatientDashboard = () => {
       setLoading(true);
       setError(null);
 
-      const patientData = await fetchMyProfile();
+      const patientData = await fetchMyProfile(user?.id);
       setPatient(patientData);
 
       const [apptData, recordsData, dispatchData] = await Promise.all([
@@ -129,7 +132,7 @@ const PatientDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     loadDashboard();
