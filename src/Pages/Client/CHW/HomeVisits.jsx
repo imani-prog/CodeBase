@@ -176,17 +176,7 @@ function toVisitMapPoint(visit, status) {
   };
 }
 
-// ─── GoogleMap ─────────────────────────────────────────────────────────────────
-// FIX SUMMARY:
-//   1. `mapReady` state — set to true once the map instance is initialised.
-//      The marker effect depends on it so it fires immediately after init
-//      instead of waiting for the next `points`/`mapId` change.
-//   2. Singleton Loader (getMapsLoader) — avoids reconstructing the Loader
-//      on every render cycle.
-//   3. Map init effect depends only on [apiKey, mapId] — removing center.lat/
-//      center.lng prevents the entire map from being torn down and re-created
-//      whenever the parent recalculates mapCenter after visits load.
-//      The marker effect already handles panning via fitBounds / setCenter.
+
 const GoogleMap = ({ points = [], center = FALLBACK_MAP_CENTER, className = '', style = {} }) => {
   const mapRef = useRef(null);
   const containerRef = useRef(null);
