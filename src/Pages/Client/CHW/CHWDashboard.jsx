@@ -13,6 +13,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 import { chwService } from '../../../Services/domain/chwService.js';
 import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
 import { assignmentService } from '../../../Services/domain/assignmentService.js';
@@ -252,6 +253,7 @@ function SectionSkeleton({ rows = 3 }) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 const CHWDashboard = () => {
+  const { user } = useAuth();
   // CHW profile (drives stats)
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -275,14 +277,14 @@ const CHWDashboard = () => {
     setProfileLoading(true);
     setProfileError(null);
     try {
-      const data = await chwService.getMe();
+      const data = await chwService.getMe(user?.id);
       setProfile(data);
     } catch (err) {
       setProfileError(err?.message || 'Failed to load profile');
     } finally {
       setProfileLoading(false);
     }
-  }, []);
+  }, [user?.id]);
 
   const fetchVisits = useCallback(async (chwId) => {
     setVisitsLoading(true);
@@ -387,7 +389,7 @@ const CHWDashboard = () => {
         try {
           taskAssignments = await assignmentService.listAssignmentsByChw(normalizedChwId, { size: 300 });
         } catch (taskByChwError) {
-          if (![404].includes(taskByChwError?.status)) {
+          if (![401, 403, 404].includes(taskByChwError?.status)) {
             taskAssignments = [];
           }
         }

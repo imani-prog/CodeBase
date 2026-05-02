@@ -577,7 +577,7 @@ export default function ReportsAnalytics() {
     let chwProfile = null;
     let normalizedChwId = null;
     try {
-      chwProfile = await chwService.getMe();
+      chwProfile = await chwService.getMe(user?.id);
       normalizedChwId = toNumericId(chwProfile?.id ?? chwProfile?.chwId ?? chwProfile?.providerId ?? chwProfile?.user?.id);
     } catch {
       // Continue without resolved CHW id.
@@ -608,7 +608,7 @@ export default function ReportsAnalytics() {
       try {
         return await assignmentService.listAssignmentsByChw(normalizedChwId, { size: 500 });
       } catch (error) {
-        if (![404].includes(error?.status)) throw error;
+        if (![401, 403, 404].includes(error?.status)) throw error;
 
         const allAssignments = await assignmentService.listAssignments({ size: 500 });
         return allAssignments.filter((row) => String(row?.chwId ?? '') === String(normalizedChwId));

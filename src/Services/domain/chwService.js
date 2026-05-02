@@ -45,8 +45,8 @@ async function listChw(params = {}) {
   return normalizeArray(payload).map(mapChwToUi);
 }
 
-async function getMe() {
-  return mapChwToUi(await chwApi.me());
+async function getMe(fallbackUserId) {
+  return mapChwToUi(await chwApi.me({ fallbackUserId }));
 }
 
 async function getChwById(chwId) {

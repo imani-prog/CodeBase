@@ -237,7 +237,7 @@ const ResourcesTraining = () => {
           const enrollmentsPayload = await trainingApi.getChwEnrollments(activeChwId);
           enrollmentRows = normalizeArrayPayload(enrollmentsPayload);
         } catch (enrollmentsError) {
-          if (![404].includes(enrollmentsError?.status)) throw enrollmentsError;
+          if (![401, 403, 404].includes(enrollmentsError?.status)) throw enrollmentsError;
         }
       }
 
@@ -358,7 +358,7 @@ const ResourcesTraining = () => {
 
     const resolveBackendChwId = async () => {
       try {
-        const profile = await chwService.getMe();
+        const profile = await chwService.getMe(user?.id);
         const id = toNumericId(
           profile?.id ??
           profile?.raw?.id ??
@@ -379,7 +379,7 @@ const ResourcesTraining = () => {
     return () => {
       active = false;
     };
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchTrainingData();

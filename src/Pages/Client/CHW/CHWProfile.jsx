@@ -465,7 +465,7 @@ const CHWProfile = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await chwService.getMe();
+      const data = await chwService.getMe(user?.id);
       setChw(data);
       setForm(data);                    // seed form with live data
     } catch (err) {
@@ -473,7 +473,7 @@ const CHWProfile = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
 

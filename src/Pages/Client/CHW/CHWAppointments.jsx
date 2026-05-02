@@ -364,7 +364,7 @@ const CHWAppointments = () => {
     let isMounted = true;
     const loadChwProfile = async () => {
       try {
-        const me = await chwApi.me();
+        const me = await chwApi.me({ fallbackUserId: user?.id });
         const source =
           me?.data || me?.chw || me?.profile || me?.result || me;
         const found =
@@ -379,7 +379,7 @@ const CHWAppointments = () => {
 
     loadChwProfile();
     return () => { isMounted = false; };
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     if (!toast) return;

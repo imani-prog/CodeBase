@@ -393,7 +393,7 @@ const MyPatients = () => {
         try {
           assignments = await assignmentService.listAssignmentsByChw(activeChwId, { size: 1000 });
         } catch (fetchError) {
-          if (![404].includes(fetchError?.status)) throw fetchError;
+          if (![401, 403, 404].includes(fetchError?.status)) throw fetchError;
         }
       }
 
@@ -676,7 +676,7 @@ const MyPatients = () => {
 
     const resolveBackendChwId = async () => {
       try {
-        const profile = await chwService.getMe();
+        const profile = await chwService.getMe(user?.id);
         const id = toNumericId(profile?.id ?? profile?.raw?.id ?? profile?.raw?.chwId ?? profile?.raw?.providerId ?? profile?.raw?.user?.id);
         if (active && id != null) {
           setResolvedChwId(id);
@@ -692,7 +692,7 @@ const MyPatients = () => {
 
     resolveBackendChwId();
     return () => { active = false; };
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     if (!chwResolutionReady) return;

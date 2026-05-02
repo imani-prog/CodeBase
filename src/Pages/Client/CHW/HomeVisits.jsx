@@ -327,7 +327,7 @@ const HomeVisits = () => {
     let active = true;
     const resolveBackendChwId = async () => {
       try {
-        const me = await chwService.getMe();
+        const me = await chwService.getMe(user?.id);
         const id = toNumericId(me?.id ?? me?.chwId ?? me?.providerId ?? me?.user?.id);
         if (active && id != null) setResolvedChwId(id);
       } catch {
@@ -337,7 +337,7 @@ const HomeVisits = () => {
 
     resolveBackendChwId();
     return () => { active = false; };
-  }, []);
+  }, [user?.id]);
 
   const loadHomeVisits = useCallback(async () => {
     setIsLoadingVisits(true);

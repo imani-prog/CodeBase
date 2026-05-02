@@ -158,7 +158,7 @@ const TasksFollowups = () => {
         try {
           list = await assignmentService.listAssignmentsByChw(activeChwId, { size: 300 });
         } catch (error) {
-          if (![404].includes(error?.status)) throw error;
+          if (![401, 403, 404].includes(error?.status)) throw error;
         }
       }
 
@@ -190,7 +190,7 @@ const TasksFollowups = () => {
     let active = true;
     const resolveChwId = async () => {
       try {
-        const me = await chwService.getMe();
+        const me = await chwService.getMe(user?.id);
         const id = toNumericId(me?.id ?? me?.chwId ?? me?.providerId ?? me?.user?.id);
         if (active && id != null) {
           setResolvedChwId(id);
@@ -202,7 +202,7 @@ const TasksFollowups = () => {
 
     resolveChwId();
     return () => { active = false; };
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     loadTasks();

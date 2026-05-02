@@ -58,7 +58,7 @@ useEffect(() => {
       setLoadingProfile(true);
       
       
-      const data = await userApi.me();
+      const data = await userApi.me({ fallbackUserId: user?.id });
 
       setProfile({
         name: data.fullName || user?.name || '',
@@ -91,7 +91,7 @@ useEffect(() => {
   };
 
   loadProfile();
-}, []);
+}, [user?.id]);
 
 
   const [editMode, setEditMode] = useState(false);
