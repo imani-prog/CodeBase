@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
   MapPin,
   Calendar,
@@ -17,9 +17,8 @@ import {
   FileText,
   Save
 } from 'lucide-react';
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { Loader } from '@googlemaps/js-api-loader';
+// Replaced Leaflet with Google Maps API. See `GoogleMap` component below.
 import { refreshAppointmentGovernanceSnapshot } from '../../../Services/appointmentGovernanceStore';
 import { syncHomeVisitWorkItems } from '../../../Services/chwAssignmentsStore';
 import { syncHomeVisitGovernance } from '../../../Services/homeVisitGovernanceStore';
@@ -137,19 +136,16 @@ function calculateNotesQuality(outcomeText) {
   return words.length > 0 ? 20 : 0;
 }
 
-const createVisitPinIcon = (label, color) =>
-  L.divIcon({
-    className: 'leaflet-custom-pin',
-    html: `<div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:${color};color:#fff;font-weight:700;font-size:11px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)">${label}</div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -12],
-  });
+// Create SVG marker data URL for Google Maps markers
+const createMarkerSvgDataUrl = (label, color) => {
+  const svg = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'><circle cx='42' cy='30' r='21' fill='${color}' stroke='%23ffffff' stroke-width='2'/><text x='42' y='37' font-size='19' text-anchor='middle' fill='#fff' font-family='Arial' font-weight='700'>${label}</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+};
 
-const VISIT_ICONS = {
-  upcoming: createVisitPinIcon('U', '#2563eb'),
-  completed: createVisitPinIcon('C', '#16a34a'),
-  cancelled: createVisitPinIcon('X', '#ef4444'),
+const VISIT_ICON_URLS = {
+  upcoming: createMarkerSvgDataUrl('U', '#2563eb'),
+  completed: createMarkerSvgDataUrl('C', '#16a34a'),
+  cancelled: createMarkerSvgDataUrl('X', '#ef4444'),
 };
 
 function toVisitMapPoint(visit, status) {
@@ -170,22 +166,185 @@ function toVisitMapPoint(visit, status) {
   };
 }
 
-const FitMapToVisitPoints = ({ points = [] }) => {
-  const map = useMap();
+// Google Maps component to replace Leaflet usage while preserving existing UI and popups
+const GoogleMap = ({ points = [], center = { lat: -1.286389, lng: 36.817223 }, className = '', style = {} }) => {
+  const mapRef = useRef(null);
+  const containerRef = useRef(null);
+  const markersRef = useRef([]);
+  const [loadError, setLoadError] = useState('');
+
+  // Primary: Vite env var. Fallback: raw env value if available.
+  const apiKey =
+    (import.meta && import.meta.env && import.meta.env.VITE_GOOGLE_CLOUD_MAPS_API_KEY) ||
+    // runtime fallback from index.html meta tag (replaced by Vite at build)
+    document.querySelector('meta[name="google-maps-api-key"]')?.getAttribute('content') ||
+    (import.meta && import.meta.env && import.meta.env.GOOGLE_CLOUD_MAPS_API_KEY) ||
+    null;
+  const rawMapId = (import.meta && import.meta.env && import.meta.env.VITE_GOOGLE_MAPS_MAP_ID) || null;
+  const mapId =
+    rawMapId && !/^%.*%$/.test(String(rawMapId).trim())
+      ? String(rawMapId).trim()
+      : null;
 
   useEffect(() => {
-    if (!Array.isArray(points) || points.length === 0) return;
+    let cancelled = false;
+    // Use the official loader for robust async loading and to request the marker library
+    const loadScript = () =>
+      new Promise((resolve, reject) => {
+        if (typeof window === 'undefined') return reject(new Error('No window'));
+        if (!apiKey) return reject(new Error('Google Maps API key is not defined'));
+        const loader = new Loader({ apiKey, libraries: ['marker'] });
+        loader
+          .load()
+          .then(() => {
+            if (window.google && window.google.maps) return resolve(window.google.maps);
+            reject(new Error('Google maps loaded but window.google.maps is missing'));
+          })
+          .catch(reject);
+      });
 
-    if (points.length === 1) {
-      map.setView([points[0].lat, points[0].lng], 14, { animate: true });
+    let mapInstance;
+    console.debug('GoogleMap: apiKey=', !!apiKey);
+    loadScript()
+      .then((maps) => {
+        console.debug('GoogleMap: maps api available', !!maps);
+        if (cancelled) return;
+        if (!containerRef.current) return;
+        mapInstance = new maps.Map(containerRef.current, {
+          center: { lat: Number(center.lat) || -1.286389, lng: Number(center.lng) || 36.817223 },
+          zoom: 12,
+          ...(mapId ? { mapId } : {}),
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+        mapRef.current = mapInstance;
+        console.debug('GoogleMap: map initialized', mapInstance);
+        setLoadError('');
+      })
+      .catch((err) => {
+        console.error('GoogleMap: failed to load maps script or initialize map', err);
+        setLoadError(String(err?.message || 'Failed to load Google Maps'));
+      });
+
+    return () => { cancelled = true; };
+  }, [apiKey, center.lat, center.lng, mapId]);
+
+  // manage markers when points or map change
+  useEffect(() => {
+    const map = mapRef.current;
+    console.debug('GoogleMap: updating markers; points length=', points?.length, 'mapReady=', !!map);
+    if (!map) return;
+
+    // clear existing markers (AdvancedMarkerElement uses `.map = null`)
+    markersRef.current.forEach((m) => {
+      if (m?.marker && typeof m.marker.setMap === 'function') {
+        m.marker.setMap(null);
+      } else if (m?.marker && 'map' in m.marker) {
+        m.marker.map = null;
+      }
+    });
+    markersRef.current = [];
+
+    const maps = window.google && window.google.maps;
+    if (!maps) return;
+
+    if (!Array.isArray(points) || points.length === 0) {
       return;
     }
 
-    const bounds = L.latLngBounds(points.map((point) => [point.lat, point.lng]));
-    map.fitBounds(bounds, { padding: [35, 35], maxZoom: 14, animate: true });
-  }, [map, points]);
+    if (points.length === 1) {
+      map.setCenter({ lat: points[0].lat, lng: points[0].lng });
+      map.setZoom(14);
+    } else {
+      const bounds = new maps.LatLngBounds();
+      points.forEach(p => bounds.extend(new maps.LatLng(p.lat, p.lng)));
+      map.fitBounds(bounds, { top: 35, right: 35, bottom: 35, left: 35 });
+    }
 
-  return null;
+    points.forEach((point) => {
+      // create a simple circular DOM marker to use with AdvancedMarkerElement
+      const color = point.status === 'completed' ? '#16a34a' : point.status === 'cancelled' ? '#ef4444' : '#2563eb';
+      const label = point.status === 'completed' ? 'C' : point.status === 'cancelled' ? 'X' : 'U';
+
+      const markerEl = document.createElement('div');
+      markerEl.style.width = '72px';
+      markerEl.style.height = '72px';
+      markerEl.style.borderRadius = '50%';
+      markerEl.style.background = color;
+      markerEl.style.display = 'flex';
+      markerEl.style.alignItems = 'center';
+      markerEl.style.justifyContent = 'center';
+      markerEl.style.color = '#fff';
+      markerEl.style.fontWeight = '900';
+      markerEl.style.fontSize = '79px';
+      markerEl.style.border = '2px solid #fff';
+      markerEl.style.boxShadow = '0 2px 6px rgba(0,0,0,.25)';
+      markerEl.textContent = label;
+
+      const content = document.createElement('div');
+      content.className = 'text-sm';
+      content.innerHTML = `<div class="text-sm"><p class="font-bold">${point.patientName}</p><p>${point.type}</p><p>${point.location}</p><p>${point.date} ${point.time ? `• ${point.time}` : ''}</p></div>`;
+      const infoWindow = new maps.InfoWindow({ content });
+
+      const canUseAdvanced = Boolean(mapId && window.google?.maps?.marker?.AdvancedMarkerElement);
+
+      if (canUseAdvanced) {
+        const advancedMarker = new window.google.maps.marker.AdvancedMarkerElement({
+          map,
+          position: { lat: point.lat, lng: point.lng },
+          content: markerEl,
+        });
+
+        advancedMarker.addEventListener('gmp-click', () => {
+          infoWindow.open({ anchor: advancedMarker, map });
+        });
+
+        markersRef.current.push({ marker: advancedMarker, infoWindow });
+      } else {
+        const marker = new maps.Marker({
+          map,
+          position: { lat: point.lat, lng: point.lng },
+          icon: {
+            url: VISIT_ICON_URLS[point.status] || VISIT_ICON_URLS.upcoming,
+            scaledSize: new maps.Size(72, 72),
+          },
+        });
+
+        marker.addListener('click', () => {
+          infoWindow.open({ anchor: marker, map });
+        });
+
+        markersRef.current.push({ marker, infoWindow });
+      }
+    });
+
+    return () => {
+      markersRef.current.forEach((m) => {
+        if (m?.marker && typeof m.marker.setMap === 'function') {
+          m.marker.setMap(null);
+        } else if (m?.marker && 'map' in m.marker) {
+          m.marker.map = null;
+        }
+      });
+      markersRef.current = [];
+    };
+  }, [points, mapId]);
+
+  return (
+    <div className={className} style={style}>
+      <div ref={containerRef} style={{ height: '100%', width: '100%', background: '#f8fafc' }} />
+      {loadError && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div className="bg-white/90 border border-gray-200 rounded px-4 py-2 text-sm text-red-600 pointer-events-auto">
+            <div className="font-semibold">Map error</div>
+            <div>{loadError}</div>
+            <div className="text-xs text-gray-500 mt-1">Ensure `VITE_GOOGLE_CLOUD_MAPS_API_KEY` is set and dev server was restarted.</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const HomeVisits = () => {
@@ -638,34 +797,8 @@ const HomeVisits = () => {
             </div>
           </div>
         </div>
-        <div className="h-[300px] live-map-shell relative">
-          <MapContainer
-            center={[mapCenter.lat, mapCenter.lng]}
-            zoom={12}
-            style={{ height: '100%', width: '100%' }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <FitMapToVisitPoints points={mapVisitPoints} />
-            {mapVisitPoints.map((point) => (
-              <Marker
-                key={point.id}
-                position={[point.lat, point.lng]}
-                icon={VISIT_ICONS[point.status] || VISIT_ICONS.upcoming}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <p className="font-semibold">{point.patientName}</p>
-                    <p>{point.type}</p>
-                    <p>{point.location}</p>
-                    <p>{point.date} {point.time ? `• ${point.time}` : ''}</p>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+        <div className="h-[420px] live-map-shell relative">
+          <GoogleMap points={mapVisitPoints} center={mapCenter} style={{ height: '100%', width: '100%' }} />
 
           {!mapVisitPoints.length && (
             <div className="pointer-events-none absolute inset-x-0 bottom-2 text-center">
@@ -715,33 +848,7 @@ const HomeVisits = () => {
             </span>
           </div>
           <div className="flex-1 w-full live-map-shell">
-            <MapContainer
-              center={[mapCenter.lat, mapCenter.lng]}
-              zoom={12}
-              style={{ height: '100%', width: '100%' }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <FitMapToVisitPoints points={mapVisitPoints} />
-              {mapVisitPoints.map((point) => (
-                <Marker
-                  key={`mobile-${point.id}`}
-                  position={[point.lat, point.lng]}
-                  icon={VISIT_ICONS[point.status] || VISIT_ICONS.upcoming}
-                >
-                  <Popup>
-                    <div className="text-sm">
-                      <p className="font-semibold">{point.patientName}</p>
-                      <p>{point.type}</p>
-                      <p>{point.location}</p>
-                      <p>{point.date} {point.time ? `• ${point.time}` : ''}</p>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
+            <GoogleMap points={mapVisitPoints} center={mapCenter} style={{ height: '100%', width: '100%' }} />
           </div>
         </div>
       )}
