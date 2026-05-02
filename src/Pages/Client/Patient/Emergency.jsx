@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
-import EmergencyFeatures from '../../../Components/Client/EmergencyFeatures';
 import { ambulanceApi } from '../../../API/endpoints/ambulanceApi.js';
 import { chwApi } from '../../../API/endpoints/chwApi.js';
 import { patientApi } from '../../../API/endpoints/patientApi.js';
@@ -28,6 +27,25 @@ const ACTIVE_EMERGENCY_STATUSES = new Set([
   'REQUESTED', 'ASSIGNED', 'DISPATCHED', 'EN_ROUTE',
   'ON_SCENE', 'IN_PROGRESS', 'ACCEPTED',
 ]);
+
+const EMERGENCY_TIPS = [
+  {
+    title: 'Stay calm and keep the patient comfortable',
+    detail: 'A calm patient is easier to monitor. Keep them seated or lying down and avoid sudden movement.',
+  },
+  {
+    title: 'Keep your phone nearby for communication',
+    detail: 'Stay reachable for updates from the ambulance team or for urgent guidance from the portal.',
+  },
+  {
+    title: 'Have someone wait outside to guide the ambulance',
+    detail: 'A clear guide reduces response time and helps the crew find you faster.',
+  },
+  {
+    title: 'Gather any relevant medical documents or medications',
+    detail: 'Bring prescriptions, allergy details, and any medication the patient is currently taking.',
+  },
+];
 
 // ─── Singleton Loader (same pattern as HomeVisits) ─────────────────────────────
 let _mapsLoaderInstance = null;
@@ -56,7 +74,9 @@ const readPersistedEmergencyOrders = () => {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 };
 
 const writePersistedEmergencyOrders = (rows = []) => {
@@ -66,25 +86,9 @@ const writePersistedEmergencyOrders = (rows = []) => {
       PATIENT_EMERGENCY_ORDERS_STORAGE_KEY,
       JSON.stringify(Array.isArray(rows) ? rows.slice(0, 100) : [])
     );
-  } catch { /* ignore */ }
-};
-
-const mergeDispatchRows = (primaryRows = [], secondaryRows = []) => {
-  const byKey = new Map();
-  [...toArray(secondaryRows), ...toArray(primaryRows)].forEach((row) => {
-    if (!row || typeof row !== 'object') return;
-    const key = String(row.id ?? row.incidentId ?? row.backendId ?? `${row.patientId || ''}-${row.createdAt || row.requestTime || ''}`);
-    if (!key) return;
-    byKey.set(key, row);
-  });
-  return Array.from(byKey.values());
-};
-
-const isPermissionDeniedError = (error) => {
-  const status = Number(error?.status || 0);
-  if (status === 401 || status === 403) return true;
-  const message = String(error?.message || '').toLowerCase();
-  return message.includes('access denied') || message.includes('forbidden') || message.includes('unauthorized');
+  } catch {
+    // ignore storage failures
+  }
 };
 
 const toNumberOrNull = (value) => {
@@ -93,66 +97,72 @@ const toNumberOrNull = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-const titleCase = (value, fallback = 'N/A') => {
+const titleCase = (value, fallback = '') => {
   const text = String(value || '').trim();
   if (!text) return fallback;
-  return text.toLowerCase().split(/[_\s-]+/).filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-};
-
-const getVehicleIdentity = (row = {}) => {
-  const plate = String(
-    row.vehiclePlate || row.vehicleNumber || row.ambulanceVehiclePlate ||
-    row.ambulance?.vehiclePlate || ''
-  ).trim();
-  if (plate) return plate.toUpperCase();
-  if (row.id != null) return `ID:${row.id}`;
-  if (row.ambulanceId != null) return `ID:${row.ambulanceId}`;
-  return '';
+  return text
+    .toLowerCase()
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 };
 
 const getLocationFromRow = (row = {}) => {
-  const source = row.location || row.currentLocation || row.coordinates || null;
-  if (source && typeof source === 'object') {
-    const lat = toNumberOrNull(source.lat ?? source.latitude ?? source.currentLatitude);
-    const lng = toNumberOrNull(source.lng ?? source.longitude ?? source.lon ?? source.currentLongitude);
-    if (lat !== null && lng !== null) return { lat, lng };
-  }
-  const lat = toNumberOrNull(row.latitude ?? row.lat ?? row.currentLatitude ?? row.currentLat ?? row.pickupLatitude ?? row.gpsLatitude);
-  const lng = toNumberOrNull(row.longitude ?? row.lng ?? row.lon ?? row.currentLongitude ?? row.currentLng ?? row.pickupLongitude ?? row.gpsLongitude);
-  if (lat !== null && lng !== null) return { lat, lng };
-  if (row.tracking && typeof row.tracking === 'object') {
-    const tLat = toNumberOrNull(row.tracking.latitude ?? row.tracking.lat ?? row.tracking.currentLatitude);
-    const tLng = toNumberOrNull(row.tracking.longitude ?? row.tracking.lng ?? row.tracking.currentLongitude);
-    if (tLat !== null && tLng !== null) return { lat: tLat, lng: tLng };
-  }
-  return null;
+  const lat = toNumberOrNull(
+    row.latitude ?? row.lat ?? row.currentLatitude ?? row.locationLatitude ?? row.location?.lat ?? row.coordinates?.lat
+  );
+  const lng = toNumberOrNull(
+    row.longitude ?? row.lng ?? row.currentLongitude ?? row.locationLongitude ?? row.location?.lng ?? row.coordinates?.lng
+  );
+  if (lat === null || lng === null) return null;
+  return { lat, lng };
+};
+
+const mergeDispatchRows = (primaryRows = [], secondaryRows = []) => {
+  const byKey = new Map();
+  [...toArray(secondaryRows), ...toArray(primaryRows)].forEach((row) => {
+    if (!row || typeof row !== 'object') return;
+    const key = String(row.id ?? row.incidentId ?? `${row.patientId || ''}-${row.createdAt || row.requestTime || ''}`);
+    if (!key) return;
+    byKey.set(key, row);
+  });
+  return Array.from(byKey.values());
 };
 
 const mergeAmbulanceTracking = (ambulanceRows = [], trackingRows = []) => {
-  if (!Array.isArray(ambulanceRows) || ambulanceRows.length === 0) return [];
-  if (!Array.isArray(trackingRows) || trackingRows.length === 0) return ambulanceRows;
-  const trackingByVehicle = new Map();
-  trackingRows.forEach((row) => {
-    const vehicleKey = getVehicleIdentity(row);
-    if (vehicleKey) trackingByVehicle.set(vehicleKey, row);
+  const trackingByKey = new Map();
+  toArray(trackingRows).forEach((trackingRow) => {
+    if (!trackingRow || typeof trackingRow !== 'object') return;
+    const key = String(
+      trackingRow.ambulanceId ?? trackingRow.unitId ?? trackingRow.ambulanceUnitId ?? trackingRow.id ?? trackingRow.vehiclePlate ?? ''
+    ).trim().toUpperCase();
+    if (!key) return;
+    trackingByKey.set(key, trackingRow);
   });
-  return ambulanceRows.map((ambulanceRow) => {
-    const existingCoords = getLocationFromRow(ambulanceRow);
-    if (existingCoords) return ambulanceRow;
-    const vehicleKey = getVehicleIdentity(ambulanceRow);
-    const trackingRow = vehicleKey ? trackingByVehicle.get(vehicleKey) : null;
+
+  return toArray(ambulanceRows).map((ambulanceRow) => {
+    if (!ambulanceRow || typeof ambulanceRow !== 'object') return ambulanceRow;
+    const key = String(
+      ambulanceRow.id ?? ambulanceRow.ambulanceId ?? ambulanceRow.unitId ?? ambulanceRow.vehiclePlate ?? ''
+    ).trim().toUpperCase();
+    const trackingRow = trackingByKey.get(key) || null;
     if (!trackingRow) return ambulanceRow;
-    const trackingCoords = getLocationFromRow(trackingRow);
-    if (!trackingCoords) return ambulanceRow;
+
     return {
       ...ambulanceRow,
-      currentLatitude: trackingCoords.lat,
-      currentLongitude: trackingCoords.lng,
-      currentLocation: trackingRow.locationAddress || trackingRow.currentLocation || ambulanceRow.currentLocation,
       tracking: trackingRow,
+      currentLatitude: toNumberOrNull(trackingRow.currentLatitude ?? trackingRow.latitude ?? trackingRow.lat),
+      currentLongitude: toNumberOrNull(trackingRow.currentLongitude ?? trackingRow.longitude ?? trackingRow.lng),
+      currentLocation: trackingRow.locationAddress || trackingRow.currentLocation || ambulanceRow.currentLocation,
     };
   });
+};
+
+const isPermissionDeniedError = (err) => {
+  const status = Number(err?.status || err?.response?.status || err?.code || 0);
+  const message = String(err?.message || err?.response?.data?.message || '').toLowerCase();
+  return status === 401 || status === 403 || message.includes('permission') || message.includes('forbidden') || message.includes('unauthorized');
 };
 
 const distanceKm = (a, b) => {
@@ -252,7 +262,6 @@ const formatDateTime = (value) => {
   return date.toLocaleString('en-KE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 };
 const normalizeDispatchStatus = (status) => String(status || 'REQUESTED').trim().toUpperCase();
-const isActiveDispatch = (status) => ACTIVE_EMERGENCY_STATUSES.has(normalizeDispatchStatus(status));
 const dispatchStatusTone = (status) => {
   const n = normalizeDispatchStatus(status);
   if (['DISPATCHED', 'EN_ROUTE', 'ON_SCENE', 'IN_PROGRESS', 'ACCEPTED', 'ASSIGNED'].includes(n)) return 'bg-blue-50 text-blue-700 border border-blue-200';
@@ -374,13 +383,13 @@ const EmergencyGoogleMap = ({
         // If value looks percent-encoded, decode it repeatedly up to 3x
         // (handles accidentally double-encoded values).
         for (let i = 0; i < 3 && !normalized.startsWith('#'); i += 1) {
-          try { normalized = decodeURIComponent(normalized); } catch (_) { break; }
+          try { normalized = decodeURIComponent(normalized); } catch { break; }
         }
         if (!normalized.startsWith('#')) normalized = `#${normalized.replace(/^%23/, '')}`;
 
         const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='${normalized}' stroke='%23fff' stroke-width='3'/><text x='28' y='36' font-size='22' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='900'>${label}</text></svg>`;
         return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-      } catch (err) {
+      } catch {
         // Fallback to a simple black circle if something goes wrong
         const fallback = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='#000' stroke='%23fff' stroke-width='3'/></svg>`;
         return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(fallback)}`;
@@ -445,16 +454,17 @@ const EmergencyGoogleMap = ({
         const svgUrl  = makeSvgUrl(label, amb.available ? '%23dc2626' : '%239ca3af');
         const infoHtml = `
           <div style="padding:4px 2px;min-width:170px">
-            <p style="font-weight:700;margin:0 0 3px">🚑 ${amb.name}</p>
+            <p style="font-weight:700;margin:0 0 3px"> ${amb.name}</p>
             <p style="margin:0 0 2px;color:#444">${amb.type}</p>
             <p style="margin:0 0 2px">Distance: ${amb.distance}</p>
             <p style="margin:0 0 2px">ETA: ${amb.eta}</p>
             <p style="margin:0;font-weight:600;color:${amb.available ? '#16a34a' : '#9ca3af'}">
-              ${amb.available ? '● Available' : '○ Unavailable'}
+              ${amb.available ? '● Available' : ' Unavailable'}
             </p>
           </div>`;
         placeMarker({ lat, lng, domEl, svgUrl, infoHtml });
       });
+
     }
 
     if (view === 'chw') {
@@ -472,13 +482,13 @@ const EmergencyGoogleMap = ({
         const svgUrl = makeSvgUrl(label, chw.available ? '%2316a34a' : '%239ca3af');
         const infoHtml = `
           <div style="padding:4px 2px;min-width:170px">
-            <p style="font-weight:700;margin:0 0 3px">👤 ${chw.name}</p>
+            <p style="font-weight:700;margin:0 0 3px"> ${chw.name}</p>
             <p style="margin:0 0 2px;color:#444">${chw.specialization}</p>
             <p style="margin:0 0 2px">Distance: ${chw.distance}</p>
             <p style="margin:0 0 2px">Response: ${chw.responseTime}</p>
-            <p style="margin:0 0 2px">Rating: ⭐ ${chw.rating}</p>
+            <p style="margin:0 0 2px">Rating:  ${chw.rating}</p>
             <p style="margin:0;font-weight:600;color:${chw.available ? '#16a34a' : '#9ca3af'}">
-              ${chw.available ? '● Available' : '○ Unavailable'}
+              ${chw.available ? '● Available' : ' Unavailable'}
             </p>
           </div>`;
         placeMarker({ lat, lng, domEl, svgUrl, infoHtml });
@@ -525,6 +535,11 @@ const Emergency = () => {
   const [activeTab, setActiveTab] = useState('ambulance');
   const [showMap, setShowMap] = useState(false);
   const [mapView, setMapView] = useState('chw');
+  const [showOrdersModal, setShowOrdersModal] = useState(false);
+  const [showRecentModal, setShowRecentModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [showTipsModal, setShowTipsModal] = useState(false);
+  const [tipIndex, setTipIndex] = useState(0);
   const [selectedCHW, setSelectedCHW] = useState(null);
   const [selectedAmbulance, setSelectedAmbulance] = useState(null);
   const [showCHWModal, setShowCHWModal] = useState(false);
@@ -544,8 +559,6 @@ const Emergency = () => {
   const [dispatchRows, setDispatchRows] = useState(() => readPersistedEmergencyOrders());
   const [dispatchLoading, setDispatchLoading] = useState(true);
   const [dispatchError, setDispatchError] = useState('');
-  const [dispatchPermissionDenied, setDispatchPermissionDenied] = useState(false);
-
   const communityHealthWorkers = useMemo(() =>
     toArray(chwRows).map((row) => normalizeChw(row, userLocation))
       .sort((a, b) => Number(b.available) - Number(a.available)),
@@ -619,11 +632,6 @@ const Emergency = () => {
       .sort((a, b) => b.requestedAtMs - a.requestedAtMs);
   }, [dispatchRows, patientProfile, ambulances]);
 
-  const activeDispatches = useMemo(
-    () => patientDispatches.filter((item) => isActiveDispatch(item.status)),
-    [patientDispatches]
-  );
-
   // ── data fetching ────────────────────────────────────────────────────────────
   const fetchPatientProfile = useCallback(async () => {
     try {
@@ -661,11 +669,10 @@ const Emergency = () => {
       const mergedRows = mergeDispatchRows(toArray(payload), readPersistedEmergencyOrders());
       setDispatchRows(mergedRows);
       writePersistedEmergencyOrders(mergedRows);
-      setDispatchPermissionDenied(false);
     } catch (err) {
       if (isPermissionDeniedError(err)) {
         setDispatchRows(readPersistedEmergencyOrders());
-        setDispatchPermissionDenied(true); setDispatchError('');
+        setDispatchError('');
       } else { setDispatchError(err?.message || 'Failed to load emergency requests.'); }
     } finally { if (!silent) setDispatchLoading(false); }
   }, []);
@@ -687,9 +694,10 @@ const Emergency = () => {
   }, [fetchPatientProfile, fetchChwData, fetchAmbulanceData, fetchDispatchData]);
 
   // ── handlers ─────────────────────────────────────────────────────────────────
-  const handleCallCHW = (chw) => { setSelectedCHW(chw); setShowCHWModal(true); };
+  const handleCallCHW = (chw) => { closeAllModals(); setSelectedCHW(chw); setShowCHWModal(true); };
 
   const handleOrderAmbulance = (ambulance) => {
+    closeAllModals();
     setSelectedAmbulance(ambulance); setOrderError(''); setOrderConfirmed(false); setShowAmbulanceModal(true);
   };
 
@@ -739,7 +747,27 @@ const Emergency = () => {
     { id: 'chw',       label: 'Community Health Workers',   icon: Users },
   ];
 
-  const openMapOverlay = (view) => { setMapView(view); setShowMap(true); };
+  const closeAllModals = () => {
+    setShowMap(false);
+    setShowOrdersModal(false);
+    setShowRecentModal(false);
+    setShowHistoryModal(false);
+    setShowCHWModal(false);
+    setShowAmbulanceModal(false);
+  };
+
+  const openMapOverlay = (view) => { closeAllModals(); setMapView(view); setShowMap(true); };
+  const openOrdersModal = () => { closeAllModals(); setShowOrdersModal(true); };
+  const openRecentModal = () => { closeAllModals(); setShowRecentModal(true); };
+  const openHistoryModal = () => { closeAllModals(); setShowHistoryModal(true); };
+  const openTipsModal = () => { closeAllModals(); setTipIndex(0); setShowTipsModal(true); };
+  const closeTipsModal = () => { setShowTipsModal(false); setTipIndex(0); };
+  const goToNextTip = () => {
+    setTipIndex((current) => Math.min(current + 1, EMERGENCY_TIPS.length));
+  };
+  const goToPreviousTip = () => {
+    setTipIndex((current) => Math.max(current - 1, 0));
+  };
 
   const mapMeta = {
     chw: {
@@ -797,6 +825,30 @@ const Emergency = () => {
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Mental Health</p>
             <p className="text-sm sm:text-base font-bold text-gray-900 break-all">1195</p>
           </a>
+        </div>
+        {/* Quick map launch buttons (summarize maps at top with hotlines) */}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+         
+          <button onClick={openOrdersModal}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+            <MapIcon className="w-4 h-4 text-blue-700" />
+            <span>My Orders</span>
+          </button>
+          <button onClick={openRecentModal}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+            <MapIcon className="w-4 h-4 text-blue-700" />
+            <span>Recent Requests</span>
+          </button>
+          <button onClick={openHistoryModal}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+            <MapIcon className="w-4 h-4 text-blue-700" />
+            <span>Emergency History</span>
+          </button>
+          <button onClick={openTipsModal}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+            <MapIcon className="w-4 h-4 text-blue-600" />
+            <span>Emergency Tips</span>
+          </button>
         </div>
       </div>
 
@@ -857,7 +909,7 @@ const Emergency = () => {
                 ambulances={ambulances}
                 chws={communityHealthWorkers}
                 view="chw"
-                className="w-full h-[420px] xl:h-[500px]"
+                className="w-full h-[520px] xl:h-[620px]"
               />
             </div>
 
@@ -920,138 +972,44 @@ const Emergency = () => {
         {/* ── Ambulance Tab ── */}
         {activeTab === 'ambulance' && (
           <div className="space-y-4">
-            {/* Emergency orders section */}
-            <section className="p-4 grid grid-cols-1 gap-4 border border-gray-200 rounded-lg">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900">Your Emergency Orders</h3>
-                  <p className="text-xs text-gray-500">Track active and recent requests in one place.</p>
-                </div>
-                <button onClick={() => fetchDispatchData()}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 rounded border border-gray-200">
-                  Refresh
+           
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-end lg:hidden">
+                <button onClick={() => openMapOverlay('ambulance')}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                  <MapIcon className="w-4 h-4 text-blue-600" /><span>Open Live Map</span>
                 </button>
               </div>
-              {!dispatchLoading && !dispatchError && dispatchPermissionDenied && (
-                <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
-                  Live history access is restricted for this role. Showing your recently ordered ambulances.
-                </div>
-              )}
-              {dispatchLoading ? (
-                <div className="text-sm text-gray-500">Loading your emergency requests...</div>
-              ) : dispatchError ? (
-                <div className="text-sm text-red-600">{dispatchError}</div>
-              ) : patientDispatches.length === 0 ? (
-                <div className="text-sm text-gray-500">No emergency orders yet.</div>
-              ) : (
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                  <section className="space-y-2">
-                    <p className="text-xs uppercase tracking-wide font-semibold text-blue-700">Active Requests</p>
-                    {activeDispatches.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {activeDispatches.slice(0, 4).map((order, index) => (
-                          <article key={`active-${order.backendId || order.incidentId || index}`} className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="text-sm font-semibold text-gray-900 leading-tight">{order.ambulanceName}</p>
-                              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>{order.statusLabel}</span>
-                            </div>
-                            <p className="text-xs text-gray-600 mt-1">{order.incidentType}</p>
-                            <div className="mt-2 space-y-1 text-xs text-gray-700">
-                              <p>ETA: {order.estimatedResponse}</p>
-                              <p>{order.requestedAtLabel}</p>
-                            </div>
-                          </article>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-500">No active requests right now.</div>
-                    )}
-                  </section>
-                  <section className="space-y-2">
-                    <p className="text-xs uppercase tracking-wide font-semibold text-gray-600">Recent Requests</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {patientDispatches.slice(0, 4).map((order, index) => (
-                        <article key={`history-${order.backendId || order.incidentId || index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm font-semibold text-gray-900 leading-tight">{order.ambulanceName}</p>
-                            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>{order.statusLabel}</span>
-                          </div>
-                          <p className="text-xs text-gray-600 mt-1">{order.incidentType}</p>
-                          <div className="mt-2 space-y-1 text-xs text-gray-700">
-                            <p>{order.requestedAtLabel}</p>
-                            <p className="truncate">Unit: {order.vehiclePlate || 'Pending assignment'}</p>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </section>
-                </div>
-              )}
-            </section>
 
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
-              <div className="xl:col-span-8 space-y-4">
-                <div className="flex items-center justify-end lg:hidden">
-                  <button onClick={() => openMapOverlay('ambulance')}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                    <MapIcon className="w-4 h-4 text-blue-600" /><span>Open Live Map</span>
-                  </button>
-                </div>
-
-                {/* Desktop ambulance map */}
-                <div className="hidden lg:block border border-gray-200 overflow-hidden rounded-lg relative z-0">
-                  <div className="px-5 py-4 border-b border-gray-100">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-blue-600" />{mapMeta.ambulance.title}
-                        </h2>
-                        <p className="text-sm text-gray-500 mt-0.5">{mapMeta.ambulance.subtitle}</p>
-                      </div>
-                      <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">{mapMeta.ambulance.badgeLabel}</span>
+              {/* Desktop ambulance map */}
+              <div className="border border-gray-200 overflow-hidden rounded-lg relative z-0">
+                <div className="px-5 py-4 border-b border-gray-100">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-blue-600" />{mapMeta.ambulance.title}
+                      </h2>
+                      <p className="text-sm text-gray-500 mt-0.5">{mapMeta.ambulance.subtitle}</p>
                     </div>
+                    <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">{mapMeta.ambulance.badgeLabel}</span>
                   </div>
-                  {/* Legend */}
-                  <div className="flex items-center gap-4 px-5 py-2 border-b border-gray-100 text-xs text-gray-500">
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>Available ambulance</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable</span>
-                  </div>
-                  <EmergencyGoogleMap
-                    userLocation={userLocation}
-                    ambulances={ambulances}
-                    chws={communityHealthWorkers}
-                    view="ambulance"
-                    className="w-full h-[420px] xl:h-[500px]"
-                  />
                 </div>
+                {/* Legend */}
+                <div className="flex items-center gap-4 px-5 py-2 border-b border-gray-100 text-xs text-gray-500">
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>Available ambulance</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable</span>
+                </div>
+                <EmergencyGoogleMap
+                  userLocation={userLocation}
+                  ambulances={ambulances}
+                  chws={communityHealthWorkers}
+                  view="ambulance"
+                  className="w-full h-[560px] xl:h-[700px]"
+                />
               </div>
 
-              <aside className="xl:col-span-4 space-y-4">
-                <EmergencyFeatures
-                  dispatchHistory={patientDispatches}
-                  activeDispatches={activeDispatches}
-                  userLocation={userLocation}
-                />
-                {/* Emergency Tips */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <h3 className="text-sm font-bold text-yellow-900 mb-1.5 flex items-center">
-                    <AlertCircle className="w-3 h-3 mr-1.5" />While waiting for the ambulance:
-                  </h3>
-                  <ul className="space-y-1.5 text-xs text-yellow-800">
-                    {[
-                      'Stay calm and keep the patient comfortable',
-                      'Keep your phone nearby for communication',
-                      'Have someone wait outside to guide the ambulance',
-                      'Gather any relevant medical documents or medications',
-                    ].map((tip, i) => (
-                      <li key={i} className="flex items-start">
-                        <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" /><span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </aside>
             </div>
 
             {/* Ambulance List */}
@@ -1114,43 +1072,47 @@ const Emergency = () => {
         )}
       </div>
 
-      {/* Full-screen map overlay — mobile/tablet only */}
+      {/* Responsive map modal — mobile uses full-screen, desktop uses centered modal */}
       {showMap && (
-        <div className="lg:hidden fixed inset-x-0 bottom-0 top-16 z-30 flex flex-col bg-white">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shadow-sm shrink-0">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-blue-600" />
-              <div>
-                <h2 className="text-sm font-semibold text-gray-900">{mapMeta[mapView].title}</h2>
-                <p className="text-xs text-gray-500">{mapMeta[mapView].subtitle}</p>
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowMap(false)} />
+          <div className="relative w-full h-full lg:h-[80vh] lg:max-h-[80vh] lg:max-w-full lg:mx-0 bg-white rounded-lg overflow-hidden shadow-xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-blue-600" />
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900">{mapMeta[mapView].title}</h2>
+                  <p className="text-xs text-gray-500">{mapMeta[mapView].subtitle}</p>
+                </div>
               </div>
+              <button onClick={() => setShowMap(false)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Close map">
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
             </div>
-            <button onClick={() => setShowMap(false)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Close map">
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
+            <div className="flex items-center gap-4 px-4 py-2 bg-white border-b border-gray-100 text-xs text-gray-500 shrink-0">
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
+              {mapView === 'chw' ? (
+                <>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-600 inline-block"></span>Available CHW</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable CHW</span>
+                </>
+              ) : (
+                <>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>Available ambulance</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable</span>
+                </>
+              )}
+            </div>
+            <div className="w-full h-[calc(100%-88px)] lg:h-[calc(80vh-88px)]">
+              <EmergencyGoogleMap
+                userLocation={userLocation}
+                ambulances={ambulances}
+                chws={communityHealthWorkers}
+                view={mapView}
+                className="w-full h-full"
+              />
+            </div>
           </div>
-          {/* Legend */}
-          <div className="flex items-center gap-4 px-4 py-2 bg-white border-b border-gray-100 text-xs text-gray-500 shrink-0">
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
-            {mapView === 'chw' ? (
-              <>
-                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-600 inline-block"></span>Available CHW</span>
-                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable CHW</span>
-              </>
-            ) : (
-              <>
-                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>Available ambulance</span>
-                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable</span>
-              </>
-            )}
-          </div>
-          <EmergencyGoogleMap
-            userLocation={userLocation}
-            ambulances={ambulances}
-            chws={communityHealthWorkers}
-            view={mapView}
-            className="flex-1 min-h-0 w-full"
-          />
         </div>
       )}
 
@@ -1237,6 +1199,183 @@ const Emergency = () => {
       )}
 
       {/* Quick Actions */}
+
+      {showOrdersModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold text-gray-900">Your Emergency Orders</h3>
+              <button onClick={() => setShowOrdersModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-500">Track active and recent requests in one place.</p>
+                <button onClick={() => fetchDispatchData()} className="px-2.5 py-1.5 text-xs font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 rounded border border-gray-200">Refresh</button>
+              </div>
+              {dispatchLoading ? (
+                <div className="text-sm text-gray-500">Loading your emergency requests...</div>
+              ) : dispatchError ? (
+                <div className="text-sm text-red-600">{dispatchError}</div>
+              ) : patientDispatches.length === 0 ? (
+                <div className="text-sm text-gray-500">No emergency orders yet.</div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {patientDispatches.map((order, index) => (
+                    <div key={`order-modal-${order.backendId || order.incidentId || index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900 leading-tight">{order.ambulanceName}</p>
+                          <p className="text-xs text-gray-600 mt-1">{order.incidentType}</p>
+                        </div>
+                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>{order.statusLabel}</span>
+                      </div>
+                      <div className="mt-2 text-xs text-gray-700">
+                        <p>ETA: {order.estimatedResponse}</p>
+                        <p>{order.requestedAtLabel}</p>
+                        <p className="truncate">Unit: {order.vehiclePlate || 'Pending assignment'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recent Requests Modal */}
+      {showRecentModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-3xl w-full p-4 max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <h3 className="text-lg font-bold text-gray-900">Recent Requests</h3>
+              <button onClick={() => setShowRecentModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="space-y-3 overflow-y-auto pr-1">
+              {patientDispatches.length === 0 ? (
+                <p className="text-sm text-gray-500">No recent requests.</p>
+              ) : (
+                patientDispatches.map((order, index) => (
+                  <div key={`recent-modal-${order.backendId || order.incidentId || index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3 flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{order.ambulanceName}</p>
+                      <p className="text-xs text-gray-600">{order.requestedAtLabel}</p>
+                      <p className="text-xs text-gray-500">Unit: {order.vehiclePlate || 'Pending assignment'}</p>
+                    </div>
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>{order.statusLabel}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Emergency History Modal */}
+      {showHistoryModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full p-4 max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <h3 className="text-lg font-bold text-gray-900">Emergency Request History</h3>
+              <button onClick={() => setShowHistoryModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="space-y-3 overflow-y-auto pr-1">
+              {patientDispatches.length === 0 ? (
+                <p className="text-sm text-gray-500">No emergency history yet.</p>
+              ) : (
+                patientDispatches.map((order, index) => (
+                  <div key={`history-modal-${order.backendId || order.incidentId || index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{order.ambulanceName}</p>
+                        <p className="text-xs text-gray-600 mt-1">{order.incidentType}</p>
+                        <p className="text-xs text-gray-500 mt-1">{order.requestedAtLabel}</p>
+                      </div>
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>{order.statusLabel}</span>
+                    </div>
+                    <p className="text-xs text-gray-700 mt-2 truncate">Unit: {order.vehiclePlate || 'Pending assignment'}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Emergency Tips Modal */}
+      {showTipsModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full p-4 max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-blue-600" />Emergency Tips
+              </h3>
+              <button onClick={closeTipsModal} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+            </div>
+
+            <div className="flex-1 min-h-0 flex flex-col justify-between rounded-lg border border-gray-200 bg-gray-50 p-4">
+              {tipIndex < EMERGENCY_TIPS.length ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-semibold uppercase tracking-wide">
+                      Tip {tipIndex + 1} of {EMERGENCY_TIPS.length}
+                    </span>
+                    <span className="text-xs text-blue-700 bg-white border border-blue-200 rounded-full px-2 py-1">
+                      Stay prepared
+                    </span>
+                  </div>
+                  <div className="rounded-lg bg-white border border-blue-200 p-4 shadow-sm">
+                    <h4 className="text-base sm:text-lg font-medium ">
+                      {EMERGENCY_TIPS[tipIndex].title}
+                    </h4>
+                    <p className="mt-2 text-sm leading-6">
+                      {EMERGENCY_TIPS[tipIndex].detail}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-full min-h-[260px] items-center justify-center text-center px-4">
+                  <div className="space-y-3">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white border border-blue-200 shadow-sm">
+                      <CheckCircle className="h-7 w-7 text-blue-600" />
+                    </div>
+                    <h4 className="text-xl font-bold text-blue-900">Come tomorrow for more tips</h4>
+                    <p className="text-sm text-blue-800 max-w-sm mx-auto">
+                      You have reached the end of today&apos;s emergency tips.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 flex items-center justify-between gap-3 shrink-0">
+                <button
+                  onClick={goToPreviousTip}
+                  disabled={tipIndex === 0}
+                  className="px-3 py-2 rounded-lg border border-blue-200 bg-white text-sm font-semibold text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-100 transition-colors"
+                >
+                  Previous
+                </button>
+                {tipIndex < EMERGENCY_TIPS.length ? (
+                  <button
+                    onClick={goToNextTip}
+                    className="px-3 py-2 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    onClick={closeTipsModal}
+                    className="px-3 py-2 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Link to="/client/patient/dashboard" className="flex items-center justify-center space-x-2 p-3 transition-colors">
           <span className="hover:text-blue-600 font-bold">← Back to Dashboard</span>
