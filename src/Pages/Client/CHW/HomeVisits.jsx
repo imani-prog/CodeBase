@@ -35,14 +35,11 @@ const DEFAULT_CHW_META = {
 const EMPTY_VISITS = { upcoming: [], completed: [], cancelled: [] };
 const FALLBACK_MAP_CENTER = { lat: -1.286389, lng: 36.817223 };
 
-// ─── Module-level Loader singleton ────────────────────────────────────────────
-// Re-using the same Loader instance across renders avoids redundant script
-// evaluation. The @googlemaps/js-api-loader deduplicates fetches internally,
-// but constructing a new Loader each render still wastes work.
+
 let _mapsLoaderInstance = null;
 const getMapsLoader = (apiKey) => {
   if (!_mapsLoaderInstance) {
-    _mapsLoaderInstance = new Loader({ apiKey, libraries: ['marker'] });
+    _mapsLoaderInstance = new Loader({ apiKey, libraries: ['marker', 'geocoding'] });
   }
   return _mapsLoaderInstance;
 };

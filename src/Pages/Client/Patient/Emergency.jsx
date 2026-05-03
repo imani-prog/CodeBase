@@ -48,7 +48,7 @@ const EMERGENCY_TIPS = [
   },
 ];
 
-// ─── Singleton Loader (same pattern as HomeVisits) ─────────────────────────────
+// ─── Singleton Loader ──────────────────────────────────────────────────────────
 let _mapsLoaderInstance = null;
 const getMapsLoader = (apiKey) => {
   if (!_mapsLoaderInstance) {
@@ -57,47 +57,74 @@ const getMapsLoader = (apiKey) => {
   return _mapsLoaderInstance;
 };
 
-// ─── Reverse Geocoding Cache ────────────────────────────────────────────────────
+// ─── Plus Code helpers ─────────────────────────────────────────────────────────
+// \w{2,8} covers all Plus Code formats including short ones like G728+39
+const isPlusCode = (str) => {
+  const plusCodePattern = /^\w{2,8}\+\w{2,3}/;
+  return plusCodePattern.test(String(str || '').trim());
+};
+
+const stripPlusCodeFromLocation = (str) => {
+  const locationStr = String(str || '').trim();
+  const plusCodePattern = /^\w{2,8}\+\w{2,3},\s*/;
+  return locationStr.replace(plusCodePattern, '').trim();
+};
+
+// ─── Geocoding Cache ───────────────────────────────────────────────────────────
 let _geocodingCache = new Map();
+
+// Nominatim-first reverse geocode — better street-level coverage for Kenya/Africa
 const reverseGeocode = async (lat, lng, apiKey) => {
   const key = `${lat.toFixed(6)},${lng.toFixed(6)}`;
   if (_geocodingCache.has(key)) return _geocodingCache.get(key);
-  
+
+  // ── Try Nominatim FIRST — better street-level coverage for Kenya/Africa ──
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&zoom=18&addressdetails=1`;
+    const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (resp.ok) {
+      const data = await resp.json();
+      const a = data?.address || {};
+      const parts = [
+        a.road || a.pedestrian || a.footway || a.path || a.track,
+        a.neighbourhood || a.suburb || a.village || a.hamlet || a.quarter,
+        a.town || a.city || a.county,
+      ].filter(Boolean);
+      if (parts.length >= 2) {
+        const addr = parts.join(', ');
+        _geocodingCache.set(key, addr);
+        return addr;
+      }
+    }
+  } catch (_) { /* ignore, fall through to Google */ }
+
+  // ── Google fallback — pick most specific result type ──
   try {
     if (!window.google?.maps?.Geocoder) {
       const loader = getMapsLoader(apiKey);
       await loader.load();
     }
-    
     if (!window.google?.maps?.Geocoder) return null;
-    
+
     const geocoder = new window.google.maps.Geocoder();
-    const result = await new Promise((resolve, reject) => {
+    const results = await new Promise((resolve, reject) => {
       geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status === 'OK' && results && results.length > 0) {
-          resolve(results[0].formatted_address);
-        } else {
-          reject(new Error(`Geocoding failed: ${status}`));
-        }
+        if (status === 'OK' && results?.length > 0) resolve(results);
+        else reject(new Error(`Geocoding failed: ${status}`));
       });
     });
-    
-    _geocodingCache.set(key, result);
-    return result;
-  } catch (err) {
-    // Try Nominatim (OpenStreetMap) as a fallback
-    try {
-      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}`;
-      const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
-      if (resp.ok) {
-        const data = await resp.json();
-        const addr = data?.display_name || null;
-        _geocodingCache.set(key, addr);
-        return addr;
-      }
-    } catch (err2) {
-      // ignore nominatim errors
-    }
+
+    const PREFERRED = ['street_address', 'premise', 'subpremise', 'establishment', 'route', 'intersection'];
+    const FALLBACK  = ['neighborhood', 'sublocality_level_1', 'sublocality', 'locality'];
+    const best =
+      results.find((r) => r.types.some((t) => PREFERRED.includes(t))) ||
+      results.find((r) => r.types.some((t) => FALLBACK.includes(t)))  ||
+      results[0];
+
+    const addr = stripPlusCodeFromLocation(best.formatted_address);
+    _geocodingCache.set(key, addr);
+    return addr;
+  } catch (_) {
     _geocodingCache.set(key, null);
     return null;
   }
@@ -279,26 +306,10 @@ const formatDistance = (rawDistance, userLocation, responderLocation) => {
   return `${computed.toFixed(1)} km`;
 };
 
-const isPlusCode = (str) => {
-  // Plus Codes look like: F799+H7W, 6PH58+82, etc.
-  const plusCodePattern = /^\w{6,7}\+\w{2,3}/;
-  return plusCodePattern.test(String(str || '').trim());
-};
-
-const stripPlusCodeFromLocation = (str) => {
-  // Remove Plus Code prefix from location strings
-  // E.g., "F799+H7W, Kathemboni Rd, Machakos, Kenya" -> "Kathemboni Rd, Machakos, Kenya"
-  const locationStr = String(str || '').trim();
-  const plusCodePattern = /^\w{6,7}\+\w{2,3},\s*/;
-  return locationStr.replace(plusCodePattern, '').trim();
-};
-
 const isValidRealAddress = (str) => {
-  // Check if a location string contains a real address (not just Plus Code or coordinates)
   if (!str) return false;
   const cleaned = stripPlusCodeFromLocation(str);
   if (!cleaned || cleaned.length < 3) return false;
-  // Reject if it's just coordinates
   if (/^-?\d+\.?\d*,\s*-?\d+\.?\d*/.test(cleaned)) return false;
   return true;
 };
@@ -317,24 +328,20 @@ const normalizeChw = (row = {}, userLocation) => {
   const status = normalizeChwStatus(row.status);
   const ratingNumber = toNumberOrNull(row.rating ?? row.averageRating);
   const loc = getLocationFromRow(row);
-  // Prefer real addresses, skip Plus Codes, use coordinates for reverse-geocoding
-  // Also preserve the raw location string (if any) so we can map plus-code lookups
   let locationLabel = null;
   const rawLocation = row.currentLocation || row.locationAddress || row.locationName || null;
 
-  // Try to extract real address from fields (stripping Plus Codes if present)
   if (rawLocation && isValidRealAddress(rawLocation)) {
     locationLabel = stripPlusCodeFromLocation(rawLocation);
   }
 
-  // Fallback to coordinates for reverse-geocoding
   if (!locationLabel && loc) {
     locationLabel = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)} Area`;
   }
   if (!locationLabel) {
     locationLabel = 'Loading location...';
   }
-  
+
   return {
     id: row.id,
     name: fullName,
@@ -370,12 +377,9 @@ const normalizeAmbulance = (row = {}, userLocation) => {
   const etaMinutes = toNumberOrNull(row.averageResponseMinutes);
   const formattedEta = row.estimatedResponseTime || row.eta || row.averageResponseTime || (etaMinutes !== null ? `${etaMinutes} minutes` : 'Pending dispatch');
   const numericCost = toNumberOrNull(row.cost ?? row.estimatedCost);
-  // Estimate numeric distance (km)
   const loc = getLocationFromRow(row);
-  // Prefer real addresses, skip Plus Codes, use coordinates for reverse-geocoding
   let locationLabel = null;
-  
-  // Try to extract real address from fields (stripping Plus Codes if present)
+
   if (row.currentLocation && isValidRealAddress(row.currentLocation)) {
     locationLabel = stripPlusCodeFromLocation(row.currentLocation);
   }
@@ -385,14 +389,13 @@ const normalizeAmbulance = (row = {}, userLocation) => {
   if (!locationLabel && row.locationName && isValidRealAddress(row.locationName)) {
     locationLabel = stripPlusCodeFromLocation(row.locationName);
   }
-  
-  // Fallback to coordinates for reverse-geocoding
   if (!locationLabel && loc) {
     locationLabel = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)} Area`;
   }
   if (!locationLabel) {
     locationLabel = 'Loading location...';
   }
+
   let numericDistanceKm = null;
   const explicitDistance = toNumberOrNull(row.estimatedDistance ?? row.distanceKm ?? row.distance);
   if (explicitDistance !== null) numericDistanceKm = explicitDistance;
@@ -405,16 +408,14 @@ const normalizeAmbulance = (row = {}, userLocation) => {
     }
   }
 
-  // Pricing strategy
-  const baseRatePerKm = 50; // Ksh per km
-  const minFare = 500; // minimum charge in Ksh
+  const baseRatePerKm = 50;
+  const minFare = 500;
   const eqCount = Array.isArray(equipment) ? equipment.length : 0;
   const advancedKeywords = ['ICU','VENTILATOR','DEFIBRILLATOR','OXYGEN','SPINAL','TRAUMA','CARDIAC','MONITOR','INTUBATION'];
   const advancedCount = equipment.filter((e) => advancedKeywords.some((k) => String(e || '').toUpperCase().includes(k))).length;
   const equipmentSurcharge = eqCount * 30 + advancedCount * 150;
-  const distanceForCalc = numericDistanceKm !== null ? numericDistanceKm : 3; // fallback 3 km
+  const distanceForCalc = numericDistanceKm !== null ? numericDistanceKm : 3;
   const estimatedNumericCost = Math.max(minFare, Math.round(baseRatePerKm * distanceForCalc + equipmentSurcharge));
-
   const displayCost = numericCost !== null ? `Ksh ${numericCost}` : `Ksh ${estimatedNumericCost}`;
 
   return {
@@ -461,7 +462,7 @@ const dispatchStatusTone = (status) => {
   return 'bg-amber-50 text-amber-700 border border-amber-200';
 };
 
-
+// ─── Map Component ─────────────────────────────────────────────────────────────
 const EmergencyGoogleMap = ({
   userLocation = DEFAULT_LOCATION,
   ambulances = [],
@@ -473,7 +474,7 @@ const EmergencyGoogleMap = ({
   const mapRef        = useRef(null);
   const containerRef  = useRef(null);
   const markersRef    = useRef([]);
-  const [mapReady, setMapReady]   = useState(false);   // Fix 1
+  const [mapReady, setMapReady]   = useState(false);
   const [loadError, setLoadError] = useState('');
 
   const apiKey =
@@ -485,7 +486,6 @@ const EmergencyGoogleMap = ({
   const rawMapId = import.meta?.env?.VITE_GOOGLE_MAPS_MAP_ID || null;
   const mapId = rawMapId && !/^%.*%$/.test(String(rawMapId).trim()) ? String(rawMapId).trim() : null;
 
-
   useEffect(() => {
     let cancelled = false;
     const initMap = async () => {
@@ -493,13 +493,13 @@ const EmergencyGoogleMap = ({
       if (!apiKey) { setLoadError('Google Maps API key is not defined'); return; }
       if (!containerRef.current) return;
       try {
-        const loader = getMapsLoader(apiKey);   // Fix 2 – singleton
+        const loader = getMapsLoader(apiKey);
         await loader.load();
         if (cancelled) return;
         if (!window.google?.maps) { setLoadError('Google Maps loaded but window.google.maps is missing'); return; }
         const maps = window.google.maps;
         const mapInstance = new maps.Map(containerRef.current, {
-          center: DEFAULT_LOCATION,             // Fix 3 – fixed initial center
+          center: DEFAULT_LOCATION,
           zoom: 12,
           ...(mapId ? { mapId } : {}),
           mapTypeControl: false,
@@ -508,7 +508,7 @@ const EmergencyGoogleMap = ({
         });
         mapRef.current = mapInstance;
         setLoadError('');
-        setMapReady(true);                      // Fix 1 – signal ready
+        setMapReady(true);
       } catch (err) {
         if (!cancelled) {
           console.error('EmergencyGoogleMap: init failed', err);
@@ -518,14 +518,12 @@ const EmergencyGoogleMap = ({
     };
     initMap();
     return () => { cancelled = true; };
-  }, [apiKey, mapId]);  
-
+  }, [apiKey, mapId]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    // Clear previous markers
     markersRef.current.forEach((m) => {
       if (typeof m?.setMap === 'function') m.setMap(null);
       else if ('map' in (m ?? {})) m.map = null;
@@ -538,7 +536,6 @@ const EmergencyGoogleMap = ({
     const canUseAdvanced = Boolean(mapId && window.google?.maps?.marker?.AdvancedMarkerElement);
     const allPoints = [];
 
-    // ── helper: create a DOM element marker ──
     const makeDomMarker = (bgColor, label, size = 40) => {
       const el = document.createElement('div');
       el.style.cssText = [
@@ -553,28 +550,22 @@ const EmergencyGoogleMap = ({
     };
 
     const makeSvgUrl = (label, color) => {
-
       try {
         let normalized = String(color || '') || '#000000';
-
         for (let i = 0; i < 3 && !normalized.startsWith('#'); i += 1) {
           try { normalized = decodeURIComponent(normalized); } catch { break; }
         }
         if (!normalized.startsWith('#')) normalized = `#${normalized.replace(/^%23/, '')}`;
-
         const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='${normalized}' stroke='%23fff' stroke-width='3'/><text x='28' y='36' font-size='22' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='900'>${label}</text></svg>`;
         return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
       } catch {
-     
         const fallback = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='#000' stroke='%23fff' stroke-width='3'/></svg>`;
         return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(fallback)}`;
       }
     };
 
-    // ── helper: place one marker + info window ──
     const placeMarker = ({ lat, lng, domEl, svgUrl, infoHtml }) => {
       const infoWindow = new maps.InfoWindow({ content: infoHtml });
-
       if (canUseAdvanced) {
         const marker = new window.google.maps.marker.AdvancedMarkerElement({
           map,
@@ -594,12 +585,11 @@ const EmergencyGoogleMap = ({
       }
     };
 
-    // ── 1. User location pin ──
+    // ── User location pin ──
     const uLat = toNumberOrNull(userLocation?.lat);
     const uLng = toNumberOrNull(userLocation?.lng);
     if (uLat !== null && uLng !== null) {
       allPoints.push({ lat: uLat, lng: uLng });
-
       const domEl = document.createElement('div');
       domEl.style.cssText = [
         'width:20px', 'height:20px', 'border-radius:50%',
@@ -607,13 +597,12 @@ const EmergencyGoogleMap = ({
         'box-shadow:0 0 0 5px rgba(37,99,235,0.3)',
         'cursor:default',
       ].join(';');
-
       const svgUrl = makeSvgUrl('U', '%232563eb');
       const infoHtml = `<div style="padding:4px 2px;min-width:110px"><p style="font-weight:700;margin:0">📍 Your Location</p></div>`;
       placeMarker({ lat: uLat, lng: uLng, domEl, svgUrl, infoHtml });
     }
 
-    // ── 2. View-specific pins ──
+    // ── View-specific pins ──
     if (view === 'ambulance') {
       ambulances.forEach((amb) => {
         const loc = amb.location;
@@ -622,8 +611,7 @@ const EmergencyGoogleMap = ({
         const lng = toNumberOrNull(loc.lng);
         if (lat === null || lng === null) return;
         allPoints.push({ lat, lng });
-
-        const color   = amb.available ? '#dc2626' : '#9ca3af';  // red or gray
+        const color   = amb.available ? '#dc2626' : '#9ca3af';
         const label   = 'A';
         const domEl   = makeDomMarker(color, label, 44);
         const svgUrl  = makeSvgUrl(label, amb.available ? '%23dc2626' : '%239ca3af');
@@ -640,7 +628,6 @@ const EmergencyGoogleMap = ({
           </div>`;
         placeMarker({ lat, lng, domEl, svgUrl, infoHtml });
       });
-
     }
 
     if (view === 'chw') {
@@ -651,8 +638,7 @@ const EmergencyGoogleMap = ({
         const lng = toNumberOrNull(loc.lng);
         if (lat === null || lng === null) return;
         allPoints.push({ lat, lng });
-
-        const color  = chw.available ? '#16a34a' : '#9ca3af';  // green or gray
+        const color  = chw.available ? '#16a34a' : '#9ca3af';
         const label  = 'C';
         const domEl  = makeDomMarker(color, label, 44);
         const svgUrl = makeSvgUrl(label, chw.available ? '%2316a34a' : '%239ca3af');
@@ -672,7 +658,7 @@ const EmergencyGoogleMap = ({
       });
     }
 
-    // ── 3. Fit map to all visible points ──
+    // ── Fit bounds ──
     if (allPoints.length === 1) {
       map.setCenter({ lat: allPoints[0].lat, lng: allPoints[0].lng });
       map.setZoom(13);
@@ -689,7 +675,7 @@ const EmergencyGoogleMap = ({
       });
       markersRef.current = [];
     };
-  }, [ambulances, chws, view, userLocation, mapId, mapReady]); // Fix 1 – mapReady in deps
+  }, [ambulances, chws, view, userLocation, mapId, mapReady]);
 
   return (
     <div className={className} style={{ position: 'relative', ...style }}>
@@ -737,6 +723,7 @@ const Emergency = () => {
   const [dispatchLoading, setDispatchLoading] = useState(true);
   const [dispatchError, setDispatchError] = useState('');
   const [chwLocationNames, setChwLocationNames] = useState({});
+
   const communityHealthWorkers = useMemo(() =>
     toArray(chwRows).map((row) => {
       const normalized = normalizeChw(row, userLocation);
@@ -744,8 +731,6 @@ const Emergency = () => {
       if (locKey && chwLocationNames[locKey]) {
         normalized.locationLabel = chwLocationNames[locKey];
       }
-      // If the backend provided a raw plus-code address string, prefer any resolved
-      // human-readable name cached under that raw key.
       const rawKey = normalized.rawLocation ? String(normalized.rawLocation).trim() : null;
       if (rawKey && chwLocationNames[rawKey]) {
         normalized.locationLabel = chwLocationNames[rawKey];
@@ -850,7 +835,6 @@ const Emergency = () => {
       let trackingPayload = [];
       try { trackingPayload = await ambulanceApi.listActiveTracking(); } catch { trackingPayload = []; }
 
-      // Fetch drivers and map to ambulances (best-effort)
       let driversPayload = [];
       try { driversPayload = await ambulanceService.getAllDrivers(); } catch { driversPayload = []; }
       const drivers = toArray(driversPayload);
@@ -916,7 +900,7 @@ const Emergency = () => {
     fetchDispatchData();
   }, [fetchPatientProfile, fetchChwData, fetchAmbulanceData, fetchDispatchData]);
 
-  // ── Reverse geocode CHW locations ───────────────────────────────────────────
+  // ── Reverse geocode CHW locations (Nominatim-first, 2-step Plus Code decode) ─
   useEffect(() => {
     const geocodeChwLocations = async () => {
       const apiKey =
@@ -924,17 +908,16 @@ const Emergency = () => {
         document.querySelector('meta[name="google-maps-api-key"]')?.getAttribute('content') ||
         (import.meta?.env?.GOOGLE_CLOUD_MAPS_API_KEY) ||
         null;
-      
+
       if (!apiKey) return;
 
       const newLocationNames = { ...chwLocationNames };
       let needsUpdate = false;
 
       for (const chw of communityHealthWorkers) {
-        // 1) If we have coordinates, try reverse-geocoding by lat/lng.
+        // 1) Reverse-geocode from coordinates (Nominatim-first via reverseGeocode)
         if (chw.location) {
           const locKey = `${chw.location.lat.toFixed(6)},${chw.location.lng.toFixed(6)}`;
-          // If we already resolved this location, skip.
           if (!newLocationNames[locKey]) {
             try {
               const locationName = await reverseGeocode(chw.location.lat, chw.location.lng, apiKey);
@@ -942,30 +925,36 @@ const Emergency = () => {
                 newLocationNames[locKey] = locationName;
                 needsUpdate = true;
               }
-            } catch (err) {
-              // ignore geocoding errors
-            }
+            } catch (_) { /* ignore */ }
           }
         }
 
-        // 2) If no coordinates but backend provided a plus-code/raw string, try geocoding that string.
+        // 2) Two-step decode for Plus Code / raw location strings:
+        //    Step A — geocode the raw string to get precise coordinates
+        //    Step B — reverse geocode those precise coordinates for a real street address
         const raw = chw.rawLocation;
-        if (raw && !newLocationNames[String(raw).trim()]) {
+        const rawKey = raw ? String(raw).trim() : null;
+        if (rawKey && !newLocationNames[rawKey]) {
           try {
-            const res = await geocodeAddress(String(raw), apiKey);
-            if (res && res.formatted_address) {
-              const key = String(raw).trim();
-              newLocationNames[key] = res.formatted_address;
-              needsUpdate = true;
-              // also map lat/lng key so entries with coordinates also get the same label
-              if (res.location && typeof res.location.lat === 'number' && typeof res.location.lng === 'number') {
-                const latKey = `${res.location.lat.toFixed(6)},${res.location.lng.toFixed(6)}`;
-                if (!newLocationNames[latKey]) newLocationNames[latKey] = res.formatted_address;
+            const res = await geocodeAddress(rawKey, apiKey);
+            if (res?.location) {
+              const locKey = `${res.location.lat.toFixed(6)},${res.location.lng.toFixed(6)}`;
+              // Step B: use Nominatim-first reverse geocode on precise coords
+              let streetAddress = newLocationNames[locKey];
+              if (!streetAddress) {
+                streetAddress = await reverseGeocode(res.location.lat, res.location.lng, apiKey);
               }
+              const finalAddress = streetAddress || stripPlusCodeFromLocation(res.formatted_address || '');
+              if (finalAddress) {
+                newLocationNames[rawKey] = finalAddress;
+                if (!newLocationNames[locKey]) newLocationNames[locKey] = finalAddress;
+                needsUpdate = true;
+              }
+            } else if (res?.formatted_address) {
+              const clean = stripPlusCodeFromLocation(res.formatted_address);
+              if (clean) { newLocationNames[rawKey] = clean; needsUpdate = true; }
             }
-          } catch (err) {
-            // ignore
-          }
+          } catch (_) { /* ignore */ }
         }
       }
 
@@ -976,6 +965,7 @@ const Emergency = () => {
 
     geocodeChwLocations();
   }, [communityHealthWorkers]);
+
   const handleCallCHW = (chw) => { closeAllModals(); setSelectedCHW(chw); setShowCHWModal(true); };
 
   const handleOrderAmbulance = (ambulance) => {
@@ -1044,12 +1034,8 @@ const Emergency = () => {
   const openHistoryModal = () => { closeAllModals(); setShowHistoryModal(true); };
   const openTipsModal = () => { closeAllModals(); setTipIndex(0); setShowTipsModal(true); };
   const closeTipsModal = () => { setShowTipsModal(false); setTipIndex(0); };
-  const goToNextTip = () => {
-    setTipIndex((current) => Math.min(current + 1, EMERGENCY_TIPS.length));
-  };
-  const goToPreviousTip = () => {
-    setTipIndex((current) => Math.max(current - 1, 0));
-  };
+  const goToNextTip = () => { setTipIndex((current) => Math.min(current + 1, EMERGENCY_TIPS.length)); };
+  const goToPreviousTip = () => { setTipIndex((current) => Math.max(current - 1, 0)); };
 
   const mapMeta = {
     chw: {
@@ -1108,9 +1094,7 @@ const Emergency = () => {
             <p className="text-sm sm:text-base font-bold text-gray-900 break-all">1195</p>
           </a>
         </div>
-        {/* Quick map launch buttons (summarize maps at top with hotlines) */}
         <div className="mt-3 flex flex-wrap items-center gap-2">
-         
           <button onClick={openOrdersModal}
             className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
             <MapIcon className="w-4 h-4 text-blue-700" />
@@ -1180,7 +1164,6 @@ const Emergency = () => {
                   <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">{mapMeta.chw.badgeLabel}</span>
                 </div>
               </div>
-              {/* Legend */}
               <div className="flex items-center gap-4 px-5 py-2 border-b border-gray-100 text-xs text-gray-500">
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-600 inline-block"></span>Available CHW</span>
@@ -1229,7 +1212,6 @@ const Emergency = () => {
                           <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{chw.locationLabel}</span></div>
                           <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{chw.distance}</span></div>
                           <div className="flex items-center text-xs"><Clock className="w-3 h-3 mr-1 text-blue-600" /><span className="font-bold">Response: {chw.responseTime}</span></div>
-                          {/* <div className="flex items-center text-xs"><Star className="w-3 h-3 mr-1 text-yellow-500 fill-current" /><span className="font-semibold text-gray-700">Rating: {chw.rating}</span></div> */}
                         </div>
                         <div className="mb-2 text-xs text-gray-700">
                           <div className="text-[11px] text-gray-500">Phone</div>
@@ -1257,8 +1239,6 @@ const Emergency = () => {
         {/* ── Ambulance Tab ── */}
         {activeTab === 'ambulance' && (
           <div className="space-y-4">
-           
-
             <div className="space-y-4">
               <div className="flex items-center justify-end lg:hidden">
                 <button onClick={() => openMapOverlay('ambulance')}
@@ -1280,7 +1260,6 @@ const Emergency = () => {
                     <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">{mapMeta.ambulance.badgeLabel}</span>
                   </div>
                 </div>
-                {/* Legend */}
                 <div className="flex items-center gap-4 px-5 py-2 border-b border-gray-100 text-xs text-gray-500">
                   <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
                   <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>Available ambulance</span>
@@ -1294,7 +1273,6 @@ const Emergency = () => {
                   className="w-full h-[560px] xl:h-[700px]"
                 />
               </div>
-
             </div>
 
             {/* Ambulance List */}
@@ -1338,7 +1316,6 @@ const Emergency = () => {
                             <span key={index} className="px-1.5 py-0.5 text-blue-600 text-xs">{item}</span>
                           ))}
                         </div>
-
                         <div className="mb-2 text-xs text-gray-700">
                           <div className="text-[11px] text-gray-500">Driver</div>
                           <div className="font-semibold text-sm">{ambulance.driverName || 'Unassigned'}</div>
@@ -1351,7 +1328,6 @@ const Emergency = () => {
                                 className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1">
                                 <Ambulance className="w-3 h-3" /><span>Order</span>
                               </button>
-
                               {ambulance.driverPhone ? (
                                 <a href={`tel:${ambulance.driverPhone}`} className="px-2 py-0.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold transition-colors flex items-center gap-1">
                                   <Phone className="w-3 h-3" /> Call Driver
@@ -1374,7 +1350,7 @@ const Emergency = () => {
         )}
       </div>
 
-      {/* Responsive map modal — mobile uses full-screen, desktop uses centered modal */}
+      {/* Map modal */}
       {showMap && (
         <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowMap(false)} />
@@ -1502,8 +1478,7 @@ const Emergency = () => {
         </div>
       )}
 
-      {/* Quick Actions */}
-
+      {/* Orders Modal */}
       {showOrdersModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full p-4">
@@ -1616,7 +1591,6 @@ const Emergency = () => {
               </h3>
               <button onClick={closeTipsModal} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
             </div>
-
             <div className="flex-1 min-h-0 flex flex-col justify-between rounded-lg border border-gray-200 bg-gray-50 p-4">
               {tipIndex < EMERGENCY_TIPS.length ? (
                 <div className="space-y-4">
@@ -1629,12 +1603,8 @@ const Emergency = () => {
                     </span>
                   </div>
                   <div className="rounded-lg bg-white border border-blue-200 p-4 shadow-sm">
-                    <h4 className="text-base sm:text-lg font-medium ">
-                      {EMERGENCY_TIPS[tipIndex].title}
-                    </h4>
-                    <p className="mt-2 text-sm leading-6">
-                      {EMERGENCY_TIPS[tipIndex].detail}
-                    </p>
+                    <h4 className="text-base sm:text-lg font-medium">{EMERGENCY_TIPS[tipIndex].title}</h4>
+                    <p className="mt-2 text-sm leading-6">{EMERGENCY_TIPS[tipIndex].detail}</p>
                   </div>
                 </div>
               ) : (
@@ -1650,7 +1620,6 @@ const Emergency = () => {
                   </div>
                 </div>
               )}
-
               <div className="mt-4 flex items-center justify-between gap-3 shrink-0">
                 <button
                   onClick={goToPreviousTip}
