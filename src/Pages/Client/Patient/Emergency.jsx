@@ -52,9 +52,104 @@ const EMERGENCY_TIPS = [
 let _mapsLoaderInstance = null;
 const getMapsLoader = (apiKey) => {
   if (!_mapsLoaderInstance) {
-    _mapsLoaderInstance = new Loader({ apiKey, libraries: ['marker'] });
+    _mapsLoaderInstance = new Loader({ apiKey, libraries: ['marker', 'geocoding'] });
   }
   return _mapsLoaderInstance;
+};
+
+// ─── Reverse Geocoding Cache ────────────────────────────────────────────────────
+let _geocodingCache = new Map();
+const reverseGeocode = async (lat, lng, apiKey) => {
+  const key = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+  if (_geocodingCache.has(key)) return _geocodingCache.get(key);
+  
+  try {
+    if (!window.google?.maps?.Geocoder) {
+      const loader = getMapsLoader(apiKey);
+      await loader.load();
+    }
+    
+    if (!window.google?.maps?.Geocoder) return null;
+    
+    const geocoder = new window.google.maps.Geocoder();
+    const result = await new Promise((resolve, reject) => {
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === 'OK' && results && results.length > 0) {
+          resolve(results[0].formatted_address);
+        } else {
+          reject(new Error(`Geocoding failed: ${status}`));
+        }
+      });
+    });
+    
+    _geocodingCache.set(key, result);
+    return result;
+  } catch (err) {
+    // Try Nominatim (OpenStreetMap) as a fallback
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}`;
+      const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (resp.ok) {
+        const data = await resp.json();
+        const addr = data?.display_name || null;
+        _geocodingCache.set(key, addr);
+        return addr;
+      }
+    } catch (err2) {
+      // ignore nominatim errors
+    }
+    _geocodingCache.set(key, null);
+    return null;
+  }
+};
+
+const geocodeAddress = async (address, apiKey) => {
+  if (!address) return null;
+  const key = `addr:${String(address).trim()}`;
+  if (_geocodingCache.has(key)) return _geocodingCache.get(key);
+  try {
+    if (!window.google?.maps?.Geocoder) {
+      const loader = getMapsLoader(apiKey);
+      await loader.load();
+    }
+    if (!window.google?.maps?.Geocoder) return null;
+    const geocoder = new window.google.maps.Geocoder();
+    const result = await new Promise((resolve, reject) => {
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === 'OK' && results && results.length > 0) {
+          const r = results[0];
+          const loc = r.geometry?.location ? { lat: r.geometry.location.lat(), lng: r.geometry.location.lng() } : null;
+          resolve({ formatted_address: r.formatted_address, location: loc });
+        } else {
+          reject(new Error(`Geocoding failed: ${status}`));
+        }
+      });
+    });
+    _geocodingCache.set(key, result);
+    return result;
+  } catch (err) {
+    // Fallback to Nominatim search
+    try {
+      const q = encodeURIComponent(String(address || '').trim());
+      const url = `https://nominatim.openstreetmap.org/search?q=${q}&format=jsonv2&limit=1`;
+      const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (resp.ok) {
+        const items = await resp.json();
+        if (Array.isArray(items) && items.length > 0) {
+          const it = items[0];
+          const formatted = it.display_name || null;
+          const loc = it.lat && it.lon ? { lat: Number(it.lat), lng: Number(it.lon) } : null;
+          const fallback = formatted ? { formatted_address: formatted, location: loc } : null;
+          _geocodingCache.set(key, fallback);
+          return fallback;
+        }
+      }
+    } catch (err2) {
+      // ignore
+    }
+    _geocodingCache.set(key, null);
+    return null;
+  }
 };
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -184,6 +279,30 @@ const formatDistance = (rawDistance, userLocation, responderLocation) => {
   return `${computed.toFixed(1)} km`;
 };
 
+const isPlusCode = (str) => {
+  // Plus Codes look like: F799+H7W, 6PH58+82, etc.
+  const plusCodePattern = /^\w{6,7}\+\w{2,3}/;
+  return plusCodePattern.test(String(str || '').trim());
+};
+
+const stripPlusCodeFromLocation = (str) => {
+  // Remove Plus Code prefix from location strings
+  // E.g., "F799+H7W, Kathemboni Rd, Machakos, Kenya" -> "Kathemboni Rd, Machakos, Kenya"
+  const locationStr = String(str || '').trim();
+  const plusCodePattern = /^\w{6,7}\+\w{2,3},\s*/;
+  return locationStr.replace(plusCodePattern, '').trim();
+};
+
+const isValidRealAddress = (str) => {
+  // Check if a location string contains a real address (not just Plus Code or coordinates)
+  if (!str) return false;
+  const cleaned = stripPlusCodeFromLocation(str);
+  if (!cleaned || cleaned.length < 3) return false;
+  // Reject if it's just coordinates
+  if (/^-?\d+\.?\d*,\s*-?\d+\.?\d*/.test(cleaned)) return false;
+  return true;
+};
+
 const normalizeChwStatus = (status) => String(status || '').trim().toUpperCase();
 const isChwAvailable = (status) => !['OFFLINE', 'ON_LEAVE', 'INACTIVE'].includes(normalizeChwStatus(status));
 
@@ -197,6 +316,25 @@ const normalizeChw = (row = {}, userLocation) => {
     'Unknown CHW';
   const status = normalizeChwStatus(row.status);
   const ratingNumber = toNumberOrNull(row.rating ?? row.averageRating);
+  const loc = getLocationFromRow(row);
+  // Prefer real addresses, skip Plus Codes, use coordinates for reverse-geocoding
+  // Also preserve the raw location string (if any) so we can map plus-code lookups
+  let locationLabel = null;
+  const rawLocation = row.currentLocation || row.locationAddress || row.locationName || null;
+
+  // Try to extract real address from fields (stripping Plus Codes if present)
+  if (rawLocation && isValidRealAddress(rawLocation)) {
+    locationLabel = stripPlusCodeFromLocation(rawLocation);
+  }
+
+  // Fallback to coordinates for reverse-geocoding
+  if (!locationLabel && loc) {
+    locationLabel = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)} Area`;
+  }
+  if (!locationLabel) {
+    locationLabel = 'Loading location...';
+  }
+  
   return {
     id: row.id,
     name: fullName,
@@ -205,7 +343,9 @@ const normalizeChw = (row = {}, userLocation) => {
     distance: formatDistance(row.distanceKm ?? row.distance, userLocation, getLocationFromRow(row)),
     rating: ratingNumber !== null ? ratingNumber.toFixed(1) : 'N/A',
     available: isChwAvailable(status),
-    location: getLocationFromRow(row),
+    location: loc,
+    locationLabel,
+    rawLocation,
     responseTime: row.responseTime || row.averageResponseTime || (status === 'BUSY' ? '10-20 min' : '5-15 min'),
     status,
   };
@@ -232,7 +372,27 @@ const normalizeAmbulance = (row = {}, userLocation) => {
   const numericCost = toNumberOrNull(row.cost ?? row.estimatedCost);
   // Estimate numeric distance (km)
   const loc = getLocationFromRow(row);
-    const locationLabel = row.currentLocation || row.locationAddress || row.location || row.locationName || (loc ? `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}` : 'Unknown location') + ' Area';
+  // Prefer real addresses, skip Plus Codes, use coordinates for reverse-geocoding
+  let locationLabel = null;
+  
+  // Try to extract real address from fields (stripping Plus Codes if present)
+  if (row.currentLocation && isValidRealAddress(row.currentLocation)) {
+    locationLabel = stripPlusCodeFromLocation(row.currentLocation);
+  }
+  if (!locationLabel && row.locationAddress && isValidRealAddress(row.locationAddress)) {
+    locationLabel = stripPlusCodeFromLocation(row.locationAddress);
+  }
+  if (!locationLabel && row.locationName && isValidRealAddress(row.locationName)) {
+    locationLabel = stripPlusCodeFromLocation(row.locationName);
+  }
+  
+  // Fallback to coordinates for reverse-geocoding
+  if (!locationLabel && loc) {
+    locationLabel = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)} Area`;
+  }
+  if (!locationLabel) {
+    locationLabel = 'Loading location...';
+  }
   let numericDistanceKm = null;
   const explicitDistance = toNumberOrNull(row.estimatedDistance ?? row.distanceKm ?? row.distance);
   if (explicitDistance !== null) numericDistanceKm = explicitDistance;
@@ -497,14 +657,15 @@ const EmergencyGoogleMap = ({
         const domEl  = makeDomMarker(color, label, 44);
         const svgUrl = makeSvgUrl(label, chw.available ? '%2316a34a' : '%239ca3af');
         const infoHtml = `
-          <div style="padding:4px 2px;min-width:170px">
-            <p style="font-weight:700;margin:0 0 3px"> ${chw.name}</p>
-            <p style="margin:0 0 2px;color:#444">${chw.specialization}</p>
-            <p style="margin:0 0 2px">Distance: ${chw.distance}</p>
-            <p style="margin:0 0 2px">Response: ${chw.responseTime}</p>
-            <p style="margin:0 0 2px">Rating:  ${chw.rating}</p>
+          <div style="padding:6px 8px;min-width:200px;max-width:320px;font-family:Arial,Helvetica,sans-serif;">
+            <p style="font-weight:700;margin:0 0 6px">${chw.name}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">${chw.specialization}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Location: ${chw.locationLabel || 'Unknown location'}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Distance: ${chw.distance}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Response: ${chw.responseTime}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Rating: ${chw.rating}</p>
             <p style="margin:0;font-weight:600;color:${chw.available ? '#16a34a' : '#9ca3af'}">
-              ${chw.available ? '● Available' : ' Unavailable'}
+              ${chw.available ? '● Available' : '● Unavailable'}
             </p>
           </div>`;
         placeMarker({ lat, lng, domEl, svgUrl, infoHtml });
@@ -575,10 +736,24 @@ const Emergency = () => {
   const [dispatchRows, setDispatchRows] = useState(() => readPersistedEmergencyOrders());
   const [dispatchLoading, setDispatchLoading] = useState(true);
   const [dispatchError, setDispatchError] = useState('');
+  const [chwLocationNames, setChwLocationNames] = useState({});
   const communityHealthWorkers = useMemo(() =>
-    toArray(chwRows).map((row) => normalizeChw(row, userLocation))
+    toArray(chwRows).map((row) => {
+      const normalized = normalizeChw(row, userLocation);
+      const locKey = normalized.location ? `${normalized.location.lat.toFixed(6)},${normalized.location.lng.toFixed(6)}` : null;
+      if (locKey && chwLocationNames[locKey]) {
+        normalized.locationLabel = chwLocationNames[locKey];
+      }
+      // If the backend provided a raw plus-code address string, prefer any resolved
+      // human-readable name cached under that raw key.
+      const rawKey = normalized.rawLocation ? String(normalized.rawLocation).trim() : null;
+      if (rawKey && chwLocationNames[rawKey]) {
+        normalized.locationLabel = chwLocationNames[rawKey];
+      }
+      return normalized;
+    })
       .sort((a, b) => Number(b.available) - Number(a.available)),
-    [chwRows, userLocation]
+    [chwRows, userLocation, chwLocationNames]
   );
 
   const ambulances = useMemo(() =>
@@ -741,7 +916,66 @@ const Emergency = () => {
     fetchDispatchData();
   }, [fetchPatientProfile, fetchChwData, fetchAmbulanceData, fetchDispatchData]);
 
-  // ── handlers ─────────────────────────────────────────────────────────────────
+  // ── Reverse geocode CHW locations ───────────────────────────────────────────
+  useEffect(() => {
+    const geocodeChwLocations = async () => {
+      const apiKey =
+        (import.meta?.env?.VITE_GOOGLE_CLOUD_MAPS_API_KEY) ||
+        document.querySelector('meta[name="google-maps-api-key"]')?.getAttribute('content') ||
+        (import.meta?.env?.GOOGLE_CLOUD_MAPS_API_KEY) ||
+        null;
+      
+      if (!apiKey) return;
+
+      const newLocationNames = { ...chwLocationNames };
+      let needsUpdate = false;
+
+      for (const chw of communityHealthWorkers) {
+        // 1) If we have coordinates, try reverse-geocoding by lat/lng.
+        if (chw.location) {
+          const locKey = `${chw.location.lat.toFixed(6)},${chw.location.lng.toFixed(6)}`;
+          // If we already resolved this location, skip.
+          if (!newLocationNames[locKey]) {
+            try {
+              const locationName = await reverseGeocode(chw.location.lat, chw.location.lng, apiKey);
+              if (locationName) {
+                newLocationNames[locKey] = locationName;
+                needsUpdate = true;
+              }
+            } catch (err) {
+              // ignore geocoding errors
+            }
+          }
+        }
+
+        // 2) If no coordinates but backend provided a plus-code/raw string, try geocoding that string.
+        const raw = chw.rawLocation;
+        if (raw && !newLocationNames[String(raw).trim()]) {
+          try {
+            const res = await geocodeAddress(String(raw), apiKey);
+            if (res && res.formatted_address) {
+              const key = String(raw).trim();
+              newLocationNames[key] = res.formatted_address;
+              needsUpdate = true;
+              // also map lat/lng key so entries with coordinates also get the same label
+              if (res.location && typeof res.location.lat === 'number' && typeof res.location.lng === 'number') {
+                const latKey = `${res.location.lat.toFixed(6)},${res.location.lng.toFixed(6)}`;
+                if (!newLocationNames[latKey]) newLocationNames[latKey] = res.formatted_address;
+              }
+            }
+          } catch (err) {
+            // ignore
+          }
+        }
+      }
+
+      if (needsUpdate) {
+        setChwLocationNames(newLocationNames);
+      }
+    };
+
+    geocodeChwLocations();
+  }, [communityHealthWorkers]);
   const handleCallCHW = (chw) => { closeAllModals(); setSelectedCHW(chw); setShowCHWModal(true); };
 
   const handleOrderAmbulance = (ambulance) => {
@@ -977,35 +1211,38 @@ const Emergency = () => {
               ) : communityHealthWorkers.length === 0 ? (
                 <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">No CHWs are currently available.</div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2">
                   {communityHealthWorkers.map((chw) => (
-                    <div key={chw.id} className={`p-2 border rounded-lg transition-all ${chw.available ? 'border-gray-200 hover:shadow-lg hover:border-gray-300' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
+                    <div key={chw.id} className={`p-2 border rounded-lg transition-all ${chw.available ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
                       <div className="flex flex-col">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                            {chw.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
-                          </div>
-                          <div>
-                            <h3 className="text-sm font-semibold text-gray-900">{chw.name}</h3>
-                            <p className="text-xs text-gray-600">{chw.specialization}</p>
-                          </div>
+                        <div className="flex items-center space-x-1 mb-1">
+                          <Users className={`w-4 h-4 ${chw.available ? 'text-blue-600' : 'text-gray-400'}`} />
+                          <h3 className="text-xs font-bold text-gray-900">{chw.name}</h3>
                         </div>
-                        <div className="flex flex-col space-y-1">
-                          <span className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-0.5" />{chw.distance}</span>
-                          <span className="flex items-center text-xs"><Clock className="w-3 h-3 mr-0.5" />{chw.responseTime}</span>
-                          <span className="flex items-center text-xs text-blue-600"><Star className="w-3 h-3 mr-0.5 fill-current" />{chw.rating}</span>
+                        {chw.available ? (
+                          <span className="px-1.5 py-0.5 text-green-700 text-xs font-semibold rounded-full text-center mb-1">Available</span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 text-gray-600 text-xs font-semibold rounded-full text-center mb-1">{titleCase(chw.status, 'Unavailable')}</span>
+                        )}
+                        <p className="text-xs text-gray-600 mb-2">{chw.specialization}</p>
+                        <div className="flex flex-col space-y-1 mb-2">
+                          <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{chw.locationLabel}</span></div>
+                          <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{chw.distance}</span></div>
+                          <div className="flex items-center text-xs"><Clock className="w-3 h-3 mr-1 text-blue-600" /><span className="font-bold">Response: {chw.responseTime}</span></div>
+                          {/* <div className="flex items-center text-xs"><Star className="w-3 h-3 mr-1 text-yellow-500 fill-current" /><span className="font-semibold text-gray-700">Rating: {chw.rating}</span></div> */}
                         </div>
-                        <div className="mt-2">
+                        <div className="mb-2 text-xs text-gray-700">
+                          <div className="text-[11px] text-gray-500">Phone</div>
+                          <div className="font-semibold text-sm">{chw.phone}</div>
+                        </div>
+                        <div className="flex justify-center gap-2">
                           {chw.available ? (
-                            <div className="flex flex-col space-y-1 items-center">
-                              <span className="px-2 py-0.5 text-green-800 text-xs font-bold">Available</span>
-                              <a href={`tel:${chw.phone}`} onClick={() => handleCallCHW(chw)}
-                                className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors flex items-center space-x-1">
-                                <Phone className="w-3 h-3" /><span>Call</span>
-                              </a>
-                            </div>
+                            <a href={`tel:${chw.phone}`} onClick={() => handleCallCHW(chw)}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1">
+                              <Phone className="w-3 h-3" /><span>Call</span>
+                            </a>
                           ) : (
-                            <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full block text-center">Unavailable</span>
+                            <span className="px-3 py-1 bg-gray-200 text-gray-600 rounded text-xs font-semibold">Unavailable</span>
                           )}
                         </div>
                       </div>
@@ -1195,11 +1432,13 @@ const Emergency = () => {
               </div>
               <h4 className="text-base font-semibold text-gray-900">{selectedCHW.name}</h4>
               <p className="text-sm text-gray-600">{selectedCHW.specialization}</p>
+              <p className="text-xs text-gray-500 mt-1">{selectedCHW.locationLabel}</p>
+              <p className="text-xs text-gray-500">{selectedCHW.distance}</p>
               <p className="text-xl font-bold text-blue-600 mt-2">{selectedCHW.phone}</p>
             </div>
-            <div className="space-y-2">
-              <a href={`tel:${selectedCHW.phone}`} className="block w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold text-center transition-colors">Call Now</a>
-              <button onClick={() => setShowCHWModal(false)} className="block w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors">Cancel</button>
+            <div className="space-y-2 flex flex-col items-center">
+              <a href={`tel:${selectedCHW.phone}`} className="px-8 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold text-center transition-colors">Call Now</a>
+              <button onClick={() => setShowCHWModal(false)} className="px-8 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors">Cancel</button>
             </div>
           </div>
         </div>
