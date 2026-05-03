@@ -270,16 +270,7 @@ const dispatchStatusTone = (status) => {
   return 'bg-amber-50 text-amber-700 border border-amber-200';
 };
 
-// ─── EmergencyGoogleMap ────────────────────────────────────────────────────────
-// Replaces LiveMap. Renders:
-//   - A "You" pin for the user's current location (blue pulsing circle)
-//   - CHW pins  (green = available, gray = unavailable) when view='chw'
-//   - Ambulance pins (red = available, gray = unavailable) when view='ambulance'
-//
-// Uses the same three-fix pattern as HomeVisits:
-//   Fix 1 – mapReady state  → markers fire immediately after init
-//   Fix 2 – Singleton Loader → no duplicate script construction
-//   Fix 3 – Init effect deps = [apiKey, mapId] only → no map re-init on data load
+
 const EmergencyGoogleMap = ({
   userLocation = DEFAULT_LOCATION,
   ambulances = [],
@@ -303,9 +294,7 @@ const EmergencyGoogleMap = ({
   const rawMapId = import.meta?.env?.VITE_GOOGLE_MAPS_MAP_ID || null;
   const mapId = rawMapId && !/^%.*%$/.test(String(rawMapId).trim()) ? String(rawMapId).trim() : null;
 
-  // ── Effect 1: init map once ──────────────────────────────────────────────────
-  // Deps: [apiKey, mapId] only — not userLocation, not view.
-  // Prevents full map re-init when live data arrives.
+
   useEffect(() => {
     let cancelled = false;
     const initMap = async () => {
@@ -338,10 +327,9 @@ const EmergencyGoogleMap = ({
     };
     initMap();
     return () => { cancelled = true; };
-  }, [apiKey, mapId]);  // Fix 3 – no location/view dependency
+  }, [apiKey, mapId]);  
 
-  // ── Effect 2: add/update markers ────────────────────────────────────────────
-  // Rebuilds all markers whenever data, view, mapReady, or userLocation changes.
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -373,15 +361,11 @@ const EmergencyGoogleMap = ({
       return el;
     };
 
-    // ── helper: create SVG icon URL for legacy Marker ──
     const makeSvgUrl = (label, color) => {
-      // Accept either raw hex colors like '#2563eb' or percent-encoded values
-      // like '%232563eb' (some call sites currently pass encoded values).
-      // Normalize to a raw hex like '#2563eb' before embedding in the SVG.
+
       try {
         let normalized = String(color || '') || '#000000';
-        // If value looks percent-encoded, decode it repeatedly up to 3x
-        // (handles accidentally double-encoded values).
+
         for (let i = 0; i < 3 && !normalized.startsWith('#'); i += 1) {
           try { normalized = decodeURIComponent(normalized); } catch { break; }
         }
@@ -390,7 +374,7 @@ const EmergencyGoogleMap = ({
         const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='${normalized}' stroke='%23fff' stroke-width='3'/><text x='28' y='36' font-size='22' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='900'>${label}</text></svg>`;
         return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
       } catch {
-        // Fallback to a simple black circle if something goes wrong
+     
         const fallback = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='#000' stroke='%23fff' stroke-width='3'/></svg>`;
         return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(fallback)}`;
       }
@@ -519,7 +503,7 @@ const EmergencyGoogleMap = ({
       <div ref={containerRef} style={{ height: '100%', width: '100%', background: '#f0f4f8' }} />
       {loadError && (
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-          <div className="bg-white/90 border border-gray-200 rounded px-4 py-2 text-sm text-red-600 pointer-events-auto shadow">
+          <div className="bg-white/90 border border-gray-200 px-4 py-2 text-sm text-red-600 pointer-events-auto shadow">
             <div className="font-semibold">Map error</div>
             <div>{loadError}</div>
             <div className="text-xs text-gray-500 mt-1">Ensure <code>VITE_GOOGLE_CLOUD_MAPS_API_KEY</code> is set and dev server was restarted.</div>
@@ -805,23 +789,23 @@ const Emergency = () => {
           Emergency Hotlines
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2">
-          <a href="tel:999" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-red-300 transition-colors">
+          <a href="tel:999" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-red-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">National Emergency</p>
             <p className="text-sm sm:text-base font-bold text-red-600 break-all">999</p>
           </a>
-          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-blue-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">MediLink Emergency</p>
             <p className="text-sm sm:text-base font-bold text-blue-600 break-all">0743669252</p>
           </a>
-          <a href="tel:911" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+          <a href="tel:911" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-blue-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Ambulance</p>
             <p className="text-sm sm:text-base font-bold text-gray-900 break-all">911</p>
           </a>
-          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-blue-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Poison Control</p>
             <p className="text-sm sm:text-base font-bold text-gray-900 break-all">0743669252</p>
           </a>
-          <a href="tel:1195" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+          <a href="tel:1195" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-blue-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Mental Health</p>
             <p className="text-sm sm:text-base font-bold text-gray-900 break-all">1195</p>
           </a>
@@ -830,22 +814,22 @@ const Emergency = () => {
         <div className="mt-3 flex flex-wrap items-center gap-2">
          
           <button onClick={openOrdersModal}
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
             <MapIcon className="w-4 h-4 text-blue-700" />
             <span>My Orders</span>
           </button>
           <button onClick={openRecentModal}
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
             <MapIcon className="w-4 h-4 text-blue-700" />
             <span>Recent Requests</span>
           </button>
           <button onClick={openHistoryModal}
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
             <MapIcon className="w-4 h-4 text-blue-700" />
             <span>Emergency History</span>
           </button>
           <button onClick={openTipsModal}
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
             <MapIcon className="w-4 h-4 text-blue-600" />
             <span>Emergency Tips</span>
           </button>
@@ -886,7 +870,7 @@ const Emergency = () => {
             </div>
 
             {/* Desktop map */}
-            <div className="hidden lg:block border border-gray-200 overflow-hidden relative z-0 rounded-lg">
+            <div className="hidden lg:block border border-gray-200 overflow-hidden relative z-0">
               <div className="px-5 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -914,7 +898,7 @@ const Emergency = () => {
             </div>
 
             {/* CHW List */}
-            <div className="p-3 border border-gray-200 rounded-lg bg-white">
+            <div className="p-3 border border-gray-200 bg-white">
               <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
                 <Users className="w-4 h-4 mr-2 text-blue-600" />
                 Available Community Health Workers Near You
@@ -931,7 +915,7 @@ const Emergency = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
                   {communityHealthWorkers.map((chw) => (
-                    <div key={chw.id} className={`p-2 border-2 rounded-lg transition-all ${chw.available ? 'border-gray-200 hover:border-gray-300' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
+                    <div key={chw.id} className={`p-2 border rounded-lg transition-all ${chw.available ? 'border-gray-200 hover:shadow-lg hover:border-gray-300' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
                       <div className="flex flex-col">
                         <div className="flex items-center space-x-2 mb-1">
                           <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
@@ -983,7 +967,7 @@ const Emergency = () => {
               </div>
 
               {/* Desktop ambulance map */}
-              <div className="border border-gray-200 overflow-hidden rounded-lg relative z-0">
+              <div className="border border-gray-200 overflow-hidden relative z-0">
                 <div className="px-5 py-4 border-b border-gray-100">
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -1013,7 +997,7 @@ const Emergency = () => {
             </div>
 
             {/* Ambulance List */}
-            <div className="p-3 border border-gray-200 rounded-lg">
+            <div className="p-3 border border-gray-200">
               <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
                 <Ambulance className="w-4 h-4 mr-2 text-blue-600" />Available Ambulances Near You
               </h2>
@@ -1029,7 +1013,7 @@ const Emergency = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2">
                   {ambulances.map((ambulance) => (
-                    <div key={ambulance.id} className={`p-2 border-2 rounded-lg transition-all ${ambulance.available ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
+                    <div key={ambulance.id} className={`p-2 border rounded-lg transition-all ${ambulance.available ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
                       <div className="flex flex-col">
                         <div className="flex items-center space-x-1 mb-1">
                           <Ambulance className={`w-4 h-4 ${ambulance.available ? 'text-blue-600' : 'text-gray-400'}`} />
