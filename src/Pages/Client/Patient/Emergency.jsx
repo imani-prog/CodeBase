@@ -15,6 +15,7 @@ import {
 import { Link } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
 import { ambulanceApi } from '../../../API/endpoints/ambulanceApi.js';
+import { ambulanceService } from '../../../Services/domain/ambulanceService.js';
 import { chwApi } from '../../../API/endpoints/chwApi.js';
 import { patientApi } from '../../../API/endpoints/patientApi.js';
 import { useAuth } from '../../../hooks/useAuth.jsx';
@@ -242,6 +243,8 @@ const normalizeAmbulance = (row = {}, userLocation) => {
     location: getLocationFromRow(row),
     equipment,
     cost: numericCost !== null ? `Ksh ${numericCost}` : 'Ksh --',
+    driverName: row.driverName || row.currentDriver?.name || row.currentDriverName || 'Unassigned',
+    driverPhone: row.driverPhone || row.currentDriver?.phone || row.driverContact || '',
   };
 };
 
@@ -639,9 +642,41 @@ const Emergency = () => {
       let payload;
       try { payload = await ambulanceApi.list(); }
       catch { payload = await ambulanceApi.listAvailable(); }
+
       let trackingPayload = [];
       try { trackingPayload = await ambulanceApi.listActiveTracking(); } catch { trackingPayload = []; }
-      setAmbulanceRows(mergeAmbulanceTracking(toArray(payload), toArray(trackingPayload)));
+
+      // Fetch drivers and map to ambulances (best-effort)
+      let driversPayload = [];
+      try { driversPayload = await ambulanceService.getAllDrivers(); } catch { driversPayload = []; }
+      const drivers = toArray(driversPayload);
+
+      const driverMap = new Map();
+      drivers.forEach((d) => {
+        try {
+          const ambId = d.currentAmbulance?.id ?? d.assignedAmbulance?.id ?? d.ambulanceId ?? d.ambulance?.id ?? null;
+          if (ambId !== null && ambId !== undefined) driverMap.set(String(ambId).toUpperCase(), d);
+          const plate = (d.currentVehicle || d.vehiclePlate || d.vehicleNumber || d.vehicle || d.currentAmbulance?.vehiclePlate || d.ambulance?.vehiclePlate || '').toString().toUpperCase();
+          if (plate) driverMap.set(plate, d);
+        } catch (e) { /* ignore */ }
+      });
+
+      const ambulancesRaw = toArray(payload).map((r) => {
+        if (!r || typeof r !== 'object') return r;
+        const key = String(r.id ?? r.ambulanceId ?? r.unitId ?? r.vehiclePlate ?? '').toUpperCase();
+        const driver = driverMap.get(key) || driverMap.get(String(r.vehiclePlate || '').toUpperCase()) || null;
+        if (driver) {
+          return {
+            ...r,
+            driverName: r.driverName || driver.name || r.driverName,
+            driverPhone: r.driverPhone || driver.phone || driver.driverPhone || r.driverPhone,
+            currentDriver: r.currentDriver || { id: driver.id, name: driver.name, phone: driver.phone },
+          };
+        }
+        return r;
+      });
+
+      setAmbulanceRows(mergeAmbulanceTracking(ambulancesRaw, toArray(trackingPayload)));
     } catch (err) { setAmbulanceRows([]); setAmbulanceError(err?.message || 'Failed to load ambulances.'); }
     finally { setLoadingAmbulances(false); }
   }, []);
@@ -1036,12 +1071,28 @@ const Emergency = () => {
                             <span key={index} className="px-1.5 py-0.5 text-blue-600 text-xs">{item}</span>
                           ))}
                         </div>
-                        <div className="flex justify-center">
+
+                        <div className="mb-2 text-xs text-gray-700">
+                          <div className="text-[11px] text-gray-500">Driver</div>
+                          <div className="font-semibold text-sm">{ambulance.driverName || 'Unassigned'}</div>
+                          <div className="text-[11px] text-gray-700">{ambulance.driverPhone || 'No phone available'}</div>
+                        </div>
+                        <div className="flex justify-center gap-2">
                           {ambulance.available ? (
-                            <button onClick={() => handleOrderAmbulance(ambulance)}
-                              className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1">
-                              <Ambulance className="w-3 h-3" /><span>Order</span>
-                            </button>
+                            <>
+                              <button onClick={() => handleOrderAmbulance(ambulance)}
+                                className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1">
+                                <Ambulance className="w-3 h-3" /><span>Order</span>
+                              </button>
+
+                              {ambulance.driverPhone ? (
+                                <a href={`tel:${ambulance.driverPhone}`} className="px-2 py-0.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold transition-colors flex items-center gap-1">
+                                  <Phone className="w-3 h-3" /> Call Driver
+                                </a>
+                              ) : (
+                                <button disabled className="px-2 py-0.5 bg-gray-200 text-gray-500 rounded text-xs font-semibold opacity-60 cursor-not-allowed">No phone</button>
+                              )}
+                            </>
                           ) : (
                             <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-xs font-semibold">Unavailable</span>
                           )}
