@@ -230,6 +230,33 @@ const normalizeAmbulance = (row = {}, userLocation) => {
   const etaMinutes = toNumberOrNull(row.averageResponseMinutes);
   const formattedEta = row.estimatedResponseTime || row.eta || row.averageResponseTime || (etaMinutes !== null ? `${etaMinutes} minutes` : 'Pending dispatch');
   const numericCost = toNumberOrNull(row.cost ?? row.estimatedCost);
+  // Estimate numeric distance (km)
+  const loc = getLocationFromRow(row);
+    const locationLabel = row.currentLocation || row.locationAddress || row.location || row.locationName || (loc ? `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}` : 'Unknown location') + ' Area';
+  let numericDistanceKm = null;
+  const explicitDistance = toNumberOrNull(row.estimatedDistance ?? row.distanceKm ?? row.distance);
+  if (explicitDistance !== null) numericDistanceKm = explicitDistance;
+  else {
+    try {
+      const dKm = distanceKm(userLocation, loc);
+      if (dKm !== null) numericDistanceKm = Number(dKm.toFixed(2));
+    } catch {
+      numericDistanceKm = null;
+    }
+  }
+
+  // Pricing strategy
+  const baseRatePerKm = 50; // Ksh per km
+  const minFare = 500; // minimum charge in Ksh
+  const eqCount = Array.isArray(equipment) ? equipment.length : 0;
+  const advancedKeywords = ['ICU','VENTILATOR','DEFIBRILLATOR','OXYGEN','SPINAL','TRAUMA','CARDIAC','MONITOR','INTUBATION'];
+  const advancedCount = equipment.filter((e) => advancedKeywords.some((k) => String(e || '').toUpperCase().includes(k))).length;
+  const equipmentSurcharge = eqCount * 30 + advancedCount * 150;
+  const distanceForCalc = numericDistanceKm !== null ? numericDistanceKm : 3; // fallback 3 km
+  const estimatedNumericCost = Math.max(minFare, Math.round(baseRatePerKm * distanceForCalc + equipmentSurcharge));
+
+  const displayCost = numericCost !== null ? `Ksh ${numericCost}` : `Ksh ${estimatedNumericCost}`;
+
   return {
     id: row.id,
     backendId: row.id,
@@ -240,9 +267,10 @@ const normalizeAmbulance = (row = {}, userLocation) => {
     eta: formattedEta,
     available: isAmbulanceAvailable(status),
     status,
-    location: getLocationFromRow(row),
+    location: loc,
+    locationLabel,
     equipment,
-    cost: numericCost !== null ? `Ksh ${numericCost}` : 'Ksh --',
+    cost: displayCost,
     driverName: row.driverName || row.currentDriver?.name || row.currentDriverName || 'Unassigned',
     driverPhone: row.driverPhone || row.currentDriver?.phone || row.driverContact || '',
   };
@@ -440,11 +468,12 @@ const EmergencyGoogleMap = ({
         const domEl   = makeDomMarker(color, label, 44);
         const svgUrl  = makeSvgUrl(label, amb.available ? '%23dc2626' : '%239ca3af');
         const infoHtml = `
-          <div style="padding:4px 2px;min-width:170px">
-            <p style="font-weight:700;margin:0 0 3px"> ${amb.name}</p>
-            <p style="margin:0 0 2px;color:#444">${amb.type}</p>
-            <p style="margin:0 0 2px">Distance: ${amb.distance}</p>
-            <p style="margin:0 0 2px">ETA: ${amb.eta}</p>
+          <div style="padding:6px 8px;min-width:200px;max-width:320px;font-family:Arial,Helvetica,sans-serif;">
+            <p style="font-weight:700;margin:0 0 6px">${amb.name}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">${amb.type}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Location: ${amb.locationLabel || 'Unknown location'}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Distance: ${amb.distance}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">ETA: ${amb.eta}</p>
             <p style="margin:0;font-weight:600;color:${amb.available ? '#16a34a' : '#9ca3af'}">
               ${amb.available ? '● Available' : ' Unavailable'}
             </p>
@@ -1061,6 +1090,7 @@ const Emergency = () => {
                         )}
                         <p className="text-xs text-gray-600 mb-2">{ambulance.type}</p>
                         <div className="flex flex-col space-y-1 mb-2">
+                          <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{ambulance.locationLabel}</span></div>
                           <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{ambulance.distance}</span></div>
                           <div className="flex items-center text-xs"><Clock className="w-3 h-3 mr-1 text-blue-600" /><span className="font-bold">ETA: {ambulance.eta}</span></div>
                           <div className="flex items-center text-xs"><Activity className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{ambulance.equipment.length} Equipment</span></div>
