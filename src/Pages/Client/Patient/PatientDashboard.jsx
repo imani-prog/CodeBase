@@ -19,18 +19,18 @@ import { patientApi } from '../../../API/endpoints/patientApi.js';
 import { httpClient } from '../../../API/clients/httpClient.js';
 
 // ── API helpers ────────────────────────────────────────────────────────
-const fetchMyProfile   = (userId)     => patientApi.me({ fallbackUserId: userId });
-const fetchAppointments = (patientId) => httpClient.get(`/api/appointments/patient/${patientId}`);
-const fetchHealthRecords = (patientId) => httpClient.get(`/api/health-records/patient/${patientId}`);
-const fetchEmergencyDispatches = ()    => httpClient.get('/api/assist');
-const EMERGENCY_ORDERS_UPDATED_EVENT = 'patient-emergency-orders-updated';
-const PATIENT_EMERGENCY_ORDERS_STORAGE_KEY = 'patient-emergency-orders-v1';
+const fetchMyProfile         = (userId)     => patientApi.me({ fallbackUserId: userId });
+const fetchAppointments      = (patientId)  => httpClient.get(`/api/appointments/patient/${patientId}`);
+const fetchHealthRecords     = (patientId)  => httpClient.get(`/api/health-records/patient/${patientId}`);
+const fetchEmergencyDispatches = ()         => httpClient.get('/api/assist');
+const EMERGENCY_ORDERS_UPDATED_EVENT        = 'patient-emergency-orders-updated';
+const PATIENT_EMERGENCY_ORDERS_STORAGE_KEY  = 'patient-emergency-orders-v1';
 
 const toArray = (payload) => {
   if (Array.isArray(payload)) return payload;
   if (Array.isArray(payload?.content)) return payload.content;
-  if (Array.isArray(payload?.items)) return payload.items;
-  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.items))   return payload.items;
+  if (Array.isArray(payload?.data))    return payload.data;
   if (payload?.data && typeof payload.data === 'object') return toArray(payload.data);
   return [];
 };
@@ -38,7 +38,7 @@ const toArray = (payload) => {
 const readPersistedEmergencyOrders = () => {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = window.localStorage.getItem(PATIENT_EMERGENCY_ORDERS_STORAGE_KEY);
+    const raw    = window.localStorage.getItem(PATIENT_EMERGENCY_ORDERS_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -79,36 +79,61 @@ const extractPatientName = (patient) => {
 
 const toTimestamp = (value) => {
   const date = new Date(value || '');
-  const ms = date.getTime();
+  const ms   = date.getTime();
   return Number.isNaN(ms) ? 0 : ms;
 };
 
 // ── Date helpers ───────────────────────────────────────────────────────
-const isUpcoming = (scheduledAt) => {
-  if (!scheduledAt) return false;
-  return new Date(scheduledAt) >= new Date();
+
+/**
+ * Extract the scheduled date from an appointment, trying every field name
+ * the backend has been observed to use.
+ */
+const getScheduledDate = (a) =>
+  a.scheduledAt || a.scheduledStart || a.date || a.startAt || a.appointmentDate || a.startTime;
+
+/**
+ * FIX 1 — Compare timestamps (ms numbers) instead of Date objects.
+ * `new Date(str) >= new Date()` can be unreliable across JS engines when
+ * the string is a UTC ISO value; comparing `.getTime()` integers is safe.
+ */
+const isUpcoming = (dateValue) => {
+  if (!dateValue) return false;
+  const ms = new Date(dateValue).getTime();
+  return !Number.isNaN(ms) && ms >= Date.now();
+};
+
+/**
+ * FIX 2 — The backend uses 'SCHEDULED' as the status for a booked-but-not-
+ * yet-confirmed appointment. The original filter only allowed 'CONFIRMED' and
+ * 'PENDING', so every SCHEDULED appointment was silently dropped.
+ * Now we exclude only the terminal statuses (CANCELED / CANCELLED / COMPLETED).
+ */
+const isActiveStatus = (status) => {
+  const s = (status ?? '').toUpperCase();
+  return s !== 'CANCELED' && s !== 'CANCELLED' && s !== 'COMPLETED';
 };
 
 const formatRelativeTime = (dateString) => {
   if (!dateString) return '';
-  const diff = Date.now() - new Date(dateString).getTime();
+  const diff  = Date.now() - new Date(dateString).getTime();
   const mins  = Math.floor(diff / 60000);
   const hours = Math.floor(mins / 60);
   const days  = Math.floor(hours / 24);
-  if (mins  < 60)  return `${mins} minute${mins !== 1 ? 's' : ''} ago`;
-  if (hours < 24)  return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+  if (mins  < 60) return `${mins} minute${mins !== 1 ? 's' : ''} ago`;
+  if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
   return `${days} day${days !== 1 ? 's' : ''} ago`;
 };
 
 // ── Component ──────────────────────────────────────────────────────────
 const PatientDashboard = () => {
   const { user } = useAuth();
-  const [patient,     setPatient]     = useState(null);
-  const [appointments, setAppointments] = useState([]);
-  const [healthRecords, setHealthRecords] = useState([]);
+  const [patient,             setPatient]             = useState(null);
+  const [appointments,        setAppointments]        = useState([]);
+  const [healthRecords,       setHealthRecords]       = useState([]);
   const [emergencyDispatches, setEmergencyDispatches] = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [error,       setError]       = useState(null);
+  const [loading,             setLoading]             = useState(true);
+  const [error,               setError]               = useState(null);
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -118,15 +143,28 @@ const PatientDashboard = () => {
       const patientData = await fetchMyProfile(user?.id);
       setPatient(patientData);
 
-      const [apptData, recordsData, dispatchData] = await Promise.all([
-        fetchAppointments(patientData.id),
-        fetchHealthRecords(patientData.id),
+      const resolvedPatientId =
+        patientData?.id ??
+        patientData?.patientId ??
+        patientData?.patient?.id ??
+        patientData?.data?.id ??
+        (patientApi.resolveMyPatientId
+          ? await patientApi.resolveMyPatientId(user?.id).catch(() => undefined)
+          : undefined);
+
+      if (!resolvedPatientId) {
+        throw new Error('Could not resolve patient ID');
+      }
+
+      const [apptRaw, recordsRaw, dispatchRaw] = await Promise.all([
+        fetchAppointments(resolvedPatientId).catch(() => []),
+        fetchHealthRecords(resolvedPatientId).catch(() => []),
         fetchEmergencyDispatches().catch(() => []),
       ]);
 
-      setAppointments(Array.isArray(apptData) ? apptData : []);
-      setHealthRecords(Array.isArray(recordsData) ? recordsData : []);
-      setEmergencyDispatches(mergeDispatchRows(toArray(dispatchData), readPersistedEmergencyOrders()));
+      setAppointments(toArray(apptRaw));
+      setHealthRecords(toArray(recordsRaw));
+      setEmergencyDispatches(mergeDispatchRows(toArray(dispatchRaw), readPersistedEmergencyOrders()));
     } catch (err) {
       setError(err.message || 'Failed to load dashboard');
     } finally {
@@ -139,18 +177,16 @@ const PatientDashboard = () => {
   }, [loadDashboard]);
 
   useEffect(() => {
-    const onEmergencyOrderUpdated = () => {
-      loadDashboard();
-    };
-    window.addEventListener(EMERGENCY_ORDERS_UPDATED_EVENT, onEmergencyOrderUpdated);
-    return () => window.removeEventListener(EMERGENCY_ORDERS_UPDATED_EVENT, onEmergencyOrderUpdated);
+    const handler = () => loadDashboard();
+    window.addEventListener(EMERGENCY_ORDERS_UPDATED_EVENT, handler);
+    return () => window.removeEventListener(EMERGENCY_ORDERS_UPDATED_EVENT, handler);
   }, [loadDashboard]);
 
   // ── Derived data ─────────────────────────────────────────────────────
 
   const upcomingAppointments = appointments
-    .filter(a => isUpcoming(a.scheduledAt) && a.status !== 'CANCELED' && a.status !== 'COMPLETED')
-    .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))
+    .filter(a => isUpcoming(getScheduledDate(a)) && isActiveStatus(a.status))
+    .sort((a, b) => new Date(getScheduledDate(a)).getTime() - new Date(getScheduledDate(b)).getTime())
     .slice(0, 3);
 
   const activePresciptions = healthRecords.filter(
@@ -165,16 +201,13 @@ const PatientDashboard = () => {
     .filter((dispatch) => {
       if (!patient) return false;
       if (String(dispatch.patientId || '') === String(patient.id || '')) return true;
-
-      const patientPhone = normalizePhone(patient.phone || patient.phoneNumber || '');
-      const callerPhone = normalizePhone(dispatch.callerPhone || '');
+      const patientPhone       = normalizePhone(patient.phone || patient.phoneNumber || '');
+      const callerPhone        = normalizePhone(dispatch.callerPhone || '');
       if (patientPhone && callerPhone && callerPhone.endsWith(patientPhone.slice(-9))) return true;
-
-      const patientName = normalizeName(extractPatientName(patient));
+      const patientName        = normalizeName(extractPatientName(patient));
       const dispatchPatientName = normalizeName(dispatch.patientName || '');
-      const dispatchCallerName = normalizeName(dispatch.callerName || '');
+      const dispatchCallerName  = normalizeName(dispatch.callerName  || '');
       if (patientName && (dispatchPatientName === patientName || dispatchCallerName === patientName)) return true;
-
       return false;
     })
     .sort((a, b) => toTimestamp(b.requestTime || b.createdAt) - toTimestamp(a.requestTime || a.createdAt));
@@ -185,10 +218,9 @@ const PatientDashboard = () => {
     { label: 'Upcoming Visits',      value: upcomingAppointments.length, icon: Calendar },
     { label: 'Active Prescriptions', value: activePresciptions,          icon: Pill },
     { label: 'Pending Results',      value: pendingResults,              icon: Clock },
-    { label: 'Emergency Orders',     value: emergencyOrdersCount,         icon: AlertCircle },
+    { label: 'Emergency Orders',     value: emergencyOrdersCount,        icon: AlertCircle },
   ];
 
-  // Build recent activity from latest health records + appointments
   const recentActivities = [
     ...healthRecords.slice(0, 4).map(r => ({
       id:    `hr-${r.id}`,
@@ -201,19 +233,18 @@ const PatientDashboard = () => {
       id:    `apt-${a.id}`,
       icon:  Calendar,
       text:  `Appointment ${(a.status ?? '').toLowerCase()} — ${a.providerName ?? a.doctorName ?? 'Provider'}`,
-      time:  formatRelativeTime(a.createdAt ?? a.scheduledAt),
+      time:  formatRelativeTime(a.createdAt ?? getScheduledDate(a)),
       color: 'text-blue-600',
     })),
     ...patientDispatches.slice(0, 2).map((dispatch) => ({
-      id: `emg-${dispatch.id}`,
-      icon: AlertCircle,
-      text: `Emergency request ${(dispatch.status ?? 'REQUESTED').toLowerCase()} — ${dispatch.vehiclePlate || dispatch.ambulanceUnitId || 'Ambulance pending'}`,
-      time: formatRelativeTime(dispatch.requestTime ?? dispatch.createdAt),
+      id:    `emg-${dispatch.id}`,
+      icon:   AlertCircle,
+      text:   `Emergency request ${(dispatch.status ?? 'REQUESTED').toLowerCase()} — ${dispatch.vehiclePlate || dispatch.ambulanceUnitId || 'Ambulance pending'}`,
+      time:   formatRelativeTime(dispatch.requestTime ?? dispatch.createdAt),
       color: 'text-red-600',
     })),
   ]
     .filter(item => item.time)
-    .sort((a, b) => 0) // already ordered by fetch
     .slice(0, 4);
 
   const quickActions = [
@@ -241,7 +272,7 @@ const PatientDashboard = () => {
         <p className="text-gray-700 font-medium mb-1">Failed to load dashboard</p>
         <p className="text-sm text-gray-500 mb-4">{error}</p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={loadDashboard}
           className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
         >
           Try Again
@@ -328,8 +359,8 @@ const PatientDashboard = () => {
             </div>
             <div className="space-y-3 sm:space-y-4">
               {upcomingAppointments.map((appointment) => {
-                const scheduledDate = appointment.scheduledAt
-                  ? new Date(appointment.scheduledAt)
+                const scheduledDate = getScheduledDate(appointment)
+                  ? new Date(getScheduledDate(appointment))
                   : null;
                 const isTelemedicine = (appointment.type ?? appointment.appointmentType ?? '')
                   .toLowerCase()
@@ -349,7 +380,7 @@ const PatientDashboard = () => {
                           <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full shrink-0 ${
                             appointment.status === 'CONFIRMED'
                               ? 'bg-green-100 text-green-700'
-                              : appointment.status === 'PENDING'
+                              : appointment.status === 'PENDING' || appointment.status === 'SCHEDULED'
                               ? 'bg-yellow-100 text-yellow-700'
                               : 'bg-gray-100 text-gray-600'
                           }`}>
