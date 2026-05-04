@@ -42,9 +42,19 @@ const FitToMarkers = ({ points = [] }) => {
   return null;
 };
 
-const LiveMap = ({ userLocation, ambulances = [], chws = [], view = 'all', className = '' }) => {
-
+const LiveMap = ({
+  userLocation,
+  ambulances = [],
+  chws = [],
+  view = 'all',
+  className = '',
+  primaryLabel = 'Patient Location',
+  primaryIcon = patientIcon,
+  showPrimaryMarker = true,
+  fallbackCenter = null,
+}) => {
   const patientPoint = toPoint(userLocation);
+  const fallbackPoint = toPoint(fallbackCenter);
 
   const validAmbulances = ambulances
     .map((ambulance) => ({
@@ -63,11 +73,14 @@ const LiveMap = ({ userLocation, ambulances = [], chws = [], view = 'all', class
   const showAmbulances = view === 'all' || view === 'ambulance' || !view;
   const showChws = view === 'all' || view === 'chw' || !view;
 
-  const mapPoints = [patientPoint].filter(Boolean);
+  const mapPoints = [];
+  if (showPrimaryMarker && patientPoint) mapPoints.push(patientPoint);
   if (showAmbulances) mapPoints.push(...validAmbulances.map((row) => row.point));
   if (showChws) mapPoints.push(...validChws.map((row) => row.point));
 
-  if (!patientPoint) {
+  const initialCenter = patientPoint || fallbackPoint || mapPoints[0] || null;
+
+  if (!initialCenter) {
     return (
       <div className={`flex items-center justify-center h-full text-gray-500 ${className}`}>
         Loading map...
@@ -78,7 +91,7 @@ const LiveMap = ({ userLocation, ambulances = [], chws = [], view = 'all', class
   return (
     <div className={`live-map-shell relative z-0 ${className}`}>
       <MapContainer
-        center={[patientPoint.lat, patientPoint.lng]}
+        center={[initialCenter.lat, initialCenter.lng]}
         zoom={13}
         className="z-0"
         style={{ height: '100%', width: '100%' }}
@@ -90,14 +103,16 @@ const LiveMap = ({ userLocation, ambulances = [], chws = [], view = 'all', class
 
         <FitToMarkers points={mapPoints} />
 
-        <Marker position={[patientPoint.lat, patientPoint.lng]} icon={patientIcon}>
-          <Popup>
-            <div className="text-sm">
-              <p className="font-semibold">Patient Location</p>
-              <p>{formatPoint(patientPoint)}</p>
-            </div>
-          </Popup>
-        </Marker>
+        {showPrimaryMarker && patientPoint && (
+          <Marker position={[patientPoint.lat, patientPoint.lng]} icon={primaryIcon}>
+            <Popup>
+              <div className="text-sm">
+                <p className="font-semibold">{primaryLabel}</p>
+                <p>{formatPoint(patientPoint)}</p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
 
         {showAmbulances &&
           validAmbulances.map((ambulance) => (

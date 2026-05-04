@@ -64,6 +64,7 @@ import EditDriverModal from './AmbulanceManagement/modals/EditDriverModal';
 import MoreOptionsDriverModal from './AmbulanceManagement/modals/MoreOptionsDriverModal';
 import MoreOptionsModal from './AmbulanceManagement/modals/MoreOptionsModal';
 import Pagination from '../../Components/Admin/Pagination';
+import { Loader } from '@googlemaps/js-api-loader';
 import { ambulanceService } from '../../Services/domain/ambulanceService.js';
 import { hospitalService } from '../../Services/domain/hospitalService.js';
 
@@ -178,7 +179,16 @@ const buildCsv = (rows = []) => rows
   }).join(','))
   .join('\n');
 
+let mapsLoaderInstance = null;
+const getMapsLoader = (apiKey) => {
+  if (!mapsLoaderInstance) {
+    mapsLoaderInstance = new Loader({ apiKey, libraries: ['marker', 'geocoding'] });
+  }
+  return mapsLoaderInstance;
+};
+
 const AUTO_REFRESH_INTERVAL_MS = 60000;
+const DEFAULT_TRACKING_CENTER = { lat: -1.5305180166278827, lng: 37.26242921919778 };
 
 const toSignature = (value) => {
   try {
@@ -532,6 +542,248 @@ const normalizeTrackingMap = (payload = [], ambulances = []) => {
   return trackingMap;
 };
 
+const resolveAmbulanceCoords = (ambulance, trackingRow) => {
+  const lat = toNumberOrNull(
+    trackingRow?.latitude
+    ?? trackingRow?.currentLatitude
+    ?? ambulance?.currentLatitude
+    ?? ambulance?.latitude
+    ?? ambulance?.backend?.currentLatitude
+    ?? ambulance?.backend?.latitude
+    ?? ambulance?.backend?.locationLatitude
+    ?? ambulance?.backend?.lat
+  );
+  const lng = toNumberOrNull(
+    trackingRow?.longitude
+    ?? trackingRow?.currentLongitude
+    ?? ambulance?.currentLongitude
+    ?? ambulance?.longitude
+    ?? ambulance?.backend?.currentLongitude
+    ?? ambulance?.backend?.longitude
+    ?? ambulance?.backend?.locationLongitude
+    ?? ambulance?.backend?.lng
+  );
+  if (lat === null || lng === null) return null;
+  return { lat, lng };
+};
+
+const resolveAmbulanceLocationLabel = (ambulance, trackingRow, coords) => {
+  const label = trackingRow?.locationAddress
+    || ambulance?.locationAddress
+    || ambulance?.currentLocation
+    || ambulance?.location
+    || ambulance?.backend?.locationAddress
+    || ambulance?.backend?.currentLocation
+    || ambulance?.backend?.location
+    || '';
+  if (label) return label;
+  if (coords) return `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+  return '';
+};
+
+const AdminGoogleMap = ({ ambulances = [], className = '', style = {}, fallbackCenter = DEFAULT_TRACKING_CENTER }) => {
+  const mapRef = useRef(null);
+  const containerRef = useRef(null);
+  const markersRef = useRef([]);
+  const [mapReady, setMapReady] = useState(false);
+  const [loadError, setLoadError] = useState('');
+
+  const apiKey =
+    import.meta?.env?.VITE_GOOGLE_CLOUD_MAPS_API_KEY ||
+    document.querySelector('meta[name="google-maps-api-key"]')?.getAttribute('content') ||
+    import.meta?.env?.GOOGLE_CLOUD_MAPS_API_KEY ||
+    null;
+
+  const rawMapId = import.meta?.env?.VITE_GOOGLE_MAPS_MAP_ID || null;
+  const mapId = rawMapId && !/^%.*%$/.test(String(rawMapId).trim()) ? String(rawMapId).trim() : null;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const initMap = async () => {
+      if (typeof window === 'undefined') return;
+      if (!containerRef.current) return;
+      if (!apiKey) {
+        setLoadError('Google Maps API key is not defined');
+        return;
+      }
+
+      try {
+        const loader = getMapsLoader(apiKey);
+        await loader.load();
+        if (cancelled) return;
+        if (!window.google?.maps) {
+          setLoadError('Google Maps loaded but window.google.maps is missing');
+          return;
+        }
+
+        const maps = window.google.maps;
+        mapRef.current = new maps.Map(containerRef.current, {
+          center: fallbackCenter,
+          zoom: 12,
+          ...(mapId ? { mapId } : {}),
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+        setLoadError('');
+        setMapReady(true);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('AdminGoogleMap: init failed', err);
+          setLoadError(String(err?.message || 'Failed to load Google Maps'));
+        }
+      }
+    };
+
+    initMap();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiKey, fallbackCenter, mapId]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+
+    markersRef.current.forEach((marker) => {
+      if (typeof marker?.setMap === 'function') marker.setMap(null);
+      else if ('map' in (marker ?? {})) marker.map = null;
+    });
+    markersRef.current = [];
+
+    const maps = window.google?.maps;
+    if (!maps) return;
+
+    const canUseAdvanced = Boolean(mapId && window.google?.maps?.marker?.AdvancedMarkerElement);
+    const allPoints = [];
+
+    const makeDomMarker = (bgColor, label) => {
+      const el = document.createElement('div');
+      el.style.cssText = [
+        'width:40px',
+        'height:40px',
+        'border-radius:50%',
+        `background:${bgColor}`,
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'color:#fff',
+        'font-weight:900',
+        'font-size:14px',
+        'border:2px solid #fff',
+        'box-shadow:0 2px 8px rgba(0,0,0,.30)',
+        'cursor:pointer',
+      ].join(';');
+      el.textContent = label;
+      return el;
+    };
+
+    const makeSvgUrl = (label, color) => {
+      const safeColor = String(color || '#dc2626').startsWith('#')
+        ? String(color || '#dc2626')
+        : `#${String(color || 'dc2626').replace(/^%23/, '')}`;
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='${safeColor}' stroke='%23fff' stroke-width='3'/><text x='28' y='36' font-size='22' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='900'>${label}</text></svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    };
+
+    const placeMarker = ({ lat, lng, title, infoHtml, color, label = 'A' }) => {
+      const infoWindow = new maps.InfoWindow({ content: infoHtml });
+      const domEl = makeDomMarker(color, label);
+
+      if (canUseAdvanced) {
+        const marker = new window.google.maps.marker.AdvancedMarkerElement({
+          map,
+          position: { lat, lng },
+          content: domEl,
+        });
+        marker.addEventListener('gmp-click', () => infoWindow.open({ anchor: marker, map }));
+        markersRef.current.push(marker);
+      } else {
+        const marker = new maps.Marker({
+          map,
+          position: { lat, lng },
+          icon: { url: makeSvgUrl(label, color), scaledSize: new maps.Size(56, 56) },
+          title,
+        });
+        marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
+        markersRef.current.push(marker);
+      }
+    };
+
+    ambulances.forEach((ambulance) => {
+      const lat = toNumberOrNull(ambulance?.location?.lat);
+      const lng = toNumberOrNull(ambulance?.location?.lng);
+      if (lat === null || lng === null) return;
+
+      allPoints.push({ lat, lng });
+      const isAvailable = ambulance.available ?? (String(ambulance.status || '').toUpperCase() === 'AVAILABLE');
+      const color = isAvailable ? '#dc2626' : '#9ca3af';
+      const locationLabel = ambulance.locationLabel
+        || ambulance.locationAddress
+        || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      const typeLabel = String(ambulance.type || 'Ambulance').replace(/_/g, ' ');
+      const distanceLabel = ambulance.distance || 'N/A';
+      const etaLabel = ambulance.eta || 'N/A';
+      const infoHtml = `
+        <div style="padding:6px 8px;min-width:220px;max-width:320px;font-family:Arial,Helvetica,sans-serif;">
+          <p style="font-weight:700;margin:0 0 6px">${ambulance.vehicleId || ambulance.name || 'Ambulance'}</p>
+          <p style="margin:0 0 4px;color:#444;font-size:13px">${typeLabel}</p>
+          <p style="margin:0 0 4px;color:#444;font-size:13px">Location: ${locationLabel || 'Unknown location'}</p>
+          <p style="margin:0 0 4px;color:#444;font-size:13px">Distance: ${distanceLabel}</p>
+          <p style="margin:0 0 4px;color:#444;font-size:13px">ETA: ${etaLabel}</p>
+          <p style="margin:0;font-weight:600;color:${isAvailable ? '#16a34a' : '#9ca3af'}">
+            ${isAvailable ? '● Available' : '● Unavailable'}
+          </p>
+        </div>`;
+
+      placeMarker({
+        lat,
+        lng,
+        title: ambulance.vehicleId || ambulance.name || 'Ambulance',
+        infoHtml,
+        color,
+        label: 'A',
+      });
+    });
+
+    if (allPoints.length === 1) {
+      map.setCenter({ lat: allPoints[0].lat, lng: allPoints[0].lng });
+      map.setZoom(13);
+    } else if (allPoints.length > 1) {
+      const bounds = new maps.LatLngBounds();
+      allPoints.forEach((point) => bounds.extend(new maps.LatLng(point.lat, point.lng)));
+      map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
+    } else {
+      map.setCenter(fallbackCenter);
+      map.setZoom(12);
+    }
+
+    return () => {
+      markersRef.current.forEach((marker) => {
+        if (typeof marker?.setMap === 'function') marker.setMap(null);
+        else if ('map' in (marker ?? {})) marker.map = null;
+      });
+      markersRef.current = [];
+    };
+  }, [ambulances, fallbackCenter, mapId, mapReady]);
+
+  return (
+    <div className={className} style={{ position: 'relative', ...style }}>
+      <div ref={containerRef} style={{ height: '100%', width: '100%', background: '#f0f4f8' }} />
+      {loadError && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div className="bg-white/90 border border-gray-200 px-4 py-2 text-sm text-red-600 pointer-events-auto shadow">
+            <div className="font-semibold">Map error</div>
+            <div>{loadError}</div>
+            <div className="text-xs text-gray-500 mt-1">Ensure <code>VITE_GOOGLE_CLOUD_MAPS_API_KEY</code> is set and the dev server was restarted.</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const normalizeHospitalOption = (row = {}) => ({
   id: row.id,
   name: row.name || row.hospitalName || row.code || `Hospital ${row.id || ''}`.trim(),
@@ -707,6 +959,47 @@ const AmbulanceManagement = () => {
     tracking: '',
     hospitals: '',
   });
+
+  const trackedAmbulances = useMemo(() => (
+    ambulances
+      .map((ambulance) => {
+        const vehicleKey = ambulance.vehicleNumber || ambulance.vehiclePlate || ambulance.id;
+        const trackingRow =
+          trackingData[vehicleKey]
+          || trackingData[ambulance.vehiclePlate]
+          || trackingData[String(ambulance.id || '')];
+        const coords = resolveAmbulanceCoords(ambulance, trackingRow);
+        if (!coords) return null;
+
+        const typeLabel = String(ambulance.type || 'Ambulance').replace(/_/g, ' ');
+        const locationLabel = resolveAmbulanceLocationLabel(ambulance, trackingRow, coords);
+        const available = String(ambulance.status || '').toUpperCase() === 'AVAILABLE';
+        const eta = trackingRow?.speed > 0
+          ? `${Math.max(1, Math.round(60 / Math.max(trackingRow.speed, 1)))} min`
+          : (ambulance.averageResponseTime || 'N/A');
+
+        return {
+          id: vehicleKey,
+          vehicleId: vehicleKey,
+          name: ambulance.vehiclePlate || vehicleKey,
+          driverName: ambulance.currentDriver || ambulance.driverName || 'Unassigned',
+          status: ambulance.status,
+          available,
+          type: typeLabel,
+          distance: 'N/A',
+          speed: trackingRow?.speed,
+          heading: trackingRow?.heading,
+          batteryLevel: trackingRow?.batteryLevel,
+          signalStrength: trackingRow?.signalStrength,
+          eta,
+          locationAddress: locationLabel,
+          locationLabel,
+          lastUpdate: trackingRow?.lastUpdate,
+          location: coords,
+        };
+      })
+      .filter(Boolean)
+  ), [ambulances, trackingData]);
 
   const resetDispatchForm = useCallback(() => {
     setDispatchForm({
@@ -1754,7 +2047,7 @@ const AmbulanceManagement = () => {
                 }`}
               >
                 <Target className="w-4 h-4 inline mr-2" />
-                Live Tracking ({Object.keys(trackingData).length})
+                Live Tracking ({trackedAmbulances.length})
               </button>
             
             </div> 
@@ -2350,27 +2643,26 @@ const AmbulanceManagement = () => {
                         Real-time Updates
                       </div>
                     </div>
-                    <button className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center text-sm">
+                    <button
+                      onClick={() => refreshDashboardData({ silent: true })}
+                      className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center text-sm"
+                    >
                       <RefreshCw className="w-3 h-3 mr-1.5" />
                       Refresh Map
                     </button>
                   </div>
                 </div>
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d277.7549826743736!2d37.26242921919778!3d-1.5305180166278827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f87eeedd7e1cd%3A0x2bb0f6a2ec4c7859!2sMachakos%20University%20Administration!5e0!3m2!1sen!2ske!4v1774964157029!5m2!1sen!2ske"
-                      width="100%"
-                      height="260"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Supervisor Coverage Map"
-                    />
+                <div className="h-[460px]">
+                  <AdminGoogleMap
+                    className="h-full w-full"
+                    ambulances={trackedAmbulances}
+                  />
+                </div>
               </div>
 
               {/* Live Tracking Table */}
               <div className="bg-white shadow overflow-x-auto">
-                {Object.keys(trackingData).length === 0 ? (
+                {trackedAmbulances.length === 0 ? (
                   <div className="p-12 text-center">
                     <Navigation className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Tracking</h3>
@@ -2392,45 +2684,34 @@ const AmbulanceManagement = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.entries(trackingData).map(([vehicleId, data]) => {
-                        const ambulance = ambulances.find(a => a.vehicleNumber === vehicleId);
-                        if (!ambulance) return null;
-                        const trackingExtraFields = getExtraFields(data.backend, [
-                          'ambulanceId',
-                          'vehiclePlate',
-                          'ambulanceVehiclePlate',
-                          'latitude',
-                          'currentLatitude',
-                          'longitude',
-                          'currentLongitude',
-                          'speed',
-                          'heading',
-                          'batteryLevel',
-                          'signalStrength',
-                          'timestamp',
-                          'updatedAt',
-                          'createdAt',
-                          'route',
-                          'routeHistory',
-                          'locationAddress',
-                          'currentLocation',
-                          'connectionStatus',
-                          'networkStatus',
-                        ]);
+                      {trackedAmbulances.map((ambulance) => {
+                        const vehicleId = ambulance.vehicleId || ambulance.name || 'N/A';
+                        const speed = Number.isFinite(ambulance.speed) ? ambulance.speed : 0;
+                        const heading = Number.isFinite(ambulance.heading) ? ambulance.heading : 0;
+                        const signalStrength = Number.isFinite(ambulance.signalStrength)
+                          ? ambulance.signalStrength
+                          : 0;
+                        const locationLabel = ambulance.locationLabel || ambulance.locationAddress || 'Location unavailable';
+                        const coords = ambulance.location
+                          ? `${ambulance.location.lat.toFixed(4)}, ${ambulance.location.lng.toFixed(4)}`
+                          : 'N/A';
+                        const lastUpdateLabel = ambulance.lastUpdate
+                          ? formatDateTime(ambulance.lastUpdate)
+                          : 'N/A';
 
                         return (
-                          <tr key={vehicleId} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                          <tr key={ambulance.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                             {/* Vehicle ID */}
                             <td className="px-4 py-4">
                               <div className="font-semibold text-gray-900">{vehicleId}</div>
-                              <div className="text-xs text-gray-500">{ambulance.vehiclePlate}</div>
+                              <div className="text-xs text-gray-500">{ambulance.name || ambulance.vehicleId || 'Ambulance'}</div>
                             </td>
 
                             {/* Driver */}
                             <td className="px-4 py-4">
                               <div className="flex items-center">
                                 <UserCheck className="w-4 h-4 mr-1.5 text-gray-400" />
-                                <span className="text-gray-700">{ambulance.currentDriver}</span>
+                                <span className="text-gray-700">{ambulance.driverName || 'Unassigned'}</span>
                               </div>
                             </td>
 
@@ -2439,7 +2720,7 @@ const AmbulanceManagement = () => {
                               <div className="flex items-center">
                                 {getStatusIcon(ambulance.status)}
                                 <span className={`ml-1.5 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(ambulance.status)}`}>
-                                  {ambulance.status.replace('_', ' ').toUpperCase()}
+                                  {String(ambulance.status || 'UNKNOWN').replace(/_/g, ' ').toUpperCase()}
                                 </span>
                               </div>
                             </td>
@@ -2450,10 +2731,10 @@ const AmbulanceManagement = () => {
                                 <MapPin className="w-4 h-4 mr-1.5 mt-0.5 text-gray-400 flex-shrink-0" />
                                 <div>
                                   <div className="text-xs text-gray-700 font-medium">
-                                    {data.latitude.toFixed(4)}, {data.longitude.toFixed(4)}
+                                    {coords}
                                   </div>
                                   <div className="text-xs text-gray-500 mt-0.5">
-                                    {data.locationAddress || ambulance.location}
+                                    {locationLabel}
                                   </div>
                                 </div>
                               </div>
@@ -2464,11 +2745,11 @@ const AmbulanceManagement = () => {
                               <div className="space-y-1">
                                 <div className="flex items-center text-xs">
                                   <Zap className="w-3 h-3 mr-1 text-blue-500" />
-                                  <span className="font-medium text-gray-900">{data.speed.toFixed(0)} km/h</span>
+                                  <span className="font-medium text-gray-900">{speed.toFixed(0)} km/h</span>
                                 </div>
                                 <div className="flex items-center text-xs text-gray-600">
                                   <Compass className="w-3 h-3 mr-1 text-gray-400" />
-                                  <span>{data.heading.toFixed(0)}°</span>
+                                  <span>{heading.toFixed(0)}°</span>
                                 </div>
                               </div>
                             </td>
@@ -2480,13 +2761,13 @@ const AmbulanceManagement = () => {
                                   {[1,2,3,4].map(bar => (
                                     <div 
                                       key={bar}
-                                      className={`w-1 h-3 rounded ${bar <= data.signalStrength ? 'bg-green-500' : 'bg-gray-300'}`}
+                                      className={`w-1 h-3 rounded ${bar <= signalStrength ? 'bg-green-500' : 'bg-gray-300'}`}
                                     ></div>
                                   ))}
                                 </div>
                                 <div className="flex items-center text-xs text-gray-600">
                                   <Wifi className="w-3 h-3 mr-1" />
-                                  {String(data.connectionStatus || 'CONNECTED').replace(/_/g, ' ')}
+                                  {signalStrength > 0 ? 'CONNECTED' : 'UNKNOWN'}
                                 </div>
                               </div>
                             </td>
@@ -2495,32 +2776,14 @@ const AmbulanceManagement = () => {
                             <td className="px-4 py-4">
                               <div className="flex items-center text-xs text-gray-600">
                                 <Clock className="w-3 h-3 mr-1" />
-                                <span>{data.lastUpdate.toLocaleTimeString()}</span>
+                                <span>{lastUpdateLabel}</span>
                               </div>
                             </td>
 
                             {/* Recent Route */}
                             <td className="px-4 py-4">
-                              <div className="space-y-1 max-w-xs">
-                                {data.route.slice(-3).map((point, index) => (
-                                  <div key={index} className="flex items-center text-xs text-gray-600">
-                                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1.5 flex-shrink-0"></div>
-                                    <span className="truncate">{point.timestamp} - {point.lat.toFixed(4)}, {point.lng.toFixed(4)}</span>
-                                  </div>
-                                ))}
-                                {trackingExtraFields.length > 0 && (
-                                  <details className="mt-2">
-                                    <summary className="cursor-pointer text-xs text-blue-700">More details</summary>
-                                    <div className="mt-1 max-h-32 overflow-auto rounded bg-gray-50 p-2 text-[10px]">
-                                      {trackingExtraFields.map(([key, value]) => (
-                                        <div key={key} className="mb-1 text-gray-700">
-                                          <span className="font-semibold">{formatFieldLabel(key)}:</span>{' '}
-                                          <span className="whitespace-pre-wrap break-words">{formatFieldValue(value)}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </details>
-                                )}
+                              <div className="space-y-1 max-w-xs text-xs text-gray-600">
+                                N/A
                               </div>
                             </td>
 
