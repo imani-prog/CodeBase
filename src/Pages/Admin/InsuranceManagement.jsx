@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { 
   Shield, 
   Users, 
@@ -44,6 +44,127 @@ import {
   Bell,
   MessageSquare
 } from 'lucide-react';
+import { insuranceService } from '../../Services/domain/insuranceService.js';
+
+const normalizeToArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.items)) return payload.items;
+  return [];
+};
+
+const asNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizeId = (value) => (value === null || value === undefined ? '' : String(value));
+
+const formatDate = (value) => {
+  if (!value) return 'N/A';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toISOString().slice(0, 10);
+};
+
+const formatTitle = (value) => {
+  if (!value) return 'Unknown';
+  return String(value)
+    .replace(/[_-]/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const mapProviderFromApi = (provider) => ({
+  id: provider.id || provider.provider_id,
+  name: provider.name || provider.providerName || provider.provider_name || `Provider ${provider.id || provider.provider_id}`,
+  type: provider.type
+    ? formatTitle(provider.type)
+    : (provider.isGovernment || /sha|nhif|authority/i.test(provider.name || '') ? 'Government' : 'Private'),
+  logo: provider.logo || '',
+  status: formatTitle(provider.status || provider.provider_status || 'Active'),
+  patients: asNumber(provider.patients || provider.activePatients || provider.patientCount),
+  coverage: provider.coverage || provider.description || provider.notes || 'Medical Insurance Coverage',
+  claimsProcessed: asNumber(provider.claimsProcessed || provider.claimCount || provider.processedClaims),
+  totalAmount: asNumber(provider.totalAmount || provider.totalClaimsAmount || provider.claimedAmount || provider.claimed_amount),
+  contactPerson: provider.contactPerson || provider.primaryContactName || provider.claimsContactPerson || 'Provider Desk',
+  phone: provider.phone || provider.supportPhone || provider.support_phone || provider.claims_submission_phone || 'Not Provided',
+  email: provider.email || provider.supportEmail || provider.support_email || provider.claims_submission_email || 'Not Provided',
+  policyTypes: normalizeToArray(provider.policyTypes || provider.planTypes || provider.supported_plans || provider.supportedPlans),
+  ambulanceCover: Boolean(provider.ambulanceCover || provider.emergencyCover || provider.ambulanceCoverage),
+  coveragePercentage: asNumber(provider.coveragePercentage || provider.coverPercent || provider.coverageRate, 80),
+  averageProcessingTime: provider.averageProcessingTime || provider.processingTime || '7 days',
+  addressLine1: provider.addressLine1 || provider.address_line1 || '',
+  addressLine2: provider.addressLine2 || provider.address_line2 || '',
+  city: provider.city || '',
+  country: provider.country || '',
+  website: provider.website || provider.provider_portal_url || provider.providerPortalUrl || '',
+});
+
+const mapPolicyFromApi = (policy, providersById) => {
+  const providerId = policy.providerId || policy.provider_id || policy.insuranceProviderId || policy.insurance_provider_id || policy.provider?.id;
+  const providerName = providersById.get(normalizeId(providerId))?.name || policy.providerName || policy.provider_name || policy.provider || 'Unknown Provider';
+  const coverageAmount = asNumber(policy.coverageAmount || policy.coverage_amount || policy.coverage || policy.maxCoverageAmount || policy.max_coverage_amount || policy.annualLimit || policy.annual_limit);
+  const usedAmount = asNumber(policy.usedAmount || policy.used_amount || policy.usedCoverage || policy.used_coverage || policy.consumedAmount || policy.consumed_amount || policy.claimedAmount || policy.claimed_amount);
+  const remainingAmount = Math.max(coverageAmount - usedAmount, 0);
+
+  return {
+    id: policy.id,
+    policyHolder: policy.policyHolder || policy.policy_holder || policy.patientName || policy.patient_name || policy.memberName || policy.member_name || 'Not Assigned',
+    patientName: policy.patientName || policy.patient_name || policy.policyHolder || policy.policy_holder || policy.memberName || policy.member_name || 'Not Assigned',
+    patientId: policy.patientId || policy.patient_id || policy.memberNumber || policy.member_number || policy.patient?.id || 'N/A',
+    insuranceProvider: providerName,
+    policyNumber: policy.policyNumber || policy.policy_number || policy.planCode || policy.plan_code || `POL-${policy.id ?? 'N/A'}`,
+    policyType: policy.policyType || policy.policy_type || policy.planName || policy.plan_name || policy.type || 'General',
+    coverageAmount,
+    usedAmount,
+    remainingAmount,
+    status: formatTitle(policy.status || 'Active'),
+    renewalDate: formatDate(policy.expiryDate || policy.expiry_date || policy.renewalDate || policy.renewal_date || policy.validUntil || policy.valid_until || policy.endDate || policy.end_date),
+    dependents: asNumber(policy.dependents || policy.beneficiaries || policy.beneficiaries_count || 1, 1),
+    lastClaim: formatDate(policy.lastClaimDate || policy.last_claim_date),
+    claimAmount: asNumber(policy.lastClaimAmount || policy.last_claim_amount),
+    category: policy.category || 'Individual',
+    type: policy.type || policy.policyType || policy.policy_type || policy.planName || policy.plan_name || 'Comprehensive',
+    provider: providerName,
+    premium: asNumber(policy.premium || policy.monthlyPremium || policy.monthly_premium || policy.annualPremium || policy.annual_premium),
+    coverage: coverageAmount,
+    startDate: formatDate(policy.startDate || policy.start_date || policy.effectiveDate || policy.effective_date || policy.validFrom || policy.valid_from),
+    expiryDate: formatDate(policy.expiryDate || policy.expiry_date || policy.validUntil || policy.valid_until || policy.endDate || policy.end_date),
+    beneficiaries: asNumber(policy.beneficiaries || policy.beneficiaries_count || policy.dependents || 1, 1),
+    claims: asNumber(policy.claims || policy.claimCount || policy.claim_count),
+  };
+};
+
+const mapClaimFromApi = (claim, providersById) => {
+  const providerId = claim.providerId || claim.provider_id || claim.insuranceProviderId || claim.insurance_provider_id || claim.provider?.id;
+  const providerName = providersById.get(normalizeId(providerId))?.name || claim.providerName || claim.provider_name || claim.insuranceProvider || claim.insurance_provider || 'Unknown Provider';
+  const claimAmount = asNumber(claim.claimedAmount || claim.claimed_amount || claim.claimAmount || claim.claim_amount || claim.amount);
+  const approvedAmountRaw = asNumber(claim.approvedAmount || claim.approved_amount || claim.paidAmount || claim.paid_amount || claim.settledAmount || claim.settled_amount);
+  const resolvedStatus = formatTitle(claim.status || 'Pending');
+  const approvedAmount = approvedAmountRaw > 0 ? approvedAmountRaw : (resolvedStatus === 'Approved' ? claimAmount : 0);
+
+  return {
+    id: claim.id,
+    claimNumber: claim.claimNumber || claim.claim_number || `CLM-${claim.id ?? 'N/A'}`,
+    patientName: claim.patientName || claim.patient_name || claim.patient?.name || claim.memberName || claim.member_name || 'Unknown Patient',
+    patientId: claim.patientId || claim.patient_id || claim.patient?.id || claim.memberNumber || claim.member_number || 'N/A',
+    insuranceProvider: providerName,
+    claimType: claim.claimType || claim.claim_type || claim.serviceType || claim.service_type || 'General',
+    claimAmount,
+    approvedAmount,
+    status: resolvedStatus,
+    submissionDate: formatDate(claim.submissionDate || claim.submission_date || claim.createdAt || claim.created_at),
+    processingTime: claim.processingTime || 'N/A',
+    diagnosis: claim.diagnosis || claim.reason || claim.rejectionReason || claim.rejection_reason || 'N/A',
+    hospital: claim.hospital || claim.facilityName || 'N/A',
+    responseDate: formatDate(claim.responseDate || claim.response_date || claim.updatedAt || claim.updated_at),
+    billingId: claim.billingId || claim.billing_id || null,
+    patientResponsibility: asNumber(claim.patientResponsibility || claim.patient_responsibility),
+    rejectionReason: claim.rejectionReason || claim.rejection_reason || '',
+  };
+};
 
 const InsuranceManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -144,258 +265,120 @@ const InsuranceManagement = () => {
   const [showDownloadPolicyModal, setShowDownloadPolicyModal] = useState(false);
   const [policyToDownload, setPolicyToDownload] = useState(null);
 
-  // Sample data for Kenyan insurance context
-  const insuranceOverview = {
-    totalProviders: 8,
-    activePatients: 2347,
-    totalCoverage: 45670000, // KES
-    claimsProcessed: 1289,
-    pendingClaims: 67,
-    rejectedClaims: 23,
-    averageClaimAmount: 8500,
-    ambulanceCoverage: 89.5,
-    monthlyPremiums: 2890000
-  };
+  const [insuranceProviders, setInsuranceProviders] = useState([]);
+  const [patientCoverage, setPatientCoverage] = useState([]);
+  const [claimsData, setClaimsData] = useState([]);
+  const [policiesData, setPoliciesData] = useState([]);
+  const [ambulancePolicies, setAmbulancePolicies] = useState([]);
+  const [insuranceLoading, setInsuranceLoading] = useState(false);
+  const [insuranceError, setInsuranceError] = useState('');
 
-  const insuranceProviders = [
-    {
-      id: 1,
-      name: "Social Health Authority (SHA)",
-      type: "Government",
-      logo: "",
-      status: "Active",
-      patients: 1245,
-      coverage: "Universal Health Coverage",
-      claimsProcessed: 456,
-      totalAmount: 15670000,
-      contactPerson: "Dr. Sarah Mwangi",
-      phone: "+254-700-123456",
-      email: "claims@sha.go.ke",
-      policyTypes: ["UHC Basic", "UHC Plus", "Emergency Care"],
-      ambulanceCover: true,
-      coveragePercentage: 85,
-      averageProcessingTime: "7 days"
-    },
-    {
-      id: 2,
-      name: "National Hospital Insurance Fund (NHIF)",
-      type: "Government",
-      logo: "",
-      status: "Active",
-      patients: 867,
-      coverage: "National Health Insurance",
-      claimsProcessed: 312,
-      totalAmount: 12450000,
-      contactPerson: "Mr. Peter Kiprotich",
-      phone: "+254-700-789012",
-      email: "claims@nhif.or.ke",
-      policyTypes: ["Inpatient", "Outpatient", "Maternity", "Chronic Disease"],
-      ambulanceCover: true,
-      coveragePercentage: 80,
-      averageProcessingTime: "10 days"
-    },
-    {
-      id: 3,
-      name: "AAR Insurance",
-      type: "Private",
-      logo: "",
-      status: "Active",
-      patients: 156,
-      coverage: "Comprehensive Health Insurance",
-      claimsProcessed: 89,
-      totalAmount: 8920000,
-      contactPerson: "Ms. Grace Wanjiku",
-      phone: "+254-700-345678",
-      email: "medical@aar.co.ke",
-      policyTypes: ["Individual", "Family", "Corporate", "Travel"],
-      ambulanceCover: true,
-      coveragePercentage: 90,
-      averageProcessingTime: "5 days"
-    },
-    {
-      id: 4,
-      name: "Jubilee Insurance",
-      type: "Private",
-      logo: "",
-      status: "Active",
-      patients: 78,
-      coverage: "Premium Health Plans",
-      claimsProcessed: 45,
-      totalAmount: 5670000,
-      contactPerson: "Dr. Michael Ochieng",
-      phone: "+254-700-456789",
-      email: "health@jubilee.co.ke",
-      policyTypes: ["Gold", "Silver", "Bronze", "Executive"],
-      ambulanceCover: true,
-      coveragePercentage: 95,
-      averageProcessingTime: "3 days"
-    },
-    {
-      id: 5,
-      name: "CIC Insurance",
-      type: "Private",
-      logo: "",
-      status: "Active",
-      patients: 234,
-      coverage: "Affordable Health Coverage",
-      claimsProcessed: 134,
-      totalAmount: 4560000,
-      contactPerson: "Ms. Betty Njeri",
-      phone: "+254-700-567890",
-      email: "medical@cic.co.ke",
-      policyTypes: ["Basic", "Standard", "Premium"],
-      ambulanceCover: false,
-      coveragePercentage: 75,
-      averageProcessingTime: "8 days"
-    }
-  ];
+  const insuranceOverview = useMemo(() => {
+    const pendingClaims = claimsData.filter((claim) => String(claim.status).toLowerCase() === 'pending').length;
+    const rejectedClaims = claimsData.filter((claim) => String(claim.status).toLowerCase() === 'rejected').length;
+    const totalClaimAmount = claimsData.reduce((sum, claim) => sum + asNumber(claim.claimAmount), 0);
+    const ambulanceProviders = insuranceProviders.filter((provider) => provider.ambulanceCover).length;
 
-  const patientCoverage = [
-    {
-      id: 1,
-      patientName: "John Mwangi",
-      patientId: "PT001",
-      insuranceProvider: "SHA",
-      policyNumber: "SHA/2024/001234",
-      policyType: "UHC Plus",
-      coverageAmount: 150000,
-      usedAmount: 45000,
-      remainingAmount: 105000,
-      status: "Active",
-      renewalDate: "2024-12-31",
-      dependents: 3,
-      lastClaim: "2024-09-15",
-      claimAmount: 12500
-    },
-    {
-      id: 2,
-      patientName: "Mary Achieng",
-      patientId: "PT002",
-      insuranceProvider: "NHIF",
-      policyNumber: "NHIF/2024/567890",
-      policyType: "Comprehensive",
-      coverageAmount: 100000,
-      usedAmount: 23000,
-      remainingAmount: 77000,
-      status: "Active",
-      renewalDate: "2024-11-30",
-      dependents: 2,
-      lastClaim: "2024-08-22",
-      claimAmount: 8700
-    },
-    {
-      id: 3,
-      patientName: "Peter Kimani",
-      patientId: "PT003",
-      insuranceProvider: "AAR Insurance",
-      policyNumber: "AAR/2024/112233",
-      policyType: "Family Plan",
-      coverageAmount: 300000,
-      usedAmount: 67000,
-      remainingAmount: 233000,
-      status: "Active",
-      renewalDate: "2025-01-15",
-      dependents: 4,
-      lastClaim: "2024-10-01",
-      claimAmount: 34500
-    }
-  ];
+    return {
+      totalProviders: insuranceProviders.length,
+      activePatients: patientCoverage.length || insuranceProviders.reduce((sum, provider) => sum + asNumber(provider.patients), 0),
+      totalCoverage: patientCoverage.reduce((sum, row) => sum + asNumber(row.coverageAmount), 0),
+      claimsProcessed: claimsData.length,
+      pendingClaims,
+      rejectedClaims,
+      averageClaimAmount: claimsData.length ? Math.round(totalClaimAmount / claimsData.length) : 0,
+      ambulanceCoverage: insuranceProviders.length ? Number(((ambulanceProviders / insuranceProviders.length) * 100).toFixed(1)) : 0,
+      monthlyPremiums: policiesData.reduce((sum, policy) => sum + asNumber(policy.premium), 0),
+    };
+  }, [claimsData, insuranceProviders, patientCoverage, policiesData]);
 
-  const [ambulancePolicies, setAmbulancePolicies] = useState([
-    {
-      id: 1,
-      vehicleNumber: "KCA 001A",
-      insuranceProvider: "AAR Insurance",
-      policyNumber: "AAR/AMB/2024/001",
-      policyType: "Comprehensive Commercial",
-      coverageAmount: 5000000,
-      premium: 45000,
-      deductible: 25000,
-      status: "Active",
-      expiryDate: "2024-12-15",
-      lastClaim: "2024-07-20",
-      claimAmount: 125000,
-      driversCovered: 3
-    },
-    {
-      id: 2,
-      vehicleNumber: "KCB 002B",
-      insuranceProvider: "Jubilee Insurance",
-      policyNumber: "JUB/AMB/2024/002",
-      policyType: "Third Party Plus",
-      coverageAmount: 3000000,
-      premium: 32000,
-      deductible: 20000,
-      status: "Active",
-      expiryDate: "2025-01-10",
-      lastClaim: "2024-05-15",
-      claimAmount: 85000,
-      driversCovered: 2
-    },
-    {
-      id: 3,
-      vehicleNumber: "KCC 003C",
-      insuranceProvider: "CIC Insurance",
-      policyNumber: "CIC/AMB/2024/003",
-      policyType: "Commercial Vehicle",
-      coverageAmount: 4000000,
-      premium: 38000,
-      deductible: 30000,
-      status: "Expiring Soon",
-      expiryDate: "2024-10-25",
-      lastClaim: "2024-09-10",
-      claimAmount: 95000,
-      driversCovered: 4
-    }
-  ]);
+  const loadInsuranceData = useCallback(async () => {
+    setInsuranceLoading(true);
+    setInsuranceError('');
+    try {
+      const providersResponse = await insuranceService.listProviders({ status: 'ACTIVE' });
+      const providerRows = normalizeToArray(providersResponse).map(mapProviderFromApi);
+      setInsuranceProviders(providerRows);
 
-  const claimsData = [
-    {
-      id: 1,
-      claimNumber: "CLM-2024-001",
-      patientName: "Sarah Wanjiku",
-      patientId: "PT045",
-      insuranceProvider: "SHA",
-      claimType: "Outpatient",
-      claimAmount: 15500,
-      approvedAmount: 13950,
-      status: "Approved",
-      submissionDate: "2024-10-01",
-      processingTime: "6 days",
-      diagnosis: "Hypertension Management",
-      hospital: "Kenyatta National Hospital"
-    },
-    {
-      id: 2,
-      claimNumber: "CLM-2024-002",
-      patientName: "David Kiprotich",
-      patientId: "PT067",
-      insuranceProvider: "NHIF",
-      claimType: "Emergency",
-      claimAmount: 45000,
-      approvedAmount: 36000,
-      status: "Processing",
-      submissionDate: "2024-10-08",
-      processingTime: "3 days",
-      diagnosis: "Cardiac Emergency",
-      hospital: "Aga Khan University Hospital"
-    },
-    {
-      id: 3,
-      claimNumber: "CLM-2024-003",
-      patientName: "Grace Njeri",
-      patientId: "PT089",
-      insuranceProvider: "AAR Insurance",
-      claimType: "Maternity",
-      claimAmount: 85000,
-      approvedAmount: 80750,
-      status: "Approved",
-      submissionDate: "2024-09-25",
-      processingTime: "4 days",
-      diagnosis: "Normal Delivery",
-      hospital: "Nairobi Hospital"
+      const providerIds = providerRows.map((provider) => provider.id).filter(Boolean);
+      const providerMap = new Map(providerRows.map((provider) => [normalizeId(provider.id), provider]));
+
+      let policySource = [];
+      if (providerIds.length > 0) {
+        const groupedPolicies = await Promise.all(
+          providerIds.map(async (providerId) => {
+            const [providerPolicies, providerPlans] = await Promise.all([
+              insuranceService.listPoliciesByProvider(providerId).catch(() => []),
+              insuranceService.listInsurancePlansByProvider(providerId).catch(() => []),
+            ]);
+            return [...normalizeToArray(providerPolicies), ...normalizeToArray(providerPlans)]
+              .map((row) => ({ ...row, providerId: row.providerId || providerId }));
+          }),
+        );
+        policySource = groupedPolicies.flat();
+      }
+
+      if (policySource.length === 0) {
+        const activePolicies = await insuranceService.listActivePoliciesInRange({}).catch(() => []);
+        policySource = normalizeToArray(activePolicies);
+      }
+
+      const uniquePolicies = Array.from(
+        new Map(policySource.map((row) => [row.id || row.policyNumber || row.planCode, row])).values(),
+      );
+      const mappedPolicies = uniquePolicies.map((row) => mapPolicyFromApi(row, providerMap));
+      setPatientCoverage(mappedPolicies);
+      setPoliciesData(mappedPolicies);
+
+      let claimsSource = [];
+      if (providerIds.length > 0) {
+        const claimStatuses = ['PENDING', 'PROCESSING', 'APPROVED', 'REJECTED', 'SUBMITTED', 'PAID'];
+        const claimRequests = providerIds.flatMap((providerId) =>
+          claimStatuses.map((status) => insuranceService.listClaimsByProviderAndStatus(providerId, status).catch(() => [])),
+        );
+        const claimResponses = await Promise.all(claimRequests);
+        claimsSource = claimResponses.flatMap((response) => normalizeToArray(response));
+      }
+
+      const uniqueClaims = Array.from(
+        new Map(claimsSource.map((row) => [row.id || row.claimNumber || row.claim_number, row])).values(),
+      );
+      setClaimsData(uniqueClaims.map((row) => mapClaimFromApi(row, providerMap)));
+
+      const providerClaimStats = uniqueClaims.reduce((acc, claim) => {
+        const key = normalizeId(claim.providerId || claim.provider_id || claim.insuranceProviderId || claim.insurance_provider_id);
+        if (!key) return acc;
+        const existing = acc.get(key) || { count: 0, amount: 0 };
+        existing.count += 1;
+        existing.amount += asNumber(claim.claimedAmount || claim.claimed_amount || claim.claimAmount || claim.claim_amount || claim.amount);
+        acc.set(key, existing);
+        return acc;
+      }, new Map());
+
+      const enrichedProviders = providerRows.map((provider) => {
+        const stats = providerClaimStats.get(normalizeId(provider.id));
+        if (!stats) return provider;
+        return {
+          ...provider,
+          claimsProcessed: provider.claimsProcessed || stats.count,
+          totalAmount: provider.totalAmount || stats.amount,
+        };
+      });
+      setInsuranceProviders(enrichedProviders);
+    } catch (error) {
+      setInsuranceProviders([]);
+      setPatientCoverage([]);
+      setPoliciesData([]);
+      setClaimsData([]);
+      setInsuranceError(error?.message || 'Unable to load insurance data from backend.');
+    } finally {
+      setInsuranceLoading(false);
     }
-  ];
+  }, []);
+
+  useEffect(() => {
+    loadInsuranceData();
+  }, [loadInsuranceData]);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Shield },
@@ -417,7 +400,7 @@ const InsuranceManagement = () => {
   };
 
   const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
+    switch (String(status || '').toLowerCase()) {
       case 'active': return 'text-green-600';
       case 'processing': return 'text-yellow-600';
       case 'approved': return 'text-green-600';
@@ -427,6 +410,31 @@ const InsuranceManagement = () => {
       default: return 'text-gray-600';
     }
   };
+
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const selectedProviderNormalized = selectedProvider.toLowerCase();
+
+  const filteredProviders = insuranceProviders;
+
+  const filteredPatientCoverage = useMemo(() => {
+    return patientCoverage.filter((patient) => {
+      const matchesProvider = selectedProvider === 'all' || String(patient.insuranceProvider || '').toLowerCase() === selectedProviderNormalized;
+      const matchesSearch = !normalizedSearch || [patient.patientName, patient.patientId, patient.policyNumber]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(normalizedSearch));
+      return matchesProvider && matchesSearch;
+    });
+  }, [normalizedSearch, patientCoverage, selectedProvider, selectedProviderNormalized]);
+
+  const filteredPolicies = useMemo(() => {
+    return policiesData.filter((policy) => {
+      const matchesProvider = selectedProvider === 'all' || String(policy.provider || '').toLowerCase() === selectedProviderNormalized;
+      const matchesSearch = !normalizedSearch || [policy.policyNumber, policy.policyHolder, policy.provider]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(normalizedSearch));
+      return matchesProvider && matchesSearch;
+    });
+  }, [normalizedSearch, policiesData, selectedProvider, selectedProviderNormalized]);
 
   // ---------- Quick Action handlers ----------
 
@@ -448,13 +456,26 @@ const InsuranceManagement = () => {
     return errors;
   };
 
-  const handleAddProviderSubmit = (e) => {
+  const handleAddProviderSubmit = async (e) => {
     e.preventDefault();
     const errors = validateProvider();
     if (Object.keys(errors).length > 0) { setProviderErrors(errors); return; }
-    // In a real app: POST to API then refresh providers list
-    alert(`Provider "${newProvider.name}" added successfully!`);
-    setShowAddProviderModal(false);
+    try {
+      await insuranceService.createProvider({
+        name: newProvider.name,
+        email: newProvider.email,
+        phone: newProvider.phone,
+        status: 'ACTIVE',
+        notes: `Contact: ${newProvider.contactPerson}; Coverage: ${newProvider.coverage}`,
+      });
+      await loadInsuranceData();
+      setShowAddProviderModal(false);
+    } catch (error) {
+      setProviderErrors((prev) => ({
+        ...prev,
+        submit: error?.message || 'Unable to create provider.',
+      }));
+    }
   };
 
   const handleViewProvider = (provider) => {
@@ -479,12 +500,26 @@ const InsuranceManagement = () => {
     return errors;
   };
 
-  const handleEditProviderSubmit = (e) => {
+  const handleEditProviderSubmit = async (e) => {
     e.preventDefault();
     const errors = validateEditProvider();
     if (Object.keys(errors).length > 0) { setEditProviderErrors(errors); return; }
-    alert(`Provider "${editProvider.name}" updated successfully!`);
-    setShowEditProviderModal(false);
+    try {
+      await insuranceService.updateProvider(editProvider.id, {
+        name: editProvider.name,
+        email: editProvider.email,
+        phone: editProvider.phone,
+        status: String(editProvider.status || 'ACTIVE').toUpperCase(),
+        notes: `Contact: ${editProvider.contactPerson}; Coverage: ${editProvider.coverage}`,
+      });
+      await loadInsuranceData();
+      setShowEditProviderModal(false);
+    } catch (error) {
+      setEditProviderErrors((prev) => ({
+        ...prev,
+        submit: error?.message || 'Unable to update provider.',
+      }));
+    }
   };
 
   // Patient coverage modal handlers
@@ -894,7 +929,7 @@ const InsuranceManagement = () => {
             <Shield className="w-6 h-6 text-blue-600 mr-2" />
             <div>
               <p className="">Total Providers</p>
-              <p className="text-xl font-bold">{insuranceProviders.length}</p>
+              <p className="text-xl font-bold">{filteredProviders.length}</p>
             </div>
           </div>
         </div>
@@ -904,7 +939,7 @@ const InsuranceManagement = () => {
             <div>
               <p className="">Covered Patients</p>
               <p className="text-xl font-bold">
-                {insuranceProviders.reduce((sum, p) => sum + p.patients, 0).toLocaleString()}
+                {filteredProviders.reduce((sum, p) => sum + p.patients, 0).toLocaleString()}
               </p>
             </div>
           </div>
@@ -915,7 +950,7 @@ const InsuranceManagement = () => {
             <div>
               <p className="">Total Claims</p>
               <p className="text-xl font-bold">
-                {insuranceProviders.reduce((sum, p) => sum + p.claimsProcessed, 0).toLocaleString()}
+                {filteredProviders.reduce((sum, p) => sum + p.claimsProcessed, 0).toLocaleString()}
               </p>
             </div>
           </div>
@@ -926,7 +961,7 @@ const InsuranceManagement = () => {
             <div>
               <p className="">Total Amount</p>
               <p className="text-xl font-bold">
-                {formatCurrency(insuranceProviders.reduce((sum, p) => sum + p.totalAmount, 0))}
+                {formatCurrency(filteredProviders.reduce((sum, p) => sum + p.totalAmount, 0))}
               </p>
             </div>
           </div>
@@ -952,7 +987,7 @@ const InsuranceManagement = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {insuranceProviders.map((provider) => (
+            {filteredProviders.map((provider) => (
               <tr key={provider.id} className="hover:bg-blue-50/40 transition-colors">
                 <td className="px-3 py-2 max-w-[180px]">
                   <p className="font-semibold text-gray-800 leading-tight truncate">{provider.name}</p>
@@ -1064,10 +1099,9 @@ const InsuranceManagement = () => {
             onChange={(e) => setSelectedProvider(e.target.value)}
           >
             <option value="all">All Providers</option>
-            <option value="sha">SHA</option>
-            <option value="nhif">NHIF</option>
-            <option value="aar">AAR Insurance</option>
-            <option value="jubilee">Jubilee Insurance</option>
+            {insuranceProviders.map((provider) => (
+              <option key={provider.id} value={provider.name.toLowerCase()}>{provider.name}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -1091,8 +1125,10 @@ const InsuranceManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {patientCoverage.map((patient) => {
-                const remainingPct = Math.round((patient.remainingAmount / patient.coverageAmount) * 100);
+              {filteredPatientCoverage.map((patient) => {
+                const remainingPct = patient.coverageAmount > 0
+                  ? Math.round((patient.remainingAmount / patient.coverageAmount) * 100)
+                  : 0;
                 return (
                   <tr key={patient.id} className="hover:bg-blue-50/40 transition-colors">
                     <td className="px-3 py-2">
@@ -2080,8 +2116,7 @@ const InsuranceManagement = () => {
 
   const renderCreateInsurancePolicyModal = () => {
     if (!showCreateInsurancePolicyModal) return null;
-    const providerOptions = ['Jubilee Insurance', 'AAR Healthcare', 'Madison Insurance', 'CIC Insurance',
-      'Britam Insurance', 'Resolution Health', 'Social Health Authority (SHA)', 'UAP Old Mutual'];
+    const providerOptions = insuranceProviders.map((provider) => provider.name);
     const categoryOptions = ['Individual', 'Family', 'Corporate', 'Emergency'];
     const typeOptions = ['Comprehensive', 'Premium', 'Basic', 'Standard', 'Group', 'Critical Care'];
 
@@ -2332,8 +2367,7 @@ const InsuranceManagement = () => {
   const renderEditInsurancePolicyModal = () => {
     if (!showEditInsurancePolicyModal || !editInsurancePolicy) return null;
     const p = editInsurancePolicy;
-    const providerOptions = ['Jubilee Insurance', 'AAR Healthcare', 'Madison Insurance', 'CIC Insurance',
-      'Britam Insurance', 'Resolution Health', 'Social Health Authority (SHA)', 'UAP Old Mutual'];
+    const providerOptions = insuranceProviders.map((provider) => provider.name);
     const categoryOptions = ['Individual', 'Family', 'Corporate', 'Emergency'];
     const typeOptions = ['Comprehensive', 'Premium', 'Basic', 'Standard', 'Group', 'Critical Care'];
 
@@ -2558,24 +2592,23 @@ const InsuranceManagement = () => {
 
   // Render Policy Management Tab
   const renderPolicies = () => {
-    const policies = [
-      { id: 'POL-001', policyNumber: 'NHIF-2024-001', policyHolder: 'John Kamau', category: 'Individual', type: 'Comprehensive', provider: 'Jubilee Insurance', premium: 45000, coverage: 1500000, startDate: '2024-01-15', expiryDate: '2025-01-15', status: 'Active', beneficiaries: 1, claims: 3 },
-      { id: 'POL-002', policyNumber: 'AAR-2024-089', policyHolder: 'Mary Njeri', category: 'Family', type: 'Premium', provider: 'AAR Healthcare', premium: 85000, coverage: 3000000, startDate: '2024-02-20', expiryDate: '2025-02-20', status: 'Active', beneficiaries: 4, claims: 5 },
-      { id: 'POL-003', policyNumber: 'MED-2024-045', policyHolder: 'Peter Omondi', category: 'Individual', type: 'Basic', provider: 'Madison Insurance', premium: 28000, coverage: 800000, startDate: '2024-03-10', expiryDate: '2025-03-10', status: 'Active', beneficiaries: 1, claims: 2 },
-      { id: 'POL-004', policyNumber: 'CIC-2024-123', policyHolder: 'Tech Solutions Ltd', category: 'Corporate', type: 'Group', provider: 'CIC Insurance', premium: 450000, coverage: 10000000, startDate: '2024-01-01', expiryDate: '2025-01-01', status: 'Active', beneficiaries: 25, claims: 18 },
-      { id: 'POL-005', policyNumber: 'BRI-2024-067', policyHolder: 'Grace Muthoni', category: 'Family', type: 'Standard', provider: 'Britam Insurance', premium: 62000, coverage: 2000000, startDate: '2024-04-15', expiryDate: '2024-02-10', status: 'Expiring', beneficiaries: 3, claims: 4 },
-      { id: 'POL-006', policyNumber: 'JUB-2024-234', policyHolder: 'Samuel Kipchoge', category: 'Individual', type: 'Premium', provider: 'Jubilee Insurance', premium: 55000, coverage: 2500000, startDate: '2024-05-01', expiryDate: '2025-05-01', status: 'Active', beneficiaries: 1, claims: 1 },
-      { id: 'POL-007', policyNumber: 'AAR-2024-156', policyHolder: 'Jane Wambui', category: 'Family', type: 'Comprehensive', provider: 'AAR Healthcare', premium: 95000, coverage: 3500000, startDate: '2024-03-20', expiryDate: '2024-02-05', status: 'Expiring', beneficiaries: 5, claims: 7 },
-      { id: 'POL-008', policyNumber: 'EMG-2024-012', policyHolder: 'Dr. David Mutua', category: 'Emergency', type: 'Critical Care', provider: 'Resolution Health', premium: 120000, coverage: 5000000, startDate: '2024-06-01', expiryDate: '2025-06-01', status: 'Active', beneficiaries: 1, claims: 2 },
-      { id: 'POL-009', policyNumber: 'MED-2024-078', policyHolder: 'Sarah Achieng', category: 'Individual', type: 'Basic', provider: 'Madison Insurance', premium: 32000, coverage: 1000000, startDate: '2024-07-10', expiryDate: '2025-07-10', status: 'Active', beneficiaries: 1, claims: 0 },
-      { id: 'POL-010', policyNumber: 'CIC-2024-189', policyHolder: 'Green Valley School', category: 'Corporate', type: 'Group', provider: 'CIC Insurance', premium: 380000, coverage: 8000000, startDate: '2024-02-01', expiryDate: '2025-02-01', status: 'Active', beneficiaries: 42, claims: 12 }
-    ];
+    const policies = filteredPolicies;
+    const expiringSoon = policies.filter((policy) => {
+      const expiry = new Date(policy.expiryDate);
+      if (Number.isNaN(expiry.getTime())) return false;
+      const daysLeft = (expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+      return daysLeft >= 0 && daysLeft <= 30;
+    }).length;
+    const activeClaims = claimsData.filter((claim) => {
+      const status = String(claim.status).toLowerCase();
+      return status === 'pending' || status === 'processing' || status === 'submitted';
+    }).length;
 
     const stats = [
-      { label: 'Total Policies', value: '127', change: '+12 this month', icon: Receipt, color: 'blue' },
-      { label: 'Expiring Soon', value: '8', change: 'Next 30 days', icon: AlertCircle, color: 'blue' },
-      { label: 'Premium Value', value: formatCurrency(2890000), change: '+5.2% growth', icon: Calculator, color: 'blue' },
-      { label: 'Active Claims', value: '54', change: '18 pending', icon: FileText, color: 'blue' }
+      { label: 'Total Policies', value: policies.length.toLocaleString(), change: 'From backend', icon: Receipt, color: 'blue' },
+      { label: 'Expiring Soon', value: expiringSoon.toLocaleString(), change: 'Next 30 days', icon: AlertCircle, color: 'blue' },
+      { label: 'Premium Value', value: formatCurrency(policies.reduce((sum, policy) => sum + asNumber(policy.premium), 0)), change: 'From backend', icon: Calculator, color: 'blue' },
+      { label: 'Active Claims', value: activeClaims.toLocaleString(), change: `${insuranceOverview.pendingClaims} pending`, icon: FileText, color: 'blue' }
     ];
 
     return (
@@ -2626,7 +2659,10 @@ const InsuranceManagement = () => {
               <Download className="w-4 h-4 mr-1" />
               Export
             </button>
-            <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center">
+            <button
+              onClick={loadInsuranceData}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+            >
               <RefreshCw className="w-4 h-4 mr-1" />
               Refresh
             </button>
@@ -2641,6 +2677,8 @@ const InsuranceManagement = () => {
               type="text"
               placeholder="Search by policy number, holder name..."
               className="w-full pl-10 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <select className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -2742,7 +2780,7 @@ const InsuranceManagement = () => {
         {/* Pagination */}
           <div className="px-4 py-3 border border-gray-200 bg-white flex items-center justify-between text-xs">
             <span className="text-gray-500">
-              Showing <span className="font-medium">1–10</span> of <span className="font-medium">127</span> policies
+              Showing <span className="font-medium">1–{Math.min(10, policies.length)}</span> of <span className="font-medium">{policies.length}</span> policies
             </span>
             <div className="flex items-center gap-1">
               <button className="px-2.5 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors">Previous</button>
@@ -4216,6 +4254,12 @@ const InsuranceManagement = () => {
                 </div>
               </div>
 
+              {editProviderErrors.submit && (
+                <div className="text-sm text-red-600 border border-red-200 bg-red-50 px-3 py-2">
+                  {editProviderErrors.submit}
+                </div>
+              )}
+
               {/* Footer */}
               <div className="flex items-center justify-end gap-3 pt-1 border-t border-gray-100">
                 <button
@@ -4393,6 +4437,12 @@ const InsuranceManagement = () => {
                 </div>
               </div>
 
+              {providerErrors.submit && (
+                <div className="text-sm text-red-600 border border-red-200 bg-red-50 px-3 py-2">
+                  {providerErrors.submit}
+                </div>
+              )}
+
               {/* Footer */}
               <div className="flex items-center justify-end gap-3 pt-1 border-t border-gray-100">
                 <button
@@ -4446,6 +4496,17 @@ const InsuranceManagement = () => {
               <h1 className="text-2xl font-bold text-gray-900 mb-1">Insurance Management</h1>
               
             </div>
+
+            {insuranceError && (
+              <div className="mb-4 border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {insuranceError}
+              </div>
+            )}
+            {insuranceLoading && (
+              <div className="mb-4 border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700">
+                Loading insurance data from backend...
+              </div>
+            )}
 
             {/* Tab Navigation */}
             <div className="mb-4">

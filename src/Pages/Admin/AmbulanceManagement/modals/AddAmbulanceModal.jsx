@@ -72,17 +72,7 @@ const AddAmbulanceModal = ({ onClose, onSave }) => {
       return;
     }
 
-    // Generate new ambulance object
-    const newAmbulance = {
-      id: Date.now(),
-      ...formData,
-      totalTrips: 0,
-      avgResponseTime: '0 min',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    onSave(newAmbulance);
+    onSave(formData);
     onClose();
   };
 
@@ -230,7 +220,6 @@ const AddAmbulanceModal = ({ onClose, onSave }) => {
                 <option value="DIESEL">Diesel</option>
                 <option value="PETROL">Petrol</option>
                 <option value="ELECTRIC">Electric</option>
-                <option value="HYBRID">Hybrid</option>
               </select>
             </div>
 

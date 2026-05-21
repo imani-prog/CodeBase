@@ -2,7 +2,7 @@
 
 const Story = () => {
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50 overflow-x-hidden">
       
       
       <main className="flex flex-col items-center w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-[1200px] mx-auto">
@@ -11,7 +11,7 @@ const Story = () => {
         </section>
 
 
-        <section className="mb-4 sm:mb-5 md:mb-6 w-full bg-blue-50 p-3 sm:p-4 text-left">
+        <section className="mb-4 sm:mb-5 md:mb-6 w-full bg-gray-50 p-3 sm:p-4 text-left">
           <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-blue-800 mb-3 sm:mb-4 font-serif px-2">Problem-Driven</h2>
           <p className="text-sm sm:text-base md:text-lg mb-2 sm:mb-3 px-2 leading-relaxed">MediLink was born from a deep understanding of the challenges many African communities face when trying to access timely and quality healthcare. In rural and underserved areas, distance, cost, lack of infrastructure, and limited staffing continue to be barriers to life-saving care.</p>
           <p className="text-sm sm:text-base md:text-lg mb-2 sm:mb-3 px-2 leading-relaxed">Founded by a group of passionate technologists, medical professionals, and community leaders, MediLink is more than a platform—it is a movement. A movement to ensure that no one is left behind due to where they live, how much they earn, or the resources available around them.</p>

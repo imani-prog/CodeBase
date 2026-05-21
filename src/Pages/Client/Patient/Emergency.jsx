@@ -1,191 +1,1058 @@
-import { useState, useEffect } from 'react';
-import { 
-  Phone, 
-  MapPin, 
-  Navigation, 
-  Users, 
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Phone,
+  MapPin,
+  Users,
   Ambulance,
   Clock,
   AlertCircle,
   CheckCircle,
   X,
   Map as MapIcon,
-  User,
   Star,
-  Activity,
-  Heart,
-  Shield
+  Activity
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import EmergencyFeatures from '../../../Components/Client/EmergencyFeatures';
+import { Loader } from '@googlemaps/js-api-loader';
+import { ambulanceApi } from '../../../API/endpoints/ambulanceApi.js';
+import { ambulanceService } from '../../../Services/domain/ambulanceService.js';
+import { chwApi } from '../../../API/endpoints/chwApi.js';
+import { patientApi } from '../../../API/endpoints/patientApi.js';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
+// ─── Constants ─────────────────────────────────────────────────────────────────
+const DEFAULT_LOCATION = { lat: -1.286389, lng: 36.817223 };
+const EMERGENCY_ORDERS_UPDATED_EVENT = 'patient-emergency-orders-updated';
+const PATIENT_EMERGENCY_ORDERS_STORAGE_KEY = 'patient-emergency-orders-v1';
+const ACTIVE_EMERGENCY_STATUSES = new Set([
+  'REQUESTED', 'ASSIGNED', 'DISPATCHED', 'EN_ROUTE',
+  'ON_SCENE', 'IN_PROGRESS', 'ACCEPTED',
+]);
+
+const EMERGENCY_TIPS = [
+  {
+    title: 'Stay calm and keep the patient comfortable',
+    detail: 'A calm patient is easier to monitor. Keep them seated or lying down and avoid sudden movement.',
+  },
+  {
+    title: 'Keep your phone nearby for communication',
+    detail: 'Stay reachable for updates from the ambulance team or for urgent guidance from the portal.',
+  },
+  {
+    title: 'Have someone wait outside to guide the ambulance',
+    detail: 'A clear guide reduces response time and helps the crew find you faster.',
+  },
+  {
+    title: 'Gather any relevant medical documents or medications',
+    detail: 'Bring prescriptions, allergy details, and any medication the patient is currently taking.',
+  },
+];
+
+// ─── Singleton Loader ──────────────────────────────────────────────────────────
+let _mapsLoaderInstance = null;
+const getMapsLoader = (apiKey) => {
+  if (!_mapsLoaderInstance) {
+    _mapsLoaderInstance = new Loader({ apiKey, libraries: ['marker', 'geocoding'] });
+  }
+  return _mapsLoaderInstance;
+};
+
+// ─── Plus Code helpers ─────────────────────────────────────────────────────────
+// \w{2,8} covers all Plus Code formats including short ones like G728+39
+const isPlusCode = (str) => {
+  const plusCodePattern = /^\w{2,8}\+\w{2,3}/;
+  return plusCodePattern.test(String(str || '').trim());
+};
+
+const stripPlusCodeFromLocation = (str) => {
+  const locationStr = String(str || '').trim();
+  const plusCodePattern = /^\w{2,8}\+\w{2,3},\s*/;
+  return locationStr.replace(plusCodePattern, '').trim();
+};
+
+// ─── Geocoding Cache ───────────────────────────────────────────────────────────
+let _geocodingCache = new Map();
+
+// Nominatim-first reverse geocode — better street-level coverage for Kenya/Africa
+const reverseGeocode = async (lat, lng, apiKey) => {
+  const key = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+  if (_geocodingCache.has(key)) return _geocodingCache.get(key);
+
+  // ── Try Nominatim FIRST — better street-level coverage for Kenya/Africa ──
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&zoom=18&addressdetails=1`;
+    const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (resp.ok) {
+      const data = await resp.json();
+      const a = data?.address || {};
+      const parts = [
+        a.road || a.pedestrian || a.footway || a.path || a.track,
+        a.neighbourhood || a.suburb || a.village || a.hamlet || a.quarter,
+        a.town || a.city || a.county,
+      ].filter(Boolean);
+      if (parts.length >= 2) {
+        const addr = parts.join(', ');
+        _geocodingCache.set(key, addr);
+        return addr;
+      }
+    }
+  } catch (_) { /* ignore, fall through to Google */ }
+
+  // ── Google fallback — pick most specific result type ──
+  try {
+    if (!window.google?.maps?.Geocoder) {
+      const loader = getMapsLoader(apiKey);
+      await loader.load();
+    }
+    if (!window.google?.maps?.Geocoder) return null;
+
+    const geocoder = new window.google.maps.Geocoder();
+    const results = await new Promise((resolve, reject) => {
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === 'OK' && results?.length > 0) resolve(results);
+        else reject(new Error(`Geocoding failed: ${status}`));
+      });
+    });
+
+    const PREFERRED = ['street_address', 'premise', 'subpremise', 'establishment', 'route', 'intersection'];
+    const FALLBACK  = ['neighborhood', 'sublocality_level_1', 'sublocality', 'locality'];
+    const best =
+      results.find((r) => r.types.some((t) => PREFERRED.includes(t))) ||
+      results.find((r) => r.types.some((t) => FALLBACK.includes(t)))  ||
+      results[0];
+
+    const addr = stripPlusCodeFromLocation(best.formatted_address);
+    _geocodingCache.set(key, addr);
+    return addr;
+  } catch (_) {
+    _geocodingCache.set(key, null);
+    return null;
+  }
+};
+
+const geocodeAddress = async (address, apiKey) => {
+  if (!address) return null;
+  const key = `addr:${String(address).trim()}`;
+  if (_geocodingCache.has(key)) return _geocodingCache.get(key);
+  try {
+    if (!window.google?.maps?.Geocoder) {
+      const loader = getMapsLoader(apiKey);
+      await loader.load();
+    }
+    if (!window.google?.maps?.Geocoder) return null;
+    const geocoder = new window.google.maps.Geocoder();
+    const result = await new Promise((resolve, reject) => {
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === 'OK' && results && results.length > 0) {
+          const r = results[0];
+          const loc = r.geometry?.location ? { lat: r.geometry.location.lat(), lng: r.geometry.location.lng() } : null;
+          resolve({ formatted_address: r.formatted_address, location: loc });
+        } else {
+          reject(new Error(`Geocoding failed: ${status}`));
+        }
+      });
+    });
+    _geocodingCache.set(key, result);
+    return result;
+  } catch (err) {
+    // Fallback to Nominatim search
+    try {
+      const q = encodeURIComponent(String(address || '').trim());
+      const url = `https://nominatim.openstreetmap.org/search?q=${q}&format=jsonv2&limit=1`;
+      const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (resp.ok) {
+        const items = await resp.json();
+        if (Array.isArray(items) && items.length > 0) {
+          const it = items[0];
+          const formatted = it.display_name || null;
+          const loc = it.lat && it.lon ? { lat: Number(it.lat), lng: Number(it.lon) } : null;
+          const fallback = formatted ? { formatted_address: formatted, location: loc } : null;
+          _geocodingCache.set(key, fallback);
+          return fallback;
+        }
+      }
+    } catch (err2) {
+      // ignore
+    }
+    _geocodingCache.set(key, null);
+    return null;
+  }
+};
+
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+const toArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (payload?.data && typeof payload.data === 'object') return toArray(payload.data);
+  return [];
+};
+
+const readPersistedEmergencyOrders = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(PATIENT_EMERGENCY_ORDERS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writePersistedEmergencyOrders = (rows = []) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(
+      PATIENT_EMERGENCY_ORDERS_STORAGE_KEY,
+      JSON.stringify(Array.isArray(rows) ? rows.slice(0, 100) : [])
+    );
+  } catch {
+    // ignore storage failures
+  }
+};
+
+const toNumberOrNull = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const titleCase = (value, fallback = '') => {
+  const text = String(value || '').trim();
+  if (!text) return fallback;
+  return text
+    .toLowerCase()
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const getLocationFromRow = (row = {}) => {
+  const lat = toNumberOrNull(
+    row.latitude ?? row.lat ?? row.currentLatitude ?? row.locationLatitude ?? row.location?.lat ?? row.coordinates?.lat
+  );
+  const lng = toNumberOrNull(
+    row.longitude ?? row.lng ?? row.currentLongitude ?? row.locationLongitude ?? row.location?.lng ?? row.coordinates?.lng
+  );
+  if (lat === null || lng === null) return null;
+  return { lat, lng };
+};
+
+const mergeDispatchRows = (primaryRows = [], secondaryRows = []) => {
+  const byKey = new Map();
+  [...toArray(secondaryRows), ...toArray(primaryRows)].forEach((row) => {
+    if (!row || typeof row !== 'object') return;
+    const key = String(row.id ?? row.incidentId ?? `${row.patientId || ''}-${row.createdAt || row.requestTime || ''}`);
+    if (!key) return;
+    byKey.set(key, row);
+  });
+  return Array.from(byKey.values());
+};
+
+const mergeAmbulanceTracking = (ambulanceRows = [], trackingRows = []) => {
+  const trackingByKey = new Map();
+  toArray(trackingRows).forEach((trackingRow) => {
+    if (!trackingRow || typeof trackingRow !== 'object') return;
+    const key = String(
+      trackingRow.ambulanceId ?? trackingRow.unitId ?? trackingRow.ambulanceUnitId ?? trackingRow.id ?? trackingRow.vehiclePlate ?? ''
+    ).trim().toUpperCase();
+    if (!key) return;
+    trackingByKey.set(key, trackingRow);
+  });
+
+  return toArray(ambulanceRows).map((ambulanceRow) => {
+    if (!ambulanceRow || typeof ambulanceRow !== 'object') return ambulanceRow;
+    const key = String(
+      ambulanceRow.id ?? ambulanceRow.ambulanceId ?? ambulanceRow.unitId ?? ambulanceRow.vehiclePlate ?? ''
+    ).trim().toUpperCase();
+    const trackingRow = trackingByKey.get(key) || null;
+    if (!trackingRow) return ambulanceRow;
+
+    return {
+      ...ambulanceRow,
+      tracking: trackingRow,
+      currentLatitude: toNumberOrNull(trackingRow.currentLatitude ?? trackingRow.latitude ?? trackingRow.lat),
+      currentLongitude: toNumberOrNull(trackingRow.currentLongitude ?? trackingRow.longitude ?? trackingRow.lng),
+      currentLocation: trackingRow.locationAddress || trackingRow.currentLocation || ambulanceRow.currentLocation,
+    };
+  });
+};
+
+const isPermissionDeniedError = (err) => {
+  const status = Number(err?.status || err?.response?.status || err?.code || 0);
+  const message = String(err?.message || err?.response?.data?.message || '').toLowerCase();
+  return status === 401 || status === 403 || message.includes('permission') || message.includes('forbidden') || message.includes('unauthorized');
+};
+
+const distanceKm = (a, b) => {
+  if (!a || !b) return null;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const lat1 = (a.lat * Math.PI) / 180;
+  const lat2 = (b.lat * Math.PI) / 180;
+  const hav = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return 6371 * (2 * Math.atan2(Math.sqrt(hav), Math.sqrt(1 - hav)));
+};
+
+const formatDistance = (rawDistance, userLocation, responderLocation) => {
+  const explicitDistance = toNumberOrNull(rawDistance);
+  if (explicitDistance !== null) return `${explicitDistance.toFixed(1)} km`;
+  const computed = distanceKm(userLocation, responderLocation);
+  if (computed === null) return 'Distance unavailable';
+  return `${computed.toFixed(1)} km`;
+};
+
+const isValidRealAddress = (str) => {
+  if (!str) return false;
+  const cleaned = stripPlusCodeFromLocation(str);
+  if (!cleaned || cleaned.length < 3) return false;
+  if (/^-?\d+\.?\d*,\s*-?\d+\.?\d*/.test(cleaned)) return false;
+  return true;
+};
+
+const normalizeChwStatus = (status) => String(status || '').trim().toUpperCase();
+const isChwAvailable = (status) => !['OFFLINE', 'ON_LEAVE', 'INACTIVE'].includes(normalizeChwStatus(status));
+
+const normalizeChw = (row = {}, userLocation) => {
+  const firstName = String(row.firstName || '').trim();
+  const middleName = String(row.middleName || '').trim();
+  const lastName = String(row.lastName || '').trim();
+  const fullName =
+    String(row.fullName || row.name || '').trim() ||
+    [firstName, middleName, lastName].filter(Boolean).join(' ').trim() ||
+    'Unknown CHW';
+  const status = normalizeChwStatus(row.status);
+  const ratingNumber = toNumberOrNull(row.rating ?? row.averageRating);
+  const loc = getLocationFromRow(row);
+  let locationLabel = null;
+  const rawLocation = row.currentLocation || row.locationAddress || row.locationName || null;
+
+  if (rawLocation && isValidRealAddress(rawLocation)) {
+    locationLabel = stripPlusCodeFromLocation(rawLocation);
+  }
+
+  if (!locationLabel && loc) {
+    locationLabel = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)} Area`;
+  }
+  if (!locationLabel) {
+    locationLabel = 'Loading location...';
+  }
+
+  return {
+    id: row.id,
+    name: fullName,
+    phone: row.phone || row.phoneNumber || row.contactPhone || 'N/A',
+    specialization: row.specialization || 'Community Health Worker',
+    distance: formatDistance(row.distanceKm ?? row.distance, userLocation, getLocationFromRow(row)),
+    rating: ratingNumber !== null ? ratingNumber.toFixed(1) : 'N/A',
+    available: isChwAvailable(status),
+    location: loc,
+    locationLabel,
+    rawLocation,
+    responseTime: row.responseTime || row.averageResponseTime || (status === 'BUSY' ? '10-20 min' : '5-15 min'),
+    status,
+  };
+};
+
+const normalizeAmbulanceStatus = (status) => String(status || '').trim().toUpperCase();
+const isAmbulanceAvailable = (status) => ['AVAILABLE', 'ACTIVE', 'READY', 'IDLE'].includes(normalizeAmbulanceStatus(status));
+
+const extractEquipment = (row = {}) => {
+  if (Array.isArray(row.equipmentList)) return row.equipmentList.map(String);
+  if (Array.isArray(row.equipment)) {
+    return row.equipment.map((item) => item?.name || item?.equipmentName || String(item || '')).filter(Boolean);
+  }
+  return [];
+};
+
+const normalizeAmbulance = (row = {}, userLocation) => {
+  const status = normalizeAmbulanceStatus(row.status);
+  const vehiclePlate = row.vehiclePlate || row.vehicleNumber || row.registrationNumber || `AMB-${row.id ?? 'N/A'}`;
+  const type = titleCase(row.type, 'Ambulance');
+  const equipment = extractEquipment(row);
+  const etaMinutes = toNumberOrNull(row.averageResponseMinutes);
+  const formattedEta = row.estimatedResponseTime || row.eta || row.averageResponseTime || (etaMinutes !== null ? `${etaMinutes} minutes` : 'Pending dispatch');
+  const numericCost = toNumberOrNull(row.cost ?? row.estimatedCost);
+  const loc = getLocationFromRow(row);
+  let locationLabel = null;
+
+  if (row.currentLocation && isValidRealAddress(row.currentLocation)) {
+    locationLabel = stripPlusCodeFromLocation(row.currentLocation);
+  }
+  if (!locationLabel && row.locationAddress && isValidRealAddress(row.locationAddress)) {
+    locationLabel = stripPlusCodeFromLocation(row.locationAddress);
+  }
+  if (!locationLabel && row.locationName && isValidRealAddress(row.locationName)) {
+    locationLabel = stripPlusCodeFromLocation(row.locationName);
+  }
+  if (!locationLabel && loc) {
+    locationLabel = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)} Area`;
+  }
+  if (!locationLabel) {
+    locationLabel = 'Loading location...';
+  }
+
+  let numericDistanceKm = null;
+  const explicitDistance = toNumberOrNull(row.estimatedDistance ?? row.distanceKm ?? row.distance);
+  if (explicitDistance !== null) numericDistanceKm = explicitDistance;
+  else {
+    try {
+      const dKm = distanceKm(userLocation, loc);
+      if (dKm !== null) numericDistanceKm = Number(dKm.toFixed(2));
+    } catch {
+      numericDistanceKm = null;
+    }
+  }
+
+  const baseRatePerKm = 50;
+  const minFare = 500;
+  const eqCount = Array.isArray(equipment) ? equipment.length : 0;
+  const advancedKeywords = ['ICU','VENTILATOR','DEFIBRILLATOR','OXYGEN','SPINAL','TRAUMA','CARDIAC','MONITOR','INTUBATION'];
+  const advancedCount = equipment.filter((e) => advancedKeywords.some((k) => String(e || '').toUpperCase().includes(k))).length;
+  const equipmentSurcharge = eqCount * 30 + advancedCount * 150;
+  const distanceForCalc = numericDistanceKm !== null ? numericDistanceKm : 3;
+  const estimatedNumericCost = Math.max(minFare, Math.round(baseRatePerKm * distanceForCalc + equipmentSurcharge));
+  const displayCost = numericCost !== null ? `Ksh ${numericCost}` : `Ksh ${estimatedNumericCost}`;
+
+  return {
+    id: row.id,
+    backendId: row.id,
+    vehiclePlate,
+    name: row.name || `MediLink Ambulance ${vehiclePlate}`,
+    type,
+    distance: formatDistance(row.estimatedDistance ?? row.distanceKm ?? row.distance, userLocation, getLocationFromRow(row)),
+    eta: formattedEta,
+    available: isAmbulanceAvailable(status),
+    status,
+    location: loc,
+    locationLabel,
+    equipment,
+    cost: displayCost,
+    driverName: row.driverName || row.currentDriver?.name || row.currentDriverName || 'Unassigned',
+    driverPhone: row.driverPhone || row.currentDriver?.phone || row.driverContact || '',
+  };
+};
+
+const extractPatientName = (patient) => {
+  if (!patient) return '';
+  const fullName = String(patient.fullName || patient.name || '').trim();
+  if (fullName) return fullName;
+  return [patient.firstName, patient.middleName, patient.lastName]
+    .map((part) => String(part || '').trim()).filter(Boolean).join(' ').trim();
+};
+
+const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
+const normalizeName = (value) => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const toTimestamp = (value) => { const d = new Date(value || ''); const ms = d.getTime(); return Number.isNaN(ms) ? 0 : ms; };
+const formatDateTime = (value) => {
+  const date = new Date(value || '');
+  if (Number.isNaN(date.getTime())) return 'N/A';
+  return date.toLocaleString('en-KE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+};
+const normalizeDispatchStatus = (status) => String(status || 'REQUESTED').trim().toUpperCase();
+const dispatchStatusTone = (status) => {
+  const n = normalizeDispatchStatus(status);
+  if (['DISPATCHED', 'EN_ROUTE', 'ON_SCENE', 'IN_PROGRESS', 'ACCEPTED', 'ASSIGNED'].includes(n)) return 'bg-blue-50 text-blue-700 border border-blue-200';
+  if (['COMPLETED', 'RESOLVED', 'CLOSED'].includes(n)) return 'bg-green-50 text-green-700 border border-green-200';
+  if (['CANCELLED', 'REJECTED', 'FAILED'].includes(n)) return 'bg-red-50 text-red-700 border border-red-200';
+  return 'bg-amber-50 text-amber-700 border border-amber-200';
+};
+
+// ─── Map Component ─────────────────────────────────────────────────────────────
+const EmergencyGoogleMap = ({
+  userLocation = DEFAULT_LOCATION,
+  ambulances = [],
+  chws = [],
+  view = 'ambulance',
+  className = '',
+  style = {},
+}) => {
+  const mapRef        = useRef(null);
+  const containerRef  = useRef(null);
+  const markersRef    = useRef([]);
+  const [mapReady, setMapReady]   = useState(false);
+  const [loadError, setLoadError] = useState('');
+
+  const apiKey =
+    (import.meta?.env?.VITE_GOOGLE_CLOUD_MAPS_API_KEY) ||
+    document.querySelector('meta[name="google-maps-api-key"]')?.getAttribute('content') ||
+    (import.meta?.env?.GOOGLE_CLOUD_MAPS_API_KEY) ||
+    null;
+
+  const rawMapId = import.meta?.env?.VITE_GOOGLE_MAPS_MAP_ID || null;
+  const mapId = rawMapId && !/^%.*%$/.test(String(rawMapId).trim()) ? String(rawMapId).trim() : null;
+
+  useEffect(() => {
+    let cancelled = false;
+    const initMap = async () => {
+      if (typeof window === 'undefined') return;
+      if (!apiKey) { setLoadError('Google Maps API key is not defined'); return; }
+      if (!containerRef.current) return;
+      try {
+        const loader = getMapsLoader(apiKey);
+        await loader.load();
+        if (cancelled) return;
+        if (!window.google?.maps) { setLoadError('Google Maps loaded but window.google.maps is missing'); return; }
+        const maps = window.google.maps;
+        const mapInstance = new maps.Map(containerRef.current, {
+          center: DEFAULT_LOCATION,
+          zoom: 12,
+          ...(mapId ? { mapId } : {}),
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+        mapRef.current = mapInstance;
+        setLoadError('');
+        setMapReady(true);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('EmergencyGoogleMap: init failed', err);
+          setLoadError(String(err?.message || 'Failed to load Google Maps'));
+        }
+      }
+    };
+    initMap();
+    return () => { cancelled = true; };
+  }, [apiKey, mapId]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    markersRef.current.forEach((m) => {
+      if (typeof m?.setMap === 'function') m.setMap(null);
+      else if ('map' in (m ?? {})) m.map = null;
+    });
+    markersRef.current = [];
+
+    const maps = window.google?.maps;
+    if (!maps) return;
+
+    const canUseAdvanced = Boolean(mapId && window.google?.maps?.marker?.AdvancedMarkerElement);
+    const allPoints = [];
+
+    const makeDomMarker = (bgColor, label, size = 40) => {
+      const el = document.createElement('div');
+      el.style.cssText = [
+        `width:${size}px`, `height:${size}px`, 'border-radius:50%',
+        `background:${bgColor}`, 'display:flex', 'align-items:center',
+        'justify-content:center', 'color:#fff', 'font-weight:900',
+        `font-size:${Math.round(size * 0.45)}px`, 'border:2px solid #fff',
+        'box-shadow:0 2px 8px rgba(0,0,0,.30)', 'cursor:pointer',
+      ].join(';');
+      el.textContent = label;
+      return el;
+    };
+
+    const makeSvgUrl = (label, color) => {
+      try {
+        let normalized = String(color || '') || '#000000';
+        for (let i = 0; i < 3 && !normalized.startsWith('#'); i += 1) {
+          try { normalized = decodeURIComponent(normalized); } catch { break; }
+        }
+        if (!normalized.startsWith('#')) normalized = `#${normalized.replace(/^%23/, '')}`;
+        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='${normalized}' stroke='%23fff' stroke-width='3'/><text x='28' y='36' font-size='22' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='900'>${label}</text></svg>`;
+        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+      } catch {
+        const fallback = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><circle cx='28' cy='28' r='24' fill='#000' stroke='%23fff' stroke-width='3'/></svg>`;
+        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(fallback)}`;
+      }
+    };
+
+    const placeMarker = ({ lat, lng, domEl, svgUrl, infoHtml }) => {
+      const infoWindow = new maps.InfoWindow({ content: infoHtml });
+      if (canUseAdvanced) {
+        const marker = new window.google.maps.marker.AdvancedMarkerElement({
+          map,
+          position: { lat, lng },
+          content: domEl,
+        });
+        marker.addEventListener('gmp-click', () => infoWindow.open({ anchor: marker, map }));
+        markersRef.current.push(marker);
+      } else {
+        const marker = new maps.Marker({
+          map,
+          position: { lat, lng },
+          icon: { url: svgUrl, scaledSize: new maps.Size(56, 56) },
+        });
+        marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
+        markersRef.current.push(marker);
+      }
+    };
+
+    // ── User location pin ──
+    const uLat = toNumberOrNull(userLocation?.lat);
+    const uLng = toNumberOrNull(userLocation?.lng);
+    if (uLat !== null && uLng !== null) {
+      allPoints.push({ lat: uLat, lng: uLng });
+      const domEl = document.createElement('div');
+      domEl.style.cssText = [
+        'width:20px', 'height:20px', 'border-radius:50%',
+        'background:#2563eb', 'border:3px solid #fff',
+        'box-shadow:0 0 0 5px rgba(37,99,235,0.3)',
+        'cursor:default',
+      ].join(';');
+      const svgUrl = makeSvgUrl('U', '%232563eb');
+      const infoHtml = `<div style="padding:4px 2px;min-width:110px"><p style="font-weight:700;margin:0">📍 Your Location</p></div>`;
+      placeMarker({ lat: uLat, lng: uLng, domEl, svgUrl, infoHtml });
+    }
+
+    // ── View-specific pins ──
+    if (view === 'ambulance') {
+      ambulances.forEach((amb) => {
+        const loc = amb.location;
+        if (!loc) return;
+        const lat = toNumberOrNull(loc.lat);
+        const lng = toNumberOrNull(loc.lng);
+        if (lat === null || lng === null) return;
+        allPoints.push({ lat, lng });
+        const color   = amb.available ? '#dc2626' : '#9ca3af';
+        const label   = 'A';
+        const domEl   = makeDomMarker(color, label, 44);
+        const svgUrl  = makeSvgUrl(label, amb.available ? '%23dc2626' : '%239ca3af');
+        const infoHtml = `
+          <div style="padding:6px 8px;min-width:200px;max-width:320px;font-family:Arial,Helvetica,sans-serif;">
+            <p style="font-weight:700;margin:0 0 6px">${amb.name}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">${amb.type}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Location: ${amb.locationLabel || 'Unknown location'}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Distance: ${amb.distance}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">ETA: ${amb.eta}</p>
+            <p style="margin:0;font-weight:600;color:${amb.available ? '#16a34a' : '#9ca3af'}">
+              ${amb.available ? '● Available' : ' Unavailable'}
+            </p>
+          </div>`;
+        placeMarker({ lat, lng, domEl, svgUrl, infoHtml });
+      });
+    }
+
+    if (view === 'chw') {
+      chws.forEach((chw) => {
+        const loc = chw.location;
+        if (!loc) return;
+        const lat = toNumberOrNull(loc.lat);
+        const lng = toNumberOrNull(loc.lng);
+        if (lat === null || lng === null) return;
+        allPoints.push({ lat, lng });
+        const color  = chw.available ? '#16a34a' : '#9ca3af';
+        const label  = 'C';
+        const domEl  = makeDomMarker(color, label, 44);
+        const svgUrl = makeSvgUrl(label, chw.available ? '%2316a34a' : '%239ca3af');
+        const infoHtml = `
+          <div style="padding:6px 8px;min-width:200px;max-width:320px;font-family:Arial,Helvetica,sans-serif;">
+            <p style="font-weight:700;margin:0 0 6px">${chw.name}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">${chw.specialization}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Location: ${chw.locationLabel || 'Unknown location'}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Distance: ${chw.distance}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Response: ${chw.responseTime}</p>
+            <p style="margin:0 0 4px;color:#444;font-size:13px">Rating: ${chw.rating}</p>
+            <p style="margin:0;font-weight:600;color:${chw.available ? '#16a34a' : '#9ca3af'}">
+              ${chw.available ? '● Available' : '● Unavailable'}
+            </p>
+          </div>`;
+        placeMarker({ lat, lng, domEl, svgUrl, infoHtml });
+      });
+    }
+
+    // ── Fit bounds ──
+    if (allPoints.length === 1) {
+      map.setCenter({ lat: allPoints[0].lat, lng: allPoints[0].lng });
+      map.setZoom(13);
+    } else if (allPoints.length > 1) {
+      const bounds = new maps.LatLngBounds();
+      allPoints.forEach((p) => bounds.extend(new maps.LatLng(p.lat, p.lng)));
+      map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
+    }
+
+    return () => {
+      markersRef.current.forEach((m) => {
+        if (typeof m?.setMap === 'function') m.setMap(null);
+        else if ('map' in (m ?? {})) m.map = null;
+      });
+      markersRef.current = [];
+    };
+  }, [ambulances, chws, view, userLocation, mapId, mapReady]);
+
+  return (
+    <div className={className} style={{ position: 'relative', ...style }}>
+      <div ref={containerRef} style={{ height: '100%', width: '100%', background: '#f0f4f8' }} />
+      {loadError && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div className="bg-white/90 border border-gray-200 px-4 py-2 text-sm text-red-600 pointer-events-auto shadow">
+            <div className="font-semibold">Map error</div>
+            <div>{loadError}</div>
+            <div className="text-xs text-gray-500 mt-1">Ensure <code>VITE_GOOGLE_CLOUD_MAPS_API_KEY</code> is set and dev server was restarted.</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Emergency (main page) ─────────────────────────────────────────────────────
 const Emergency = () => {
   const [activeTab, setActiveTab] = useState('ambulance');
   const [showMap, setShowMap] = useState(false);
   const [mapView, setMapView] = useState('chw');
+  const [showOrdersModal, setShowOrdersModal] = useState(false);
+  const [showRecentModal, setShowRecentModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [showTipsModal, setShowTipsModal] = useState(false);
+  const [tipIndex, setTipIndex] = useState(0);
   const [selectedCHW, setSelectedCHW] = useState(null);
   const [selectedAmbulance, setSelectedAmbulance] = useState(null);
   const [showCHWModal, setShowCHWModal] = useState(false);
   const [showAmbulanceModal, setShowAmbulanceModal] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
-  const [userLocation, setUserLocation] = useState({ lat: -1.286389, lng: 36.817223 }); // Default: Nairobi
+  const [userLocation, setUserLocation] = useState(DEFAULT_LOCATION);
+  const [chwRows, setChwRows] = useState([]);
+  const [ambulanceRows, setAmbulanceRows] = useState([]);
+  const { user } = useAuth();
+  const [patientProfile, setPatientProfile] = useState(null);
+  const [loadingChw, setLoadingChw] = useState(true);
+  const [loadingAmbulances, setLoadingAmbulances] = useState(true);
+  const [chwError, setChwError] = useState('');
+  const [ambulanceError, setAmbulanceError] = useState('');
+  const [orderSubmitting, setOrderSubmitting] = useState(false);
+  const [orderError, setOrderError] = useState('');
+  const [dispatchRows, setDispatchRows] = useState(() => readPersistedEmergencyOrders());
+  const [dispatchLoading, setDispatchLoading] = useState(true);
+  const [dispatchError, setDispatchError] = useState('');
+  const [chwLocationNames, setChwLocationNames] = useState({});
 
-  // Sample CHW data
-  const communityHealthWorkers = [
-    {
-      id: 1,
-      name: 'Sarah Kamau',
-      phone: '+254712345678',
-      specialization: 'General Health',
-      distance: '0.5 km',
-      rating: 4.8,
-      available: true,
-      location: { lat: -1.286389, lng: 36.817223 },
-      responseTime: '5-10 min'
-    },
-    {
-      id: 2,
-      name: 'John Mwangi',
-      phone: '+254723456789',
-      specialization: 'First Aid',
-      distance: '1.2 km',
-      rating: 4.9,
-      available: true,
-      location: { lat: -1.290389, lng: 36.820223 },
-      responseTime: '10-15 min'
-    },
-    {
-      id: 3,
-      name: 'Grace Njeri',
-      phone: '+254734567890',
-      specialization: 'Maternal Health',
-      distance: '2.1 km',
-      rating: 4.7,
-      available: false,
-      location: { lat: -1.295389, lng: 36.825223 },
-      responseTime: '15-20 min'
-    },
-    {
-      id: 4,
-      name: 'David Ochieng',
-      phone: '+254745678901',
-      specialization: 'Emergency Response',
-      distance: '0.8 km',
-      rating: 5.0,
-      available: true,
-      location: { lat: -1.288389, lng: 36.819223 },
-      responseTime: '5-10 min'
-    }
-  ];
+  const communityHealthWorkers = useMemo(() =>
+    toArray(chwRows).map((row) => {
+      const normalized = normalizeChw(row, userLocation);
+      const locKey = normalized.location ? `${normalized.location.lat.toFixed(6)},${normalized.location.lng.toFixed(6)}` : null;
+      if (locKey && chwLocationNames[locKey]) {
+        normalized.locationLabel = chwLocationNames[locKey];
+      }
+      const rawKey = normalized.rawLocation ? String(normalized.rawLocation).trim() : null;
+      if (rawKey && chwLocationNames[rawKey]) {
+        normalized.locationLabel = chwLocationNames[rawKey];
+      }
+      return normalized;
+    })
+      .sort((a, b) => Number(b.available) - Number(a.available)),
+    [chwRows, userLocation, chwLocationNames]
+  );
 
-  // Sample Ambulance data - Replace with actual API data
-  const ambulances = [
-    {
-      id: 1,
-      name: 'MediLink Ambulance KDH 556H',
-      type: 'Advanced Life Support',
-      distance: '2.3 km',
-      eta: '8 minutes',
-      available: true,
-      location: { lat: -1.289389, lng: 36.818223 },
-      equipment: ['Defibrillator', 'Oxygen', 'ECG Monitor'],
-      cost: 'Ksh 300'
-    },
-    {
-      id: 2,
-      name: 'MediLink Ambulance KDE 223E',
-      type: 'Basic Life Support',
-      distance: '3.5 km',
-      eta: '12 minutes',
-      available: true,
-      location: { lat: -1.292389, lng: 36.822223 },
-      equipment: ['First Aid Kit', 'Oxygen', 'Stretcher'],
-      cost: 'Ksh 350'
-    },
-    {
-      id: 3,
-      name: 'City Hospital KDB 456B',
-      type: 'Critical Care',
-      distance: '4.2 km',
-      eta: '15 minutes',
-      available: false,
-      location: { lat: -1.296389, lng: 36.826223 },
-      equipment: ['Ventilator', 'Defibrillator', 'IV Equipment'],
-      cost: 'Ksh 400'
-    },
-    {
-      id: 4,
-      name: 'Rescue Unit KBX 456B',
-      type: 'Advanced Life Support',
-      distance: '1.8 km',
-      eta: '6 minutes',
-      available: true,
-      location: { lat: -1.287389, lng: 36.816223 },
-      equipment: ['Defibrillator', 'Oxygen', 'Trauma Kit'],
-      cost: 'Ksh 150'
-    }
-  ];
+  const ambulances = useMemo(() =>
+    toArray(ambulanceRows).map((row) => normalizeAmbulance(row, userLocation))
+      .sort((a, b) => Number(b.available) - Number(a.available)),
+    [ambulanceRows, userLocation]
+  );
+
+  const patientDispatches = useMemo(() => {
+    const profileId   = patientProfile?.id ? String(patientProfile.id) : '';
+    const profilePhone = normalizePhone(patientProfile?.phone || patientProfile?.phoneNumber || '');
+    const profileName  = normalizeName(extractPatientName(patientProfile));
+    const ambulanceNameById   = new Map(ambulances.map((a) => [String(a.backendId), a.name]));
+    const ambulanceStatusById = new Map(ambulances.map((a) => [String(a.backendId), normalizeDispatchStatus(a.status)]));
+    const ambulanceStatusByPlate = new Map(ambulances.map((a) => [String(a.vehiclePlate || '').toUpperCase(), normalizeDispatchStatus(a.status)]));
+
+    return toArray(dispatchRows)
+      .map((row) => {
+        const timestamp = row.requestTime || row.createdAt || row.updatedAt || row.dispatchTime;
+        const dispatchStatus = normalizeDispatchStatus(row.status);
+        const pickupAddress = [row.pickupAddressLine1, row.pickupAddressLine2, row.pickupCity]
+          .filter(Boolean).join(', ') || row.pickupLocation || row.location || 'N/A';
+        const vehiclePlate = row.vehiclePlate || row.ambulance?.vehiclePlate || row.ambulanceUnitId || 'Pending assignment';
+        const hasAssignedVehicle = vehiclePlate !== 'Pending assignment';
+        const matchedAmbulanceStatus =
+          ambulanceStatusById.get(String(row.ambulanceId || '')) ||
+          ambulanceStatusByPlate.get(String(vehiclePlate || '').toUpperCase()) || null;
+        const status = matchedAmbulanceStatus && ['REQUESTED', 'PENDING'].includes(dispatchStatus)
+          ? matchedAmbulanceStatus : dispatchStatus;
+        return {
+          backendId: row.id,
+          incidentId: row.incidentId || `EMG-${row.id}`,
+          status,
+          statusLabel: titleCase(status, 'Requested'),
+          priority: titleCase(row.priority || 'HIGH', 'High'),
+          patientId: row.patientId,
+          patientName: row.patientName || '',
+          callerName: row.callerName || '',
+          callerPhone: row.callerPhone || '',
+          incidentType: titleCase(row.incidentType || 'MEDICAL_EMERGENCY', 'Medical Emergency'),
+          requestedAt: timestamp,
+          requestedAtMs: toTimestamp(timestamp),
+          requestedAtLabel: formatDateTime(timestamp),
+          pickupAddress,
+          destination: row.dropoffAddressLine1 || row.hospitalName || row.destination || 'Nearest Hospital',
+          vehiclePlate,
+          ambulanceName:
+            ambulanceNameById.get(String(row.ambulanceId || '')) ||
+            row.ambulance?.name || row.ambulanceName ||
+            (hasAssignedVehicle ? `Ambulance ${vehiclePlate}` : `Status: ${titleCase(status, 'Requested')}`),
+          estimatedResponse: row.estimatedResponseTime || row.estimatedResponse || 'Pending',
+          estimatedDistance: row.estimatedDistance || '',
+          notes: row.specialInstructions || row.notes || '',
+          raw: row,
+        };
+      })
+      .filter((item) => {
+        if (!patientProfile) return true;
+        if (profileId && String(item.patientId || '') === profileId) return true;
+        const callerPhone = normalizePhone(item.callerPhone);
+        if (profilePhone && callerPhone && callerPhone.endsWith(profilePhone.slice(-9))) return true;
+        const patientName = normalizeName(item.patientName);
+        const callerName  = normalizeName(item.callerName);
+        if (profileName && (patientName === profileName || callerName === profileName)) return true;
+        return false;
+      })
+      .sort((a, b) => b.requestedAtMs - a.requestedAtMs);
+  }, [dispatchRows, patientProfile, ambulances]);
+
+  // ── data fetching ────────────────────────────────────────────────────────────
+  const fetchPatientProfile = useCallback(async () => {
+    try {
+      const profile = await patientApi.me({ fallbackUserId: user?.id });
+      setPatientProfile(profile || null);
+    } catch { setPatientProfile(null); }
+  }, [user?.id]);
+
+  const fetchChwData = useCallback(async () => {
+    setLoadingChw(true); setChwError('');
+    try {
+      const payload = await chwApi.list();
+      setChwRows(toArray(payload));
+    } catch (err) { setChwRows([]); setChwError(err?.message || 'Failed to load CHWs.'); }
+    finally { setLoadingChw(false); }
+  }, []);
+
+  const fetchAmbulanceData = useCallback(async () => {
+    setLoadingAmbulances(true); setAmbulanceError('');
+    try {
+      let payload;
+      try { payload = await ambulanceApi.list(); }
+      catch { payload = await ambulanceApi.listAvailable(); }
+
+      let trackingPayload = [];
+      try { trackingPayload = await ambulanceApi.listActiveTracking(); } catch { trackingPayload = []; }
+
+      let driversPayload = [];
+      try { driversPayload = await ambulanceService.getAllDrivers(); } catch { driversPayload = []; }
+      const drivers = toArray(driversPayload);
+
+      const driverMap = new Map();
+      drivers.forEach((d) => {
+        try {
+          const ambId = d.currentAmbulance?.id ?? d.assignedAmbulance?.id ?? d.ambulanceId ?? d.ambulance?.id ?? null;
+          if (ambId !== null && ambId !== undefined) driverMap.set(String(ambId).toUpperCase(), d);
+          const plate = (d.currentVehicle || d.vehiclePlate || d.vehicleNumber || d.vehicle || d.currentAmbulance?.vehiclePlate || d.ambulance?.vehiclePlate || '').toString().toUpperCase();
+          if (plate) driverMap.set(plate, d);
+        } catch (e) { /* ignore */ }
+      });
+
+      const ambulancesRaw = toArray(payload).map((r) => {
+        if (!r || typeof r !== 'object') return r;
+        const key = String(r.id ?? r.ambulanceId ?? r.unitId ?? r.vehiclePlate ?? '').toUpperCase();
+        const driver = driverMap.get(key) || driverMap.get(String(r.vehiclePlate || '').toUpperCase()) || null;
+        if (driver) {
+          return {
+            ...r,
+            driverName: r.driverName || driver.name || r.driverName,
+            driverPhone: r.driverPhone || driver.phone || driver.driverPhone || r.driverPhone,
+            currentDriver: r.currentDriver || { id: driver.id, name: driver.name, phone: driver.phone },
+          };
+        }
+        return r;
+      });
+
+      setAmbulanceRows(mergeAmbulanceTracking(ambulancesRaw, toArray(trackingPayload)));
+    } catch (err) { setAmbulanceRows([]); setAmbulanceError(err?.message || 'Failed to load ambulances.'); }
+    finally { setLoadingAmbulances(false); }
+  }, []);
+
+  const fetchDispatchData = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) { setDispatchLoading(true); setDispatchError(''); }
+    try {
+      const payload = await ambulanceApi.listDispatches();
+      const mergedRows = mergeDispatchRows(toArray(payload), readPersistedEmergencyOrders());
+      setDispatchRows(mergedRows);
+      writePersistedEmergencyOrders(mergedRows);
+    } catch (err) {
+      if (isPermissionDeniedError(err)) {
+        setDispatchRows(readPersistedEmergencyOrders());
+        setDispatchError('');
+      } else { setDispatchError(err?.message || 'Failed to load emergency requests.'); }
+    } finally { if (!silent) setDispatchLoading(false); }
+  }, []);
 
   useEffect(() => {
-    // Get user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-        }
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (err) => console.error('Geolocation error:', err)
       );
     }
   }, []);
 
-  const handleCallCHW = (chw) => {
-    setSelectedCHW(chw);
-    setShowCHWModal(true);
-  };
+  useEffect(() => {
+    fetchPatientProfile();
+    fetchChwData();
+    fetchAmbulanceData();
+    fetchDispatchData();
+  }, [fetchPatientProfile, fetchChwData, fetchAmbulanceData, fetchDispatchData]);
+
+  // ── Reverse geocode CHW locations (Nominatim-first, 2-step Plus Code decode) ─
+  useEffect(() => {
+    const geocodeChwLocations = async () => {
+      const apiKey =
+        (import.meta?.env?.VITE_GOOGLE_CLOUD_MAPS_API_KEY) ||
+        document.querySelector('meta[name="google-maps-api-key"]')?.getAttribute('content') ||
+        (import.meta?.env?.GOOGLE_CLOUD_MAPS_API_KEY) ||
+        null;
+
+      if (!apiKey) return;
+
+      const newLocationNames = { ...chwLocationNames };
+      let needsUpdate = false;
+
+      for (const chw of communityHealthWorkers) {
+        // 1) Reverse-geocode from coordinates (Nominatim-first via reverseGeocode)
+        if (chw.location) {
+          const locKey = `${chw.location.lat.toFixed(6)},${chw.location.lng.toFixed(6)}`;
+          if (!newLocationNames[locKey]) {
+            try {
+              const locationName = await reverseGeocode(chw.location.lat, chw.location.lng, apiKey);
+              if (locationName) {
+                newLocationNames[locKey] = locationName;
+                needsUpdate = true;
+              }
+            } catch (_) { /* ignore */ }
+          }
+        }
+
+        // 2) Two-step decode for Plus Code / raw location strings:
+        //    Step A — geocode the raw string to get precise coordinates
+        //    Step B — reverse geocode those precise coordinates for a real street address
+        const raw = chw.rawLocation;
+        const rawKey = raw ? String(raw).trim() : null;
+        if (rawKey && !newLocationNames[rawKey]) {
+          try {
+            const res = await geocodeAddress(rawKey, apiKey);
+            if (res?.location) {
+              const locKey = `${res.location.lat.toFixed(6)},${res.location.lng.toFixed(6)}`;
+              // Step B: use Nominatim-first reverse geocode on precise coords
+              let streetAddress = newLocationNames[locKey];
+              if (!streetAddress) {
+                streetAddress = await reverseGeocode(res.location.lat, res.location.lng, apiKey);
+              }
+              const finalAddress = streetAddress || stripPlusCodeFromLocation(res.formatted_address || '');
+              if (finalAddress) {
+                newLocationNames[rawKey] = finalAddress;
+                if (!newLocationNames[locKey]) newLocationNames[locKey] = finalAddress;
+                needsUpdate = true;
+              }
+            } else if (res?.formatted_address) {
+              const clean = stripPlusCodeFromLocation(res.formatted_address);
+              if (clean) { newLocationNames[rawKey] = clean; needsUpdate = true; }
+            }
+          } catch (_) { /* ignore */ }
+        }
+      }
+
+      if (needsUpdate) {
+        setChwLocationNames(newLocationNames);
+      }
+    };
+
+    geocodeChwLocations();
+  }, [communityHealthWorkers]);
+
+  const handleCallCHW = (chw) => { closeAllModals(); setSelectedCHW(chw); setShowCHWModal(true); };
 
   const handleOrderAmbulance = (ambulance) => {
-    setSelectedAmbulance(ambulance);
-    setShowAmbulanceModal(true);
+    closeAllModals();
+    setSelectedAmbulance(ambulance); setOrderError(''); setOrderConfirmed(false); setShowAmbulanceModal(true);
   };
 
-  const confirmAmbulanceOrder = () => {
-    setOrderConfirmed(true);
-    setTimeout(() => {
-      setShowAmbulanceModal(false);
-      setOrderConfirmed(false);
-    }, 3000);
+  const confirmAmbulanceOrder = async () => {
+    if (!selectedAmbulance?.backendId || orderSubmitting) return;
+    const patientName = extractPatientName(patientProfile);
+    const payload = {
+      incidentType: 'MEDICAL_EMERGENCY', priority: 'HIGH',
+      patientId: patientProfile?.id || null,
+      patientName: patientName || 'Portal Patient',
+      patientCondition: 'Emergency assistance requested from patient portal',
+      callerName: patientName || null,
+      callerPhone: patientProfile?.phone || patientProfile?.phoneNumber || null,
+      pickupAddressLine1: patientProfile?.addressLine1 || patientProfile?.address || 'Patient current location',
+      pickupCity: patientProfile?.city || null, pickupCountry: patientProfile?.country || 'Kenya',
+      pickupLatitude: userLocation.lat, pickupLongitude: userLocation.lng,
+      specialInstructions: 'Requested directly via patient emergency page.',
+      requiresStretcher: true, ambulanceId: selectedAmbulance.backendId,
+    };
+    setOrderSubmitting(true); setOrderError('');
+    try {
+      const createdDispatch = await ambulanceApi.requestAssistance(payload);
+      const fallback = {
+        id: createdDispatch?.id || `local-${Date.now()}`,
+        incidentId: createdDispatch?.incidentId, status: createdDispatch?.status || 'REQUESTED',
+        patientId: payload.patientId, patientName: payload.patientName,
+        callerName: payload.callerName, callerPhone: payload.callerPhone,
+        incidentType: payload.incidentType, vehiclePlate: selectedAmbulance.vehiclePlate || selectedAmbulance.backendId || 'Pending assignment',
+        ambulanceId: selectedAmbulance.backendId, estimatedResponseTime: selectedAmbulance.eta,
+        estimatedDistance: selectedAmbulance.distance, pickupAddressLine1: payload.pickupAddressLine1,
+        pickupCity: payload.pickupCity, requestTime: createdDispatch?.requestTime || new Date().toISOString(),
+        createdAt: createdDispatch?.createdAt || new Date().toISOString(),
+      };
+      const mergedRows = mergeDispatchRows([createdDispatch || fallback], dispatchRows);
+      setDispatchRows(mergedRows); writePersistedEmergencyOrders(mergedRows);
+      setOrderConfirmed(true);
+      await fetchAmbulanceData();
+      await fetchDispatchData({ silent: true });
+      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(EMERGENCY_ORDERS_UPDATED_EVENT));
+      setTimeout(() => { setShowAmbulanceModal(false); setOrderConfirmed(false); }, 3000);
+    } catch (err) { setOrderError(err?.message || 'Failed to submit ambulance request.'); }
+    finally { setOrderSubmitting(false); }
   };
 
   const tabs = [
-      { id: 'ambulance', label: 'Order Ambulance', icon: Ambulance },
-      { id: 'chw', label: 'Community Health Workers', icon: Users }
+    { id: 'ambulance', label: 'Order Ambulance',            icon: Ambulance },
+    { id: 'chw',       label: 'Community Health Workers',   icon: Users },
   ];
 
-  const openMapOverlay = (view) => {
-    setMapView(view);
-    setShowMap(true);
+  const closeAllModals = () => {
+    setShowMap(false);
+    setShowOrdersModal(false);
+    setShowRecentModal(false);
+    setShowHistoryModal(false);
+    setShowCHWModal(false);
+    setShowAmbulanceModal(false);
   };
+
+  const openMapOverlay = (view) => { closeAllModals(); setMapView(view); setShowMap(true); };
+  const openOrdersModal = () => { closeAllModals(); setShowOrdersModal(true); };
+  const openRecentModal = () => { closeAllModals(); setShowRecentModal(true); };
+  const openHistoryModal = () => { closeAllModals(); setShowHistoryModal(true); };
+  const openTipsModal = () => { closeAllModals(); setTipIndex(0); setShowTipsModal(true); };
+  const closeTipsModal = () => { setShowTipsModal(false); setTipIndex(0); };
+  const goToNextTip = () => { setTipIndex((current) => Math.min(current + 1, EMERGENCY_TIPS.length)); };
+  const goToPreviousTip = () => { setTipIndex((current) => Math.max(current - 1, 0)); };
 
   const mapMeta = {
     chw: {
       title: 'Nearby CHW Coverage Map',
       subtitle: 'Showing Community Health Workers around your area',
-      badgeLabel: 'CHW Live View'
+      badgeLabel: 'CHW Live View',
     },
     ambulance: {
       title: 'Live Ambulance Coverage Map',
       subtitle: 'Showing available ambulance coverage around your area',
-      badgeLabel: 'Ambulance Live View'
-    }
+      badgeLabel: 'Ambulance Live View',
+    },
   };
 
+  // ── render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-gray-50">
       {/* Header */}
       <div className="rounded-lg p-2.5">
         <div className="flex items-center gap-2">
@@ -206,31 +1073,50 @@ const Emergency = () => {
           Emergency Hotlines
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2">
-          <a href="tel:999" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-red-300 transition-colors">
+          <a href="tel:999" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-red-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">National Emergency</p>
             <p className="text-sm sm:text-base font-bold text-red-600 break-all">999</p>
           </a>
-          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-blue-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">MediLink Emergency</p>
             <p className="text-sm sm:text-base font-bold text-blue-600 break-all">0743669252</p>
           </a>
-          <a href="tel:911" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+          <a href="tel:911" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-blue-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Ambulance</p>
             <p className="text-sm sm:text-base font-bold text-gray-900 break-all">911</p>
           </a>
-          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+          <a href="tel:+254743669252" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-blue-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Poison Control</p>
             <p className="text-sm sm:text-base font-bold text-gray-900 break-all">0743669252</p>
           </a>
-          <a href="tel:1195" className="min-w-0 w-full p-2.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+          <a href="tel:1195" className="min-w-0 w-full p-2.5 border border-gray-200 hover:border-blue-300 transition-colors">
             <p className="text-[11px] sm:text-xs text-gray-600 leading-tight">Mental Health</p>
             <p className="text-sm sm:text-base font-bold text-gray-900 break-all">1195</p>
           </a>
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button onClick={openOrdersModal}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
+            <MapIcon className="w-4 h-4 text-blue-700" />
+            <span>My Orders</span>
+          </button>
+          <button onClick={openRecentModal}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
+            <MapIcon className="w-4 h-4 text-blue-700" />
+            <span>Recent Requests</span>
+          </button>
+          <button onClick={openHistoryModal}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
+            <MapIcon className="w-4 h-4 text-blue-700" />
+            <span>Emergency History</span>
+          </button>
+          <button onClick={openTipsModal}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors shadow-sm">
+            <MapIcon className="w-4 h-4 text-blue-600" />
+            <span>Emergency Tips</span>
+          </button>
+        </div>
       </div>
-
-      
-
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -238,324 +1124,273 @@ const Emergency = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center gap-2 ${
                   activeTab === tab.id
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-800 hover:text-gray-900 hover:border-gray-300'
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                <span>{tab.label}</span>
+                <Icon className="w-4 h-4" /><span>{tab.label}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Content Sections */}
+      {/* Tab content */}
       <div className="space-y-4">
-        {/* Community Health Workers Tab */}
+
+        {/* ── CHW Tab ── */}
         {activeTab === 'chw' && (
           <div className="space-y-4">
             <div className="flex items-center justify-end lg:hidden">
-              <button
-                onClick={() => openMapOverlay('chw')}
-                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm"
-              >
-                <MapIcon className="w-4 h-4 text-blue-600" />
-                <span>Open Live Map</span>
+              <button onClick={() => openMapOverlay('chw')}
+                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                <MapIcon className="w-4 h-4 text-blue-600" /><span>Open Live Map</span>
               </button>
             </div>
 
-            {/* Live map view — desktop only (lg+) */}
-            <div className="hidden lg:block border border-gray-200 overflow-hidden">
+            {/* Desktop map */}
+            <div className="hidden lg:block border border-gray-200 overflow-hidden relative z-0">
               <div className="px-5 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-blue-600" />
-                      {mapMeta.chw.title}
+                      <MapPin className="w-4 h-4 text-blue-600" />{mapMeta.chw.title}
                     </h2>
                     <p className="text-sm text-gray-500 mt-0.5">{mapMeta.chw.subtitle}</p>
                   </div>
-                  <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
-                    {mapMeta.chw.badgeLabel}
-                  </span>
+                  <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">{mapMeta.chw.badgeLabel}</span>
                 </div>
               </div>
-              <iframe
-                src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
-                width="100%"
-                height="460"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="CHW Coverage Map"
-                className="w-full h-[420px] xl:h-[500px]"
+              <div className="flex items-center gap-4 px-5 py-2 border-b border-gray-100 text-xs text-gray-500">
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-600 inline-block"></span>Available CHW</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable CHW</span>
+              </div>
+              <EmergencyGoogleMap
+                userLocation={userLocation}
+                ambulances={ambulances}
+                chws={communityHealthWorkers}
+                view="chw"
+                className="w-full h-[520px] xl:h-[620px]"
               />
             </div>
 
             {/* CHW List */}
-            <div className="p-3">
+            <div className="p-3 border border-gray-200 bg-white">
               <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
                 <Users className="w-4 h-4 mr-2 text-blue-600" />
                 Available Community Health Workers Near You
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
-                {communityHealthWorkers.map((chw) => (
-                  <div
-                    key={chw.id}
-                    className={`p-2 border-2 rounded-lg transition-all ${
-                      chw.available
-                        ? 'border-gray-200 hover:border-gray-300'
-                        : 'border-gray-200 bg-gray-50 opacity-60'
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                          {chw.name.split(' ').map(n => n[0]).join('')}
+              {loadingChw ? (
+                <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">Loading active CHWs...</div>
+              ) : chwError ? (
+                <div className="p-3 text-sm text-red-600 border border-red-200 rounded-lg flex items-center justify-between gap-3">
+                  <span>{chwError}</span>
+                  <button onClick={fetchChwData} className="px-2.5 py-1.5 text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-700 rounded">Retry</button>
+                </div>
+              ) : communityHealthWorkers.length === 0 ? (
+                <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">No CHWs are currently available.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2">
+                  {communityHealthWorkers.map((chw) => (
+                    <div key={chw.id} className={`p-2 border rounded-lg transition-all ${chw.available ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
+                      <div className="flex flex-col">
+                        <div className="flex items-center space-x-1 mb-1">
+                          <Users className={`w-4 h-4 ${chw.available ? 'text-blue-600' : 'text-gray-400'}`} />
+                          <h3 className="text-xs font-bold text-gray-900">{chw.name}</h3>
                         </div>
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-900">{chw.name}</h3>
-                          <p className="text-xs text-gray-600">{chw.specialization}</p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col space-y-1">
-                        <span className="flex items-center text-xs">
-                          <MapPin className="w-3 h-3 mr-0.5" />
-                          {chw.distance}
-                        </span>
-                        <span className="flex items-center text-xs">
-                          <Clock className="w-3 h-3 mr-0.5" />
-                          {chw.responseTime}
-                        </span>
-                        <span className="flex items-center text-xs text-blue-600">
-                          <Star className="w-3 h-3 mr-0.5 fill-current" />
-                          {chw.rating}
-                        </span>
-                      </div>
-                      <div className="mt-2">
                         {chw.available ? (
-                          <div className="flex flex-col space-y-1 items-center">
-                            <span className="px-2 py-0.5 text-green-800 text-xs font-bold">
-                              Available
-                            </span>
-                            <a
-                              href={`tel:${chw.phone}`}
-                              className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors flex items-center space-x-1"
-                              onClick={() => handleCallCHW(chw)}
-                            >
-                              <Phone className="w-3 h-3" />
-                              <span>Call</span>
-                            </a>
-                          </div>
+                          <span className="px-1.5 py-0.5 text-green-700 text-xs font-semibold rounded-full text-center mb-1">Available</span>
                         ) : (
-                          <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full block text-center">
-                            Unavailable
-                          </span>
+                          <span className="px-1.5 py-0.5 text-gray-600 text-xs font-semibold rounded-full text-center mb-1">{titleCase(chw.status, 'Unavailable')}</span>
                         )}
+                        <p className="text-xs text-gray-600 mb-2">{chw.specialization}</p>
+                        <div className="flex flex-col space-y-1 mb-2">
+                          <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{chw.locationLabel}</span></div>
+                          <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{chw.distance}</span></div>
+                          <div className="flex items-center text-xs"><Clock className="w-3 h-3 mr-1 text-blue-600" /><span className="font-bold">Response: {chw.responseTime}</span></div>
+                        </div>
+                        <div className="mb-2 text-xs text-gray-700">
+                          <div className="text-[11px] text-gray-500">Phone</div>
+                          <div className="font-semibold text-sm">{chw.phone}</div>
+                        </div>
+                        <div className="flex justify-center gap-2">
+                          {chw.available ? (
+                            <a href={`tel:${chw.phone}`} onClick={() => handleCallCHW(chw)}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1">
+                              <Phone className="w-3 h-3" /><span>Call</span>
+                            </a>
+                          ) : (
+                            <span className="px-3 py-1 bg-gray-200 text-gray-600 rounded text-xs font-semibold">Unavailable</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Order Ambulance Tab */}
+        {/* ── Ambulance Tab ── */}
         {activeTab === 'ambulance' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-end lg:hidden">
-              <button
-                onClick={() => openMapOverlay('ambulance')}
-                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm"
-              >
-                <MapIcon className="w-4 h-4 text-blue-600" />
-                <span>Open Live Map</span>
-              </button>
-            </div>
-
-            {/* Live map view — desktop only (lg+) */}
-            <div className="hidden lg:block border border-gray-200 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-blue-600" />
-                      {mapMeta.ambulance.title}
-                    </h2>
-                    <p className="text-sm text-gray-500 mt-0.5">{mapMeta.ambulance.subtitle}</p>
-                  </div>
-                  <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
-                    {mapMeta.ambulance.badgeLabel}
-                  </span>
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-end lg:hidden">
+                <button onClick={() => openMapOverlay('ambulance')}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                  <MapIcon className="w-4 h-4 text-blue-600" /><span>Open Live Map</span>
+                </button>
               </div>
-             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d277.7549826743736!2d37.26242921919778!3d-1.5305180166278827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f87eeedd7e1cd%3A0x2bb0f6a2ec4c7859!2sMachakos%20University%20Administration!5e0!3m2!1sen!2ske!4v1774964157029!5m2!1sen!2ske"
-              width="100%"
-              height="260"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Supervisor Coverage Map"
-            />
+
+              {/* Desktop ambulance map */}
+              <div className="border border-gray-200 overflow-hidden relative z-0">
+                <div className="px-5 py-4 border-b border-gray-100">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-blue-600" />{mapMeta.ambulance.title}
+                      </h2>
+                      <p className="text-sm text-gray-500 mt-0.5">{mapMeta.ambulance.subtitle}</p>
+                    </div>
+                    <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">{mapMeta.ambulance.badgeLabel}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 px-5 py-2 border-b border-gray-100 text-xs text-gray-500">
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>Available ambulance</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable</span>
+                </div>
+                <EmergencyGoogleMap
+                  userLocation={userLocation}
+                  ambulances={ambulances}
+                  chws={communityHealthWorkers}
+                  view="ambulance"
+                  className="w-full h-[560px] xl:h-[700px]"
+                />
+              </div>
             </div>
 
             {/* Ambulance List */}
-            <div className="p-3">
+            <div className="p-3 border border-gray-200">
               <h2 className="text-base font-bold text-gray-900 mb-2 flex items-center">
-                <Ambulance className="w-4 h-4 mr-2 text-blue-600" />
-                Available Ambulances Near You
+                <Ambulance className="w-4 h-4 mr-2 text-blue-600" />Available Ambulances Near You
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
-                {ambulances.map((ambulance) => (
-                  <div
-                    key={ambulance.id}
-                    className={`p-2 border-2 rounded-lg transition-all ${
-                      ambulance.available
-                        ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
-                        : 'border-gray-200 bg-gray-50 opacity-60'
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <div className="flex items-center space-x-1 mb-1">
-                        <Ambulance className={`w-4 h-4 ${ambulance.available ? 'text-blue-600' : 'text-gray-400'}`} />
-                        <h3 className="text-xs font-bold text-gray-900">{ambulance.name}</h3>
-                      </div>
-                      {ambulance.available && (
-                        <span className="px-1.5 py-0.5 text-green-700 text-xs font-semibold rounded-full text-center mb-1">
-                          Available
-                        </span>
-                      )}
-                      <p className="text-xs text-gray-600 mb-2">{ambulance.type}</p>
-                      <div className="flex flex-col space-y-1 mb-2">
-                        <div className="flex items-center text-xs">
-                          <MapPin className="w-3 h-3 mr-1 text-gray-500" />
-                          <span className="font-semibold text-gray-700">{ambulance.distance}</span>
+              {loadingAmbulances ? (
+                <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">Loading ambulances...</div>
+              ) : ambulanceError ? (
+                <div className="p-3 text-sm text-red-600 border border-red-200 rounded-lg flex items-center justify-between gap-3">
+                  <span>{ambulanceError}</span>
+                  <button onClick={fetchAmbulanceData} className="px-2.5 py-1.5 text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-700 rounded">Retry</button>
+                </div>
+              ) : ambulances.length === 0 ? (
+                <div className="p-3 text-sm text-gray-500 border border-gray-200 rounded-lg">No ambulances are currently available.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2">
+                  {ambulances.map((ambulance) => (
+                    <div key={ambulance.id} className={`p-2 border rounded-lg transition-all ${ambulance.available ? 'border-gray-200 hover:border-gray-300 hover:shadow-lg' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
+                      <div className="flex flex-col">
+                        <div className="flex items-center space-x-1 mb-1">
+                          <Ambulance className={`w-4 h-4 ${ambulance.available ? 'text-blue-600' : 'text-gray-400'}`} />
+                          <h3 className="text-xs font-bold text-gray-900">{ambulance.name}</h3>
                         </div>
-                        <div className="flex items-center text-xs">
-                          <Clock className="w-3 h-3 mr-1 text-blue-600" />
-                          <span className="font-bold">ETA: {ambulance.eta}</span>
-                        </div>
-                        <div className="flex items-center text-xs">
-                          <Activity className="w-3 h-3 mr-1 text-gray-500" />
-                          <span className="font-semibold text-gray-700">{ambulance.equipment.length} Equipment</span>
-                        </div>
-                        <div className="flex items-center text-xs">
-                          <span className="font-bold">{ambulance.cost}</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {ambulance.equipment.map((item, index) => (
-                          <span
-                            key={index}
-                            className="px-1.5 py-0.5  text-blue-600 text-xs"
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex justify-center">
                         {ambulance.available ? (
-                          <button
-                            onClick={() => handleOrderAmbulance(ambulance)}
-                            className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1"
-                          >
-                            <Ambulance className="w-3 h-3" />
-                            <span>Order</span>
-                          </button>
+                          <span className="px-1.5 py-0.5 text-green-700 text-xs font-semibold rounded-full text-center mb-1">Available</span>
                         ) : (
-                          <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-xs font-semibold">
-                            Unavailable
-                          </span>
+                          <span className="px-1.5 py-0.5 text-gray-600 text-xs font-semibold rounded-full text-center mb-1">{titleCase(ambulance.status, 'Unavailable')}</span>
                         )}
+                        <p className="text-xs text-gray-600 mb-2">{ambulance.type}</p>
+                        <div className="flex flex-col space-y-1 mb-2">
+                          <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{ambulance.locationLabel}</span></div>
+                          <div className="flex items-center text-xs"><MapPin className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{ambulance.distance}</span></div>
+                          <div className="flex items-center text-xs"><Clock className="w-3 h-3 mr-1 text-blue-600" /><span className="font-bold">ETA: {ambulance.eta}</span></div>
+                          <div className="flex items-center text-xs"><Activity className="w-3 h-3 mr-1 text-gray-500" /><span className="font-semibold text-gray-700">{ambulance.equipment.length} Equipment</span></div>
+                          <div className="flex items-center text-xs"><span className="font-bold">{ambulance.cost}</span></div>
+                        </div>
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {ambulance.equipment.map((item, index) => (
+                            <span key={index} className="px-1.5 py-0.5 text-blue-600 text-xs">{item}</span>
+                          ))}
+                        </div>
+                        <div className="mb-2 text-xs text-gray-700">
+                          <div className="text-[11px] text-gray-500">Driver</div>
+                          <div className="font-semibold text-sm">{ambulance.driverName || 'Unassigned'}</div>
+                          <div className="text-[11px] text-gray-700">{ambulance.driverPhone || 'No phone available'}</div>
+                        </div>
+                        <div className="flex justify-center gap-2">
+                          {ambulance.available ? (
+                            <>
+                              <button onClick={() => handleOrderAmbulance(ambulance)}
+                                className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-all shadow-lg flex items-center space-x-1">
+                                <Ambulance className="w-3 h-3" /><span>Order</span>
+                              </button>
+                              {ambulance.driverPhone ? (
+                                <a href={`tel:${ambulance.driverPhone}`} className="px-2 py-0.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold transition-colors flex items-center gap-1">
+                                  <Phone className="w-3 h-3" /> Call Driver
+                                </a>
+                              ) : (
+                                <button disabled className="px-2 py-0.5 bg-gray-200 text-gray-500 rounded text-xs font-semibold opacity-60 cursor-not-allowed">No phone</button>
+                              )}
+                            </>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-xs font-semibold">Unavailable</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Emergency Tips */}
-            <div className="bg-yellow-50 w-full lg:w-3/4 xl:w-1/2 border border-yellow-200 rounded-lg p-3">
-              <h3 className="text-sm font-bold text-yellow-900 mb-1.5 flex items-center">
-                <AlertCircle className="w-3 h-3 mr-1.5" />
-                While waiting for the ambulance:
-              </h3>
-              <ul className="space-y-1.5 text-xs text-yellow-800">
-                <li className="flex items-start">
-                  <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
-                  <span>Stay calm and keep the patient comfortable</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
-                  <span>Keep your phone nearby for communication</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
-                  <span>Have someone wait outside to guide the ambulance</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="w-3 h-3 mr-1.5 mt-0.5 text-yellow-600" />
-                  <span>Gather any relevant medical documents or medications</span>
-                </li>
-              </ul>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
 
-      {/* Emergency Features Component */}
-      <EmergencyFeatures />
-
-      {/* Full-screen map overlay — mobile/tablet only */}
+      {/* Map modal */}
       {showMap && (
-        <div className="lg:hidden fixed inset-0 z-50 flex flex-col bg-white">
-          <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm shrink-0">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-blue-600" />
-              <div>
-                <h2 className="text-sm font-semibold text-gray-900">{mapMeta[mapView].title}</h2>
-                <p className="text-xs text-gray-500">{mapMeta[mapView].subtitle}</p>
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowMap(false)} />
+          <div className="relative w-full h-full lg:h-[80vh] lg:max-h-[80vh] lg:max-w-full lg:mx-0 bg-white rounded-lg overflow-hidden shadow-xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-blue-600" />
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900">{mapMeta[mapView].title}</h2>
+                  <p className="text-xs text-gray-500">{mapMeta[mapView].subtitle}</p>
+                </div>
               </div>
+              <button onClick={() => setShowMap(false)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Close map">
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
             </div>
-            <button
-              onClick={() => setShowMap(false)}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-              aria-label="Close map"
-            >
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
+            <div className="flex items-center gap-4 px-4 py-2 bg-white border-b border-gray-100 text-xs text-gray-500 shrink-0">
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Your location</span>
+              {mapView === 'chw' ? (
+                <>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-600 inline-block"></span>Available CHW</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable CHW</span>
+                </>
+              ) : (
+                <>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>Available ambulance</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>Unavailable</span>
+                </>
+              )}
+            </div>
+            <div className="w-full h-[calc(100%-88px)] lg:h-[calc(80vh-88px)]">
+              <EmergencyGoogleMap
+                userLocation={userLocation}
+                ambulances={ambulances}
+                chws={communityHealthWorkers}
+                view={mapView}
+                className="w-full h-full"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-4 px-4 py-2 bg-white border-b border-gray-100 text-xs text-gray-500 shrink-0">
-            <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
-              Your location
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
-              Active responders
-            </span>
-          </div>
-          <iframe
-            src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
-            width="100%"
-            height="100%"
-            style={{ border: 0, flex: 1, display: 'block' }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Emergency Live Map"
-            className="flex-1 w-full"
-          />
         </div>
       )}
 
@@ -565,34 +1400,21 @@ const Emergency = () => {
           <div className="bg-white shadow-2xl max-w-md w-full p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-bold text-gray-900">Calling CHW</h3>
-              <button
-                onClick={() => setShowCHWModal(false)}
-                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <button onClick={() => setShowCHWModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"><X className="w-4 h-4" /></button>
             </div>
             <div className="text-center mb-4">
               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-3">
-                {selectedCHW.name.split(' ').map(n => n[0]).join('')}
+                {selectedCHW.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
               </div>
               <h4 className="text-base font-semibold text-gray-900">{selectedCHW.name}</h4>
               <p className="text-sm text-gray-600">{selectedCHW.specialization}</p>
+              <p className="text-xs text-gray-500 mt-1">{selectedCHW.locationLabel}</p>
+              <p className="text-xs text-gray-500">{selectedCHW.distance}</p>
               <p className="text-xl font-bold text-blue-600 mt-2">{selectedCHW.phone}</p>
             </div>
-            <div className="space-y-2">
-              <a
-                href={`tel:${selectedCHW.phone}`}
-                className="block w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold text-center transition-colors"
-              >
-                Call Now
-              </a>
-              <button
-                onClick={() => setShowCHWModal(false)}
-                className="block w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
-              >
-                Cancel
-              </button>
+            <div className="space-y-2 flex flex-col items-center">
+              <a href={`tel:${selectedCHW.phone}`} className="px-8 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold text-center transition-colors">Call Now</a>
+              <button onClick={() => setShowCHWModal(false)} className="px-8 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors">Cancel</button>
             </div>
           </div>
         </div>
@@ -606,12 +1428,7 @@ const Emergency = () => {
               <>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold">Confirm Ambulance Order</h3>
-                  <button
-                    onClick={() => setShowAmbulanceModal(false)}
-                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                  <button onClick={() => setShowAmbulanceModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"><X className="w-4 h-4" /></button>
                 </div>
                 <div className="space-y-3 mb-4">
                   <div className="p-3 border border-blue-200 rounded-lg">
@@ -620,22 +1437,10 @@ const Emergency = () => {
                       <h4 className="text-sm font-bold">{selectedAmbulance.name}</h4>
                     </div>
                     <div className="space-y-1.5 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Type:</span>
-                        <span className="font-semibold">{selectedAmbulance.type}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Distance:</span>
-                        <span className="font-semibold">{selectedAmbulance.distance}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">ETA:</span>
-                        <span className="font-semibold ">{selectedAmbulance.eta}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Cost:</span>
-                        <span className="font-bold">{selectedAmbulance.cost}</span>
-                      </div>
+                      <div className="flex justify-between"><span className="text-gray-600">Type:</span><span className="font-semibold">{selectedAmbulance.type}</span></div>
+                      <div className="flex justify-between"><span className="text-gray-600">Distance:</span><span className="font-semibold">{selectedAmbulance.distance}</span></div>
+                      <div className="flex justify-between"><span className="text-gray-600">ETA:</span><span className="font-semibold">{selectedAmbulance.eta}</span></div>
+                      <div className="flex justify-between"><span className="text-gray-600">Cost:</span><span className="font-bold">{selectedAmbulance.cost}</span></div>
                     </div>
                   </div>
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -647,20 +1452,17 @@ const Emergency = () => {
                   </div>
                 </div>
                 <div className="flex flex-col items-center space-y-2">
-                  <button
-                    onClick={confirmAmbulanceOrder}
-                    className="w-40 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors flex items-center justify-center space-x-2"
-                  >
+                  <button onClick={confirmAmbulanceOrder} disabled={orderSubmitting}
+                    className="w-40 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors flex items-center justify-center space-x-2">
                     <CheckCircle className="w-4 h-4" />
-                    <span>Confirm Order</span>
+                    <span>{orderSubmitting ? 'Submitting...' : 'Confirm Order'}</span>
                   </button>
-                  <button
-                    onClick={() => setShowAmbulanceModal(false)}
-                    className="w-40 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
-                  >
+                  <button onClick={() => setShowAmbulanceModal(false)} disabled={orderSubmitting}
+                    className="w-40 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors">
                     Cancel
                   </button>
                 </div>
+                {orderError && <p className="mt-3 text-sm text-red-600 text-center">{orderError}</p>}
               </>
             ) : (
               <div className="text-center py-6">
@@ -668,30 +1470,190 @@ const Emergency = () => {
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Order Confirmed!</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  {selectedAmbulance.name} is on the way
-                </p>
-                <p className="text-xs text-gray-500">
-                  ETA: <span className="font-semibold text-blue-600">{selectedAmbulance.eta}</span>
-                </p>
+                <p className="text-sm text-gray-600 mb-3">{selectedAmbulance.name} is on the way</p>
+                <p className="text-xs text-gray-500">ETA: <span className="font-semibold text-blue-600">{selectedAmbulance.eta}</span></p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Quick Actions */}
+      {/* Orders Modal */}
+      {showOrdersModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold text-gray-900">Your Emergency Orders</h3>
+              <button onClick={() => setShowOrdersModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-500">Track active and recent requests in one place.</p>
+                <button onClick={() => fetchDispatchData()} className="px-2.5 py-1.5 text-xs font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 rounded border border-gray-200">Refresh</button>
+              </div>
+              {dispatchLoading ? (
+                <div className="text-sm text-gray-500">Loading your emergency requests...</div>
+              ) : dispatchError ? (
+                <div className="text-sm text-red-600">{dispatchError}</div>
+              ) : patientDispatches.length === 0 ? (
+                <div className="text-sm text-gray-500">No emergency orders yet.</div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {patientDispatches.map((order, index) => (
+                    <div key={`order-modal-${order.backendId || order.incidentId || index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900 leading-tight">{order.ambulanceName}</p>
+                          <p className="text-xs text-gray-600 mt-1">{order.incidentType}</p>
+                        </div>
+                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>{order.statusLabel}</span>
+                      </div>
+                      <div className="mt-2 text-xs text-gray-700">
+                        <p>ETA: {order.estimatedResponse}</p>
+                        <p>{order.requestedAtLabel}</p>
+                        <p className="truncate">Unit: {order.vehiclePlate || 'Pending assignment'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recent Requests Modal */}
+      {showRecentModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-3xl w-full p-4 max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <h3 className="text-lg font-bold text-gray-900">Recent Requests</h3>
+              <button onClick={() => setShowRecentModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="space-y-3 overflow-y-auto pr-1">
+              {patientDispatches.length === 0 ? (
+                <p className="text-sm text-gray-500">No recent requests.</p>
+              ) : (
+                patientDispatches.map((order, index) => (
+                  <div key={`recent-modal-${order.backendId || order.incidentId || index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3 flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{order.ambulanceName}</p>
+                      <p className="text-xs text-gray-600">{order.requestedAtLabel}</p>
+                      <p className="text-xs text-gray-500">Unit: {order.vehiclePlate || 'Pending assignment'}</p>
+                    </div>
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>{order.statusLabel}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Emergency History Modal */}
+      {showHistoryModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full p-4 max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <h3 className="text-lg font-bold text-gray-900">Emergency Request History</h3>
+              <button onClick={() => setShowHistoryModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="space-y-3 overflow-y-auto pr-1">
+              {patientDispatches.length === 0 ? (
+                <p className="text-sm text-gray-500">No emergency history yet.</p>
+              ) : (
+                patientDispatches.map((order, index) => (
+                  <div key={`history-modal-${order.backendId || order.incidentId || index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{order.ambulanceName}</p>
+                        <p className="text-xs text-gray-600 mt-1">{order.incidentType}</p>
+                        <p className="text-xs text-gray-500 mt-1">{order.requestedAtLabel}</p>
+                      </div>
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${dispatchStatusTone(order.status)}`}>{order.statusLabel}</span>
+                    </div>
+                    <p className="text-xs text-gray-700 mt-2 truncate">Unit: {order.vehiclePlate || 'Pending assignment'}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Emergency Tips Modal */}
+      {showTipsModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full p-4 max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-blue-600" />Emergency Tips
+              </h3>
+              <button onClick={closeTipsModal} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="flex-1 min-h-0 flex flex-col justify-between rounded-lg border border-gray-200 bg-gray-50 p-4">
+              {tipIndex < EMERGENCY_TIPS.length ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-semibold uppercase tracking-wide">
+                      Tip {tipIndex + 1} of {EMERGENCY_TIPS.length}
+                    </span>
+                    <span className="text-xs text-blue-700 bg-white border border-blue-200 rounded-full px-2 py-1">
+                      Stay prepared
+                    </span>
+                  </div>
+                  <div className="rounded-lg bg-white border border-blue-200 p-4 shadow-sm">
+                    <h4 className="text-base sm:text-lg font-medium">{EMERGENCY_TIPS[tipIndex].title}</h4>
+                    <p className="mt-2 text-sm leading-6">{EMERGENCY_TIPS[tipIndex].detail}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-full min-h-[260px] items-center justify-center text-center px-4">
+                  <div className="space-y-3">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white border border-blue-200 shadow-sm">
+                      <CheckCircle className="h-7 w-7 text-blue-600" />
+                    </div>
+                    <h4 className="text-xl font-bold text-blue-900">Come tomorrow for more tips</h4>
+                    <p className="text-sm text-blue-800 max-w-sm mx-auto">
+                      You have reached the end of today&apos;s emergency tips.
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="mt-4 flex items-center justify-between gap-3 shrink-0">
+                <button
+                  onClick={goToPreviousTip}
+                  disabled={tipIndex === 0}
+                  className="px-3 py-2 rounded-lg border border-blue-200 bg-white text-sm font-semibold text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-100 transition-colors"
+                >
+                  Previous
+                </button>
+                {tipIndex < EMERGENCY_TIPS.length ? (
+                  <button
+                    onClick={goToNextTip}
+                    className="px-3 py-2 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    onClick={closeTipsModal}
+                    className="px-3 py-2 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Link
-          to="/client/patient/dashboard"
-          className="flex items-center justify-center space-x-2 p-3transition-colors"
-        >
+        <Link to="/client/patient/dashboard" className="flex items-center justify-center space-x-2 p-3 transition-colors">
           <span className="hover:text-blue-600 font-bold">← Back to Dashboard</span>
         </Link>
-        <Link
-          to="/client/patient/health-records"
-          className="flex items-center justify-center space-x-2 p-3 transition-colors"
-        >
+        <Link to="/client/patient/health-records" className="flex items-center justify-center space-x-2 p-3 transition-colors">
           <span className="hover:text-blue-600 font-bold">View Medical Records →</span>
         </Link>
       </div>

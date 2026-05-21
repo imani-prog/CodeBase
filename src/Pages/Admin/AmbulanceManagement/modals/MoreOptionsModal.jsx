@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Download,
@@ -9,11 +9,17 @@ import {
   MapPin,
   Calendar,
   FileText,
-  AlertTriangle
+  AlertTriangle,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Info
 } from 'lucide-react';
 
 const MoreOptionsModal = ({ ambulance, onClose, onAction }) => {
-  if (!ambulance) return null;
+  const [pendingAction, setPendingAction] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
   const menuItems = [
     {
@@ -70,7 +76,9 @@ const MoreOptionsModal = ({ ambulance, onClose, onAction }) => {
       action: 'archive',
      color: 'text-blue-600',
       bgColor: 'hover:bg-blue-50',
-      description: 'Move to archived vehicles'
+      description: 'Move to archived vehicles',
+      requiresConfirmation: true,
+      confirmLabel: 'Archive this vehicle?'
     },
     {
       icon: Trash2,
@@ -79,17 +87,95 @@ const MoreOptionsModal = ({ ambulance, onClose, onAction }) => {
       color: 'text-red-600',
       bgColor: 'hover:bg-red-50',
       description: 'Permanently remove vehicle',
-      danger: true
+      danger: true,
+      requiresConfirmation: true,
+      confirmLabel: 'Delete this vehicle permanently?'
     }
   ];
 
-  const handleAction = (action) => {
-    onAction(action, ambulance);
-    onClose();
+  const actionMap = Object.fromEntries(menuItems.map((item) => [item.action, item]));
+
+  const renderDetails = (details) => {
+    if (!details) return null;
+    if (Array.isArray(details)) {
+      if (details.length === 0) return null;
+      return (
+        <div className="mt-3 space-y-2">
+          {details.map((entry, index) => {
+            if (entry && typeof entry === 'object') {
+              return (
+                <div key={`${index}-obj`} className="rounded bg-white/70 p-2 text-xs text-gray-700 border border-gray-200">
+                  {Object.entries(entry).map(([key, value]) => (
+                    <div key={key} className="mb-1 last:mb-0">
+                      <span className="font-semibold">{key}:</span> {String(value ?? 'N/A')}
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+            return <p key={`${index}-txt`} className="text-xs text-gray-700">{String(entry)}</p>;
+          })}
+        </div>
+      );
+    }
+    if (details && typeof details === 'object') {
+      return (
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+          {Object.entries(details).map(([key, value]) => (
+            <div key={key} className="rounded bg-white/70 p-2 text-xs text-gray-700 border border-gray-200">
+              <span className="font-semibold">{key}:</span> {String(value ?? 'N/A')}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return <p className="mt-2 text-xs text-gray-700">{String(details)}</p>;
   };
 
+  const feedbackStyle = feedback?.type === 'error'
+    ? 'border-red-200 bg-red-50 text-red-700'
+    : feedback?.type === 'success'
+      ? 'border-green-200 bg-green-50 text-green-700'
+      : 'border-blue-200 bg-blue-50 text-blue-700';
+
+  const feedbackIcon = feedback?.type === 'error'
+    ? <AlertCircle className="w-4 h-4 mt-0.5" />
+    : feedback?.type === 'success'
+      ? <CheckCircle2 className="w-4 h-4 mt-0.5" />
+      : <Info className="w-4 h-4 mt-0.5" />;
+
+  const executeAction = async (action) => {
+    setIsSubmitting(true);
+    setFeedback(null);
+    try {
+      const result = await onAction(action, ambulance);
+      const normalizedResult = result || { type: 'success', message: 'Action completed.' };
+      setFeedback(normalizedResult);
+      if (normalizedResult.closeModal) {
+        onClose();
+      }
+    } catch (error) {
+      setFeedback({ type: 'error', message: error?.message || 'Action failed.' });
+    } finally {
+      setIsSubmitting(false);
+      setPendingAction(null);
+    }
+  };
+
+  const handleAction = (action) => {
+    const option = actionMap[action];
+    if (!option) return;
+    if (option.requiresConfirmation) {
+      setPendingAction(option);
+      return;
+    }
+    executeAction(action);
+  };
+
+  if (!ambulance) return null;
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur flex items-center justify-center p-4 z-50">
       <div className="bg-white shadow-2xl max-w-2xl w-full">
         {/* Header */}
         <div className="p-6 rounded-t-xl">
@@ -111,19 +197,56 @@ const MoreOptionsModal = ({ ambulance, onClose, onAction }) => {
 
         {/* Content */}
         <div className="p-6 max-h-[70vh] overflow-y-auto">
+          {feedback && (
+            <div className={`mb-4 rounded-lg border px-4 py-3 ${feedbackStyle}`}>
+              <div className="flex items-start gap-2">
+                {feedbackIcon}
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{feedback.message}</p>
+                  {renderDetails(feedback.details)}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {pendingAction && (
+            <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-sm font-semibold text-amber-800">{pendingAction.confirmLabel}</p>
+              <p className="text-xs text-amber-700 mt-1">This action will update backend records immediately.</p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={() => executeAction(pendingAction.action)}
+                  disabled={isSubmitting}
+                  className={`px-3 py-1.5 rounded-md text-white text-sm ${pendingAction.danger ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} ${isSubmitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+                >
+                  {isSubmitting ? 'Processing...' : 'Confirm'}
+                </button>
+                <button
+                  onClick={() => setPendingAction(null)}
+                  disabled={isSubmitting}
+                  className="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-3">
             {menuItems.map((item, index) => {
               const Icon = item.icon;
+              const isActionPending = isSubmitting && pendingAction?.action === item.action;
               return (
                 <button
                   key={index}
                   onClick={() => handleAction(item.action)}
+                  disabled={isSubmitting}
                   className={`flex items-start p-4 border-2 border-gray-100 transition-all ${item.bgColor} ${
                     item.danger ? 'border-red-200' : ''
-                  } group`}
+                  } group ${isSubmitting ? 'opacity-60 cursor-not-allowed' : ''}`}
                 >
                   <div className={`p-2 rounded-lg ${item.danger ? '' : ''} mr-4`}>
-                    <Icon className={`w-5 h-5 ${item.color}`} />
+                    {isActionPending ? <Loader2 className={`w-5 h-5 ${item.color} animate-spin`} /> : <Icon className={`w-5 h-5 ${item.color}`} />}
                   </div>
                   <div className="flex-1 text-left">
                     <h3 className={`font-semibold ${item.danger ? 'text-red-600' : 'text-gray-900'} group-hover:${item.color}`}>

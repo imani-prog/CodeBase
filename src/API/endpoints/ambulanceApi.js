@@ -48,4 +48,6 @@ export const ambulanceApi = {
     httpClient.patch(`${API_PATHS.ambulance.drivers}/${id}/status`, null, { query: { status } }),
   assignDriverToAmbulance: (id, ambulanceId) =>
     httpClient.patch(`${API_PATHS.ambulance.drivers}/${id}/assign-ambulance`, null, { query: { ambulanceId } }),
+  unassignDriverFromAmbulance: (id) =>
+    httpClient.patch(`${API_PATHS.ambulance.drivers}/${id}/unassign-ambulance`),
 };

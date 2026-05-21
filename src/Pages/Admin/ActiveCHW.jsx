@@ -5,6 +5,10 @@ import CHWDetailsModal from '../../Components/Admin/CHWDetailsModal';
 import EditCHWModal from '../../Components/Admin/EditCHWModal';
 import AddCHWModal from '../../Components/Admin/AddCHWModal';
 import Pagination from '../../Components/Admin/Pagination';
+import { chwApi } from '../../API/endpoints/chwApi.js';
+
+
+import { LoadingSpinner, ErrorMessage } from '../../Components/Admin/DataState.jsx';
 
 const CHW_DIRECTORY_STORAGE_KEY = 'medilink_admin_chw_directory_v1';
 
@@ -29,6 +33,9 @@ const normalizeCHWRecord = (record) => {
     lastName,
     name,
     avatar,
+    patients: Number(record.assignedPatients) || 0, 
+    monthlyVisits: Number(record.monthlyVisits) || 0,
+    rating: Number(record.rating) || 0,
     status: normalizeCHWStatus(record.status),
     coverageArea: record.coverageArea || record.region || 'Unassigned Coverage Area',
     assignedFacility: record.assignedFacility || record.hospitalName || 'Unassigned Facility',
@@ -37,178 +44,6 @@ const normalizeCHWRecord = (record) => {
   };
 };
 
-const dummyCHWs = [
-  { 
-    id: 1,
-    code: 'CHW-001',
-    firstName: 'Grace',
-    middleName: 'Akinyi',
-    lastName: 'Achieng',
-    name: 'Grace Akinyi Achieng',
-    email: 'grace.achieng@medilink.com', 
-    phone: '+254712345678',
-    addressLine1: 'Kimathi Street, Building 12',
-    addressLine2: 'Floor 3, Suite 5A',
-    city: 'Nairobi',
-    state: 'Nairobi County',
-    postalCode: '00100',
-    country: 'Kenya',
-    latitude: -1.286389,
-    longitude: 36.817223,
-    hospitalId: 'HOSP-001',
-    hospitalName: 'Kenyatta National Hospital',
-    status: 'AVAILABLE',
-    specialization: 'Maternal Health',
-    createdAt: '2023-01-15T08:00:00+03:00',
-    updatedAt: '2025-10-28T14:30:00+03:00',
-    region: 'Nairobi', 
-    patients: 32, 
-    avatar: 'GA',
-    startDate: '2023-01-15',
-    lastActivity: '2025-09-23',
-    monthlyVisits: 48,
-    successRate: 96,
-    responseTime: '1.8hrs',
-    rating: 4.8,
-    lastStatusUpdate: '2025-09-24'
-  },
-  { 
-    id: 2,
-    code: 'CHW-002',
-    firstName: 'Peter',
-    middleName: 'Kamau',
-    lastName: 'Njoroge',
-    name: 'Peter Kamau Njoroge', 
-    email: 'peter.njoroge@medilink.com', 
-    phone: '+254723456789',
-    addressLine1: 'Moi Avenue, Plot 45',
-    addressLine2: null,
-    city: 'Mombasa',
-    state: 'Mombasa County',
-    postalCode: '80100',
-    country: 'Kenya',
-    latitude: -4.043477,
-    longitude: 39.668206,
-    hospitalId: 'HOSP-002',
-    hospitalName: 'Mombasa General Hospital',
-    status: 'AVAILABLE',
-    specialization: 'General Health',
-    createdAt: '2023-03-20T10:00:00+03:00',
-    updatedAt: '2025-10-27T16:45:00+03:00',
-    region: 'Mombasa', 
-    patients: 18, 
-    avatar: 'PN',
-    startDate: '2023-03-20',
-    lastActivity: '2025-09-22',
-    monthlyVisits: 35,
-    successRate: 94,
-    responseTime: '2.1hrs',
-    rating: 4.6,
-    lastStatusUpdate: '2025-09-23'
-  },
-  { 
-    id: 3,
-    code: 'CHW-003',
-    firstName: 'Lucy',
-    middleName: 'Nyambura',
-    lastName: 'Wanjiku',
-    name: 'Lucy Nyambura Wanjiku', 
-    email: 'lucy.wanjiku@medilink.com', 
-    phone: '+254734567890',
-    addressLine1: 'Oginga Odinga Street',
-    addressLine2: 'Near Kisumu Municipal Market',
-    city: 'Kisumu',
-    state: 'Kisumu County',
-    postalCode: '40100',
-    country: 'Kenya',
-    latitude: -0.091702,
-    longitude: 34.767956,
-    hospitalId: 'HOSP-003',
-    hospitalName: 'Kisumu County Hospital',
-    status: 'AVAILABLE',
-    specialization: 'Child Health',
-    createdAt: '2022-11-10T09:30:00+03:00',
-    updatedAt: '2025-10-28T11:20:00+03:00',
-    region: 'Kisumu', 
-    patients: 25, 
-    avatar: 'LW',
-    startDate: '2022-11-10',
-    lastActivity: '2025-09-24',
-    monthlyVisits: 42,
-    successRate: 97,
-    responseTime: '1.5hrs',
-    rating: 4.9,
-    lastStatusUpdate: '2025-09-24'
-  },
-  { 
-    id: 4,
-    code: 'CHW-004',
-    firstName: 'Joseph',
-    middleName: 'Omondi',
-    lastName: 'Otieno',
-    name: 'Joseph Omondi Otieno', 
-    email: 'joseph.otieno@medilink.com', 
-    phone: '+254745678901',
-    addressLine1: 'Kenyatta Avenue',
-    addressLine2: 'Opposite Nakuru Post Office',
-    city: 'Nakuru',
-    state: 'Nakuru County',
-    postalCode: '20100',
-    country: 'Kenya',
-    latitude: -0.303099,
-    longitude: 36.080026,
-    hospitalId: 'HOSP-004',
-    hospitalName: 'Nakuru Level 5 Hospital',
-    status: 'OFFLINE', // On leave status
-    specialization: 'Elderly Care',
-    createdAt: '2023-06-05T07:15:00+03:00',
-    updatedAt: '2025-09-20T09:00:00+03:00',
-    region: 'Nakuru', 
-    patients: 29, 
-    avatar: 'JO',
-    startDate: '2023-06-05',
-    lastActivity: '2025-09-20',
-    monthlyVisits: 0,
-    successRate: 92,
-    responseTime: 'N/A',
-    rating: 4.4,
-    lastStatusUpdate: '2025-09-20'
-  },
-  { 
-    id: 5,
-    code: 'CHW-005',
-    firstName: 'Susan',
-    middleName: 'Wanjiru',
-    lastName: 'Mwangi',
-    name: 'Susan Wanjiru Mwangi', 
-    email: 'susan.mwangi@medilink.com', 
-    phone: '+254756789012',
-    addressLine1: 'Uganda Road',
-    addressLine2: 'Eldoret Medical Plaza, 2nd Floor',
-    city: 'Eldoret',
-    state: 'Uasin Gishu County',
-    postalCode: '30100',
-    country: 'Kenya',
-    latitude: 0.514277,
-    longitude: 35.269779,
-    hospitalId: 'HOSP-005',
-    hospitalName: 'Moi Teaching and Referral Hospital',
-    status: 'BUSY',
-    specialization: 'Mental Health',
-    createdAt: '2022-08-12T11:00:00+03:00',
-    updatedAt: '2025-10-28T15:10:00+03:00',
-    region: 'Eldoret', 
-    patients: 38, 
-    avatar: 'SM',
-    startDate: '2022-08-12',
-    lastActivity: '2025-09-24',
-    monthlyVisits: 52,
-    successRate: 98,
-    responseTime: '1.2hrs',
-    rating: 5.0,
-    lastStatusUpdate: '2025-09-24'
-  },
-];
 
 const ActiveCHW = () => {
   const navigate = useNavigate();
@@ -224,18 +59,34 @@ const ActiveCHW = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [chws, setCHWs] = useState(() => {
-    if (typeof window === 'undefined') return dummyCHWs.map(normalizeCHWRecord);
-    try {
-      const raw = window.localStorage.getItem(CHW_DIRECTORY_STORAGE_KEY);
-      if (!raw) return dummyCHWs.map(normalizeCHWRecord);
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed) || parsed.length === 0) return dummyCHWs.map(normalizeCHWRecord);
-      return parsed.map(normalizeCHWRecord);
-    } catch {
-      return dummyCHWs.map(normalizeCHWRecord);
-    }
-  });
+ 
+
+// Replace the state initialization block with this:
+const [chws, setCHWs] = useState([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
+
+// Replace the useEffect for localStorage with this:
+const fetchCHWs = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    const data = await chwApi.list();
+    const list = Array.isArray(data?.content) ? data.content
+      : Array.isArray(data) ? data : [];
+
+    // ADD THIS to see the raw field names
+    console.log('Raw CHW record sample:', list[0]);
+
+    setCHWs(list.map(normalizeCHWRecord));
+  } catch (err) {
+    setError(err.message || 'Failed to load CHWs');
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => { fetchCHWs(); }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -364,34 +215,42 @@ const ActiveCHW = () => {
     window.open(`mailto:${chw.email}?subject=${subject}&body=${body}`, '_blank');
   };
 
-  const handleDeleteCHW = (chw) => {
-    if (window.confirm(`Are you sure you want to delete ${chw.name}? This action cannot be undone.`)) {
-      setCHWs(prev => prev.filter(c => c.id !== chw.id));
-    }
-  };
+const handleSaveCHW = async (updatedCHW) => {
+  try {
+    await chwApi.update(updatedCHW.id, updatedCHW);
+    fetchCHWs();
+    setShowEditModal(false);
+  } catch (err) {
+    alert('Failed to update CHW: ' + err.message);
+  }
+};
 
-  const handleSaveCHW = (updatedCHW) => {
-    const normalized = normalizeCHWRecord({
-      ...updatedCHW,
-      updatedAt: new Date().toISOString(),
-      lastStatusUpdate: new Date().toISOString().split('T')[0],
-    });
-    setCHWs(prev => prev.map(c => c.id === normalized.id ? normalized : c));
-  };
-
-  const handleAddNewCHW = (newCHW) => {
-    const normalized = normalizeCHWRecord({
-      ...newCHW,
-      createdAt: newCHW.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      lastStatusUpdate: new Date().toISOString().split('T')[0],
-    });
-    setCHWs(prev => [...prev, normalized]);
+const handleAddNewCHW = async (newCHW) => {
+  try {
+    await chwApi.create(newCHW);
+    fetchCHWs();
     setShowAddModal(false);
-  };
+  } catch (err) {
+    alert('Failed to add CHW: ' + err.message);
+  }
+};
+
+const handleDeleteCHW = async (chw) => {
+  if (!window.confirm(`Delete ${chw.name}?`)) return;
+  try {
+    await chwApi.delete(chw.id);
+    fetchCHWs();
+  } catch (err) {
+    alert('Failed to delete CHW: ' + err.message);
+  }
+};
+
 
   // Get unique regions for filter
   const uniqueRegions = [...new Set(chws.map(chw => chw.region))];
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error} onRetry={fetchCHWs} />;
 
   return (
     <div className=" bg-gray-50 min-h-screen">
@@ -461,7 +320,7 @@ const ActiveCHW = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Patients</p>
-                <p className="text-2xl font-bold text-gray-900">{chws.reduce((sum, chw) => sum + chw.patients, 0)}</p>
+                <p className="text-2xl font-bold text-gray-900">{chws.reduce((sum, chw) => sum + (Number(chw.patients) || 0), 0)}</p>
               </div>
             </div>
           </div>

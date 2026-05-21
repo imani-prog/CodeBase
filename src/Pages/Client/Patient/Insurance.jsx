@@ -1,13 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { 
-  Shield, FileText, CreditCard, DollarSign,
+  Shield, FileText, DollarSign,
   CheckCircle, Clock, XCircle, AlertCircle,
-  Download, Plus, Edit, Trash2, 
-  Receipt, Wallet,
+  Download,
+  Receipt,
   Phone, Info, 
   ExternalLink,
-  Copy, Check, RefreshCw, X, Smartphone, Building2, Eye, EyeOff
+  Copy, Check, RefreshCw, X, Smartphone
 } from 'lucide-react';
+import { useAuth } from '../../../hooks/useAuth.jsx';
+import { patientApi } from '../../../API/endpoints/patientApi.js';
+import { insuranceService } from '../../../Services/domain/insuranceService.js';
+
+const normalizeToArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.items)) return payload.items;
+  return [];
+};
+
+const asNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizeId = (value) => (value === null || value === undefined ? '' : String(value));
+
+const formatDate = (value) => {
+  if (!value) return 'N/A';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toISOString().slice(0, 10);
+};
+
+const formatMoney = (value) => {
+  return `KSh ${asNumber(value).toLocaleString()}`;
+};
+
+const formatTitle = (value) => {
+  if (!value) return 'N/A';
+  return String(value)
+    .replace(/[_-]/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+};
 
 // ─── PDF Generation Utility (client-side via jsPDF CDN)
 const loadJsPDF = () => {
@@ -420,300 +457,217 @@ const ClaimDetailsModal = ({ claim, onClose }) => (
   </ModalOverlay>
 );
 
-// Add Payment Method Modal
-const AddPaymentModal = ({ onClose, onAdd }) => {
-  const [type, setType] = useState('mpesa');
-  const [mpesaPhone, setMpesaPhone] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCVV, setCardCVV] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [showCVV, setShowCVV] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = () => {
-    setSaving(true);
-    setTimeout(() => {
-      const newMethod = type === 'mpesa'
-        ? { id: Date.now(), type: 'M-Pesa', number: mpesaPhone, primary: false, icon: Phone }
-        : type === 'card'
-        ? { id: Date.now(), type: 'Credit Card', last4: cardNumber.slice(-4), expiry: cardExpiry, brand: 'Visa', primary: false, icon: CreditCard }
-        : { id: Date.now(), type: 'Bank Transfer', number: bankName, primary: false, icon: Building2 };
-      onAdd(newMethod);
-      onClose();
-    }, 1000);
-  };
-
-  return (
-    <ModalOverlay onClose={onClose}>
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-900">Add Payment Method</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors">
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-        </div>
-
-        {/* Type selector */}
-        <div className="flex gap-1.5 mb-4 bg-gray-100 p-1 rounded-lg">
-          {[
-            { key: 'mpesa', label: 'M-Pesa', Icon: Phone },
-            { key: 'card', label: 'Card', Icon: CreditCard },
-            { key: 'bank', label: 'Bank', Icon: Building2 },
-          ].map((option) => (
-            <button
-              key={option.key}
-              onClick={() => setType(option.key)}
-              className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                type === option.key ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <option.Icon className="w-3 h-3" />
-              {option.label}
-            </button>
-          ))}
-        </div>
-
-        {type === 'mpesa' && (
-          <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Phone Number</label>
-              <div className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-                <Phone className="w-3.5 h-3.5 text-gray-400" />
-                <input value={mpesaPhone} onChange={e => setMpesaPhone(e.target.value)}
-                  className="flex-1 text-sm outline-none" placeholder="+254 7XX XXX XXX" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {type === 'card' && (
-          <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Cardholder Name</label>
-              <input value={cardName} onChange={e => setCardName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="John Doe" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Card Number</label>
-              <input value={cardNumber} onChange={e => setCardNumber(e.target.value.replace(/\D/g, '').slice(0, 16))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="1234 5678 9012 3456" />
-            </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-700 mb-1">Expiry</label>
-                <input value={cardExpiry} onChange={e => setCardExpiry(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="MM/YY" />
-              </div>
-              <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-700 mb-1">CVV</label>
-                <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-                  <input value={cardCVV} onChange={e => setCardCVV(e.target.value.slice(0, 4))}
-                    type={showCVV ? 'text' : 'password'}
-                    className="flex-1 text-sm outline-none w-0" placeholder="•••" />
-                  <button onClick={() => setShowCVV(v => !v)} className="ml-1">
-                    {showCVV ? <EyeOff className="w-3 h-3 text-gray-400" /> : <Eye className="w-3 h-3 text-gray-400" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {type === 'bank' && (
-          <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Bank Name</label>
-              <input value={bankName} onChange={e => setBankName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g. KCB, Equity, NCBA" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Account Number</label>
-              <input value={accountNumber} onChange={e => setAccountNumber(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Account number" />
-            </div>
-          </div>
-        )}
-
-        <div className="flex gap-2 mt-4">
-          <button onClick={onClose} className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-            Cancel
-          </button>
-          <button onClick={handleSave} disabled={saving}
-            className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-60 flex items-center justify-center gap-1.5">
-            {saving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : null}
-            {saving ? 'Saving...' : 'Add Method'}
-          </button>
-        </div>
-      </div>
-    </ModalOverlay>
-  );
-};
-
-// Edit Payment Method Modal
-const EditPaymentModal = ({ method, onClose, onSave }) => {
-  const [value, setValue] = useState(method.number || (method.last4 ? `•••• ${method.last4}` : ''));
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = () => {
-    setSaving(true);
-    setTimeout(() => {
-      onSave({ ...method, number: value });
-      onClose();
-    }, 800);
-  };
-
-  return (
-    <ModalOverlay onClose={onClose}>
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-900">Edit {method.type}</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors">
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-        </div>
-        <div className="mb-4">
-          <label className="block text-xs font-medium text-gray-700 mb-1">
-            {method.type === 'M-Pesa' ? 'Phone Number' : 'Account Details'}
-          </label>
-          <input value={value} onChange={e => setValue(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-        </div>
-        <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm">Cancel</button>
-          <button onClick={handleSave} disabled={saving}
-            className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium disabled:opacity-60 flex items-center justify-center gap-1.5">
-            {saving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : null}
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
-      </div>
-    </ModalOverlay>
-  );
-};
-
-// Confirm Remove Modal
-const ConfirmRemoveModal = ({ method, onClose, onConfirm }) => (
-  <ModalOverlay onClose={onClose}>
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-semibold text-gray-900">Remove Payment Method</h2>
-        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors">
-          <X className="w-4 h-4 text-gray-500" />
-        </button>
-      </div>
-      <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-        <p className="text-sm text-red-800">
-          Are you sure you want to remove <strong>{method.type}</strong> ({method.number || `•••• ${method.last4}`}) from your payment methods?
-        </p>
-      </div>
-      <div className="flex gap-2">
-        <button onClick={onClose} className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm">Cancel</button>
-        <button onClick={() => { onConfirm(method.id); onClose(); }}
-          className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
-          Remove
-        </button>
-      </div>
-    </div>
-  </ModalOverlay>
-);
-
 // ─── Main Insurance Component ────────────────────────────────────────────────
 
 const Insurance = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [copiedText, setCopiedText] = useState('');
+  const [patientId, setPatientId] = useState(null);
+  const [insuranceLoading, setInsuranceLoading] = useState(false);
+  const [insuranceError, setInsuranceError] = useState('');
+  const [billingLoadError, setBillingLoadError] = useState('');
 
   // Modal states
   const [mpesaModal, setMpesaModal] = useState(null); // bill object
   const [claimDetailsModal, setClaimDetailsModal] = useState(null); // claim object
-  const [showAddPayment, setShowAddPayment] = useState(false);
-  const [editPaymentModal, setEditPaymentModal] = useState(null); // method object
-  const [removePaymentModal, setRemovePaymentModal] = useState(null); // method object
   const [downloadingReceipt, setDownloadingReceipt] = useState(null);
   const [downloadingInvoice, setDownloadingInvoice] = useState(null);
 
-  const insuranceInfo = {
-    provider: 'NHIF (National Hospital Insurance Fund)',
-    memberNumber: 'NHIF-2025-789456',
-    status: 'Active',
-    coverageType: 'Family Cover',
-    validFrom: '2025-01-01',
-    validUntil: '2025-12-31',
-    principal: 'John Doe',
-    dependents: 3,
-    monthlyContribution: 'KSh 1,700',
-    lastPayment: '2025-11-01',
-    benefitLimit: 'Up to KSh 500,000 per year',
-    coverageServices: [
-      'Outpatient Services', 'Inpatient Services', 
-      'Maternity Services', 'Surgical Procedures',
-      'Emergency Services', 'Chronic Disease Management'
-    ]
-  };
+  const [insuranceInfo, setInsuranceInfo] = useState({
+    provider: 'N/A',
+    memberNumber: 'N/A',
+    status: 'N/A',
+    coverageType: 'N/A',
+    validFrom: 'N/A',
+    validUntil: 'N/A',
+    principal: 'N/A',
+    dependents: 0,
+    monthlyContribution: 'KSh 0',
+    lastPayment: 'N/A',
+    benefitLimit: 'KSh 0',
+    coverageServices: [],
+  });
 
-  const shaInfo = {
-    provider: 'SHA (Social Health Authority)',
-    memberNumber: 'SHA-KE-2025-456789',
-    status: 'Active',
-    tier: 'Standard Package',
-    validFrom: '2025-01-01',
-    validUntil: '2026-01-01',
-    monthlyContribution: 'KSh 2,500',
-    coverageLevel: 'Enhanced Coverage'
-  };
+  const [shaInfo, setShaInfo] = useState({
+    provider: 'N/A',
+    memberNumber: 'N/A',
+    status: 'N/A',
+    tier: 'N/A',
+    validFrom: 'N/A',
+    validUntil: 'N/A',
+    monthlyContribution: 'KSh 0',
+    coverageLevel: 'N/A',
+  });
 
-  const [claims] = useState([
-    {
-      id: 1, claimNumber: 'CLM-2025-001234', service: 'General Consultation',
-      provider: 'Nairobi Health Center', date: '2025-11-15', claimAmount: 'KSh 3,500',
-      approvedAmount: 'KSh 3,500', status: 'approved', submittedDate: '2025-11-16',
-      processedDate: '2025-11-18', paymentStatus: 'paid', diagnosis: 'Seasonal allergies',
-      doctor: 'Dr. Sarah Kamau'
-    },
-    {
-      id: 2, claimNumber: 'CLM-2025-001198', service: 'Laboratory Tests',
-      provider: 'MediLink Laboratory', date: '2025-11-08', claimAmount: 'KSh 4,200',
-      approvedAmount: 'KSh 4,200', status: 'approved', submittedDate: '2025-11-09',
-      processedDate: '2025-11-12', paymentStatus: 'paid', tests: 'Complete Blood Count, Lipid Panel'
-    },
-    {
-      id: 3, claimNumber: 'CLM-2025-001267', service: 'Prescription Medication',
-      provider: 'Westlands Pharmacy', date: '2025-11-20', claimAmount: 'KSh 2,800',
-      approvedAmount: 'KSh 2,100', copayment: 'KSh 700', status: 'processing',
-      submittedDate: '2025-11-21', paymentStatus: 'pending', medication: 'Amoxicillin, Cetirizine'
+  const [claims, setClaims] = useState([]);
+
+  const [billingHistory, setBillingHistory] = useState([]);
+
+  const loadInsuranceData = useCallback(async () => {
+    if (!user?.id) return;
+    setInsuranceLoading(true);
+    setInsuranceError('');
+    setBillingLoadError('');
+
+    try {
+      const resolvedPatientId = patientId || (await patientApi.resolveMyPatientId(user?.id));
+      if (!resolvedPatientId) {
+        throw new Error('Patient profile not found for this account.');
+      }
+      if (!patientId) setPatientId(resolvedPatientId);
+
+      const [providersResult, policiesResult, billingResult] = await Promise.allSettled([
+        insuranceService.listProviders({ status: 'ACTIVE' }),
+        insuranceService.listPoliciesByPatient(resolvedPatientId),
+        insuranceService.listBillingByPatient(resolvedPatientId),
+      ]);
+
+      const providersResponse = providersResult.status === 'fulfilled' ? providersResult.value : [];
+      const policiesResponse = policiesResult.status === 'fulfilled' ? policiesResult.value : [];
+      const billingResponse = billingResult.status === 'fulfilled' ? billingResult.value : [];
+
+      if (billingResult.status === 'rejected') {
+        setBillingLoadError(billingResult.reason?.message || 'Could not load billing records for this patient.');
+      }
+
+      if (providersResult.status === 'rejected' && policiesResult.status === 'rejected' && billingResult.status === 'rejected') {
+        throw new Error('Unable to load insurance services at the moment.');
+      }
+
+      const providers = normalizeToArray(providersResponse);
+      const providerLookup = new Map(
+        providers.map((provider) => [
+          normalizeId(provider.id || provider.provider_id),
+          provider.name || provider.providerName || provider.provider_name || 'Unknown Provider',
+        ]),
+      );
+
+      const policyRows = normalizeToArray(policiesResponse);
+      const billingRows = normalizeToArray(billingResponse);
+
+      const mappedBilling = billingRows.map((bill) => {
+        const totalAmount = asNumber(bill.totalAmount ?? bill.total_amount ?? bill.amount);
+        const paidAmount = asNumber(bill.paidAmount ?? bill.paid_amount ?? bill.paid);
+        const balanceAmount = Math.max(totalAmount - paidAmount, 0);
+        const status = String(bill.status || (balanceAmount > 0 ? 'pending' : 'paid')).toLowerCase();
+
+        return {
+          id: bill.id,
+          invoiceNumber: bill.invoiceNumber || bill.invoice_number || `INV-${bill.id ?? 'N/A'}`,
+          date: formatDate(bill.date || bill.createdAt || bill.created_at || bill.serviceDate || bill.service_date),
+          service: bill.service || bill.service_name || bill.description || bill.serviceName || 'Medical Service',
+          amount: formatMoney(totalAmount),
+          paid: formatMoney(paidAmount),
+          balance: formatMoney(balanceAmount),
+          status,
+          paymentMethod: 'M-Pesa',
+          paymentDate: bill.paymentDate || bill.payment_date || bill.updatedAt || bill.updated_at
+            ? formatDate(bill.paymentDate || bill.payment_date || bill.updatedAt || bill.updated_at)
+            : '',
+          dueDate: bill.dueDate || bill.due_date ? formatDate(bill.dueDate || bill.due_date) : '',
+        };
+      });
+      setBillingHistory(mappedBilling);
+
+      const resolvePolicy = (policy, fallbackProvider) => {
+        const providerId = normalizeId(policy.providerId || policy.provider_id || policy.insuranceProviderId || policy.insurance_provider_id);
+        const providerName = providerLookup.get(providerId) || policy.providerName || policy.provider_name || policy.provider || fallbackProvider || 'Unknown Provider';
+        return {
+          provider: providerName,
+          memberNumber: policy.policyNumber || policy.policy_number || policy.planCode || policy.plan_code || `POL-${policy.id ?? 'N/A'}`,
+          status: formatTitle(policy.status || 'active'),
+          coverageType: policy.policyType || policy.policy_type || policy.planName || policy.plan_name || policy.type || 'General Cover',
+          validFrom: formatDate(policy.startDate || policy.start_date || policy.effectiveDate || policy.effective_date || policy.validFrom || policy.valid_from),
+          validUntil: formatDate(policy.expiryDate || policy.expiry_date || policy.validUntil || policy.valid_until || policy.endDate || policy.end_date),
+          principal: policy.policyHolder || policy.policy_holder || policy.memberName || policy.member_name || user?.name || 'N/A',
+          dependents: asNumber(policy.dependents ?? policy.beneficiaries ?? policy.beneficiaries_count, 0),
+          monthlyContribution: formatMoney(policy.monthlyPremium ?? policy.monthly_premium ?? policy.premium),
+          lastPayment: formatDate(policy.lastPaymentDate || policy.last_payment_date || policy.updatedAt || policy.updated_at),
+          benefitLimit: formatMoney(policy.coverageAmount ?? policy.coverage_amount ?? policy.coverage ?? policy.annualLimit ?? policy.annual_limit),
+          coverageServices: normalizeToArray(policy.coverageServices || policy.services || policy.benefits),
+          tier: policy.tier || policy.planName || policy.plan_name || 'Standard Package',
+          coverageLevel: policy.coverageLevel || policy.coverage_level || policy.policyType || policy.policy_type || 'Standard Coverage',
+        };
+      };
+
+      const nhifPolicy = policyRows.find((policy) => String(policy.providerName || policy.provider || '').toLowerCase().includes('nhif')) || policyRows[0];
+      const shaPolicy = policyRows.find((policy) => String(policy.providerName || policy.provider || '').toLowerCase().includes('sha')) || policyRows[1] || policyRows[0];
+
+      setInsuranceInfo(nhifPolicy ? resolvePolicy(nhifPolicy, 'NHIF') : {
+        provider: 'N/A', memberNumber: 'N/A', status: 'N/A', coverageType: 'N/A',
+        validFrom: 'N/A', validUntil: 'N/A', principal: user?.name || 'N/A', dependents: 0,
+        monthlyContribution: 'KSh 0', lastPayment: 'N/A', benefitLimit: 'KSh 0', coverageServices: [],
+      });
+
+      setShaInfo(shaPolicy ? resolvePolicy(shaPolicy, 'SHA') : {
+        provider: 'N/A', memberNumber: 'N/A', status: 'N/A', tier: 'N/A',
+        validFrom: 'N/A', validUntil: 'N/A', monthlyContribution: 'KSh 0', coverageLevel: 'N/A',
+      });
+
+      const billingIds = billingRows.map((bill) => bill.id).filter(Boolean);
+      let claimRows = [];
+
+      if (billingIds.length > 0) {
+        const claimResponses = await Promise.all(
+          billingIds.map((id) => insuranceService.listClaimsByBilling(id).catch(() => [])),
+        );
+        claimRows = claimResponses.flatMap((response) => normalizeToArray(response));
+      }
+
+      const uniqueClaims = Array.from(
+        new Map(claimRows.map((claim) => [claim.id || claim.claimNumber, claim])).values(),
+      );
+
+      const mappedClaims = uniqueClaims.map((claim) => {
+        const providerId = normalizeId(claim.providerId || claim.provider_id || claim.insuranceProviderId || claim.insurance_provider_id);
+        const providerName = providerLookup.get(providerId) || claim.providerName || claim.provider_name || claim.provider || claim.hospital || 'MediLink Facility';
+        const claimAmount = asNumber(claim.claimedAmount ?? claim.claimed_amount ?? claim.claimAmount ?? claim.claim_amount ?? claim.amount);
+        const approvedAmountRaw = asNumber(claim.approvedAmount ?? claim.approved_amount ?? claim.paidAmount ?? claim.paid_amount ?? claim.settledAmount ?? claim.settled_amount, 0);
+        const resolvedStatus = String(claim.status || 'pending').toLowerCase();
+        const approvedAmount = approvedAmountRaw > 0 ? approvedAmountRaw : (resolvedStatus === 'approved' ? claimAmount : 0);
+        const copayment = Math.max(claimAmount - approvedAmount, 0);
+        return {
+          id: claim.id,
+          claimNumber: claim.claimNumber || `CLM-${claim.id ?? 'N/A'}`,
+          service: claim.service || claim.service_name || claim.serviceType || claim.service_type || claim.claimType || claim.claim_type || 'Medical Service',
+          provider: providerName,
+          date: claim.serviceDate || claim.service_date || claim.submissionDate || claim.submission_date || claim.createdAt || claim.created_at
+            ? formatDate(claim.serviceDate || claim.service_date || claim.submissionDate || claim.submission_date || claim.createdAt || claim.created_at)
+            : 'N/A',
+          claimAmount: formatMoney(claimAmount),
+          approvedAmount: formatMoney(approvedAmount),
+          copayment: copayment > 0 ? formatMoney(copayment) : '',
+          status: resolvedStatus,
+          submittedDate: claim.submissionDate || claim.submission_date || claim.createdAt || claim.created_at
+            ? formatDate(claim.submissionDate || claim.submission_date || claim.createdAt || claim.created_at)
+            : '',
+          processedDate: claim.processedDate || claim.processed_date || claim.responseDate || claim.response_date || claim.updatedAt || claim.updated_at
+            ? formatDate(claim.processedDate || claim.processed_date || claim.responseDate || claim.response_date || claim.updatedAt || claim.updated_at)
+            : '',
+          paymentStatus: String(claim.paymentStatus || (approvedAmount > 0 ? 'paid' : 'pending')).toLowerCase(),
+          diagnosis: claim.diagnosis || claim.reason || claim.rejectionReason || claim.rejection_reason || '',
+          doctor: claim.doctor || claim.clinician || '',
+          tests: claim.tests || '',
+          medication: claim.medication || '',
+        };
+      });
+      setClaims(mappedClaims);
+    } catch (error) {
+      setInsuranceError(error?.message || 'Unable to load insurance and billing data.');
+      setClaims([]);
+      setBillingHistory([]);
+      setBillingLoadError('');
+      setInsuranceInfo((prev) => ({ ...prev, status: 'N/A' }));
+      setShaInfo((prev) => ({ ...prev, status: 'N/A' }));
+    } finally {
+      setInsuranceLoading(false);
     }
-  ]);
+  }, [patientId, user?.id, user?.name]);
 
-  const [paymentMethods, setPaymentMethods] = useState([
-    { id: 1, type: 'M-Pesa', number: '+254 712 345 678', primary: true, icon: Phone },
-    { id: 2, type: 'Credit Card', last4: '4532', expiry: '12/26', brand: 'Visa', primary: false, icon: CreditCard }
-  ]);
-
-  const [billingHistory, setBillingHistory] = useState([
-    {
-      id: 1, invoiceNumber: 'INV-2025-00156', date: '2025-11-15',
-      service: 'General Consultation + Lab Tests', amount: 'KSh 7,700',
-      paid: 'KSh 7,700', balance: 'KSh 0', status: 'paid', paymentMethod: 'NHIF', paymentDate: '2025-11-18'
-    },
-    {
-      id: 2, invoiceNumber: 'INV-2025-00142', date: '2025-10-22',
-      service: 'Telemedicine Consultation', amount: 'KSh 2,500',
-      paid: 'KSh 2,500', balance: 'KSh 0', status: 'paid', paymentMethod: 'M-Pesa', paymentDate: '2025-10-22'
-    },
-    {
-      id: 3, invoiceNumber: 'INV-2025-00178', date: '2025-11-20',
-      service: 'Prescription Co-payment', amount: 'KSh 700',
-      paid: 'KSh 0', balance: 'KSh 700', status: 'pending', dueDate: '2025-11-30'
-    }
-  ]);
+  useEffect(() => {
+    loadInsuranceData();
+  }, [loadInsuranceData]);
 
   const handlePaymentSuccess = (billId) => {
     setBillingHistory(prev => prev.map(b =>
@@ -741,18 +695,6 @@ const Insurance = () => {
     }
   };
 
-  const handleAddPaymentMethod = (newMethod) => {
-    setPaymentMethods(prev => [...prev, newMethod]);
-  };
-
-  const handleSavePaymentMethod = (updated) => {
-    setPaymentMethods(prev => prev.map(m => m.id === updated.id ? updated : m));
-  };
-
-  const handleRemovePaymentMethod = (id) => {
-    setPaymentMethods(prev => prev.filter(m => m.id !== id));
-  };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved': case 'paid': case 'Active': return 'text-green-700';
@@ -777,6 +719,13 @@ const Insurance = () => {
     setTimeout(() => setCopiedText(''), 2000);
   };
 
+  const toMoneyNumber = (value) => Number(String(value || '').replace(/[^0-9.-]/g, '')) || 0;
+  const totalPendingAmount = billingHistory
+    .filter((bill) => bill.status === 'pending')
+    .reduce((sum, bill) => sum + toMoneyNumber(bill.balance), 0);
+  const totalPaidAmount = billingHistory.reduce((sum, bill) => sum + toMoneyNumber(bill.paid), 0);
+  const totalInvoicedAmount = billingHistory.reduce((sum, bill) => sum + toMoneyNumber(bill.amount), 0);
+
   return (
     <div className="space-y-6">
       {/* Modals */}
@@ -793,42 +742,38 @@ const Insurance = () => {
           onClose={() => setClaimDetailsModal(null)}
         />
       )}
-      {showAddPayment && (
-        <AddPaymentModal
-          onClose={() => setShowAddPayment(false)}
-          onAdd={handleAddPaymentMethod}
-        />
-      )}
-      {editPaymentModal && (
-        <EditPaymentModal
-          method={editPaymentModal}
-          onClose={() => setEditPaymentModal(null)}
-          onSave={handleSavePaymentMethod}
-        />
-      )}
-      {removePaymentModal && (
-        <ConfirmRemoveModal
-          method={removePaymentModal}
-          onClose={() => setRemovePaymentModal(null)}
-          onConfirm={handleRemovePaymentMethod}
-        />
-      )}
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Insurance & Billing</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Insurance & Payments</h1>
           
         </div>
       </div>
+
+      {insuranceError && (
+        <div className="border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 rounded-sm">
+          {insuranceError}
+        </div>
+      )}
+      {insuranceLoading && (
+        <div className="border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700 rounded-sm">
+          Loading insurance data from backend...
+        </div>
+      )}
+      {billingLoadError && !insuranceError && (
+        <div className="border border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-700 rounded-sm">
+          {billingLoadError}
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {[
           { label: "Active Claims", value: claims.filter(c => c.status === 'processing').length, icon: <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />, valueClass: "text-lg sm:text-xl font-bold text-gray-900" },
-          { label: "Pending Payments", value: `KSh ${billingHistory.filter(b => b.status === 'pending').reduce((sum, b) => sum + parseInt(b.balance.replace(/[^0-9]/g, '')), 0).toLocaleString()}`, icon: <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />, valueClass: "text-base sm:text-lg font-bold text-gray-900 truncate" },
+          { label: "Pending Payments", value: `KSh ${totalPendingAmount.toLocaleString()}`, icon: <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />, valueClass: "text-base sm:text-lg font-bold text-gray-900 truncate" },
           { label: "Coverage Status", value: insuranceInfo.status, icon: <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />, valueClass: "text-base sm:text-lg font-bold text-green-600" },
-          { label: "Payment Methods", value: paymentMethods.length, icon: <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />, valueClass: "text-lg sm:text-xl font-bold text-gray-900" },
+          { label: "M-Pesa Transactions", value: billingHistory.length, icon: <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />, valueClass: "text-lg sm:text-xl font-bold text-gray-900" },
         ].map(({ label, value, icon, valueClass }) => (
           <div key={label} className="bg-white p-3 sm:p-4 border border-gray-200 rounded-sm">
             <div className="flex items-start justify-between gap-2">
@@ -845,7 +790,7 @@ const Insurance = () => {
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex overflow-x-auto scrollbar-hide">
-          {['overview', 'claims', 'billing', 'payment-methods'].map((tab) => (
+          {['overview', 'claims', 'finances'].map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`flex-1 sm:flex-none py-3 sm:py-4 px-3 sm:px-5 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
                 activeTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-800 hover:text-gray-900 hover:border-gray-300'
@@ -889,9 +834,11 @@ const Insurance = () => {
                   {insuranceInfo.coverageServices.slice(0, 4).map((service, i) => (
                     <span key={i} className="text-sm px-2 py-0.5 text-blue-700">{service}</span>
                   ))}
-                  <span className="text-xs px-2 py-0.5 bg-gray-50 text-gray-700 rounded-full border border-gray-200">
-                    +{insuranceInfo.coverageServices.length - 4} more
-                  </span>
+                  {insuranceInfo.coverageServices.length > 4 && (
+                    <span className="text-xs px-2 py-0.5 bg-gray-50 text-gray-700 rounded-full border border-gray-200">
+                      +{insuranceInfo.coverageServices.length - 4} more
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1061,151 +1008,96 @@ const Insurance = () => {
         </div>
       )}
 
-      {/* Billing Tab */}
-      {activeTab === 'billing' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {billingHistory.map((bill) => {
-            const isDownloading = downloadingInvoice === bill.id;
-            return (
-              <div key={bill.id} className="bg-white rounded border border-gray-200 p-2.5">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-start gap-2 flex-1 min-w-0">
-                    <div className="p-1.5 rounded flex-shrink-0">
-                      <Receipt className="w-3.5 h-3.5 text-blue-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold truncate">{bill.service}</h3>
-                      <p className="text-xs text-gray-600 truncate">Invoice: {bill.invoiceNumber}</p>
-                      <p className="text-xs text-gray-600">{bill.date}</p>
-                    </div>
-                  </div>
-                  <span className={`text-sm font-semibold px-1.5 py-0.5 flex-shrink-0 ml-2 ${getStatusColor(bill.status)}`}>{bill.status}</span>
-                </div>
+      {/* Finances Tab */}
+      {activeTab === 'finances' && (
+        <div className="space-y-4">
+         
 
-                <div className="space-y-1.5 text-sm mb-2">
-                  <div className="flex justify-between"><span className="text-gray-500">Total:</span><span className="font-semibold">{bill.amount}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Paid:</span><span className="font-semibold">{bill.paid}</span></div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Balance:</span>
-                    <span className={`font-semibold ${bill.balance === 'KSh 0' ? '' : 'text-red-600'}`}>{bill.balance}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Method:</span>
-                    <span className="font-medium text-gray-900">{bill.paymentMethod || '—'}</span>
-                  </div>
-                  {bill.dueDate && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Due:</span>
-                      <span className="font-medium text-orange-600">{bill.dueDate}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-1.5">
-                  <button
-                    onClick={() => handleDownloadInvoice(bill)}
-                    disabled={isDownloading}
-                    className="flex items-center gap-0.5 px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-sm disabled:opacity-60"
-                  >
-                    {isDownloading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                    {isDownloading ? 'Saving...' : 'Invoice'}
-                  </button>
-                  {bill.status === 'pending' && (
-                    <button
-                      onClick={() => setMpesaModal(bill)}
-                      className="flex items-center gap-0.5 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
-                    >
-                      <CreditCard className="w-3 h-3" />
-                      Pay
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Payment Methods Tab */}
-      {activeTab === 'payment-methods' && (
-        <div className="space-y-3">
-          <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
-            <div className="flex items-start gap-2">
-              <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="text-xs font-semibold text-blue-900">Secure Payments</h3>
-                <p className="text-xs text-blue-800 mt-0.5">All payment information is encrypted and securely stored. We support M-Pesa, credit/debit cards, and bank transfers.</p>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="bg-white rounded border border-gray-200 p-3">
+              <p className="text-xs text-gray-500">Total Invoiced</p>
+              <p className="text-lg font-bold text-gray-900 mt-1">KSh {totalInvoicedAmount.toLocaleString()}</p>
+            </div>
+            <div className="bg-white rounded border border-gray-200 p-3">
+              <p className="text-xs text-gray-500">Total Paid (M-Pesa)</p>
+              <p className="text-lg font-bold text-green-700 mt-1">KSh {totalPaidAmount.toLocaleString()}</p>
+            </div>
+            <div className="bg-white rounded border border-gray-200 p-3">
+              <p className="text-xs text-gray-500">Outstanding Balance</p>
+              <p className="text-lg font-bold text-red-600 mt-1">KSh {totalPendingAmount.toLocaleString()}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {paymentMethods.map((method) => {
-              const Icon = method.icon;
+            {!insuranceLoading && billingHistory.length === 0 && (
+              <div className="md:col-span-2 lg:col-span-3 bg-white rounded border border-gray-200 p-6 text-center">
+                <Receipt className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-gray-700">No finance records found</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  This patient profile has no financial entries yet, or finance records could not be linked to this patient account.
+                </p>
+              </div>
+            )}
+
+            {billingHistory.map((bill) => {
+              const isDownloading = downloadingInvoice === bill.id;
               return (
-                <div key={method.id} className="bg-white rounded border border-gray-200 p-2.5">
+                <div key={bill.id} className="bg-white rounded border border-gray-200 p-2.5">
                   <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1 rounded">
-                        <Icon className="w-3.5 h-3.5 text-blue-600" />
+                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                      <div className="p-1.5 rounded flex-shrink-0">
+                        <Receipt className="w-3.5 h-3.5 text-blue-600" />
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-gray-900">{method.type}</p>
-                        <p className="text-xs text-gray-600">{method.number || `•••• ${method.last4}`}</p>
-                        {method.expiry && <p className="text-xs text-gray-500">Expires: {method.expiry}</p>}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold truncate">{bill.service}</h3>
+                        <p className="text-xs text-gray-600 truncate">Invoice: {bill.invoiceNumber}</p>
+                        <p className="text-xs text-gray-600">{bill.date}</p>
                       </div>
                     </div>
-                    {method.primary && (
-                      <span className="text-sm font-semibold px-1.5 py-0.5 text-blue-700 flex-shrink-0">Primary</span>
-                    )}
+                    <span className={`text-sm font-semibold px-1.5 py-0.5 flex-shrink-0 ml-2 ${getStatusColor(bill.status)}`}>{bill.status}</span>
                   </div>
-                  <div className="mb-2 p-2 bg-gray-50 rounded">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-gray-600">Status:</span>
-                      <span className="text-green-600 font-medium">Active</span>
+
+                  <div className="space-y-1.5 text-sm mb-2">
+                    <div className="flex justify-between"><span className="text-gray-500">Total:</span><span className="font-semibold">{bill.amount}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-500">Paid:</span><span className="font-semibold">{bill.paid}</span></div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Balance:</span>
+                      <span className={`font-semibold ${bill.balance === 'KSh 0' ? '' : 'text-red-600'}`}>{bill.balance}</span>
                     </div>
-                    {method.type === 'M-Pesa' && (
-                      <div className="flex justify-between items-center text-xs mt-1">
-                        <span className="text-gray-600">Last used:</span>
-                        <span className="text-gray-900">2 days ago</span>
-                      </div>
-                    )}
-                    {method.type !== 'M-Pesa' && (
-                      <div className="flex justify-between items-center text-xs mt-1">
-                        <span className="text-gray-600">Card type:</span>
-                        <span className="text-gray-900">{method.brand || 'Visa'}</span>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Payment Channel:</span>
+                      <span className="font-medium text-gray-900">M-Pesa</span>
+                    </div>
+                    {bill.dueDate && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Due:</span>
+                        <span className="font-medium text-orange-600">{bill.dueDate}</span>
                       </div>
                     )}
                   </div>
+
                   <div className="flex gap-1.5">
                     <button
-                      onClick={() => setEditPaymentModal(method)}
-                      className="flex items-center gap-0.5 px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-sm"
+                      onClick={() => handleDownloadInvoice(bill)}
+                      disabled={isDownloading}
+                      className="flex items-center gap-0.5 px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors text-sm disabled:opacity-60"
                     >
-                      <Edit className="w-3 h-3" /> Edit
+                      {isDownloading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                      {isDownloading ? 'Saving...' : 'Invoice'}
                     </button>
-                    <button
-                      onClick={() => setRemovePaymentModal(method)}
-                      className="flex items-center gap-0.5 px-2 py-1 bg-white border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors text-sm"
-                    >
-                      <Trash2 className="w-3 h-3" /> Remove
-                    </button>
+                    {bill.status === 'pending' && (
+                      <button
+                        onClick={() => setMpesaModal(bill)}
+                        className="flex items-center gap-0.5 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
+                      >
+                        <Phone className="w-3 h-3" />
+                        Pay via M-Pesa
+                      </button>
+                    )}
                   </div>
                 </div>
               );
             })}
-
-            {/* Add Payment Method Card */}
-            <button
-              onClick={() => setShowAddPayment(true)}
-              className="bg-white rounded border-2 border-dashed border-gray-300 p-3 hover:border-blue-400 hover:bg-blue-50 transition-all group"
-            >
-              <div className="text-center">
-                <Plus className="w-6 h-6 text-gray-400 group-hover:text-blue-600 mx-auto mb-1" />
-                <p className="text-sm font-medium text-gray-600 group-hover:text-blue-600">Add Payment Method</p>
-                <p className="text-xs text-gray-500 mt-0.5">M-Pesa, Card, or Bank Transfer</p>
-              </div>
-            </button>
           </div>
         </div>
       )}

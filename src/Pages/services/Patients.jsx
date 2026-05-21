@@ -35,7 +35,7 @@ const List = ({ items, small }) => (
 
 const Patients = () => {
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50 overflow-x-hidden">
       <main className="flex flex-col items-center w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-[1200px] mx-auto">
 
         {/* Header Section */}

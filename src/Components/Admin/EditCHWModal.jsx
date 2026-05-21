@@ -40,11 +40,14 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
     });
   }, [chw]);
 
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setFormData(p => ({ ...p, [name]: value }));
-    if (errors[name]) setErrors(p => ({ ...p, [name]: "" }));
-  };
+const handleChange = e => {
+  const { name, value, type } = e.target;
+  setFormData(p => ({
+    ...p,
+    [name]: type === "number" ? (value === "" ? "" : Number(value)) : value
+  }));
+  if (errors[name]) setErrors(p => ({ ...p, [name]: "" }));
+};
 
   const validateForm = () => {
     const req = ["firstName", "lastName", "email", "phone", "city", "state", "country", "status"];
@@ -67,7 +70,7 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
         status: formData.status === 'ON_LEAVE' ? 'OFFLINE' : formData.status,
       });
       setIsSaving(false);
-      onClose();
+     
     }, 1000);
   };
 
@@ -81,7 +84,7 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
           <FieldIcon className="h-5 w-5 text-gray-400" />
         </div>}
         {options ? (
-          <select name={name} value={formData[name] || ""} onChange={handleChange}
+          <select name={name} value={formData[name] ?? ""} onChange={handleChange}
             className={`w-full ${FieldIcon ? "pl-10" : "px-4"} pr-4 py-3 border ${
               errors[name] ? "border-red-300 focus:ring-red-500" : "border-gray-300"
             } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent transition-all appearance-none bg-white`}>
@@ -92,7 +95,7 @@ const EditCHWModal = ({ chw, isOpen, onClose, onSave }) => {
           <input
             type={type}
             name={name}
-            value={formData[name] || ""}
+            value={formData[name] ?? ""}
             onChange={handleChange}
             className={`w-full ${FieldIcon ? "pl-10" : "px-4"} pr-4 py-3 border ${
               errors[name] ? "border-red-300 focus:ring-red-500" : "border-gray-300"

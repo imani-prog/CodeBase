@@ -10,17 +10,27 @@ let authHandlers = {
   onUnauthorized: null,
 };
 
+
+let isRefreshing = false;
+let refreshQueue = []; // Array of { resolve, reject }
+
+function processQueue(succeeded) {
+  refreshQueue.forEach(({ resolve, reject }) =>
+    succeeded ? resolve() : reject(new Error("Session expired"))
+  );
+  refreshQueue = [];
+}
+
+
 function buildUrl(path, query) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const url = new URL(`${API_BASE_URL}${normalizedPath}`);
-
   if (query && typeof query === "object") {
     Object.entries(query).forEach(([key, value]) => {
       if (value === undefined || value === null || value === "") return;
       url.searchParams.set(key, String(value));
     });
   }
-
   return url.toString();
 }
 
@@ -43,40 +53,50 @@ function getStoredToken(key) {
 
 function setStoredToken(key, value) {
   if (typeof window === "undefined") return;
-  if (!value) {
-    window.localStorage.removeItem(key);
-    return;
-  }
+  if (!value) { window.localStorage.removeItem(key); return; }
   window.localStorage.setItem(key, value);
 }
 
-export function getApiBaseUrl() {
-  return API_BASE_URL;
-}
-
-export function getAccessToken() {
-  return getStoredToken(TOKEN_KEYS.access);
-}
-
-export function getRefreshToken() {
-  return getStoredToken(TOKEN_KEYS.refresh);
-}
+export function getApiBaseUrl()  { return API_BASE_URL; }
+export function getAccessToken() { return getStoredToken(TOKEN_KEYS.access); }
+export function getRefreshToken(){ return getStoredToken(TOKEN_KEYS.refresh); }
 
 export function setTokens({ accessToken, refreshToken }) {
-  setStoredToken(TOKEN_KEYS.access, accessToken || null);
-  setStoredToken(TOKEN_KEYS.refresh, refreshToken || null);
+  setStoredToken(TOKEN_KEYS.access,   accessToken  || null);
+  setStoredToken(TOKEN_KEYS.refresh,  refreshToken || null);
 }
 
 export function clearTokens() {
-  setStoredToken(TOKEN_KEYS.access, null);
+  setStoredToken(TOKEN_KEYS.access,  null);
   setStoredToken(TOKEN_KEYS.refresh, null);
 }
 
 export function configureHttpClientHandlers(handlers = {}) {
   authHandlers = {
-    refresh: handlers.refresh || null,
+    refresh:        handlers.refresh        || null,
     onUnauthorized: handlers.onUnauthorized || null,
   };
+}
+
+async function executeRefresh() {
+
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      refreshQueue.push({ resolve, reject });
+    }).then(() => true).catch(() => false);
+  }
+
+  isRefreshing = true;
+  try {
+    const succeeded = await authHandlers.refresh();
+    processQueue(succeeded);
+    return succeeded;
+  } catch {
+    processQueue(false);
+    return false;
+  } finally {
+    isRefreshing = false;
+  }
 }
 
 export async function request(path, options = {}) {
@@ -108,13 +128,20 @@ export async function request(path, options = {}) {
   });
 
   if (response.status === 401 && retryOn401 && typeof authHandlers.refresh === "function") {
-    const refreshed = await authHandlers.refresh();
+    const refreshed = await executeRefresh(); 
+
     if (refreshed) {
+     
       return request(path, { ...options, retryOn401: false });
     }
+
+    
     if (typeof authHandlers.onUnauthorized === "function") {
       authHandlers.onUnauthorized();
     }
+    const error = new Error("Session expired. Please log in again.");
+    error.status = 401;
+    throw error;
   }
 
   const rawText = await response.text();
@@ -133,9 +160,9 @@ export async function request(path, options = {}) {
 
 export const httpClient = {
   request,
-  get: (path, options = {}) => request(path, { ...options, method: "GET" }),
-  post: (path, body, options = {}) => request(path, { ...options, method: "POST", body }),
-  put: (path, body, options = {}) => request(path, { ...options, method: "PUT", body }),
-  patch: (path, body, options = {}) => request(path, { ...options, method: "PATCH", body }),
-  delete: (path, options = {}) => request(path, { ...options, method: "DELETE" }),
+  get:    (path, options = {})        => request(path, { ...options, method: "GET" }),
+  post:   (path, body, options = {})  => request(path, { ...options, method: "POST",   body }),
+  put:    (path, body, options = {})  => request(path, { ...options, method: "PUT",    body }),
+  patch:  (path, body, options = {})  => request(path, { ...options, method: "PATCH",  body }),
+  delete: (path, options = {})        => request(path, { ...options, method: "DELETE" }),
 };

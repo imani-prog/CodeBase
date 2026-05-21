@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { X, Calendar, Clock, Video, Phone, MessageSquare, User, Stethoscope, AlertCircle, FileText } from 'lucide-react';
 
-const ScheduleSessionModal = ({ isOpen, onClose, onSchedule }) => {
+const ScheduleSessionModal = ({ isOpen, onClose, onSchedule, patients = [], doctors = [], patientsLoading = false }) => {
   const [formData, setFormData] = useState({
     patientId: '',
     patientName: '',
@@ -47,13 +47,15 @@ const ScheduleSessionModal = ({ isOpen, onClose, onSchedule }) => {
     { value: '60', label: '1 hour' }
   ];
 
-  const doctors = [
+  const fallbackDoctors = useMemo(() => ([
     { id: 'DOC-001', name: 'Dr. Sarah Mitchell', specialty: 'General Medicine' },
     { id: 'DOC-002', name: 'Dr. James Mwangi', specialty: 'Cardiology' },
     { id: 'DOC-003', name: 'Dr. Linda Chen', specialty: 'Pediatrics' },
     { id: 'DOC-004', name: 'Dr. Peter Njoroge', specialty: 'Dermatology' },
     { id: 'DOC-005', name: 'Dr. Grace Kamau', specialty: 'Psychiatry' }
-  ];
+  ]), []);
+
+  const resolvedDoctors = doctors.length > 0 ? doctors : fallbackDoctors;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,7 +67,7 @@ const ScheduleSessionModal = ({ isOpen, onClose, onSchedule }) => {
 
   const handleDoctorChange = (e) => {
     const doctorId = e.target.value;
-    const doctor = doctors.find(d => d.id === doctorId);
+    const doctor = resolvedDoctors.find((d) => String(d.id) === String(doctorId));
     setFormData(prev => ({
       ...prev,
       doctorId: doctorId,
@@ -76,11 +78,24 @@ const ScheduleSessionModal = ({ isOpen, onClose, onSchedule }) => {
     }
   };
 
+  const handlePatientChange = (e) => {
+    const patientId = e.target.value;
+    const patient = patients.find((p) => String(p.id) === String(patientId));
+    setFormData(prev => ({
+      ...prev,
+      patientId,
+      patientName: patient ? patient.name : ''
+    }));
+    if (errors.patientId) {
+      setErrors(prev => ({ ...prev, patientId: '' }));
+    }
+  };
+
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.patientName.trim()) {
-      newErrors.patientName = 'Patient name is required';
+    if (!formData.patientId) {
+      newErrors.patientId = 'Please select a patient';
     }
     if (!formData.doctorId) {
       newErrors.doctorId = 'Please select a doctor';
@@ -162,34 +177,40 @@ const ScheduleSessionModal = ({ isOpen, onClose, onSchedule }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Patient ID (Optional)
+                  Select Patient <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="patientId"
                   value={formData.patientId}
-                  onChange={handleChange}
-                  placeholder="PAT-12345"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                  onChange={handlePatientChange}
+                  disabled={patientsLoading}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.patientId ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">{patientsLoading ? 'Loading patients…' : 'Choose a patient…'}</option>
+                  {patients.map((patient) => (
+                    <option key={patient.id} value={patient.id}>
+                      {patient.name} · {patient.patientId || patient.id}
+                    </option>
+                  ))}
+                </select>
+                {errors.patientId && (
+                  <p className="text-red-500 text-xs mt-1">{errors.patientId}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Patient Name <span className="text-red-500">*</span>
+                  Patient Name
                 </label>
                 <input
                   type="text"
                   name="patientName"
                   value={formData.patientName}
-                  onChange={handleChange}
-                  placeholder="Enter patient name"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.patientName ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  readOnly
+                  placeholder="Auto-filled from selection"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700"
                 />
-                {errors.patientName && (
-                  <p className="text-red-500 text-xs mt-1">{errors.patientName}</p>
-                )}
               </div>
             </div>
           </div>
@@ -213,7 +234,7 @@ const ScheduleSessionModal = ({ isOpen, onClose, onSchedule }) => {
                 }`}
               >
                 <option value="">Choose a doctor...</option>
-                {doctors.map(doctor => (
+                {resolvedDoctors.map(doctor => (
                   <option key={doctor.id} value={doctor.id}>
                     {doctor.name} - {doctor.specialty}
                   </option>

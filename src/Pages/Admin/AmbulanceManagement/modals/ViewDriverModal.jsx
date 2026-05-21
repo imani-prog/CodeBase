@@ -18,6 +18,104 @@ import {
 const ViewDriverModal = ({ driver, onClose, getStatusColor }) => {
   if (!driver) return null;
 
+  const experienceText = driver.experience
+    || (driver.yearsOfExperience !== null && driver.yearsOfExperience !== undefined
+      ? `${driver.yearsOfExperience} years`
+      : 'Not set');
+
+  const formatDateTime = (value) => {
+    if (!value) return 'N/A';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleString();
+  };
+
+  const formatLabel = (key) => {
+    const spaced = String(key)
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return spaced ? spaced.charAt(0).toUpperCase() + spaced.slice(1) : key;
+  };
+
+  const formatValue = (value) => {
+    if (value === null || value === undefined || value === '') return 'N/A';
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    if (Array.isArray(value)) {
+      if (value.length === 0) return 'N/A';
+      const isPrimitiveList = value.every((item) => ['string', 'number', 'boolean'].includes(typeof item));
+      if (isPrimitiveList) return value.join(', ');
+      return value
+        .map((item) => {
+          if (!item || typeof item !== 'object') return String(item);
+          return Object.entries(item)
+            .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== '')
+            .map(([nestedKey, nestedValue]) => `${formatLabel(nestedKey)}: ${nestedValue}`)
+            .join(' | ');
+        })
+        .filter(Boolean)
+        .join(' ; ');
+    }
+    if (typeof value === 'object') {
+      const parts = Object.entries(value)
+        .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== '')
+        .map(([nestedKey, nestedValue]) => `${formatLabel(nestedKey)}: ${nestedValue}`);
+      return parts.length > 0 ? parts.join(' | ') : 'N/A';
+    }
+    return String(value);
+  };
+
+  const renderedKeys = new Set([
+    'id',
+    'name',
+    'driverName',
+    'firstName',
+    'lastName',
+    'licenseNumber',
+    'phone',
+    'driverPhone',
+    'email',
+    'status',
+    'yearsOfExperience',
+    'experienceYears',
+    'experience',
+    'certifications',
+    'currentVehicle',
+    'vehiclePlate',
+    'currentLocation',
+    'location',
+    'shiftStart',
+    'shiftEnd',
+    'totalTrips',
+    'totalDispatches',
+    'rating',
+    'averageRating',
+    'lastTrip',
+    'lastTripTime',
+    'emergencyContact',
+    'dateOfBirth',
+    'hireDate',
+    'createdAt',
+    'updatedAt',
+    'notes',
+    'avatar',
+    'avatarUrl',
+    'currentAmbulance',
+    'assignedAmbulance',
+    'ambulance',
+  ]);
+
+  const currentAmbulanceDetails = driver.backend?.currentAmbulance && typeof driver.backend.currentAmbulance === 'object'
+    ? Object.entries(driver.backend.currentAmbulance)
+      .filter(([, value]) => value !== null && value !== undefined && value !== '')
+    : [];
+
+  const extraBackendFields = driver.backend
+    ? Object.entries(driver.backend)
+      .filter(([key, value]) => !renderedKeys.has(key) && value !== null && value !== undefined && value !== '')
+    : [];
+
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity">
       <div className="bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
@@ -49,7 +147,7 @@ const ViewDriverModal = ({ driver, onClose, getStatusColor }) => {
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold mb-1">{driver.name}</h2>
-              <p className="text-sm text-white/80">License: {driver.licenseNumber} • {driver.experience} experience</p>
+              <p className="text-sm text-white/80">License: {driver.licenseNumber} • {experienceText} experience</p>
             </div>
           </div>
         </div>
@@ -115,6 +213,14 @@ const ViewDriverModal = ({ driver, onClose, getStatusColor }) => {
                   <p className="text-sm font-medium">{driver.currentVehicle || 'Not assigned'}</p>
                 </div>
                 <div>
+                  <p className="text-xs text-gray-500">Assigned Ambulance ID</p>
+                  <p className="text-sm font-medium">{driver.currentAmbulance?.id ?? 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Assigned Ambulance Status</p>
+                  <p className="text-sm font-medium">{driver.currentAmbulance?.status || 'N/A'}</p>
+                </div>
+                <div>
                   <p className="text-xs text-gray-500">Base Location</p>
                   <p className="text-sm font-medium flex items-center">
                     <MapPin className="w-4 h-4 mr-1" />
@@ -140,7 +246,7 @@ const ViewDriverModal = ({ driver, onClose, getStatusColor }) => {
               <div className="space-y-3">
                 <div>
                   <p className="text-xs text-gray-500">Experience</p>
-                  <p className="text-sm font-medium">{driver.experience}</p>
+                  <p className="text-sm font-medium">{experienceText}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Certifications</p>
@@ -188,6 +294,68 @@ const ViewDriverModal = ({ driver, onClose, getStatusColor }) => {
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Backend Fields */}
+            <div className="border border-gray-200 p-4 md:col-span-2">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+                Additional Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <p className="text-xs text-gray-500">Driver ID</p>
+                  <p className="text-sm font-medium">{driver.id ?? 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Date of Birth</p>
+                  <p className="text-sm font-medium">{driver.dateOfBirth || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Hire Date</p>
+                  <p className="text-sm font-medium">{driver.hireDate || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Years of Experience</p>
+                  <p className="text-sm font-medium">{driver.yearsOfExperience ?? 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Record Created</p>
+                  <p className="text-sm font-medium">{formatDateTime(driver.createdAt)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Last Updated</p>
+                  <p className="text-sm font-medium">{formatDateTime(driver.updatedAt)}</p>
+                </div>
+              </div>
+
+              {currentAmbulanceDetails.length > 0 && (
+                <div className="mt-4 border-t border-gray-200 pt-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Current Ambulance Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {currentAmbulanceDetails.map(([key, value]) => (
+                      <div key={key}>
+                        <p className="text-xs text-gray-500">{formatLabel(key)}</p>
+                        <p className="text-sm font-medium whitespace-pre-wrap break-words">{formatValue(value)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {extraBackendFields.length > 0 && (
+                <div className="mt-4 border-t border-gray-200 pt-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">More Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {extraBackendFields.map(([key, value]) => (
+                      <div key={key}>
+                        <p className="text-xs text-gray-500">{formatLabel(key)}</p>
+                        <p className="text-sm font-medium whitespace-pre-wrap break-words">{formatValue(value)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

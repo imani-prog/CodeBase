@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { 
   Building2, 
   Plus, 
@@ -39,9 +39,9 @@ import {
 } from 'lucide-react';
 import HospitalFormModal from '../../Components/Admin/EditHospitalModal';
 import Pagination from '../../Components/Admin/Pagination';
+import { hospitalService } from '../../Services/domain/hospitalService.js';
 
 const HospitalManagement = () => {
-  const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -51,9 +51,10 @@ const HospitalManagement = () => {
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [hospitals, setHospitals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
-  // Hospital types matching backend enum
-  const hospitalTypes = ['PUBLIC', 'PRIVATE', 'FAITH_BASED', 'NGO'];
   const hospitalStatuses = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
   
   // Facility types matching backend
@@ -70,310 +71,94 @@ const HospitalManagement = () => {
     'INPATIENT'
   ];
 
-  // Sample hospitals data matching backend structure exactly
-  const hospitals = [
-    {
-      id: 1,
-      code: 'HS001',
-      name: 'Kenyatta National Hospital',
-      type: 'GENERAL',
-      registrationNumber: 'KNH-REG-2001',
-      taxId: 'TAX-KNH-001',
-      mainPhone: '+254-20-2726300',
-      altPhone: '+254-20-2726301',
-      email: 'info@knh.or.ke',
-      website: 'www.knh.or.ke',
-      fax: '+254-20-2725272',
-      addressLine1: 'Hospital Road, Upper Hill',
-      addressLine2: 'P.O. Box 20723-00202',
-      city: 'Nairobi',
-      state: 'Nairobi County',
-      postalCode: '00202',
-      country: 'Kenya',
-      latitude: -1.3018,
-      longitude: 36.8073,
-      adminContactName: 'Dr. Sarah Kamau',
-      adminContactEmail: 'admin@knh.or.ke',
-      adminContactPhone: '+254-20-2726302',
-      numberOfBeds: 1800,
-      numberOfIcuBeds: 80,
-      numberOfAmbulances: 15,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, Oncology, Cardiology, Neurology, Orthopedics',
-      departments: 'Cardiology, Oncology, Neurology, Orthopedics, Pediatrics, Maternity',
-      operatingHours: '24/7 Emergency, Mon-Fri 8AM-5PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA, AAR, Jubilee, Britam, Madison, CIC',
-      notes: 'National referral and teaching hospital',
-      status: 'ACTIVE',
-      createdAt: '2020-01-15T08:00:00',
-      updatedAt: '2025-12-15T10:30:00'
-    },
-    {
-      id: 2,
-      code: 'HS002',
-      name: 'Aga Khan University Hospital',
-      type: 'SPECIALTY',
-      registrationNumber: 'AKUH-REG-1998',
-      taxId: 'TAX-AKUH-002',
-      mainPhone: '+254-20-3662000',
-      altPhone: '+254-20-3662001',
-      email: 'info@aku.edu',
-      website: 'www.aku.edu/nairobi',
-      fax: '+254-20-3740917',
-      addressLine1: '3rd Parklands Avenue',
-      addressLine2: 'P.O. Box 30270-00100',
-      city: 'Nairobi',
-      state: 'Nairobi County',
-      postalCode: '00100',
-      country: 'Kenya',
-      latitude: -1.2626,
-      longitude: 36.8070,
-      adminContactName: 'Dr. James Orwa',
-      adminContactEmail: 'j.orwa@aku.edu',
-      adminContactPhone: '+254-20-3662002',
-      numberOfBeds: 254,
-      numberOfIcuBeds: 24,
-      numberOfAmbulances: 8,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Cardiology, Oncology, Diagnostics, Wellness Center',
-      departments: 'Cardiology, Oncology, Surgery, Maternity, Diagnostics, Emergency Medicine',
-      operatingHours: '24/7 Emergency and Critical Care, Mon-Sat 8AM-8PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison, CIC, Resolution',
-      notes: 'Leading private teaching hospital with international accreditation',
-      status: 'ACTIVE',
-      createdAt: '2019-05-10T09:00:00',
-      updatedAt: '2025-12-18T14:20:00'
-    },
-    {
-      id: 3,
-      code: 'HS003',
-      name: 'Mombasa General Hospital',
-      type: 'GENERAL',
-      registrationNumber: 'MGH-REG-2003',
-      taxId: 'TAX-MGH-003',
-      mainPhone: '+254-41-2314201',
-      altPhone: '+254-41-2314202',
-      email: 'info@mombasahospital.go.ke',
-      website: 'www.mombasahospital.go.ke',
-      fax: '+254-41-2225792',
-      addressLine1: 'Nyerere Avenue',
-      addressLine2: 'P.O. Box 90114-80100',
-      city: 'Mombasa',
-      state: 'Mombasa County',
-      postalCode: '80100',
-      country: 'Kenya',
-      latitude: -4.0435,
-      longitude: 39.6682,
-      adminContactName: 'Dr. Fatuma Hassan',
-      adminContactEmail: 'f.hassan@mombasahospital.go.ke',
-      adminContactPhone: '+254-41-2314203',
-      numberOfBeds: 650,
-      numberOfIcuBeds: 30,
-      numberOfAmbulances: 6,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, General Medicine, Orthopedics',
-      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Internal Medicine, Orthopedics',
-      operatingHours: '24/7 Emergency Services, Mon-Fri 8AM-6PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA, AAR, Jubilee',
-      notes: 'Main referral hospital for Coast region',
-      status: 'ACTIVE',
-      createdAt: '2020-03-20T10:00:00',
-      updatedAt: '2025-12-10T09:15:00'
-    },
-    {
-      id: 4,
-      code: 'HS004',
-      name: 'Kisumu County Hospital',
-      type: 'GENERAL',
-      registrationNumber: 'KCH-REG-2005',
-      taxId: 'TAX-KCH-004',
-      mainPhone: '+254-57-2020333',
-      altPhone: '+254-57-2020334',
-      email: 'info@kisumuhospital.go.ke',
-      website: null,
-      fax: null,
-      addressLine1: 'Oginga Odinga Street',
-      addressLine2: 'P.O. Box 612-40100',
-      city: 'Kisumu',
-      state: 'Kisumu County',
-      postalCode: '40100',
-      country: 'Kenya',
-      latitude: -0.0917,
-      longitude: 34.7680,
-      adminContactName: 'Dr. Peter Odhiambo',
-      adminContactEmail: 'p.odhiambo@kisumuhospital.go.ke',
-      adminContactPhone: '+254-57-2020335',
-      numberOfBeds: 420,
-      numberOfIcuBeds: 18,
-      numberOfAmbulances: 4,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, HIV/AIDS Care, TB Treatment',
-      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Infectious Diseases',
-      operatingHours: '24/7 Emergency, Mon-Fri 8AM-5PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA',
-      notes: 'County referral hospital serving Nyanza region',
-      status: 'ACTIVE',
-      createdAt: '2020-06-12T11:30:00',
-      updatedAt: '2025-12-05T16:45:00'
-    },
-    {
-      id: 5,
-      code: 'HS005',
-      name: "St. Mary's Mission Hospital",
-      type: 'CLINIC',
-      registrationNumber: 'STMH-REG-1995',
-      taxId: 'TAX-STMH-005',
-      mainPhone: '+254-45-31234',
-      altPhone: '+254-45-31236',
-      email: 'info@stmarysmission.org',
-      website: 'www.stmarysmission.org',
-      fax: '+254-45-31235',
-      addressLine1: 'Catholic Diocese Road',
-      addressLine2: 'P.O. Box 134-60400',
-      city: 'Mumias',
-      state: 'Kakamega County',
-      postalCode: '60400',
-      country: 'Kenya',
-      latitude: 0.3348,
-      longitude: 34.4877,
-      adminContactName: 'Sr. Mary Wanjiru',
-      adminContactEmail: 'm.wanjiru@stmarysmission.org',
-      adminContactPhone: '+254-45-31237',
-      numberOfBeds: 180,
-      numberOfIcuBeds: 8,
-      numberOfAmbulances: 2,
-      servicesOffered: 'General Medicine, Maternity, Surgery, HIV/AIDS Care, TB Treatment, Community Health',
-      departments: 'General Medicine, Maternity, Surgery, Infectious Diseases, Outpatient Services',
-      operatingHours: '24/7 Emergency and Maternity, Mon-Sat 8AM-5PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA',
-      notes: 'Faith-based mission hospital serving rural community',
-      status: 'ACTIVE',
-      createdAt: '2019-11-08T08:00:00',
-      updatedAt: '2025-12-12T13:00:00'
-    },
-    {
-      id: 6,
-      code: 'HS006',
-      name: 'Nairobi Women\'s Hospital',
-      type: 'SPECIALTY',
-      registrationNumber: 'NWH-REG-2001',
-      taxId: 'TAX-NWH-006',
-      mainPhone: '+254-20-7202000',
-      altPhone: '+254-20-7202001',
-      email: 'info@nwch.co.ke',
-      website: 'www.nwch.co.ke',
-      fax: '+254-20-3870219',
-      addressLine1: 'Adams Arcade, Ngong Road',
-      addressLine2: 'P.O. Box 10552-00100',
-      city: 'Nairobi',
-      state: 'Nairobi County',
-      postalCode: '00100',
-      country: 'Kenya',
-      latitude: -1.3027,
-      longitude: 36.7693,
-      adminContactName: 'Dr. Lucy Mwangi',
-      adminContactEmail: 'l.mwangi@nwch.co.ke',
-      adminContactPhone: '+254-20-7202002',
-      numberOfBeds: 120,
-      numberOfIcuBeds: 12,
-      numberOfAmbulances: 5,
-      servicesOffered: 'Maternity, Gynecology, Pediatrics, Fertility Clinic, Well Woman Clinic, Neonatal Care',
-      departments: 'Maternity, Gynecology, Pediatrics, Fertility, Neonatal ICU',
-      operatingHours: '24/7 Emergency Maternity Services, Mon-Sat 8AM-8PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, MATERNITY, SURGERY, PEDIATRICS, OUTPATIENT',
-      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison, CIC, APA',
-      notes: 'Specialized women and children healthcare facility',
-      status: 'ACTIVE',
-      createdAt: '2019-08-22T10:00:00',
-      updatedAt: '2025-12-19T11:30:00'
-    },
-    {
-      id: 7,
-      code: 'HS007',
-      name: 'Gertrude\'s Children Hospital',
-      type: 'SPECIALTY',
-      registrationNumber: 'GCH-REG-1999',
-      taxId: 'TAX-GCH-007',
-      mainPhone: '+254-20-7206000',
-      altPhone: '+254-20-7206001',
-      email: 'info@gerties.org',
-      website: 'www.gerties.org',
-      fax: '+254-20-2721175',
-      addressLine1: 'Muthaiga Road',
-      addressLine2: 'P.O. Box 42325-00100',
-      city: 'Nairobi',
-      state: 'Nairobi County',
-      postalCode: '00100',
-      country: 'Kenya',
-      latitude: -1.2571,
-      longitude: 36.8267,
-      adminContactName: 'Dr. Robert Nyarango',
-      adminContactEmail: 'r.nyarango@gerties.org',
-      adminContactPhone: '+254-20-7206002',
-      numberOfBeds: 85,
-      numberOfIcuBeds: 15,
-      numberOfAmbulances: 3,
-      servicesOffered: 'Pediatrics, Neonatal Care, Pediatric Surgery, Child Vaccination, Child Nutrition, Child Development',
-      departments: 'Pediatrics, Neonatology, Pediatric Surgery, Pediatric ICU, Immunization',
-      operatingHours: '24/7 Emergency Pediatric Care, Mon-Sun 8AM-8PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, SURGERY, PEDIATRICS, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, AAR, Jubilee, Britam, Madison',
-      notes: 'Leading pediatric specialty hospital',
-      status: 'ACTIVE',
-      createdAt: '2019-04-18T09:00:00',
-      updatedAt: '2025-12-17T15:20:00'
-    },
-    {
-      id: 8,
-      code: 'HS008',
-      name: 'Nakuru Level 5 Hospital',
-      type: 'GENERAL',
-      registrationNumber: 'NKR-REG-2004',
-      taxId: 'TAX-NKR-008',
-      mainPhone: '+254-51-2212995',
-      altPhone: '+254-51-2212996',
-      email: 'info@nakuruhospital.go.ke',
-      website: null,
-      fax: null,
-      addressLine1: 'Hospital Road',
-      addressLine2: 'P.O. Box 851-20100',
-      city: 'Nakuru',
-      state: 'Nakuru County',
-      postalCode: '20100',
-      country: 'Kenya',
-      latitude: -0.2827,
-      longitude: 36.0667,
-      adminContactName: 'Dr. Jane Kiplagat',
-      adminContactEmail: 'j.kiplagat@nakuruhospital.go.ke',
-      adminContactPhone: '+254-51-2212997',
-      numberOfBeds: 380,
-      numberOfIcuBeds: 16,
-      numberOfAmbulances: 5,
-      servicesOffered: 'Emergency Care, Surgery, Maternity, Pediatrics, General Medicine, Orthopedics',
-      departments: 'Emergency Medicine, Surgery, Maternity, Pediatrics, Internal Medicine, Orthopedics',
-      operatingHours: '24/7 Emergency Services, Mon-Fri 8AM-5PM Outpatient',
-      facilities: 'LABORATORY, PHARMACY, RADIOLOGY, ICU, EMERGENCY, MATERNITY, SURGERY, OUTPATIENT, INPATIENT',
-      acceptedInsurance: 'NHIF, SHA, AAR',
-      notes: 'County referral hospital for Rift Valley region',
-      status: 'ACTIVE',
-      createdAt: '2020-02-10T10:30:00',
-      updatedAt: '2025-12-14T12:00:00'
+  // Local fallback sample data used only if API loading fails.
+  const sampleHospitals = useMemo(() => [
+    
+  ], []);
+
+  const normalizeHospital = useCallback((row = {}) => ({
+    id: row.id ?? null,
+    code: row.code || '',
+    name: row.name || 'Unnamed Hospital',
+    type: row.type || 'GENERAL',
+    registrationNumber: row.registrationNumber || '',
+    taxId: row.taxId || '',
+    mainPhone: row.mainPhone || row.phone || '',
+    altPhone: row.altPhone || '',
+    email: row.email || '',
+    website: row.website || '',
+    fax: row.fax || '',
+    addressLine1: row.addressLine1 || '',
+    addressLine2: row.addressLine2 || '',
+    city: row.city || '',
+    state: row.state || '',
+    postalCode: row.postalCode || '',
+    country: row.country || 'Kenya',
+    latitude: row.latitude ?? '',
+    longitude: row.longitude ?? '',
+    adminContactName: row.adminContactName || '',
+    adminContactEmail: row.adminContactEmail || '',
+    adminContactPhone: row.adminContactPhone || '',
+    numberOfBeds: Number(row.numberOfBeds) || 0,
+    numberOfIcuBeds: Number(row.numberOfIcuBeds) || 0,
+    numberOfAmbulances: Number(row.numberOfAmbulances) || 0,
+    servicesOffered: Array.isArray(row.servicesOffered)
+      ? row.servicesOffered.join(', ')
+      : (row.servicesOffered || ''),
+    departments: Array.isArray(row.departments)
+      ? row.departments.join(', ')
+      : (row.departments || ''),
+    operatingHours: row.operatingHours || '',
+    facilities: Array.isArray(row.facilities)
+      ? row.facilities.join(', ')
+      : (row.facilities || ''),
+    acceptedInsurance: Array.isArray(row.acceptedInsurance)
+      ? row.acceptedInsurance.join(', ')
+      : (row.acceptedInsurance || ''),
+    notes: row.notes || '',
+    status: row.status || 'ACTIVE',
+    createdAt: row.createdAt || '',
+    updatedAt: row.updatedAt || '',
+  }), []);
+
+  const fetchHospitals = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError('');
+    try {
+      const payload = await hospitalService.listHospitals();
+      const rows = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.items)
+          ? payload.items
+          : Array.isArray(payload?.content)
+            ? payload.content
+            : [];
+      setHospitals(rows.map(normalizeHospital));
+    } catch (error) {
+      setLoadError(error?.message || 'Failed to load hospitals from API.');
+      setHospitals(sampleHospitals.map(normalizeHospital));
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  }, [normalizeHospital, sampleHospitals]);
+
+  useEffect(() => {
+    fetchHospitals();
+  }, [fetchHospitals]);
 
   // Filter hospitals
-  const filteredHospitals = hospitals.filter(hospital => {
-    const matchesSearch = 
-      hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.city.toLowerCase().includes(searchTerm.toLowerCase());
-    
+  const filteredHospitals = useMemo(() => hospitals.filter((hospital) => {
+    const query = searchTerm.toLowerCase();
+    const matchesSearch =
+      (hospital.name || '').toLowerCase().includes(query) ||
+      (hospital.code || '').toLowerCase().includes(query) ||
+      (hospital.city || '').toLowerCase().includes(query);
+
     const matchesType = selectedType === 'all' || hospital.type === selectedType;
     const matchesStatus = selectedStatus === 'all' || hospital.status === selectedStatus;
-    
+
     return matchesSearch && matchesType && matchesStatus;
-  });
+  }), [hospitals, searchTerm, selectedType, selectedStatus]);
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -381,21 +166,41 @@ const HospitalManagement = () => {
   const currentHospitals = filteredHospitals.slice(indexOfFirstItem, indexOfLastItem);
 
   // Reset to page 1 when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedType, selectedStatus]);
 
   // Calculate statistics
-  const stats = {
+  const stats = useMemo(() => ({
     total: hospitals.length,
     active: hospitals.filter(h => h.status === 'ACTIVE').length,
     totalBeds: hospitals.reduce((sum, h) => sum + h.numberOfBeds, 0),
     totalAmbulances: hospitals.reduce((sum, h) => sum + h.numberOfAmbulances, 0),
-    public: hospitals.filter(h => h.type === 'PUBLIC').length,
-    private: hospitals.filter(h => h.type === 'PRIVATE').length,
-    faithBased: hospitals.filter(h => h.type === 'FAITH_BASED').length,
-    ngo: hospitals.filter(h => h.type === 'NGO').length
-  };
+  }), [hospitals]);
+
+  const hospitalTypes = useMemo(() => {
+    const uniqueTypes = new Set(
+      hospitals
+        .map((hospital) => hospital.type)
+        .filter(Boolean)
+    );
+    return Array.from(uniqueTypes).sort();
+  }, [hospitals]);
+
+  const hospitalTypeStats = useMemo(() => {
+    const counts = hospitals.reduce((acc, hospital) => {
+      const type = hospital.type || 'UNKNOWN';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4);
+  }, [hospitals]);
+
+  const topTypeRowOne = hospitalTypeStats.slice(0, 2);
+  const topTypeRowTwo = hospitalTypeStats.slice(2, 4);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -411,7 +216,7 @@ const HospitalManagement = () => {
       case 'PUBLIC': return 'text-blue-800';
       case 'PRIVATE': return 'text-blue-800';
       case 'FAITH_BASED': return 'text-blue-800';
-      case 'NGO': return 'text-tblue-800';
+      case 'NGO': return 'text-blue-800';
       default: return 'text-blue-800';
     }
   };
@@ -425,6 +230,56 @@ const HospitalManagement = () => {
     setSelectedHospital(hospital);
     setShowEditModal(true);
   };
+
+  const handleDeleteHospital = async (hospital) => {
+    if (!hospital?.id) return;
+    const confirmed = window.confirm(`Delete ${hospital.name}? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      await hospitalService.deleteHospital(hospital.id);
+      await fetchHospitals();
+    } catch (error) {
+      setLoadError(error?.message || 'Failed to delete hospital.');
+    }
+  };
+
+  {/* ── Local helper components (place outside the main return or in a separate file) ── */}
+const Section = ({ title, children }) => (
+  <div>
+    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{title}</h3>
+    {children}
+  </div>
+);
+ 
+const Grid = ({ children }) => (
+  <div className="grid grid-cols-2 gap-x-6 gap-y-4">{children}</div>
+);
+ 
+const Field = ({ label, value, children }) => (
+  <div>
+    <p className="text-xs text-gray-400 mb-0.5">{label}</p>
+    {children ?? <p className="text-sm font-medium text-gray-800">{value || '—'}</p>}
+  </div>
+);
+ 
+const Divider = () => <hr className="border-gray-100" />;
+ 
+const TagList = ({ items, color = 'blue' }) => {
+  const colors = {
+    blue:   'bg-blue-50 text-blue-700 border-blue-100',
+    purple: 'bg-purple-50 text-purple-700 border-purple-100',
+  };
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item, i) => (
+        <span key={i} className={`px-2 py-1 text-xs font-medium border rounded ${colors[color]}`}>
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+};
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -501,16 +356,30 @@ const HospitalManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm mb-1">Hospital Types</p>
-                <div className="flex items-center space-x-2 mt-2">
-                  <span className="text-sm font-medium text-blue-600">{stats.public} Public</span>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-sm font-medium text-blue-600">{stats.private} Private</span>
-                </div>
-                <div className="flex items-center space-x-2 mt-1">
-                  <span className="text-sm font-medium text-blue-600">{stats.faithBased} Faith</span>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-sm font-medium text-blue-600">{stats.ngo} NGO</span>
-                </div>
+                {hospitalTypeStats.length > 0 ? (
+                  <>
+                    <div className="flex items-center space-x-2 mt-2">
+                      {topTypeRowOne.map(([type, count], index) => (
+                        <span key={type} className="text-sm font-medium text-blue-600">
+                          {index > 0 && <span className="text-gray-300 mr-2">•</span>}
+                          {count} {type.replaceAll('_', ' ')}
+                        </span>
+                      ))}
+                    </div>
+                    {topTypeRowTwo.length > 0 && (
+                      <div className="flex items-center space-x-2 mt-1">
+                        {topTypeRowTwo.map(([type, count], index) => (
+                          <span key={type} className="text-sm font-medium text-blue-600">
+                            {index > 0 && <span className="text-gray-300 mr-2">•</span>}
+                            {count} {type.replaceAll('_', ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm mt-2 text-gray-500">No type data</p>
+                )}
               </div>
               <div className="h-14 w-14  flex items-center justify-center">
                 <Target className="w-7 h-7 text-blue-600" />
@@ -568,6 +437,12 @@ const HospitalManagement = () => {
           <div className="mt-4 flex items-center space-x-2 text-sm text-gray-600">
             <span>Showing {filteredHospitals.length} of {hospitals.length} hospitals</span>
           </div>
+
+          {loadError && (
+            <div className="mt-3 p-3 border border-red-200 bg-red-50 text-red-700 text-sm rounded-lg">
+              {loadError}
+            </div>
+          )}
         </div>
 
         {/* Hospitals Table */}
@@ -612,7 +487,19 @@ const HospitalManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {currentHospitals.map((hospital) => (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={11} className="px-3 py-10 text-center text-sm text-gray-600">
+                      Loading hospitals...
+                    </td>
+                  </tr>
+                ) : currentHospitals.length === 0 ? (
+                  <tr>
+                    <td colSpan={11} className="px-3 py-10 text-center text-sm text-gray-600">
+                      No hospitals found for the selected filters.
+                    </td>
+                  </tr>
+                ) : currentHospitals.map((hospital) => (
                   <tr key={hospital.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-3 py-3 whitespace-nowrap">
                       <span className="text-xs font-bold text-gray-900">{hospital.code}</span>
@@ -668,6 +555,7 @@ const HospitalManagement = () => {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button 
+                          onClick={() => handleDeleteHospital(hospital)}
                           className="text-red-600 hover:text-red-900 transition-colors"
                           title="Delete"
                         >
@@ -691,281 +579,200 @@ const HospitalManagement = () => {
           itemName="hospitals"
         />
 
-        {/* /* View Modal */ }
-        {showViewModal && selectedHospital && (
-          <div className="flex items-center justify-center z-50 p-4 fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div className="relative bg-white shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              
-              <div className="relative px-8 py-6 bg-blue-950 text-white">
-                <button 
-                  onClick={() => setShowViewModal(false)}
-                  className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-all duration-200"
-                >
-                  <XCircle className="w-5 h-5" />
-                </button>
 
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg ring-4 ring-white/30">
-                      <Building2 className="w-8 h-8 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h2 className="text-2xl font-bold">{selectedHospital.name}</h2>
-                      <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full border border-white/30">
-                        {selectedHospital.code}
-                      </span>
-                    </div>
-                    <p className="text-sm text-white/80">{selectedHospital.type.replace('_', ' ')} • {selectedHospital.city}</p>
-                  </div>
-                </div>
-              </div>
 
-              <div className="p-6 space-y-6">
-                {/* Basic Info */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Basic Information</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="font-bold">Type</p>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(selectedHospital.type)} mt-1`}>
-                        {selectedHospital.type.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-bold">Status</p>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedHospital.status)} mt-1`}>
-                        {selectedHospital.status}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-bold">Registration Number</p>
-                      <p className="text-sm font-medium mt-1">{selectedHospital.registrationNumber}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold">Tax ID</p>
-                      <p className="text-sm font-medium mt-1">{selectedHospital.taxId}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Information */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Contact Information</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-3">
-                      <Phone className="w-5 h-5 " />
-                      <div>
-                        <p className="font-bold">Main Phone</p>
-                        <p className="text-sm font-medium mt-1">{selectedHospital.mainPhone}</p>
-                      </div>
-                    </div>
-                    {selectedHospital.altPhone && (
-                      <div className="flex items-center space-x-3">
-                        <Phone className="w-5 h-5 " />
-                        <div>
-                          <p className="font-bold">Alternative Phone</p>
-                          <p className="text-sm font-medium mt-1">{selectedHospital.altPhone}</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center space-x-3">
-                      <Mail className="w-5 h-5 " />
-                      <div>
-                        <p className="font-bold">Email</p>
-                        <p className="text-sm font-medium mt-1">{selectedHospital.email}</p>
-                      </div>
-                    </div>
-                    {selectedHospital.website && (
-                      <div className="flex items-center space-x-3">
-                        <Globe className="w-5 h-5 " />
-                        <div>
-                          <p className="font-bold">Website</p>
-                          <p className="text-sm font-medium text-blue-600">{selectedHospital.website}</p>
-                        </div>
-                      </div>
-                    )}
-                    {selectedHospital.fax && (
-                      <div className="flex items-center space-x-3">
-                        <Phone className="w-5 h-5 " />
-                        <div>
-                          <p className="font-bold">Fax</p>
-                          <p className="text-sm font-medium mt-1">{selectedHospital.fax}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Administrative Contact */}
-                {(selectedHospital.adminContactName || selectedHospital.adminContactEmail || selectedHospital.adminContactPhone) && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Administrative Contact</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {selectedHospital.adminContactName && (
-                        <div className="flex items-center space-x-3">
-                          <User className="w-5 h-5 " />
-                          <div>
-                            <p className="font-bold">Contact Name</p>
-                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactName}</p>
-                          </div>
-                        </div>
-                      )}
-                      {selectedHospital.adminContactEmail && (
-                        <div className="flex items-center space-x-3">
-                          <Mail className="w-5 h-5 " />
-                          <div>
-                            <p className="font-bold">Contact Email</p>
-                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactEmail}</p>
-                          </div>
-                        </div>
-                      )}
-                      {selectedHospital.adminContactPhone && (
-                        <div className="flex items-center space-x-3">
-                          <Phone className="w-5 h-5 " />
-                          <div>
-                            <p className="font-bold">Contact Phone</p>
-                            <p className="text-sm font-medium mt-1">{selectedHospital.adminContactPhone}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Address */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Address</h3>
-                  <div className="flex items-start space-x-3">
-                    <MapPin className="w-5 h-5 mt-1" />
-                    <div>
-                      <p className="text-sm font-medium ">{selectedHospital.addressLine1}</p>
-                      {selectedHospital.addressLine2 && (
-                        <p className="text-sm ">{selectedHospital.addressLine2}</p>
-                      )}
-                      <p className="text-sm ">
-                        {selectedHospital.city}, {selectedHospital.state} {selectedHospital.postalCode}
-                      </p>
-                      <p className="text-sm ">{selectedHospital.country}</p>
-                      <p className="text-xs mt-2">
-                        Coordinates: {selectedHospital.latitude}, {selectedHospital.longitude}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Capacity */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Capacity</h3>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="border border-gray-200 shadow-md p-4">
-                      <Bed className="w-8 h-8 text-blue-600 mb-2" />
-                      <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfBeds}</p>
-                      <p className="text-sm text-gray-600">Total Beds</p>
-                    </div>
-                    <div className="border border-gray-200 shadow-md p-4">
-                      <Heart className="w-8 h-8 text-blue-600 mb-2" />
-                      <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfIcuBeds}</p>
-                      <p className="text-sm text-gray-600">ICU Beds</p>
-                    </div>
-                    <div className="border border-gray-200 shadow-md p-4">
-                      <Truck className="w-8 h-8 text-blue-600 mb-2" />
-                      <p className="text-2xl font-bold text-gray-900">{selectedHospital.numberOfAmbulances}</p>
-                      <p className="text-sm text-gray-600">Ambulances</p>
-                    </div>
-                  </div>
-                  {selectedHospital.operatingHours && (
-                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="font-bold text-gray-900 mb-1">Operating Hours</p>
-                      <p className="text-sm text-gray-700">{selectedHospital.operatingHours}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Departments */}
-                {selectedHospital.departments && selectedHospital.departments.trim() && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Hospital Departments</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedHospital.departments.split(', ').map((department, index) => (
-                        <span key={index} className="px-3 py-1 bg-purple-50 border border-purple-200 text-purple-800 rounded-full font-medium">
-                          {department}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Services Offered */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Services Offered</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedHospital.servicesOffered.split(', ').map((service, index) => (
-                      <span key={index} className="px-3 py-1  border border-blue-200 text-blue-800 rounded-full font-medium">
-                        {service}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Facilities */}
-                <div>
-                  <h3 className="text-lg font-semibold  mb-4">Facilities Available</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {selectedHospital.facilities.split(', ').map((facility, index) => (
-                      <div key={index} className="flex items-center space-x-2 text-sm text-gray-700">
-                        <CheckCircle className="w-4 h-4 text-blue-600" />
-                        <span>{facility}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Insurance Providers */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Insurance Providers Accepted</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedHospital.acceptedInsurance.split(', ').map((provider, index) => (
-                      <span key={index} className="px-3 py-1 border border-blue-200 text-blue-800 rounded-full font-medium flex items-center space-x-1">
-                        <Shield className="w-3 h-3" />
-                        <span>{provider}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Notes */}
-                {selectedHospital.notes && selectedHospital.notes.trim() && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Notes</h3>
-                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedHospital.notes}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
-                <button 
-                  onClick={() => setShowViewModal(false)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
-                >
-                  Close
-                </button>
-                <button 
-                  onClick={() => {
-                    setShowViewModal(false);
-                    handleEditHospital(selectedHospital);
-                  }}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-                >
-                  Edit Hospital
-                </button>
-              </div>
-            </div>
+{showViewModal && selectedHospital && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur p-4">
+    <div className="bg-white w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col">
+ 
+      {/* ── Header ── */}
+      <div className="flex items-start justify-between px-6 py-5 border-b border-gray-200">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-xl font-bold text-gray-900">{selectedHospital.name}</h2>
+            <span className="px-2 py-0.5 text-xs font-semibold bg-gray-100 text-gray-600 rounded">
+              {selectedHospital.code}
+            </span>
           </div>
+          <p className="text-sm text-gray-500">
+            {selectedHospital.type.replace('_', ' ')} &middot; {selectedHospital.city}
+          </p>
+        </div>
+        <button
+          onClick={() => setShowViewModal(false)}
+          className="text-gray-400 hover:text-gray-600 transition-colors mt-0.5"
+        >
+          <XCircle className="w-5 h-5" />
+        </button>
+      </div>
+ 
+      {/* ── Body ── */}
+      <div className="px-6 py-5 space-y-6 flex-1">
+ 
+        {/* Basic Info */}
+        <Section title="Basic Information">
+          <Grid>
+            <Field label="Type">
+              <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${getTypeColor(selectedHospital.type)}`}>
+                {selectedHospital.type.replace('_', ' ')}
+              </span>
+            </Field>
+            <Field label="Status">
+              <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(selectedHospital.status)}`}>
+                {selectedHospital.status}
+              </span>
+            </Field>
+            <Field label="Registration Number" value={selectedHospital.registrationNumber} />
+            <Field label="Tax ID" value={selectedHospital.taxId} />
+          </Grid>
+        </Section>
+ 
+        <Divider />
+ 
+        {/* Contact */}
+        <Section title="Contact Information">
+          <Grid>
+            <Field label="Main Phone" value={selectedHospital.mainPhone} />
+            {selectedHospital.altPhone && <Field label="Alternative Phone" value={selectedHospital.altPhone} />}
+            <Field label="Email" value={selectedHospital.email} />
+            {selectedHospital.website && <Field label="Website" value={selectedHospital.website} />}
+            {selectedHospital.fax && <Field label="Fax" value={selectedHospital.fax} />}
+          </Grid>
+        </Section>
+ 
+        {/* Admin Contact */}
+        {(selectedHospital.adminContactName || selectedHospital.adminContactEmail || selectedHospital.adminContactPhone) && (
+          <>
+            <Divider />
+            <Section title="Administrative Contact">
+              <Grid>
+                {selectedHospital.adminContactName  && <Field label="Name"  value={selectedHospital.adminContactName} />}
+                {selectedHospital.adminContactEmail && <Field label="Email" value={selectedHospital.adminContactEmail} />}
+                {selectedHospital.adminContactPhone && <Field label="Phone" value={selectedHospital.adminContactPhone} />}
+              </Grid>
+            </Section>
+          </>
         )}
+ 
+        <Divider />
+ 
+        {/* Address */}
+        <Section title="Address">
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {selectedHospital.addressLine1}
+            {selectedHospital.addressLine2 && <>, {selectedHospital.addressLine2}</>}<br />
+            {selectedHospital.city}, {selectedHospital.state} {selectedHospital.postalCode}<br />
+            {selectedHospital.country}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {selectedHospital.latitude}, {selectedHospital.longitude}
+          </p>
+        </Section>
+ 
+        <Divider />
+ 
+        {/* Capacity */}
+        <Section title="Capacity">
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { icon: <Bed className="w-5 h-5 text-blue-500" />,   label: 'Total Beds',  value: selectedHospital.numberOfBeds },
+              { icon: <Heart className="w-5 h-5 text-blue-500" />, label: 'ICU Beds',    value: selectedHospital.numberOfIcuBeds },
+              { icon: <Truck className="w-5 h-5 text-blue-500" />, label: 'Ambulances',  value: selectedHospital.numberOfAmbulances },
+            ].map(({ icon, label, value }) => (
+              <div key={label} className="border border-gray-200 p-4 text-center">
+                <div className="flex justify-center mb-1">{icon}</div>
+                <p className="text-2xl font-bold text-gray-900">{value}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+              </div>
+            ))}
+          </div>
+          {selectedHospital.operatingHours && (
+            <div className="mt-3 px-4 py-3 bg-gray-50 border border-gray-200">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Operating Hours</span>
+              <p className="text-sm text-gray-700 mt-0.5">{selectedHospital.operatingHours}</p>
+            </div>
+          )}
+        </Section>
+ 
+        {/* Departments */}
+        {selectedHospital.departments && selectedHospital.departments.trim() && (
+          <>
+            <Divider />
+            <Section title="Departments">
+              <TagList items={selectedHospital.departments.split(', ')} color="purple" />
+            </Section>
+          </>
+        )}
+ 
+        <Divider />
+ 
+        {/* Services */}
+        <Section title="Services Offered">
+          <TagList items={selectedHospital.servicesOffered.split(', ')} color="blue" />
+        </Section>
+ 
+        <Divider />
+ 
+        {/* Facilities */}
+        <Section title="Facilities">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {selectedHospital.facilities.split(', ').map((f, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                <CheckCircle className="w-4 h-4 text-blue-500 shrink-0" />
+                <span>{f}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+ 
+        <Divider />
+ 
+        {/* Insurance */}
+        <Section title="Accepted Insurance">
+          <div className="flex flex-wrap gap-2">
+            {selectedHospital.acceptedInsurance.split(', ').map((p, i) => (
+              <span key={i} className="flex items-center gap-1 px-2 py-1 border border-gray-200 text-xs text-gray-700 rounded">
+                <Shield className="w-3 h-3 text-gray-400" />
+                {p}
+              </span>
+            ))}
+          </div>
+        </Section>
+ 
+        {/* Notes */}
+        {selectedHospital.notes && selectedHospital.notes.trim() && (
+          <>
+            <Divider />
+            <Section title="Notes">
+              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {selectedHospital.notes}
+              </p>
+            </Section>
+          </>
+        )}
+      </div>
+ 
+      {/* ── Footer ── */}
+      <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 bg-gray-50">
+        <button
+          onClick={() => setShowViewModal(false)}
+          className="px-4 py-2 text-sm text-gray-600 border border-gray-300 hover:bg-gray-100 transition-colors"
+        >
+          Close
+        </button>
+        <button
+          onClick={() => { setShowViewModal(false); handleEditHospital(selectedHospital); }}
+          className="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+        >
+          Edit Hospital
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+ 
+
+ 
 
         {/* Add/Edit Modal */}
         {(showAddModal || showEditModal) && (
@@ -977,10 +784,19 @@ const HospitalManagement = () => {
               setShowEditModal(false);
               setSelectedHospital(null);
             }}
-            onSave={(hospitalData) => {
-              
-              console.log('Saving hospital:', hospitalData);
-             
+            onSave={async (hospitalData) => {
+              try {
+                if (showEditModal && selectedHospital?.id) {
+                  await hospitalService.updateHospital(selectedHospital.id, hospitalData);
+                } else {
+                  await hospitalService.createHospital(hospitalData);
+                }
+                await fetchHospitals();
+                setLoadError('');
+              } catch (error) {
+                setLoadError(error?.message || 'Failed to save hospital.');
+                throw error;
+              }
             }}
             facilityTypes={facilityTypes}
           />

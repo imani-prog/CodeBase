@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import {
   getAppointmentGovernanceSnapshot,
+  refreshAppointmentGovernanceSnapshot,
   rescheduleGovernanceAppointment,
   subscribeToAppointmentGovernanceUpdates,
   transitionGovernanceAppointment,
@@ -90,8 +91,29 @@ const AdminAppointments = () => {
   });
 
   useEffect(() => {
-    setSnapshot(getAppointmentGovernanceSnapshot());
-    return subscribeToAppointmentGovernanceUpdates((next) => setSnapshot(next));
+    let active = true;
+
+    const loadSnapshot = async () => {
+      try {
+        const next = await refreshAppointmentGovernanceSnapshot();
+        if (active) setSnapshot(next);
+      } catch (error) {
+        if (active) {
+          window.alert(error?.message || 'Could not load appointments');
+        }
+      }
+    };
+
+    loadSnapshot();
+
+    const unsubscribe = subscribeToAppointmentGovernanceUpdates((next) => {
+      if (active) setSnapshot(next);
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   const filteredAppointments = useMemo(() => {
@@ -110,24 +132,18 @@ const AdminAppointments = () => {
     });
   }, [snapshot.appointments, searchTerm, statusFilter, providerFilter]);
 
-  const refresh = () => setSnapshot(getAppointmentGovernanceSnapshot());
-
-  const handleMarkArrived = (appointment) => {
-    const result = transitionGovernanceAppointment(appointment.id, 'ARRIVED');
+  const handleMarkArrived = async (appointment) => {
+    const result = await transitionGovernanceAppointment(appointment.id, 'ARRIVED');
     if (!result.ok) {
       window.alert(result.reason || 'Could not mark as arrived');
-      return;
     }
-    refresh();
   };
 
-  const handleMarkCompleted = (appointment) => {
-    const result = transitionGovernanceAppointment(appointment.id, 'COMPLETED');
+  const handleMarkCompleted = async (appointment) => {
+    const result = await transitionGovernanceAppointment(appointment.id, 'COMPLETED');
     if (!result.ok) {
       window.alert(result.reason || 'Could not mark as completed');
-      return;
     }
-    refresh();
   };
 
   const openCancelModal = (appointment) => {
@@ -139,20 +155,19 @@ const AdminAppointments = () => {
     });
   };
 
-  const submitCancelModal = () => {
+  const submitCancelModal = async () => {
     if (!cancelModal.appointment) return;
     const selected = CANCEL_REASON_OPTIONS.find((item) => item.code === cancelModal.reasonCode);
     const reasonText = cancelModal.details.trim()
       ? `${selected?.label || 'Cancellation'} - ${cancelModal.details.trim()}`
       : selected?.label || 'Cancellation';
 
-    const result = transitionGovernanceAppointment(cancelModal.appointment.id, 'CANCELED', reasonText);
+    const result = await transitionGovernanceAppointment(cancelModal.appointment.id, 'CANCELED', reasonText);
     if (!result.ok) {
       window.alert(result.reason || 'Could not cancel appointment');
       return;
     }
     setCancelModal({ open: false, appointment: null, reasonCode: 'PATIENT_UNAVAILABLE', details: '' });
-    refresh();
   };
 
   const openRescheduleModal = (appointment) => {
@@ -172,23 +187,17 @@ const AdminAppointments = () => {
     });
   };
 
-  const submitRescheduleModal = () => {
+  const submitRescheduleModal = async () => {
     if (!rescheduleModal.appointment) return;
     if (!rescheduleModal.date || !rescheduleModal.time) {
       window.alert('Date and time are required');
       return;
     }
 
-    const selected = RESCHEDULE_REASON_OPTIONS.find((item) => item.code === rescheduleModal.reasonCode);
-    const reasonText = rescheduleModal.details.trim()
-      ? `${selected?.label || 'Reschedule'} - ${rescheduleModal.details.trim()}`
-      : selected?.label || 'Reschedule';
-
-    const result = rescheduleGovernanceAppointment(
+    const result = await rescheduleGovernanceAppointment(
       rescheduleModal.appointment.id,
       rescheduleModal.date,
-      rescheduleModal.time,
-      reasonText
+      rescheduleModal.time
     );
     if (!result.ok) {
       window.alert(result.reason || 'Could not reschedule appointment');
@@ -202,7 +211,6 @@ const AdminAppointments = () => {
       reasonCode: 'PATIENT_REQUESTED_TIME_CHANGE',
       details: '',
     });
-    refresh();
   };
 
   const handleExport = () => {

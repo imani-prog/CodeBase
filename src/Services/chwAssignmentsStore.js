@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'medilink_chw_assignments_store_v1';
+const STORAGE_KEY = 'medilink_chw_assignments_store_v2';
 const STORE_UPDATED_EVENT = 'chw-assignments-store-updated';
 const FINAL_STATUSES = ['COMPLETED', 'CANCELED'];
 
@@ -9,220 +9,19 @@ const STATUS_TRANSITIONS = {
   CANCELED: [],
 };
 
-const defaultAssignments = [
-  {
-    id: 1,
-    assignmentCode: 'ASG-001',
-    patientIdText: 'PT-2023-001',
-    patientName: 'Sarah Wanjiru',
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
-    priority: 'HIGH',
-    status: 'IN_PROGRESS',
-    assignedAt: '2025-12-10T08:30:00.000Z',
-    nextVisit: null,
-  },
-  {
-    id: 2,
-    assignmentCode: 'ASG-002',
-    patientIdText: 'PT-2023-045',
-    patientName: 'John Kamau',
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
-    priority: 'URGENT',
-    status: 'IN_PROGRESS',
-    assignedAt: '2025-12-11T08:30:00.000Z',
-    nextVisit: null,
-  },
-  {
-    id: 3,
-    assignmentCode: 'ASG-003',
-    patientIdText: 'PT-2023-089',
-    patientName: 'Mary Njoki',
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
-    priority: 'HIGH',
-    status: 'IN_PROGRESS',
-    assignedAt: '2025-12-12T08:30:00.000Z',
-    nextVisit: null,
-  },
-  {
-    id: 4,
-    assignmentCode: 'ASG-004',
-    patientIdText: 'PT-2023-112',
-    patientName: 'Peter Ochieng',
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
-    priority: 'NORMAL',
-    status: 'ASSIGNED',
-    assignedAt: '2025-12-13T08:30:00.000Z',
-    nextVisit: null,
-  },
-  {
-    id: 5,
-    assignmentCode: 'ASG-005',
-    patientIdText: 'PT-2023-156',
-    patientName: 'Grace Akinyi',
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
-    priority: 'NORMAL',
-    status: 'ASSIGNED',
-    assignedAt: '2025-12-14T08:30:00.000Z',
-    nextVisit: null,
-  },
-  {
-    id: 6,
-    assignmentCode: 'ASG-006',
-    patientIdText: 'PT-2023-201',
-    patientName: 'David Mwangi',
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
-    priority: 'NORMAL',
-    status: 'ASSIGNED',
-    assignedAt: '2025-12-15T08:30:00.000Z',
-    nextVisit: null,
-  },
-  {
-    id: 7,
-    assignmentCode: 'ASG-007',
-    patientIdText: 'PT-2023-178',
-    patientName: 'Jane Wambui',
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
-    priority: 'HIGH',
-    status: 'ASSIGNED',
-    assignedAt: '2025-12-16T08:30:00.000Z',
-    nextVisit: null,
-  },
-];
+const defaultAssignments = [];
 
-const defaultWorkItems = [
-  {
-    id: 'TASK-1',
-    assignmentId: 1,
-    workType: 'TASK',
-    sourceId: 1,
-    title: 'Follow-up Blood Pressure Check',
-    patientName: 'Sarah Wanjiru',
-    patientIdText: 'PT-2023-001',
-    category: 'Medical Follow-up',
-    priority: 'HIGH',
-    status: 'PENDING',
-    dueAt: '2026-03-25T14:00:00.000Z',
-    scheduledAt: null,
-    completedAt: null,
-    notes: 'Check blood pressure after medication adjustment',
-    location: null,
-    visitType: null,
-    updatedAt: '2026-03-20T10:00:00.000Z',
-  },
-  {
-    id: 'TASK-2',
-    assignmentId: 2,
-    workType: 'TASK',
-    sourceId: 2,
-    title: 'Medication Adherence Check',
-    patientName: 'John Kamau',
-    patientIdText: 'PT-2023-045',
-    category: 'Medication',
-    priority: 'URGENT',
-    status: 'IN_PROGRESS',
-    dueAt: '2026-03-24T16:00:00.000Z',
-    scheduledAt: null,
-    completedAt: null,
-    notes: 'Verify adherence to prescribed medications',
-    location: null,
-    visitType: null,
-    updatedAt: '2026-03-20T10:00:00.000Z',
-  },
-  {
-    id: 'TASK-8',
-    assignmentId: 5,
-    workType: 'TASK',
-    sourceId: 8,
-    title: 'Initial Health Assessment',
-    patientName: 'Grace Akinyi',
-    patientIdText: 'PT-2023-156',
-    category: 'Assessment',
-    priority: 'NORMAL',
-    status: 'COMPLETED',
-    dueAt: '2026-03-20T10:00:00.000Z',
-    scheduledAt: null,
-    completedAt: '2026-03-20T10:00:00.000Z',
-    notes: 'Completed comprehensive health assessment',
-    location: null,
-    visitType: null,
-    updatedAt: '2026-03-20T10:00:00.000Z',
-  },
-  {
-    id: 'HOME_VISIT-1',
-    assignmentId: 1,
-    workType: 'HOME_VISIT',
-    sourceId: 1,
-    title: 'Follow-up Visit',
-    patientName: 'Sarah Wanjiru',
-    patientIdText: 'PT-2023-001',
-    category: 'Home Visit',
-    priority: 'NORMAL',
-    status: 'PENDING',
-    dueAt: '2026-03-25T10:00:00.000Z',
-    scheduledAt: '2026-03-25T10:00:00.000Z',
-    completedAt: null,
-    notes: 'Check blood pressure and review medication',
-    location: 'Katoloni AIC Church, House 23',
-    visitType: 'Follow-up Visit',
-    updatedAt: '2026-03-20T10:00:00.000Z',
-  },
-  {
-    id: 'HOME_VISIT-2',
-    assignmentId: 2,
-    workType: 'HOME_VISIT',
-    sourceId: 2,
-    title: 'Initial Assessment',
-    patientName: 'John Kamau',
-    patientIdText: 'PT-2023-045',
-    category: 'Home Visit',
-    priority: 'URGENT',
-    status: 'PENDING',
-    dueAt: '2026-03-25T14:00:00.000Z',
-    scheduledAt: '2026-03-25T14:00:00.000Z',
-    completedAt: null,
-    notes: 'Comprehensive assessment required',
-    location: 'Kathemboni Mosque',
-    visitType: 'Initial Assessment',
-    updatedAt: '2026-03-20T10:00:00.000Z',
-  },
-  {
-    id: 'HOME_VISIT-5',
-    assignmentId: 5,
-    workType: 'HOME_VISIT',
-    sourceId: 5,
-    title: 'Nutrition Assessment',
-    patientName: 'Grace Akinyi',
-    patientIdText: 'PT-2023-156',
-    category: 'Home Visit',
-    priority: 'NORMAL',
-    status: 'COMPLETED',
-    dueAt: '2026-03-19T10:30:00.000Z',
-    scheduledAt: '2026-03-19T10:30:00.000Z',
-    completedAt: '2026-03-19T10:30:00.000Z',
-    notes: 'Patient improving - continue current plan',
-    location: 'Mathare, House 45',
-    visitType: 'Nutrition Assessment',
-    updatedAt: '2026-03-20T10:00:00.000Z',
-  },
-];
+const defaultWorkItems = [];
 
 const defaultStore = {
   assignments: defaultAssignments,
   workItems: defaultWorkItems,
+};
+
+const DEFAULT_CHW_REFERENCE = {
+  chwId: 1,
+  chwCode: 'CHW-001',
+  chwName: 'Grace Akinyi Achieng',
 };
 
 function normalizeText(value) {
@@ -336,19 +135,48 @@ function findAssignment(assignments, patientIdText, patientName) {
   });
 }
 
-function ensureAssignment(store, patientIdText, patientName, priority) {
-  const existing = findAssignment(store.assignments, patientIdText, patientName);
+function resolveChwReference(chwRef = {}) {
+  const merged = {
+    chwId: chwRef.chwId ?? DEFAULT_CHW_REFERENCE.chwId,
+    chwCode: chwRef.chwCode || DEFAULT_CHW_REFERENCE.chwCode,
+    chwName: chwRef.chwName || DEFAULT_CHW_REFERENCE.chwName,
+  };
+
+  const hasIdentifier = Boolean(merged.chwId || merged.chwCode || merged.chwName);
+  return hasIdentifier ? merged : null;
+}
+
+function ensureAssignment(store, payload = {}) {
+  const {
+    patientIdText,
+    patientName,
+    priority,
+    chwRef,
+  } = payload;
+
+  const normalizedPatientId = String(patientIdText || '').trim();
+  const normalizedPatientName = String(patientName || '').trim();
+  if (!normalizedPatientId && !normalizedPatientName) {
+    return null;
+  }
+
+  const existing = findAssignment(store.assignments, normalizedPatientId, normalizedPatientName);
   if (existing) return existing.id;
+
+  const resolvedChw = resolveChwReference(chwRef);
+  if (!resolvedChw) {
+    return null;
+  }
 
   const nextId = store.assignments.length > 0 ? Math.max(...store.assignments.map((item) => item.id)) + 1 : 1;
   const assignment = {
     id: nextId,
     assignmentCode: `ASG-${String(nextId).padStart(3, '0')}`,
-    patientIdText: patientIdText || `PT-UNMAPPED-${nextId}`,
-    patientName: patientName || `Unknown Patient ${nextId}`,
-    chwId: 1,
-    chwCode: 'CHW-001',
-    chwName: 'Grace Akinyi Achieng',
+    patientIdText: normalizedPatientId || `PT-UNMAPPED-${nextId}`,
+    patientName: normalizedPatientName || `Unknown Patient ${nextId}`,
+    chwId: resolvedChw.chwId,
+    chwCode: resolvedChw.chwCode,
+    chwName: resolvedChw.chwName,
     priority: (priority || 'NORMAL').toUpperCase(),
     status: 'ASSIGNED',
     assignedAt: new Date().toISOString(),
@@ -414,19 +242,59 @@ function visitToWorkItem(visit, tab, assignmentId) {
   };
 }
 
+function mapAppointmentStatus(status) {
+  const value = String(status || '').toUpperCase();
+  if (value === 'ARRIVED' || value === 'IN_PROGRESS') return 'IN_PROGRESS';
+  if (value === 'COMPLETED') return 'COMPLETED';
+  if (value === 'CANCELED' || value === 'CANCELLED') return 'CANCELED';
+  return 'PENDING';
+}
+
+function appointmentToWorkItem(appointment, assignmentId) {
+  const mappedStatus = mapAppointmentStatus(appointment?.status);
+  const scheduledAt = safeDate(appointment?.scheduledAt);
+  return {
+    id: `APPOINTMENT-${appointment?.id}`,
+    assignmentId,
+    workType: 'APPOINTMENT',
+    sourceId: appointment?.sourceAppointmentId || appointment?.id,
+    title: appointment?.reason || appointment?.appointmentType || 'CHW Appointment',
+    patientName: appointment?.patientName || 'Unknown Patient',
+    patientIdText: appointment?.patientId || '',
+    category: 'Appointment',
+    priority: 'NORMAL',
+    status: mappedStatus,
+    dueAt: scheduledAt,
+    scheduledAt,
+    completedAt: mappedStatus === 'COMPLETED' ? scheduledAt : null,
+    notes: appointment?.reason || '',
+    location: appointment?.facility || null,
+    visitType: appointment?.appointmentType || 'Appointment',
+    approvalStatus: mappedStatus === 'COMPLETED' ? 'PENDING_REVIEW' : 'NOT_REQUIRED',
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 export function getChwAssignmentsSnapshot() {
   return readStore();
 }
 
-export function syncTaskWorkItems(tasksByStatus) {
+export function syncTaskWorkItems(tasksByStatus, meta = {}) {
   const store = readStore();
   const keep = store.workItems.filter((item) => item.workType !== 'TASK');
   const built = [];
+  const chwRef = resolveChwReference(meta);
 
   ['pending', 'inProgress', 'completed'].forEach((tab) => {
     const list = Array.isArray(tasksByStatus?.[tab]) ? tasksByStatus[tab] : [];
     list.forEach((task) => {
-      const assignmentId = ensureAssignment(store, task.patientId, task.patient, task.priority);
+      const assignmentId = ensureAssignment(store, {
+        patientIdText: task.patientId,
+        patientName: task.patient,
+        priority: task.priority,
+        chwRef,
+      });
+      if (!assignmentId) return;
       built.push(taskToWorkItem(task, tab, assignmentId));
     });
   });
@@ -434,17 +302,52 @@ export function syncTaskWorkItems(tasksByStatus) {
   return writeStore({ ...store, workItems: [...keep, ...built] });
 }
 
-export function syncHomeVisitWorkItems(visitsByStatus) {
+export function syncHomeVisitWorkItems(visitsByStatus, meta = {}) {
   const store = readStore();
   const keep = store.workItems.filter((item) => item.workType !== 'HOME_VISIT');
   const built = [];
+  const chwRef = resolveChwReference(meta);
 
   ['upcoming', 'completed', 'cancelled'].forEach((tab) => {
     const list = Array.isArray(visitsByStatus?.[tab]) ? visitsByStatus[tab] : [];
     list.forEach((visit) => {
-      const assignmentId = ensureAssignment(store, visit.patientId, visit.patientName, visit.priority);
+      const assignmentId = ensureAssignment(store, {
+        patientIdText: visit.patientId,
+        patientName: visit.patientName,
+        priority: visit.priority,
+        chwRef,
+      });
+      if (!assignmentId) return;
       built.push(visitToWorkItem(visit, tab, assignmentId));
     });
+  });
+
+  return writeStore({ ...store, workItems: [...keep, ...built] });
+}
+
+export function syncChwAppointmentWorkItems(appointments) {
+  const store = readStore();
+  const keep = store.workItems.filter((item) => item.workType !== 'APPOINTMENT');
+  const built = [];
+  const list = Array.isArray(appointments) ? appointments : [];
+
+  list.forEach((appointment) => {
+    if (String(appointment?.providerRole || '').toUpperCase() !== 'CHW') {
+      return;
+    }
+
+    const assignmentId = ensureAssignment(store, {
+      patientIdText: appointment?.patientId,
+      patientName: appointment?.patientName,
+      priority: 'NORMAL',
+      chwRef: {
+        chwId: appointment?.providerId,
+        chwCode: appointment?.providerId,
+        chwName: appointment?.providerName,
+      },
+    });
+    if (!assignmentId) return;
+    built.push(appointmentToWorkItem(appointment, assignmentId));
   });
 
   return writeStore({ ...store, workItems: [...keep, ...built] });

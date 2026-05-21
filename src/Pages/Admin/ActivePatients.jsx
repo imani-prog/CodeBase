@@ -1,142 +1,63 @@
-
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { patientApi } from '../../API/endpoints/patientApi.js';
+import { LoadingSpinner, ErrorMessage } from '../../Components/Admin/DataState.jsx';
 import PatientDetailsModal from '../../Components/Admin/PatientDetailsModal';
 import EditPatientModal from '../../Components/Admin/EditPatientModal';
 import AddPatientModal from '../../Components/Admin/AddPatientModal';
 import Pagination from '../../Components/Admin/Pagination';
 
-const dummyPatients = [
-  { 
-    id: 1, 
-    name: 'John Doe',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john@example.com', 
-    phone: '+254-712-345-678',
-    nationalId: '28456123',
-    bloodType: 'O_POS',
-    city: 'Nairobi',
-    status: 'ACTIVE', 
-    lastVisit: '2025-08-20',
-    age: 45,
-    gender: 'MALE',
-    chronicConditions: 'Hypertension',
-    condition: 'Hypertension',
-    nextAppointment: '2025-09-25',
-    avatar: 'JD'
-  },
-  { 
-    id: 2, 
-    name: 'Mary Wambui',
-    firstName: 'Mary',
-    lastName: 'Wambui',
-    email: 'maryw@example.com', 
-    phone: '+254-723-456-789',
-    nationalId: '31245678',
-    bloodType: 'A_POS',
-    city: 'Kisumu',
-    status: 'ACTIVE', 
-    lastVisit: '2025-08-21',
-    age: 32,
-    gender: 'FEMALE',
-    chronicConditions: 'Diabetes',
-    condition: 'Diabetes',
-    nextAppointment: '2025-09-26',
-    avatar: 'MW'
-  },
-  { 
-    id: 3, 
-    name: 'Ali Hassan',
-    firstName: 'Ali',
-    lastName: 'Hassan',
-    email: 'alih@example.com', 
-    phone: '+254-734-567-890',
-    nationalId: '25789456',
-    bloodType: 'B_POS',
-    city: 'Mombasa',
-    status: 'ACTIVE', 
-    lastVisit: '2025-08-19',
-    age: 28,
-    gender: 'MALE',
-    chronicConditions: 'Asthma',
-    condition: 'Asthma',
-    nextAppointment: '2025-09-24',
-    avatar: 'AH'
-  },
-  { 
-    id: 4, 
-    name: 'Grace Achieng',
-    firstName: 'Grace',
-    lastName: 'Achieng',
-    email: 'grace@example.com', 
-    phone: '+254-745-678-901',
-    nationalId: '29856743',
-    bloodType: 'AB_POS',
-    city: 'Nairobi',
-    status: 'INACTIVE', 
-    lastVisit: '2025-08-22',
-    age: 67,
-    gender: 'FEMALE',
-    chronicConditions: 'Heart Disease',
-    condition: 'Heart Disease',
-    nextAppointment: '2025-09-25',
-    avatar: 'GA'
-  },
-  { 
-    id: 5, 
-    name: 'Peter Njoroge',
-    firstName: 'Peter',
-    lastName: 'Njoroge',
-    email: 'peter@example.com', 
-    phone: '+254-756-789-012',
-    nationalId: '32147896',
-    bloodType: 'O_NEG',
-    city: 'Nakuru',
-    status: 'ACTIVE', 
-    lastVisit: '2025-08-18',
-    age: 39,
-    gender: 'MALE',
-    chronicConditions: 'Surgery Recovery',
-    condition: 'Surgery Recovery',
-    nextAppointment: '2025-09-27',
-    avatar: 'PN'
-  },
-  {
-    id: 6,
-    name: 'Lilian Otieno',
-    firstName: 'Lilian',
-    lastName: 'Otieno',
-    email: 'lilian@example.com',
-    phone: '+254-767-890-123',
-    nationalId: '33456789',
-    bloodType: 'A_NEG',
-    city: 'Eldoret',
-    status: 'Critical',
-    lastVisit: '2025-08-17',
-    age: 52,
-    gender: 'FEMALE',
-    chronicConditions: 'Kidney Disease',
-    condition: 'Kidney Disease',
-    nextAppointment: '2025-09-28',
-    avatar: 'LO'
-  }
-];
-
 const ActivePatients = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [statusFilter, setStatusFilter] = useState('all');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [patients, setPatients] = useState(dummyPatients);
+
+  // ================= NORMALIZE =================
+  const normalizePatient = (p) => ({
+    ...p,
+    name: [p.firstName, p.lastName].filter(Boolean).join(' ') || 'Unknown',
+    age: p.dateOfBirth
+      ? Math.floor((Date.now() - new Date(p.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
+      : null,
+    condition: p.chronicConditions || p.condition || 'N/A',
+    avatar:
+      p.firstName && p.lastName
+        ? `${p.firstName[0]}${p.lastName[0]}`
+        : 'NA',
+  });
+
+  // ================= FETCH =================
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        setLoading(true);
+        const data = await patientApi.list();
+        setPatients(data.map(normalizePatient));
+      } catch (err) {
+        setError(err.message || 'Failed to load patients');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
 
   useEffect(() => {
     if (location.state?.openAddModal) {
@@ -145,40 +66,46 @@ const ActivePatients = () => {
     }
   }, [location.state]);
 
-  // Filter and sort patients
+  // ================= FILTER + SORT =================
   const filteredAndSortedPatients = useMemo(() => {
-    let filtered = patients.filter(patient => {
-      const matchesSearch = patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           patient.condition.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || patient.status.toLowerCase() === statusFilter.toLowerCase();
+    let filtered = patients.filter((patient) => {
+      const matchesSearch =
+        (patient.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (patient.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (patient.condition || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (patient.status || '').toLowerCase() === statusFilter.toLowerCase();
+
       return matchesSearch && matchesStatus;
     });
 
     filtered.sort((a, b) => {
       let aValue = a[sortField];
       let bValue = b[sortField];
-      
+
       if (sortField === 'lastVisit' || sortField === 'nextAppointment') {
         aValue = new Date(aValue);
         bValue = new Date(bValue);
       }
-      
+
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
 
     return filtered;
-  }, [searchTerm, sortField, sortDirection, statusFilter, patients]);
+  }, [patients, searchTerm, sortField, sortDirection, statusFilter]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredAndSortedPatients.length / itemsPerPage);
+
   const paginatedPatients = filteredAndSortedPatients.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  // ================= HELPERS =================
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -190,22 +117,20 @@ const ActivePatients = () => {
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      Active: 'text-green-800 border-green-200',
       ACTIVE: 'text-green-800 border-green-200',
-      Critical: 'text-red-800 border-red-200',
       INACTIVE: 'text-gray-800 border-gray-200',
-      Inactive: 'text-gray-800 border-gray-200',
-      Recovering: 'text-yellow-800 border-yellow-200',
+      CRITICAL: 'text-red-800 border-red-200',
       DECEASED: 'text-red-900 border-red-300 bg-red-50',
     };
     return statusStyles[status] || 'text-gray-800 border-gray-200';
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -214,28 +139,24 @@ const ActivePatients = () => {
     return bloodType.replace('_POS', '+').replace('_NEG', '-');
   };
 
-  // Button handlers
-  const handleAddPatient = () => {
-    setShowAddModal(true);
+  // ================= CRUD =================
+  const handleSavePatient = async (updatedPatient) => {
+    const saved = await patientApi.update(updatedPatient.id, updatedPatient);
+    const normalized = normalizePatient(saved || updatedPatient);
+    setPatients((prev) => prev.map((p) => (p.id === normalized.id ? normalized : p)));
   };
 
-  const handleExport = () => {
-    const csvContent = [
-      ['Name', 'Email', 'Phone', 'Status', 'Last Visit', 'Next Appointment'],
-      ...filteredAndSortedPatients.map(p => [
-        p.name, p.email, p.phone, p.status, p.lastVisit, p.nextAppointment
-      ])
-    ].map(row => row.join(',')).join('\n');
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `active-patients-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleAddNewPatient = async (newPatient) => {
+    const saved = await patientApi.create(newPatient);
+    const normalized = normalizePatient(saved);
+    setPatients((prev) => [...prev, normalized]);
+    setShowAddModal(false);
+  };
+
+  const handleDeletePatient = async (patient) => {
+    if (!window.confirm(`Delete ${patient.name}?`)) return;
+    await patientApi.delete(patient.id);
+    setPatients((prev) => prev.filter((p) => p.id !== patient.id));
   };
 
   const handleViewPatient = (patient) => {
@@ -248,42 +169,68 @@ const ActivePatients = () => {
     setShowEditModal(true);
   };
 
-  const handleContactPatient = (patient) => {
-    const subject = encodeURIComponent(`MediLink - Follow-up for ${patient.name}`);
-    const body = encodeURIComponent(`Dear ${patient.name},\n\nWe hope this message finds you well.\n\nBest regards,\nMediLink Team`);
-    window.open(`mailto:${patient.email}?subject=${subject}&body=${body}`, '_blank');
+  const handleAddPatient = () => {
+    setShowAddModal(true);
   };
 
-  const handleSavePatient = (updatedPatient) => {
-    setPatients(prev => prev.map(p => p.id === updatedPatient.id ? updatedPatient : p));
+  const handleExport = () => {
+    const csvContent = [
+      [
+        'Name',
+        'Email',
+        'Phone',
+        'Status',
+        'Age',
+        'Gender',
+        'City',
+        'Condition',
+        'Last Visit',
+        'Next Appointment',
+      ],
+      ...filteredAndSortedPatients.map((p) => [
+        p.name,
+        p.email || '',
+        p.phone || '',
+        p.status || '',
+        p.age || '',
+        p.gender || '',
+        p.city || '',
+        p.condition || '',
+        p.lastVisit || '',
+        p.nextAppointment || '',
+      ]),
+    ]
+      .map((row) => row.join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `patients-${new Date().toISOString().split('T')[0]}.csv`);
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
-  const handleAddNewPatient = (newPatient) => {
-    setPatients(prev => [...prev, newPatient]);
-    setShowAddModal(false);
-  };
-
-  const handleDeletePatient = (patient) => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${patient.name}?\n\nThis action cannot be undone.`
-    );
-    if (confirmDelete) {
-      setPatients(prev => prev.filter(p => p.id !== patient.id));
-    }
-  };
+  // ================= STATES =================
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error} onRetry={() => window.location.reload()} />;
 
   return (
     <div className="p-2 bg-gray-50 min-h-screen">
+
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-3xl font-bold">Active Patients</h1>
-            
           </div>
 
           <div className="flex space-x-3">
-            <button 
+            <button
               onClick={handleAddPatient}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
             >
@@ -292,7 +239,7 @@ const ActivePatients = () => {
               </svg>
               <span>Add Patient</span>
             </button>
-            <button 
+            <button
               onClick={handleExport}
               className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 flex items-center space-x-2 transition-colors"
             >
@@ -302,7 +249,6 @@ const ActivePatients = () => {
               <span>Export</span>
             </button>
           </div>
-          
         </div>
 
         {/* Stats Cards */}
@@ -317,7 +263,9 @@ const ActivePatients = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Active</p>
-                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'ACTIVE' || p.status === 'Active').length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {patients.filter((p) => p.status === 'ACTIVE' || p.status === 'Active').length}
+                </p>
               </div>
             </div>
           </div>
@@ -331,11 +279,12 @@ const ActivePatients = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Critical/Inactive</p>
-                <p className="text-2xl font-bold text-gray-900">{patients.filter(p => p.status === 'INACTIVE' || p.status === 'Critical').length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {patients.filter((p) => p.status === 'INACTIVE' || p.status === 'Critical').length}
+                </p>
               </div>
             </div>
           </div>
-
 
           <div className="p-2 bg-white border border-gray-200">
             <div className="flex items-center">
@@ -350,7 +299,7 @@ const ActivePatients = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="p-4 bg-white border border-gray-200">
             <div className="flex items-center">
               <div className="p-2">
@@ -410,8 +359,10 @@ const ActivePatients = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('name')}>
+                <th
+                  className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('name')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Patient</span>
                     {sortField === 'name' && (
@@ -421,8 +372,10 @@ const ActivePatients = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('age')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('age')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Age</span>
                     {sortField === 'age' && (
@@ -432,8 +385,10 @@ const ActivePatients = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('gender')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('gender')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Gender</span>
                     {sortField === 'gender' && (
@@ -445,8 +400,10 @@ const ActivePatients = () => {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">National ID</th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Blood Type</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('condition')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('condition')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Condition</span>
                     {sortField === 'condition' && (
@@ -458,8 +415,10 @@ const ActivePatients = () => {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">City</th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Phone</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('status')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('status')}
+                >
                   <div className="flex items-center space-x-1">
                     <span className="font-bold text-black">Status</span>
                     {sortField === 'status' && (
@@ -469,8 +428,10 @@ const ActivePatients = () => {
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('lastVisit')}>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold text-black uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('lastVisit')}
+                >
                   <div className="flex items-center space-x-1">
                     <span>Last Visit</span>
                     {sortField === 'lastVisit' && (
@@ -489,11 +450,6 @@ const ActivePatients = () => {
                 <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      {/* <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-800">{patient.avatar}</span>
-                        </div>
-                      </div> */}
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{patient.name}</div>
                       </div>
@@ -503,18 +459,30 @@ const ActivePatients = () => {
                     <div className="text-sm text-gray-900">{patient.age} years</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.gender === 'MALE' ? 'Male' : patient.gender === 'FEMALE' ? 'Female' : patient.gender === 'OTHER' ? 'Other' : patient.gender}</div>
+                    <div className="text-sm text-gray-900">
+                      {patient.gender === 'MALE'
+                        ? 'Male'
+                        : patient.gender === 'FEMALE'
+                        ? 'Female'
+                        : patient.gender === 'OTHER'
+                        ? 'Other'
+                        : patient.gender}
+                    </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-600 font-mono">{patient.nationalId || 'N/A'}</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-700">
-                      {patient.bloodType ? patient.bloodType.replace('_POS', '+').replace('_NEG', '-') : 'N/A'}
+                      {patient.bloodType
+                        ? patient.bloodType.replace('_POS', '+').replace('_NEG', '-')
+                        : 'N/A'}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.condition || patient.chronicConditions || 'N/A'}</div>
+                    <div className="text-sm text-gray-900">
+                      {patient.condition || patient.chronicConditions || 'N/A'}
+                    </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{patient.city || 'N/A'}</div>
@@ -524,7 +492,11 @@ const ActivePatients = () => {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getStatusBadge(patient.status)}`}>
-                      {patient.status === 'ACTIVE' ? 'Active' : patient.status === 'INACTIVE' ? 'Inactive' : patient.status}
+                      {patient.status === 'ACTIVE'
+                        ? 'Active'
+                        : patient.status === 'INACTIVE'
+                        ? 'Inactive'
+                        : patient.status}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -535,7 +507,7 @@ const ActivePatients = () => {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button 
+                      <button
                         onClick={() => handleViewPatient(patient)}
                         className="text-blue-600 hover:text-blue-900 transition-colors"
                         title="View Patient Details"
@@ -545,7 +517,7 @@ const ActivePatients = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleEditPatient(patient)}
                         className="text-green-600 hover:text-green-900 transition-colors"
                         title="Edit Patient"
@@ -554,16 +526,7 @@ const ActivePatients = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
-                      <button 
-                        onClick={() => handleContactPatient(patient)}
-                        className="text-blue-600 hover:text-blue-900 transition-colors"
-                        title="Contact Patient"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </button>
-                      <button 
+                      <button
                         onClick={() => handleDeletePatient(patient)}
                         className="text-red-600 hover:text-red-900 transition-colors"
                         title="Delete Patient"
@@ -583,7 +546,7 @@ const ActivePatients = () => {
 
       {/* Pagination */}
       {filteredAndSortedPatients.length > 0 && (
-        <Pagination 
+        <Pagination
           currentPage={currentPage}
           totalItems={filteredAndSortedPatients.length}
           itemsPerPage={itemsPerPage}
@@ -600,13 +563,13 @@ const ActivePatients = () => {
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">No patients found</h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== 'all' 
-              ? 'Try adjusting your search or filter criteria.' 
+            {searchTerm || statusFilter !== 'all'
+              ? 'Try adjusting your search or filter criteria.'
               : 'Get started by adding your first patient.'}
           </p>
-          {(!searchTerm && statusFilter === 'all') && (
+          {!searchTerm && statusFilter === 'all' && (
             <div className="mt-6">
-              <button 
+              <button
                 onClick={handleAddPatient}
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
               >
@@ -618,20 +581,20 @@ const ActivePatients = () => {
       )}
 
       {/* Modals */}
-      <PatientDetailsModal 
+      <PatientDetailsModal
         patient={selectedPatient}
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
       />
-      
-      <EditPatientModal 
+
+      <EditPatientModal
         patient={selectedPatient}
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSave={handleSavePatient}
       />
 
-      <AddPatientModal 
+      <AddPatientModal
         showModal={showAddModal}
         setShowModal={setShowAddModal}
         onSavePatient={handleAddNewPatient}

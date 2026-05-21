@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
   MapPin,
   Calendar,
@@ -17,14 +17,119 @@ import {
   FileText,
   Save
 } from 'lucide-react';
+import { Loader } from '@googlemaps/js-api-loader';
+import { refreshAppointmentGovernanceSnapshot } from '../../../Services/appointmentGovernanceStore';
 import { syncHomeVisitWorkItems } from '../../../Services/chwAssignmentsStore';
 import { syncHomeVisitGovernance } from '../../../Services/homeVisitGovernanceStore';
+import { chwService } from '../../../Services/domain/chwService.js';
+import { homeVisitService } from '../../../Services/domain/homeVisitService.js';
+import { useAuth } from '../../../hooks/useAuth';
 
-const CHW_META = {
-  chwId: 'CHW-001',
-  chwName: 'Grace Akinyi Achieng',
-  serviceZone: 'Machakos',
+const DEFAULT_CHW_META = {
+  chwId: null,
+  chwCode: 'CHW',
+  chwName: 'Community Health Worker',
+  serviceZone: 'Assigned area',
 };
+
+const EMPTY_VISITS = { upcoming: [], completed: [], cancelled: [] };
+const FALLBACK_MAP_CENTER = { lat: -1.286389, lng: 36.817223 };
+
+
+let _mapsLoaderInstance = null;
+const getMapsLoader = (apiKey) => {
+  if (!_mapsLoaderInstance) {
+    _mapsLoaderInstance = new Loader({ apiKey, libraries: ['marker', 'geocoding'] });
+  }
+  return _mapsLoaderInstance;
+};
+
+function toNumericId(value) {
+  if (value == null) return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const match = String(value).trim().match(/\d+/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function toStrictNumericId(value) {
+  if (value == null) return null;
+  const text = String(value).trim();
+  if (!/^\d+$/.test(text)) return null;
+  const parsed = Number(text);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function resolveChwMeta(user) {
+  const name = user?.name || user?.fullName || user?.username || DEFAULT_CHW_META.chwName;
+  const numericId =
+    toNumericId(user?.chwId) ||
+    toNumericId(user?.providerId) ||
+    toNumericId(user?.id) ||
+    toNumericId(user?.userId) ||
+    toNumericId(user?.employeeId) ||
+    null;
+
+  return {
+    chwId: numericId,
+    chwCode: user?.chwCode || user?.code || user?.employeeId || (numericId != null ? `CHW-${numericId}` : DEFAULT_CHW_META.chwCode),
+    chwName: name,
+    serviceZone: user?.region || user?.county || DEFAULT_CHW_META.serviceZone,
+  };
+}
+
+function isHomeVisitAppointment(value) {
+  const text = String(value || '').toUpperCase();
+  return text.includes('HOME') && text.includes('VISIT');
+}
+
+function mapAppointmentHomeVisits(rows = []) {
+  return rows.reduce(
+    (acc, row) => {
+      const when = row?.scheduledAt ? new Date(row.scheduledAt) : null;
+      const date = when && !Number.isNaN(when.getTime())
+        ? when.toISOString().slice(0, 10)
+        : '';
+      const time = when && !Number.isNaN(when.getTime())
+        ? when.toLocaleTimeString('en-KE', { hour: 'numeric', minute: '2-digit', hour12: true })
+        : '';
+
+      const mapped = {
+        id: `appt-${row?.id}`,
+        patientName: row?.patientName || 'Unknown Patient',
+        patientId: row?.patientId != null ? `PT-${row.patientId}` : 'N/A',
+        phone: '',
+        date,
+        time,
+        location: row?.facility || 'Community Health Visit',
+        coordinates: null,
+        type: 'Home Visit',
+        priority: 'normal',
+        notes: row?.reason || '',
+        reason: row?.cancellationReason || '',
+        outcome: row?.reason || '',
+        completionEvidence: null,
+        scheduledAt: row?.scheduledAt || null,
+        chwId: row?.providerId ?? null,
+        chwName: row?.providerName || '',
+        rescheduleHistory: [],
+        reassignmentHistory: [],
+      };
+
+      const status = String(row?.status || '').toUpperCase();
+      if (status === 'COMPLETED') {
+        acc.completed.push({ ...mapped, status: 'completed' });
+      } else if (status === 'CANCELED' || status === 'NO_SHOW') {
+        acc.cancelled.push({ ...mapped, status: 'cancelled', reasonType: status === 'NO_SHOW' ? 'NO_SHOW' : undefined });
+      } else {
+        acc.upcoming.push(mapped);
+      }
+      return acc;
+    },
+    { upcoming: [], completed: [], cancelled: [] }
+  );
+}
 
 function calculateNotesQuality(outcomeText) {
   const words = String(outcomeText || '')
@@ -39,9 +144,234 @@ function calculateNotesQuality(outcomeText) {
   return words.length > 0 ? 20 : 0;
 }
 
+const createMarkerSvgDataUrl = (label, color) => {
+  const svg = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'><circle cx='42' cy='30' r='21' fill='${color}' stroke='%23ffffff' stroke-width='2'/><text x='42' y='37' font-size='19' text-anchor='middle' fill='#fff' font-family='Arial' font-weight='700'>${label}</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+};
+
+const VISIT_ICON_URLS = {
+  upcoming: createMarkerSvgDataUrl('U', '#2563eb'),
+  completed: createMarkerSvgDataUrl('C', '#16a34a'),
+  cancelled: createMarkerSvgDataUrl('X', '#ef4444'),
+};
+
+function toVisitMapPoint(visit, status) {
+  const lat = Number(visit?.coordinates?.lat ?? visit?.latitude);
+  const lng = Number(visit?.coordinates?.lng ?? visit?.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+  return {
+    id: `${status}-${visit?.id}`,
+    lat,
+    lng,
+    status,
+    patientName: visit?.patientName || 'Patient',
+    location: visit?.location || 'Unknown location',
+    type: visit?.type || 'Home Visit',
+    date: visit?.date || '',
+    time: visit?.time || '',
+  };
+}
+
+
+const GoogleMap = ({ points = [], center = FALLBACK_MAP_CENTER, className = '', style = {} }) => {
+  const mapRef = useRef(null);
+  const containerRef = useRef(null);
+  const markersRef = useRef([]);
+  const [mapReady, setMapReady] = useState(false); // ← FIX 1: signals map is ready
+  const [loadError, setLoadError] = useState('');
+
+  const apiKey =
+    (import.meta && import.meta.env && import.meta.env.VITE_GOOGLE_CLOUD_MAPS_API_KEY) ||
+    document.querySelector('meta[name="google-maps-api-key"]')?.getAttribute('content') ||
+    (import.meta && import.meta.env && import.meta.env.GOOGLE_CLOUD_MAPS_API_KEY) ||
+    null;
+
+  const rawMapId = (import.meta && import.meta.env && import.meta.env.VITE_GOOGLE_MAPS_MAP_ID) || null;
+  const mapId =
+    rawMapId && !/^%.*%$/.test(String(rawMapId).trim())
+      ? String(rawMapId).trim()
+      : null;
+
+  // ── Effect 1: initialise map ONCE ──────────────────────────────────────────
+  // Dependencies are [apiKey, mapId] only — NOT center.lat/center.lng.
+  // Excluding center prevents the map from being destroyed and re-built every
+  // time mapCenter shifts from the fallback value to real visit coordinates.
+  // Initial positioning is handled by the fallback center passed to new maps.Map();
+  // subsequent repositioning is done by fitBounds / setCenter in Effect 2.
+  useEffect(() => {
+    let cancelled = false;
+
+    const initMap = async () => {
+      if (typeof window === 'undefined') return;
+      if (!apiKey) {
+        setLoadError('Google Maps API key is not defined');
+        return;
+      }
+      if (!containerRef.current) return;
+
+      try {
+        // ← FIX 2: reuse the singleton loader instead of new Loader() each render
+        const loader = getMapsLoader(apiKey);
+        await loader.load();
+
+        if (cancelled) return;
+        if (!window.google?.maps) {
+          setLoadError('Google maps loaded but window.google.maps is missing');
+          return;
+        }
+
+        const maps = window.google.maps;
+        const mapInstance = new maps.Map(containerRef.current, {
+          // Use the fallback as the initial centre; Effect 2 will reposition
+          // once real points are available.
+          center: FALLBACK_MAP_CENTER,
+          zoom: 12,
+          ...(mapId ? { mapId } : {}),
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+
+        mapRef.current = mapInstance;
+        setLoadError('');
+        setMapReady(true); // ← FIX 1: tell Effect 2 the map is ready
+      } catch (err) {
+        if (!cancelled) {
+          console.error('GoogleMap: failed to load maps script or initialize map', err);
+          setLoadError(String(err?.message || 'Failed to load Google Maps'));
+        }
+      }
+    };
+
+    initMap();
+    return () => { cancelled = true; };
+  }, [apiKey, mapId]); // ← FIX 3: no center dependency → map never re-inits on pan
+
+  // ── Effect 2: add / update markers ─────────────────────────────────────────
+  // `mapReady` is now a dependency so this effect re-runs the instant the map
+  // finishes initialising, picking up whatever `points` are already available.
+  // Previously it ran on mount (mapRef.current === null → early return) and
+  // would only retry on the next points/mapId change — causing the visible delay.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return; // guard: mapReady being true implies map exists, but be safe
+
+    // Clear existing markers
+    markersRef.current.forEach((m) => {
+      if (m?.marker && typeof m.marker.setMap === 'function') {
+        m.marker.setMap(null);
+      } else if (m?.marker && 'map' in m.marker) {
+        m.marker.map = null;
+      }
+    });
+    markersRef.current = [];
+
+    const maps = window.google?.maps;
+    if (!maps) return;
+
+    if (!Array.isArray(points) || points.length === 0) return;
+
+    // Reposition map around current points
+    if (points.length === 1) {
+      map.setCenter({ lat: points[0].lat, lng: points[0].lng });
+      map.setZoom(14);
+    } else {
+      const bounds = new maps.LatLngBounds();
+      points.forEach(p => bounds.extend(new maps.LatLng(p.lat, p.lng)));
+      map.fitBounds(bounds, { top: 35, right: 35, bottom: 35, left: 35 });
+    }
+
+    points.forEach((point) => {
+      const color = point.status === 'completed' ? '#16a34a' : point.status === 'cancelled' ? '#ef4444' : '#2563eb';
+      const label = point.status === 'completed' ? 'C' : point.status === 'cancelled' ? 'X' : 'U';
+
+      const markerEl = document.createElement('div');
+      markerEl.style.cssText = [
+        'width:72px', 'height:72px', 'border-radius:50%',
+        `background:${color}`, 'display:flex', 'align-items:center',
+        'justify-content:center', 'color:#fff', 'font-weight:900',
+        'font-size:28px', 'border:2px solid #fff',
+        'box-shadow:0 2px 6px rgba(0,0,0,.25)', 'cursor:pointer',
+      ].join(';');
+      markerEl.textContent = label;
+
+      const content = document.createElement('div');
+      content.className = 'text-sm';
+      content.innerHTML = `
+        <div style="padding:4px 2px;min-width:160px">
+          <p style="font-weight:700;margin:0 0 2px">${point.patientName}</p>
+          <p style="margin:0 0 2px">${point.type}</p>
+          <p style="margin:0 0 2px">${point.location}</p>
+          <p style="margin:0;color:#555">${point.date}${point.time ? ` · ${point.time}` : ''}</p>
+        </div>`;
+      const infoWindow = new maps.InfoWindow({ content });
+
+      const canUseAdvanced = Boolean(mapId && window.google?.maps?.marker?.AdvancedMarkerElement);
+
+      if (canUseAdvanced) {
+        const advancedMarker = new window.google.maps.marker.AdvancedMarkerElement({
+          map,
+          position: { lat: point.lat, lng: point.lng },
+          content: markerEl,
+        });
+        advancedMarker.addEventListener('gmp-click', () => {
+          infoWindow.open({ anchor: advancedMarker, map });
+        });
+        markersRef.current.push({ marker: advancedMarker, infoWindow });
+      } else {
+        const marker = new maps.Marker({
+          map,
+          position: { lat: point.lat, lng: point.lng },
+          icon: {
+            url: VISIT_ICON_URLS[point.status] || VISIT_ICON_URLS.upcoming,
+            scaledSize: new maps.Size(72, 72),
+          },
+        });
+        marker.addListener('click', () => {
+          infoWindow.open({ anchor: marker, map });
+        });
+        markersRef.current.push({ marker, infoWindow });
+      }
+    });
+
+    return () => {
+      markersRef.current.forEach((m) => {
+        if (m?.marker && typeof m.marker.setMap === 'function') {
+          m.marker.setMap(null);
+        } else if (m?.marker && 'map' in m.marker) {
+          m.marker.map = null;
+        }
+      });
+      markersRef.current = [];
+    };
+  }, [points, mapId, mapReady]); // ← FIX 1: mapReady triggers this as soon as map is ready
+
+  return (
+    <div className={className} style={{ position: 'relative', ...style }}>
+      <div ref={containerRef} style={{ height: '100%', width: '100%', background: '#f8fafc' }} />
+      {loadError && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div className="bg-white/90 border border-gray-200 rounded px-4 py-2 text-sm text-red-600 pointer-events-auto">
+            <div className="font-semibold">Map error</div>
+            <div>{loadError}</div>
+            <div className="text-xs text-gray-500 mt-1">Ensure `VITE_GOOGLE_CLOUD_MAPS_API_KEY` is set and dev server was restarted.</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const HomeVisits = () => {
+  const { user } = useAuth();
+  const chwMeta = useMemo(() => resolveChwMeta(user), [user]);
+  const [resolvedChwId, setResolvedChwId] = useState(null);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showMap, setShowMap] = useState(false);
+  const [isLoadingVisits, setIsLoadingVisits] = useState(true);
+  const [visitsError, setVisitsError] = useState('');
+  const [hasHydratedVisits, setHasHydratedVisits] = useState(false);
   const [completeModal, setCompleteModal] = useState({
     open: false,
     visit: null,
@@ -72,6 +402,7 @@ const HomeVisits = () => {
   const [scheduleModal, setScheduleModal] = useState({ open: false });
   const [scheduleForm, setScheduleForm] = useState(emptyScheduleForm);
   const [scheduleErrors, setScheduleErrors] = useState({});
+  const activeChwId = resolvedChwId ?? chwMeta?.chwId;
 
   const openScheduleModal = () => {
     setScheduleForm(emptyScheduleForm);
@@ -97,10 +428,32 @@ const HomeVisits = () => {
     return errs;
   };
 
-  const handleScheduleSubmit = (e) => {
+  const handleScheduleSubmit = async (e) => {
     e.preventDefault();
     const errs = validateSchedule();
     if (Object.keys(errs).length > 0) { setScheduleErrors(errs); return; }
+
+    const backendPatientId = toStrictNumericId(scheduleForm.patientId);
+    if (backendPatientId && activeChwId) {
+      try {
+        await homeVisitService.createHomeVisit({
+          patientId: backendPatientId,
+          chwId: activeChwId,
+          visitType: scheduleForm.type,
+          priority: String(scheduleForm.priority || 'NORMAL').toUpperCase(),
+          scheduledAt: new Date(`${scheduleForm.date}T${scheduleForm.time}:00`).toISOString(),
+          location: scheduleForm.location.trim(),
+          notes: scheduleForm.notes.trim(),
+          reason: scheduleForm.notes.trim(),
+        });
+        setScheduleModal({ open: false });
+        await loadHomeVisits();
+        return;
+      } catch (error) {
+        setVisitsError(error?.message || 'Failed to create home visit in backend. Saved locally only.');
+      }
+    }
+
     const [h, m] = scheduleForm.time.split(':');
     const hour = parseInt(h, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -126,108 +479,93 @@ const HomeVisits = () => {
     setScheduleModal({ open: false });
   };
 
-  const [visits, setVisits] = useState({
-    upcoming: [
-      {
-        id: 1,
-        patientName: 'Sarah Wanjiru',
-        patientId: 'PT-2023-001',
-        phone: '+254790383295',
-        date: '2024-10-25',
-        time: '10:00 AM',
-        location: 'Katoloni AIC Church, House 23',
-        coordinates: { lat: -1.3139, lng: 36.7890 },
-        type: 'Follow-up Visit',
-        priority: 'normal',
-        notes: 'Check blood pressure and review medication'
-      },
-      {
-        id: 2,
-        patientName: 'John Kamau',
-        patientId: 'PT-2023-045',
-        phone: '+254723456789',
-        date: '2024-10-25',
-        time: '2:00 PM',
-        location: 'Kathemboni Mosque',
-        coordinates: { lat: -1.2627, lng: 36.8598 },
-        type: 'Initial Assessment',
-        priority: 'urgent',
-        notes: 'New patient - comprehensive health assessment needed'
-      },
-      {
-        id: 3,
-        patientName: 'Mary Njoki',
-        patientId: 'PT-2023-089',
-        phone: '+254734567890',
-        date: '2024-10-26',
-        time: '9:00 AM',
-        location: 'Kathayoni Primary School',
-        coordinates: { lat: -1.2921, lng: 36.7561 },
-        type: 'Prenatal Checkup',
-        priority: 'high',
-        notes: 'Second trimester checkup - monitor fetal development'
-      },
-      {
-        id: 4,
-        patientName: 'Peter Ochieng',
-        patientId: 'PT-2023-112',
-        phone: '+254745678901',
-        date: '2024-10-27',
-        time: '11:00 AM',
-        location: 'Muthini Estate,',
-        coordinates: { lat: -1.2921, lng: 36.7561 },
-        type: 'Medication Review',
-        priority: 'normal',
-        notes: 'Review diabetes medication and diet plan'
-      }
-    ],
-    completed: [
-      {
-        id: 5,
-        patientName: 'Grace Akinyi',
-        patientId: 'PT-2023-156',
-        phone: '+254756789012',
-        date: '2024-10-22',
-        time: '10:30 AM',
-        location: 'Mathare, House 45',
-        type: 'Nutrition Assessment',
-        status: 'completed',
-        outcome: 'Patient improving - continue current plan'
-      },
-      {
-        id: 6,
-        patientName: 'David Mwangi',
-        patientId: 'PT-2023-201',
-        phone: '+254767890123',
-        date: '2024-10-21',
-        time: '2:00 PM',
-        location: 'Kawangware, Block A',
-        type: 'Follow-up Visit',
-        status: 'completed',
-        outcome: 'Blood pressure stable - medication working well'
-      }
-    ],
-    cancelled: [
-      {
-        id: 7,
-        patientName: 'Jane Wambui',
-        patientId: 'PT-2023-178',
-        phone: '+254778901234',
-        date: '2024-10-20',
-        time: '3:00 PM',
-        location: 'Muthini Estate, House 5',
-        coordinates: { lat: -1.3100, lng: 36.7910 },
-        type: 'Follow-up Visit',
-        status: 'cancelled',
-        reason: 'Patient not available - rescheduled'
-      }
-    ]
-  });
+  const [visits, setVisits] = useState(EMPTY_VISITS);
+
+  const mapVisitPoints = useMemo(() => {
+    return [
+      ...visits.upcoming.map((v) => toVisitMapPoint(v, 'upcoming')),
+      ...visits.completed.map((v) => toVisitMapPoint(v, 'completed')),
+      ...visits.cancelled.map((v) => toVisitMapPoint(v, 'cancelled')),
+    ].filter(Boolean);
+  }, [visits]);
+
+  const mapCenter = useMemo(() => {
+    if (mapVisitPoints.length > 0) {
+      return { lat: mapVisitPoints[0].lat, lng: mapVisitPoints[0].lng };
+    }
+    return FALLBACK_MAP_CENTER;
+  }, [mapVisitPoints]);
 
   useEffect(() => {
-    syncHomeVisitWorkItems(visits);
-    syncHomeVisitGovernance(visits, CHW_META);
-  }, [visits]);
+    let active = true;
+    const resolveBackendChwId = async () => {
+      try {
+        const me = await chwService.getMe(user?.id);
+        const id = toNumericId(me?.id ?? me?.chwId ?? me?.providerId ?? me?.user?.id);
+        if (active && id != null) setResolvedChwId(id);
+      } catch {
+        // Keep auth-derived identifier fallback.
+      }
+    };
+    resolveBackendChwId();
+    return () => { active = false; };
+  }, [user?.id]);
+
+  const loadHomeVisits = useCallback(async () => {
+    setIsLoadingVisits(true);
+    setVisitsError('');
+
+    try {
+      const query = activeChwId ? { chwId: activeChwId } : {};
+      const list = await homeVisitService.listHomeVisits(query);
+      let grouped = homeVisitService.groupHomeVisitsByTab(list);
+
+      const groupedCount = grouped.upcoming.length + grouped.completed.length + grouped.cancelled.length;
+      if (groupedCount === 0 && activeChwId) {
+        try {
+          const snapshot = await refreshAppointmentGovernanceSnapshot({ providerRole: 'CHW', chwId: activeChwId });
+          const appointments = Array.isArray(snapshot?.appointments) ? snapshot.appointments : [];
+          const homeVisitAppointments = appointments.filter((row) => (
+            String(row?.providerRole || '').toUpperCase() === 'CHW'
+            && String(row?.providerId ?? '') === String(activeChwId)
+            && isHomeVisitAppointment(row?.appointmentType)
+          ));
+
+          if (homeVisitAppointments.length > 0) {
+            grouped = mapAppointmentHomeVisits(homeVisitAppointments);
+          }
+        } catch {
+          // Ignore fallback failures and keep grouped home-visit records.
+        }
+      }
+
+      setVisits(grouped);
+      setHasHydratedVisits(true);
+    } catch (error) {
+      setVisitsError(error?.message || 'Failed to fetch home visits from backend.');
+      setVisits(EMPTY_VISITS);
+      setHasHydratedVisits(false);
+    } finally {
+      setIsLoadingVisits(false);
+    }
+  }, [activeChwId]);
+
+  useEffect(() => {
+    loadHomeVisits();
+    const timer = window.setInterval(loadHomeVisits, 20000);
+    return () => window.clearInterval(timer);
+  }, [loadHomeVisits]);
+
+  const handleManualRefresh = async () => {
+    setIsLoadingVisits(true);
+    await loadHomeVisits();
+  };
+
+  useEffect(() => {
+    if (!hasHydratedVisits) return;
+    syncHomeVisitWorkItems(visits, chwMeta);
+    syncHomeVisitGovernance(visits, chwMeta);
+  }, [visits, chwMeta, hasHydratedVisits]);
 
   const handleDirections = (visit) => {
     if (!visit.location) return;
@@ -245,10 +583,25 @@ const HomeVisits = () => {
   const openCompleteModal = (visit) =>
     setCompleteModal({ open: true, visit, outcome: '', geoCheckPassed: false });
 
-  const handleCompleteSubmit = () => {
+  const handleCompleteSubmit = async () => {
     const { visit, outcome, geoCheckPassed } = completeModal;
+    if (!visit) return;
     const completedAt = new Date().toISOString();
     const qualityScore = calculateNotesQuality(outcome);
+
+    try {
+      await homeVisitService.completeHomeVisit(visit.id, {
+        outcome: outcome.trim() || 'Visit completed successfully',
+        notes: outcome.trim() || undefined,
+        geoCheckPassed,
+        completedAt,
+      });
+      setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false });
+      await loadHomeVisits();
+      return;
+    } catch (error) {
+      setVisitsError(error?.message || 'Failed to complete visit in backend. Saved locally only.');
+    }
 
     setVisits(prev => ({
       ...prev,
@@ -271,24 +624,32 @@ const HomeVisits = () => {
   };
 
   const openRescheduleModal = (visit, mode = 'UPCOMING') =>
-    setRescheduleModal({
-      open: true,
-      visit,
-      date: visit.date || '',
-      time: '',
-      reason: '',
-      mode,
-    });
+    setRescheduleModal({ open: true, visit, date: visit.date || '', time: '', reason: '', mode });
 
   const openNoShowModal = (visit) =>
     setNoShowModal({ open: true, visit, reason: 'Patient unavailable at scheduled time' });
 
-  const handleRescheduleSubmit = () => {
+  const handleRescheduleSubmit = async () => {
     const { visit, date, time, reason, mode } = rescheduleModal;
+    if (!visit) return;
     const [h, m] = time.split(':');
     const hour = parseInt(h, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const formattedTime = `${hour % 12 || 12}:${m} ${ampm}`;
+
+    if (date && time) {
+      try {
+        await homeVisitService.rescheduleHomeVisit(visit.id, {
+          scheduledAt: new Date(`${date}T${time}:00`).toISOString(),
+          reason: reason.trim() || 'Schedule conflict',
+        });
+        setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' });
+        await loadHomeVisits();
+        return;
+      } catch (error) {
+        setVisitsError(error?.message || 'Failed to reschedule visit in backend. Saved locally only.');
+      }
+    }
 
     if (mode === 'CANCELLED') {
       const { reason: _r, reasonType: _rt, status: _s, ...rest } = visit;
@@ -311,22 +672,30 @@ const HomeVisits = () => {
             reason: reason.trim() || 'Schedule conflict',
             changedAt: new Date().toISOString(),
           });
-
-          return {
-            ...v,
-            date,
-            time: formattedTime,
-            rescheduleHistory: nextHistory,
-          };
+          return { ...v, date, time: formattedTime, rescheduleHistory: nextHistory };
         }),
       }));
     }
-
     setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' });
   };
 
-  const handleNoShowSubmit = () => {
+  const handleNoShowSubmit = async () => {
     const { visit, reason } = noShowModal;
+    if (!visit) return;
+
+    try {
+      await homeVisitService.cancelHomeVisit(visit.id, {
+        reason: reason.trim() || 'Patient unavailable at scheduled time',
+        reasonType: 'NO_SHOW',
+        status: 'NO_SHOW',
+      });
+      setNoShowModal({ open: false, visit: null, reason: '' });
+      await loadHomeVisits();
+      return;
+    } catch (error) {
+      setVisitsError(error?.message || 'Failed to update no-show status in backend. Saved locally only.');
+    }
+
     setVisits(prev => ({
       ...prev,
       upcoming: prev.upcoming.filter(v => v.id !== visit.id),
@@ -351,12 +720,9 @@ const HomeVisits = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'urgent':
-        return 'text-red-800 border-red-300';
-      case 'high':
-        return 'text-orange-800 border-orange-300';
-      default:
-        return 'text-blue-800 border-blue-300';
+      case 'urgent': return 'text-red-800 border-red-300';
+      case 'high':   return 'text-orange-800 border-orange-300';
+      default:       return 'text-blue-800 border-blue-300';
     }
   };
 
@@ -366,10 +732,17 @@ const HomeVisits = () => {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Home Visits</h1>
-          
+          {visitsError && <p className="text-sm text-red-700 mt-1">{visitsError}</p>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {/* Mobile-only: open map overlay */}
+          <button
+            onClick={handleManualRefresh}
+            disabled={isLoadingVisits}
+            title="Refresh to see reassigned visits"
+            className="px-3 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          >
+            {isLoadingVisits ? '⟳' : '⟳'}
+          </button>
           <button
             onClick={() => setShowMap(true)}
             className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm"
@@ -389,7 +762,6 @@ const HomeVisits = () => {
 
       {/* Map View — desktop only */}
       <div className="hidden lg:block border border-gray-200 overflow-hidden">
-        {/* Map Header */}
         <div className="px-5 py-4 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
@@ -398,7 +770,7 @@ const HomeVisits = () => {
                 Coverage Area Map
               </h2>
               <p className="text-sm text-gray-500 mt-0.5">
-                Showing your assigned service zone — Machakos &amp; surrounding regions. Use this map to plan efficient routes between patient home visits.
+                Showing your assigned service zone — {chwMeta.serviceZone} &amp; surrounding regions. Use this map to plan efficient routes between patient home visits.
               </p>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500 shrink-0">
@@ -417,30 +789,27 @@ const HomeVisits = () => {
             </div>
           </div>
         </div>
-        <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d277.7549826743736!2d37.26242921919778!3d-1.5305180166278827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f87eeedd7e1cd%3A0x2bb0f6a2ec4c7859!2sMachakos%20University%20Administration!5e0!3m2!1sen!2ske!4v1774964157029!5m2!1sen!2ske"
-            width="100%"
-            height="260"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Supervisor Coverage Map"
-          />
-          
+        <div className="h-[420px] live-map-shell relative">
+          <GoogleMap points={mapVisitPoints} center={mapCenter} style={{ height: '100%', width: '100%' }} />
+          {!mapVisitPoints.length && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-2 text-center">
+              <span className="inline-block px-2 py-1 text-xs text-gray-600 bg-white/90 border border-gray-200 rounded-md">
+                No visit coordinates available yet.
+              </span>
+            </div>
+          )}
+        </div>
       </div>
-    
 
       {/* Full-screen map overlay — mobile/tablet only */}
       {showMap && (
         <div className="lg:hidden fixed inset-0 z-50 flex flex-col bg-white">
-          {/* Overlay header */}
           <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shrink-0">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-blue-600" />
               <div>
                 <h2 className="text-sm font-semibold text-gray-900">Coverage Area Map</h2>
-                <p className="text-xs text-gray-500">Machakos &amp; surrounding regions</p>
+                <p className="text-xs text-gray-500">{chwMeta.serviceZone} &amp; surrounding regions</p>
               </div>
             </div>
             <button
@@ -451,7 +820,6 @@ const HomeVisits = () => {
               <X className="w-5 h-5 text-gray-600" />
             </button>
           </div>
-          {/* Legend strip */}
           <div className="flex items-center gap-4 px-4 py-2 bg-white border-b border-gray-100 text-xs text-gray-500 shrink-0">
             <span className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
@@ -466,18 +834,9 @@ const HomeVisits = () => {
               Cancelled
             </span>
           </div>
-          {/* Map fills the rest of the screen */}
-          <iframe
-            src={import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL}
-            width="100%"
-            height="100%"
-            style={{ border: 0, flex: 1, display: 'block' }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Home Visits Map"
-            className="flex-1 w-full"
-          />
+          <div className="flex-1 w-full live-map-shell">
+            <GoogleMap points={mapVisitPoints} center={mapCenter} style={{ height: '100%', width: '100%' }} />
+          </div>
         </div>
       )}
 
@@ -513,7 +872,7 @@ const HomeVisits = () => {
       {/* Upcoming Visits */}
       {activeTab === 'upcoming' && (
         <>
-          {/* Desktop Table — lg and above */}
+          {/* Desktop Table */}
           <div className="hidden lg:block bg-white border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -523,7 +882,7 @@ const HomeVisits = () => {
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Date &amp; Time</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Location</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Type</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-00">Priority</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-800">Priority</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Notes</th>
                     <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-600">Actions</th>
                   </tr>
@@ -560,40 +919,20 @@ const HomeVisits = () => {
                       <td className="px-4 py-3 text-sm text-gray-600 max-w-xs">{visit.notes}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            onClick={() => handleDirections(visit)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm"
-                          >
-                            <Navigation className="w-3.5 h-3.5" />
-                            <span>Directions</span>
+                          <button onClick={() => handleDirections(visit)} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm">
+                            <Navigation className="w-3.5 h-3.5" /><span>Directions</span>
                           </button>
-                          <button
-                            onClick={() => handleCall(visit.phone)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm"
-                          >
-                            <Phone className="w-3.5 h-3.5" />
-                            <span>Call</span>
+                          <button onClick={() => handleCall(visit.phone)} className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm">
+                            <Phone className="w-3.5 h-3.5" /><span>Call</span>
                           </button>
-                          <button
-                            onClick={() => openCompleteModal(visit)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
-                          >
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            <span>Complete</span>
+                          <button onClick={() => openCompleteModal(visit)} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all">
+                            <CheckCircle className="w-3.5 h-3.5" /><span>Complete</span>
                           </button>
-                          <button
-                            onClick={() => openRescheduleModal(visit, 'UPCOMING')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 active:scale-95 text-gray-900 border border-gray-300 rounded-lg text-xs font-semibold transition-all"
-                          >
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span>Reschedule</span>
+                          <button onClick={() => openRescheduleModal(visit, 'UPCOMING')} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 active:scale-95 text-gray-900 border border-gray-300 rounded-lg text-xs font-semibold transition-all">
+                            <Calendar className="w-3.5 h-3.5" /><span>Reschedule</span>
                           </button>
-                          <button
-                            onClick={() => openNoShowModal(visit)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
-                          >
-                            <XCircle className="w-3.5 h-3.5" />
-                            <span>No-Show</span>
+                          <button onClick={() => openNoShowModal(visit)} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all">
+                            <XCircle className="w-3.5 h-3.5" /><span>No-Show</span>
                           </button>
                         </div>
                       </td>
@@ -604,7 +943,7 @@ const HomeVisits = () => {
             </div>
           </div>
 
-          {/* Mobile / Tablet Cards — below lg */}
+          {/* Mobile / Tablet Cards */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {visits.upcoming.map((visit) => (
               <div key={visit.id} className="bg-white rounded-lg border border-gray-200 p-4">
@@ -639,40 +978,20 @@ const HomeVisits = () => {
                   </p>
                 )}
                 <div className="flex flex-wrap gap-2 pt-1">
-                  <button
-                    onClick={() => handleDirections(visit)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm"
-                  >
-                    <Navigation className="w-3.5 h-3.5" />
-                    <span>Directions</span>
+                  <button onClick={() => handleDirections(visit)} className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm">
+                    <Navigation className="w-3.5 h-3.5" /><span>Directions</span>
                   </button>
-                  <button
-                    onClick={() => handleCall(visit.phone)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-green-600 hover:bg-green-700 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>Call</span>
+                  <button onClick={() => handleCall(visit.phone)} className="flex items-center gap-1.5 px-3.5 py-2 bg-green-600 hover:bg-green-700 active:scale-95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm">
+                    <Phone className="w-3.5 h-3.5" /><span>Call</span>
                   </button>
-                  <button
-                    onClick={() => openCompleteModal(visit)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
-                  >
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    <span>Complete</span>
+                  <button onClick={() => openCompleteModal(visit)} className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all">
+                    <CheckCircle className="w-3.5 h-3.5" /><span>Complete</span>
                   </button>
-                  <button
-                    onClick={() => openRescheduleModal(visit, 'UPCOMING')}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 hover:bg-amber-100 active:scale-95 text-gray-900 border border-gray-300 rounded-lg text-xs font-semibold transition-all"
-                  >
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>Reschedule</span>
+                  <button onClick={() => openRescheduleModal(visit, 'UPCOMING')} className="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 hover:bg-amber-100 active:scale-95 text-gray-900 border border-gray-300 rounded-lg text-xs font-semibold transition-all">
+                    <Calendar className="w-3.5 h-3.5" /><span>Reschedule</span>
                   </button>
-                  <button
-                    onClick={() => openNoShowModal(visit)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
-                  >
-                    <XCircle className="w-3.5 h-3.5" />
-                    <span>No-Show</span>
+                  <button onClick={() => openNoShowModal(visit)} className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all">
+                    <XCircle className="w-3.5 h-3.5" /><span>No-Show</span>
                   </button>
                 </div>
               </div>
@@ -684,7 +1003,6 @@ const HomeVisits = () => {
       {/* Completed Visits */}
       {activeTab === 'completed' && (
         <>
-          {/* Desktop Table */}
           <div className="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -728,8 +1046,6 @@ const HomeVisits = () => {
               </table>
             </div>
           </div>
-
-          {/* Mobile / Tablet Cards */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {visits.completed.map((visit) => (
               <div key={visit.id} className="bg-white rounded-lg border border-gray-200 p-4">
@@ -764,7 +1080,6 @@ const HomeVisits = () => {
       {/* Cancelled Visits */}
       {activeTab === 'cancelled' && (
         <>
-          {/* Desktop Table */}
           <div className="hidden lg:block bg-white border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -808,8 +1123,7 @@ const HomeVisits = () => {
                           onClick={() => openRescheduleModal(visit, 'CANCELLED')}
                           className="flex items-center gap-1.5 ml-auto px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
                         >
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span>Reschedule</span>
+                          <Calendar className="w-3.5 h-3.5" /><span>Reschedule</span>
                         </button>
                       </td>
                     </tr>
@@ -818,8 +1132,6 @@ const HomeVisits = () => {
               </table>
             </div>
           </div>
-
-          {/* Mobile / Tablet Cards */}
           <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             {visits.cancelled.map((visit) => (
               <div key={visit.id} className="bg-white rounded-lg border border-gray-200 p-4">
@@ -849,8 +1161,7 @@ const HomeVisits = () => {
                   onClick={() => openRescheduleModal(visit, 'CANCELLED')}
                   className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 active:scale-95 text-blue-700 border border-blue-300 rounded-lg text-xs font-semibold transition-all"
                 >
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>Reschedule Visit</span>
+                  <Calendar className="w-3.5 h-3.5" /><span>Reschedule Visit</span>
                 </button>
               </div>
             ))}
@@ -858,12 +1169,10 @@ const HomeVisits = () => {
         </>
       )}
 
-      {/* ── Schedule Visit Modal ── */}
+      {/* Schedule Visit Modal */}
       {scheduleModal.open && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur flex items-center justify-center z-50 p-0 sm:p-4">
           <div className="bg-white shadow-2xl max-w-2xl w-full h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl">
-
-            {/* Header */}
             <div className="bg-blue-950 border-b border-gray-200 text-white px-4 py-4 sm:px-8 sm:py-5 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg flex-shrink-0">
@@ -874,157 +1183,76 @@ const HomeVisits = () => {
                   <p className="text-xs sm:text-sm">Fill in the details to add a new home visit</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setScheduleModal({ open: false })}
-                className="font-bold hover:text-blue-600 hover:bg-blue-300 rounded-full transition-colors"
-              >
+              <button type="button" onClick={() => setScheduleModal({ open: false })} className="font-bold hover:text-blue-600 hover:bg-blue-300 rounded-full transition-colors">
                 <X className="w-8 h-8" />
               </button>
             </div>
-
-            {/* Form Content — Scrollable */}
             <div className="flex-1 overflow-y-auto">
               <form onSubmit={handleScheduleSubmit} noValidate className="p-4 sm:p-8 space-y-6">
-
-                {/* Section: Patient Details */}
                 <div>
                   <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-4 flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5" /> Patient Details
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Patient Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="patientName"
-                        value={scheduleForm.patientName}
-                        onChange={handleScheduleChange}
-                        placeholder="Enter patient name"
-                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
-                          scheduleErrors.patientName ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      />
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Patient Name <span className="text-red-500">*</span></label>
+                      <input type="text" name="patientName" value={scheduleForm.patientName} onChange={handleScheduleChange} placeholder="Enter patient name"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${scheduleErrors.patientName ? 'border-red-500' : 'border-gray-300'}`} />
                       {scheduleErrors.patientName && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.patientName}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Patient ID <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="patientId"
-                        value={scheduleForm.patientId}
-                        onChange={handleScheduleChange}
-                        placeholder="e.g. PT-2024-001"
-                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
-                          scheduleErrors.patientId ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      />
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Patient ID <span className="text-red-500">*</span></label>
+                      <input type="text" name="patientId" value={scheduleForm.patientId} onChange={handleScheduleChange} placeholder="e.g. PT-2024-001"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${scheduleErrors.patientId ? 'border-red-500' : 'border-gray-300'}`} />
                       {scheduleErrors.patientId && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.patientId}</p>}
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Phone Number <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={scheduleForm.phone}
-                        onChange={handleScheduleChange}
-                        placeholder="+254 7XX XXX XXX"
-                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
-                          scheduleErrors.phone ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      />
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
+                      <input type="tel" name="phone" value={scheduleForm.phone} onChange={handleScheduleChange} placeholder="+254 7XX XXX XXX"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${scheduleErrors.phone ? 'border-red-500' : 'border-gray-300'}`} />
                       {scheduleErrors.phone && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.phone}</p>}
                     </div>
                   </div>
                 </div>
-
                 <hr className="border-gray-200" />
-
-                {/* Section: Visit Schedule */}
                 <div>
                   <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-4 flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" /> Visit Schedule
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Date <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="date"
-                        name="date"
-                        value={scheduleForm.date}
-                        onChange={handleScheduleChange}
-                        min={new Date().toISOString().split('T')[0]}
-                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
-                          scheduleErrors.date ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      />
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Date <span className="text-red-500">*</span></label>
+                      <input type="date" name="date" value={scheduleForm.date} onChange={handleScheduleChange} min={new Date().toISOString().split('T')[0]}
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${scheduleErrors.date ? 'border-red-500' : 'border-gray-300'}`} />
                       {scheduleErrors.date && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.date}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Time <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="time"
-                        name="time"
-                        value={scheduleForm.time}
-                        onChange={handleScheduleChange}
-                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
-                          scheduleErrors.time ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      />
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Time <span className="text-red-500">*</span></label>
+                      <input type="time" name="time" value={scheduleForm.time} onChange={handleScheduleChange}
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${scheduleErrors.time ? 'border-red-500' : 'border-gray-300'}`} />
                       {scheduleErrors.time && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.time}</p>}
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Location / Address <span className="text-red-500">*</span>
-                      </label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Location / Address <span className="text-red-500">*</span></label>
                       <div className="relative">
                         <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type="text"
-                          name="location"
-                          value={scheduleForm.location}
-                          onChange={handleScheduleChange}
-                          placeholder="e.g. Kibera, Plot 45 or Machakos Town, House 12"
-                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
-                            scheduleErrors.location ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                        />
+                        <input type="text" name="location" value={scheduleForm.location} onChange={handleScheduleChange} placeholder="e.g. Kibera, Plot 45 or Machakos Town, House 12"
+                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${scheduleErrors.location ? 'border-red-500' : 'border-gray-300'}`} />
                       </div>
                       {scheduleErrors.location && <p className="mt-1 text-sm text-red-600 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{scheduleErrors.location}</p>}
                     </div>
                   </div>
                 </div>
-
                 <hr className="border-gray-200" />
-
-                {/* Section: Visit Details */}
                 <div>
                   <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-4 flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5" /> Visit Details
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Visit Type <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        name="type"
-                        value={scheduleForm.type}
-                        onChange={handleScheduleChange}
-                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${
-                          scheduleErrors.type ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      >
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Visit Type <span className="text-red-500">*</span></label>
+                      <select name="type" value={scheduleForm.type} onChange={handleScheduleChange}
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent ${scheduleErrors.type ? 'border-red-500' : 'border-gray-300'}`}>
                         <option value="">Select visit type</option>
                         <option value="Follow-up Visit">Follow-up Visit</option>
                         <option value="Initial Assessment">Initial Assessment</option>
@@ -1043,18 +1271,16 @@ const HomeVisits = () => {
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Priority</label>
                       <div className="flex items-center gap-2 h-[50px]">
                         {[
-                          { value: 'normal', label: 'Normal', active: 'bg-blue-600 text-white border-blue-600', idle: 'border-gray-300 text-gray-600 hover:border-blue-400' },
-                          { value: 'high',   label: 'High',   active: 'bg-blue-600 text-white border-blue-600', idle: 'border-gray-300 text-gray-600 hover:border-blue-400' },
-                          { value: 'urgent', label: 'Urgent', active: 'bg-blue-600 text-white border-blue-600',    idle: 'border-gray-300 text-gray-600 hover:border-blue-400' }
+                          { value: 'normal', label: 'Normal' },
+                          { value: 'high',   label: 'High' },
+                          { value: 'urgent', label: 'Urgent' }
                         ].map(opt => (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => setScheduleForm(prev => ({ ...prev, priority: opt.value }))}
+                          <button key={opt.value} type="button" onClick={() => setScheduleForm(prev => ({ ...prev, priority: opt.value }))}
                             className={`flex-1 h-full border-2 rounded-xl text-sm font-semibold transition-colors ${
-                              scheduleForm.priority === opt.value ? opt.active : opt.idle
-                            }`}
-                          >
+                              scheduleForm.priority === opt.value
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'border-gray-300 text-gray-600 hover:border-blue-400'
+                            }`}>
                             {opt.label}
                           </button>
                         ))}
@@ -1062,41 +1288,24 @@ const HomeVisits = () => {
                     </div>
                     <div className="md:col-span-2">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Notes / Instructions</label>
-                      <textarea
-                        name="notes"
-                        rows={3}
-                        value={scheduleForm.notes}
-                        onChange={handleScheduleChange}
+                      <textarea name="notes" rows={3} value={scheduleForm.notes} onChange={handleScheduleChange}
                         placeholder="Any specific instructions or notes for this visit..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent resize-none"
-                      />
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent resize-none" />
                     </div>
                   </div>
                 </div>
-
               </form>
             </div>
-
-            {/* Action Buttons — Fixed at Bottom */}
             <div className="bg-gray-50 px-4 py-3 sm:px-8 sm:py-4 border-t border-gray-200 flex justify-between items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setScheduleModal({ open: false })}
-                className="px-6 py-2.5 border-2 border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-100 transition-colors flex items-center space-x-2"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
+              <button type="button" onClick={() => setScheduleModal({ open: false })}
+                className="px-6 py-2.5 border-2 border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-100 transition-colors flex items-center space-x-2">
+                <X className="w-4 h-4" /><span>Cancel</span>
               </button>
-              <button
-                type="button"
-                onClick={handleScheduleSubmit}
-                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
-              >
-                <Save className="w-4 h-4" />
-                <span>Schedule Visit</span>
+              <button type="button" onClick={handleScheduleSubmit}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl">
+                <Save className="w-4 h-4" /><span>Schedule Visit</span>
               </button>
             </div>
-
           </div>
         </div>
       )}
@@ -1107,13 +1316,9 @@ const HomeVisits = () => {
           <div className="bg-white shadow-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-blue-600" />
-                Complete Visit
+                <CheckCircle className="w-5 h-5 text-blue-600" />Complete Visit
               </h3>
-              <button
-                onClick={() => setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false })}
-                className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
-              >
+              <button onClick={() => setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false })} className="p-1.5 rounded-full hover:bg-gray-100 transition-colors">
                 <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
@@ -1122,34 +1327,17 @@ const HomeVisits = () => {
             </p>
             <p className="text-xs text-gray-400 mb-4">{completeModal.visit?.patientId} &middot; {completeModal.visit?.type}</p>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Outcome / Notes</label>
-            <textarea
-              rows={3}
-              placeholder="Describe the visit outcome..."
-              value={completeModal.outcome}
+            <textarea rows={3} placeholder="Describe the visit outcome..." value={completeModal.outcome}
               onChange={e => setCompleteModal(prev => ({ ...prev, outcome: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-yes"
-            />
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-yes" />
             <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
-              <input
-                type="checkbox"
-                checked={completeModal.geoCheckPassed}
-                onChange={e => setCompleteModal(prev => ({ ...prev, geoCheckPassed: e.target.checked }))}
-              />
+              <input type="checkbox" checked={completeModal.geoCheckPassed} onChange={e => setCompleteModal(prev => ({ ...prev, geoCheckPassed: e.target.checked }))} />
               Optional geo-check confirmed at patient location
             </label>
             <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false })}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCompleteSubmit}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-              >
-                <CheckCircle className="w-4 h-4" />
-                Mark as Completed
+              <button onClick={() => setCompleteModal({ open: false, visit: null, outcome: '', geoCheckPassed: false })} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleCompleteSubmit} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                <CheckCircle className="w-4 h-4" />Mark as Completed
               </button>
             </div>
           </div>
@@ -1162,13 +1350,9 @@ const HomeVisits = () => {
           <div className="bg-white rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-600" />
-                Reschedule Visit
+                <Calendar className="w-5 h-5 text-blue-600" />Reschedule Visit
               </h3>
-              <button
-                onClick={() => setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' })}
-                className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
-              >
+              <button onClick={() => setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' })} className="p-1.5 rounded-full hover:bg-gray-100 transition-colors">
                 <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
@@ -1179,49 +1363,28 @@ const HomeVisits = () => {
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">New Date</label>
-                <input
-                  type="date"
-                  value={rescheduleModal.date}
-                  onChange={e => setRescheduleModal(prev => ({ ...prev, date: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <input type="date" value={rescheduleModal.date} onChange={e => setRescheduleModal(prev => ({ ...prev, date: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">New Time</label>
-                <input
-                  type="time"
-                  value={rescheduleModal.time}
-                  onChange={e => setRescheduleModal(prev => ({ ...prev, time: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <input type="time" value={rescheduleModal.time} onChange={e => setRescheduleModal(prev => ({ ...prev, time: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               {rescheduleModal.mode === 'UPCOMING' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Reason</label>
-                  <input
-                    type="text"
-                    value={rescheduleModal.reason}
-                    onChange={e => setRescheduleModal(prev => ({ ...prev, reason: e.target.value }))}
+                  <input type="text" value={rescheduleModal.reason} onChange={e => setRescheduleModal(prev => ({ ...prev, reason: e.target.value }))}
                     placeholder="e.g. Patient requested later timing"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               )}
             </div>
             <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' })}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRescheduleSubmit}
-                disabled={!rescheduleModal.date || !rescheduleModal.time}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
-              >
-                <Calendar className="w-4 h-4" />
-                Confirm Reschedule
+              <button onClick={() => setRescheduleModal({ open: false, visit: null, date: '', time: '', reason: '', mode: 'UPCOMING' })} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleRescheduleSubmit} disabled={!rescheduleModal.date || !rescheduleModal.time}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors">
+                <Calendar className="w-4 h-4" />Confirm Reschedule
               </button>
             </div>
           </div>
@@ -1234,13 +1397,9 @@ const HomeVisits = () => {
           <div className="bg-white rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-blue-600" />
-                Mark No-Show
+                <XCircle className="w-5 h-5 text-blue-600" />Mark No-Show
               </h3>
-              <button
-                onClick={() => setNoShowModal({ open: false, visit: null, reason: '' })}
-                className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
-              >
+              <button onClick={() => setNoShowModal({ open: false, visit: null, reason: '' })} className="p-1.5 rounded-full hover:bg-gray-100 transition-colors">
                 <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
@@ -1249,32 +1408,18 @@ const HomeVisits = () => {
             </p>
             <p className="text-xs text-gray-400 mb-4">Capture reason for supervisor analytics.</p>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">No-show reason</label>
-            <input
-              type="text"
-              value={noShowModal.reason}
-              onChange={e => setNoShowModal(prev => ({ ...prev, reason: e.target.value }))}
+            <input type="text" value={noShowModal.reason} onChange={e => setNoShowModal(prev => ({ ...prev, reason: e.target.value }))}
               placeholder="e.g. Phone unreachable"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
             <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setNoShowModal({ open: false, visit: null, reason: '' })}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleNoShowSubmit}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-              >
-                <XCircle className="w-4 h-4" />
-                Confirm No-Show
+              <button onClick={() => setNoShowModal({ open: false, visit: null, reason: '' })} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleNoShowSubmit} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                <XCircle className="w-4 h-4" />Confirm No-Show
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 };

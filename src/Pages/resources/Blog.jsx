@@ -38,7 +38,7 @@ export const Blog = () => {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50 overflow-x-hidden">
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-3 w-full">
         {/* Hero Section */}

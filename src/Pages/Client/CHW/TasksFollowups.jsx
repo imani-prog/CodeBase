@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   CheckCircle,
   Clock,
@@ -14,10 +14,13 @@ import {
   X,
   Save
 } from 'lucide-react';
-import { syncTaskWorkItems } from '../../../Services/chwAssignmentsStore';
+import { useAuth } from '../../../hooks/useAuth.jsx';
+import { assignmentService } from '../../../Services/domain/assignmentService.js';
+import { chwService } from '../../../Services/domain/chwService.js';
 
 const CATEGORIES = ['Medical Follow-up', 'Medication', 'Education', 'Assessment', 'Other'];
 const PRIORITIES = ['normal', 'high', 'urgent'];
+const EMPTY_TASKS = { pending: [], inProgress: [], completed: [] };
 
 const emptyForm = {
   title: '',
@@ -30,118 +33,182 @@ const emptyForm = {
   description: ''
 };
 
+const toNumericId = (value) => {
+  if (value == null) return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const text = String(value).trim();
+  if (!text) return null;
+  if (/^\d+$/.test(text)) return Number(text);
+  const match = text.match(/\d+/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const assignmentStatusToTab = (status) => {
+  const value = String(status || '').toUpperCase();
+  if (value === 'COMPLETED') return 'completed';
+  if (value === 'IN_PROGRESS') return 'inProgress';
+  if (value === 'CANCELED' || value === 'CANCELLED') return null;
+  return 'pending';
+};
+
+const formatIsoDate = (value) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().slice(0, 10);
+};
+
+const formatIsoTime = (value) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString('en-KE', { hour: 'numeric', minute: '2-digit', hour12: true });
+};
+
+const patientIdText = (row) => {
+  const raw = row?.raw || {};
+  return raw?.patient?.patientId || raw?.patient?.code || (row?.patientId != null ? `PT-${row.patientId}` : 'N/A');
+};
+
+const taskTitle = (row) => {
+  const raw = row?.raw || {};
+  if (raw.title) return String(raw.title);
+  if (raw.taskTitle) return String(raw.taskTitle);
+  if (row?.notes) {
+    const firstLine = String(row.notes).split('\n').map((line) => line.trim()).find(Boolean);
+    if (firstLine) return firstLine;
+  }
+  return row?.assignmentCode || `Task ${row?.id || ''}`;
+};
+
+const groupAssignmentsToTasks = (rows = []) => {
+  const grouped = { pending: [], inProgress: [], completed: [] };
+
+  rows
+    .filter((row) => String(row?.assignmentType || '').toUpperCase() === 'TASK')
+    .forEach((row) => {
+      const tab = assignmentStatusToTab(row?.status);
+      if (!tab) return;
+
+      const raw = row?.raw || {};
+      const dueAt = raw?.dueAt || raw?.deadlineAt || row?.assignedAt || row?.createdAt || null;
+      const base = {
+        id: row.id,
+        title: taskTitle(row),
+        patient: row.patientName || 'Unknown Patient',
+        patientId: patientIdText(row),
+        priority: String(raw?.priority || 'NORMAL').toLowerCase(),
+        category: raw?.category || 'Task',
+        description: raw?.description || row.notes || '',
+      };
+
+      if (tab === 'pending') {
+        grouped.pending.push({
+          ...base,
+          dueDate: formatIsoDate(dueAt),
+          dueTime: formatIsoTime(dueAt),
+        });
+      } else if (tab === 'inProgress') {
+        grouped.inProgress.push({
+          ...base,
+          startedDate: formatIsoDate(row?.startedAt || dueAt),
+          progress: Number(raw?.progress ?? 50),
+        });
+      } else {
+        grouped.completed.push({
+          ...base,
+          completedDate: formatIsoDate(row?.completedAt || row?.updatedAt || dueAt),
+          notes: row?.notes || 'Task completed successfully',
+        });
+      }
+    });
+
+  return grouped;
+};
+
 const TasksFollowups = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('pending');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [tasksError, setTasksError] = useState('');
+  const [resolvedChwId, setResolvedChwId] = useState(null);
 
   // ── Live task state ──────────────────────────────────────────────────
-  const [tasks, setTasks] = useState({
-    pending: [
-      {
-        id: 1,
-        title: 'Follow-up Blood Pressure Check',
-        patient: 'Sarah Wanjiru',
-        patientId: 'PT-2023-001',
-        priority: 'high',
-        dueDate: '2024-10-25',
-        dueTime: '2:00 PM',
-        description: 'Check blood pressure after medication adjustment',
-        category: 'Medical Follow-up'
-      },
-      {
-        id: 2,
-        title: 'Medication Adherence Check',
-        patient: 'John Kamau',
-        patientId: 'PT-2023-045',
-        priority: 'urgent',
-        dueDate: '2024-10-25',
-        dueTime: '4:00 PM',
-        description: 'Verify patient is taking prescribed medications correctly',
-        category: 'Medication'
-      },
-      {
-        id: 3,
-        title: 'Nutrition Counseling Session',
-        patient: 'Grace Akinyi',
-        patientId: 'PT-2023-156',
-        priority: 'normal',
-        dueDate: '2024-10-26',
-        dueTime: '10:00 AM',
-        description: 'Discuss meal planning and dietary improvements',
-        category: 'Education'
-      },
-      {
-        id: 4,
-        title: 'Home Safety Assessment',
-        patient: 'Peter Ochieng',
-        patientId: 'PT-2023-112',
-        priority: 'normal',
-        dueDate: '2024-10-27',
-        dueTime: '11:00 AM',
-        description: 'Evaluate home environment for elderly patient',
-        category: 'Assessment'
-      },
-      {
-        id: 5,
-        title: 'Prenatal Check-in',
-        patient: 'Mary Njoki',
-        patientId: 'PT-2023-089',
-        priority: 'high',
-        dueDate: '2024-10-28',
-        dueTime: '9:00 AM',
-        description: 'Monitor pregnancy progress and address concerns',
-        category: 'Medical Follow-up'
+  const [tasks, setTasks] = useState(EMPTY_TASKS);
+
+  const activeChwId = useMemo(() => (
+    resolvedChwId
+    ?? toNumericId(user?.chwId)
+    ?? toNumericId(user?.providerId)
+    ?? toNumericId(user?.id)
+    ?? null
+  ), [resolvedChwId, user?.chwId, user?.providerId, user?.id]);
+
+  const loadTasks = useCallback(async () => {
+    setIsLoading(true);
+    setTasksError('');
+
+    try {
+      let list = [];
+
+      if (activeChwId != null) {
+        try {
+          list = await assignmentService.listAssignmentsByChw(activeChwId, { size: 300 });
+        } catch (error) {
+          if (![401, 403, 404].includes(error?.status)) throw error;
+        }
       }
-    ],
-    inProgress: [
-      {
-        id: 6,
-        title: 'Diabetes Education Series',
-        patient: 'David Mwangi',
-        patientId: 'PT-2023-201',
-        priority: 'normal',
-        startedDate: '2024-10-20',
-        description: 'Ongoing education about diabetes management',
-        category: 'Education',
-        progress: 60
-      },
-      {
-        id: 7,
-        title: 'Mental Health Check-in',
-        patient: 'Jane Wambui',
-        patientId: 'PT-2023-178',
-        priority: 'high',
-        startedDate: '2024-10-23',
-        description: 'Weekly mental health support and counseling',
-        category: 'Medical Follow-up',
-        progress: 40
+
+      if (!list.length) {
+        const allAssignments = await assignmentService.listAssignments({ size: 300 });
+        const names = [user?.name, user?.username]
+          .filter(Boolean)
+          .map((value) => String(value).trim().toLowerCase());
+
+        list = allAssignments.filter((row) => {
+          if (activeChwId != null && row?.chwId != null) {
+            return String(row.chwId) === String(activeChwId);
+          }
+          const chwName = String(row?.chwName || '').toLowerCase();
+          return names.some((name) => name && chwName.includes(name));
+        });
       }
-    ],
-    completed: [
-      {
-        id: 8,
-        title: 'Initial Health Assessment',
-        patient: 'Grace Akinyi',
-        patientId: 'PT-2023-156',
-        completedDate: '2024-10-22',
-        notes: 'Completed comprehensive health assessment. Patient responding well to treatment.',
-        category: 'Assessment'
-      },
-      {
-        id: 9,
-        title: 'Medication Review',
-        patient: 'Sarah Wanjiru',
-        patientId: 'PT-2023-001',
-        completedDate: '2024-10-21',
-        notes: 'Reviewed all medications. No changes needed. Patient adherent.',
-        category: 'Medication'
-      }
-    ]
-  });
+
+      setTasks(groupAssignmentsToTasks(list));
+    } catch (error) {
+      setTasksError(error?.message || 'Failed to fetch tasks from backend.');
+      setTasks(EMPTY_TASKS);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeChwId, user?.name, user?.username]);
 
   useEffect(() => {
-    syncTaskWorkItems(tasks);
-  }, [tasks]);
+    let active = true;
+    const resolveChwId = async () => {
+      try {
+        const me = await chwService.getMe(user?.id);
+        const id = toNumericId(me?.id ?? me?.chwId ?? me?.providerId ?? me?.user?.id);
+        if (active && id != null) {
+          setResolvedChwId(id);
+        }
+      } catch {
+        // Continue with auth-derived identifiers.
+      }
+    };
+
+    resolveChwId();
+    return () => { active = false; };
+  }, [user?.id]);
+
+  useEffect(() => {
+    loadTasks();
+    const timer = window.setInterval(loadTasks, 45000);
+    return () => window.clearInterval(timer);
+  }, [loadTasks]);
 
   //  Modal states
   const [newTaskModal, setNewTaskModal] = useState({ open: false, form: emptyForm, errors: {} });
@@ -197,32 +264,36 @@ const TasksFollowups = () => {
     }));
   };
 
-  const handleNewTaskSubmit = (e) => {
+  const handleNewTaskSubmit = async (e) => {
     e.preventDefault();
     const errs = validateTaskForm(newTaskModal.form);
     if (Object.keys(errs).length > 0) {
       setNewTaskModal(prev => ({ ...prev, errors: errs }));
       return;
     }
+
+    const patientId = toNumericId(newTaskModal.form.patientId);
+    if (!patientId || !activeChwId) {
+      setTasksError('Unable to create task: valid patient id and CHW assignment are required.');
+      return;
+    }
+
     const f = newTaskModal.form;
-    setTasks(prev => ({
-      ...prev,
-      pending: [
-        ...prev.pending,
-        {
-          id: Date.now(),
-          title: f.title.trim(),
-          patient: f.patient.trim(),
-          patientId: f.patientId.trim(),
-          priority: f.priority,
-          category: f.category,
-          dueDate: f.dueDate,
-          dueTime: formatTime(f.dueTime),
-          description: f.description.trim()
-        }
-      ]
-    }));
-    setNewTaskModal({ open: false, form: emptyForm, errors: {} });
+    try {
+      await assignmentService.createAssignment({
+        patientId,
+        chwId: activeChwId,
+        assignmentType: 'TASK',
+        status: 'ASSIGNED',
+        assignedAt: new Date(`${f.dueDate}T${f.dueTime}:00`).toISOString(),
+        notes: `${f.title.trim()}${f.description?.trim() ? `\n${f.description.trim()}` : ''}`,
+      });
+
+      setNewTaskModal({ open: false, form: emptyForm, errors: {} });
+      await loadTasks();
+    } catch (error) {
+      setTasksError(error?.message || 'Failed to create task in backend.');
+    }
   };
 
   //  Edit 
@@ -257,76 +328,65 @@ const TasksFollowups = () => {
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    const { task, tab, form } = editModal;
+    const { form } = editModal;
     const errs = validateTaskForm(form, true);
     if (Object.keys(errs).length > 0) {
       setEditModal(prev => ({ ...prev, errors: errs }));
       return;
     }
-    setTasks(prev => ({
-      ...prev,
-      [tab]: prev[tab].map(t =>
-        t.id === task.id
-          ? {
-              ...t,
-              title: form.title.trim(),
-              patient: form.patient.trim(),
-              patientId: form.patientId.trim(),
-              priority: form.priority,
-              category: form.category,
-              ...(tab === 'pending' && { dueDate: form.dueDate || t.dueDate }),
-              ...(tab === 'inProgress' && { startedDate: form.dueDate || t.startedDate, progress: Number(form.progress ?? t.progress) }),
-              ...(form.dueTime && tab === 'pending' && { dueTime: formatTime(form.dueTime) }),
-              description: form.description.trim()
-            }
-          : t
-      )
-    }));
+    setTasksError('Editing task fields is not supported by the backend assignment API yet.');
     setEditModal({ open: false, task: null, tab: null, form: emptyForm, errors: {} });
   };
 
   //  Start (pending → inProgress) 
   const openStartModal = (task) => setStartModal({ open: true, task });
 
-  const handleStartConfirm = () => {
+  const handleStartConfirm = async () => {
     const { task } = startModal;
-    setTasks(prev => ({
-      ...prev,
-      pending: prev.pending.filter(t => t.id !== task.id),
-      inProgress: [
-        ...prev.inProgress,
-        { ...task, startedDate: today, progress: 0 }
-      ]
-    }));
-    setStartModal({ open: false, task: null });
+    try {
+      await assignmentService.updateAssignmentStatus(task.id, 'IN_PROGRESS');
+      setStartModal({ open: false, task: null });
+      await loadTasks();
+    } catch (error) {
+      setTasksError(error?.message || 'Failed to start task.');
+    }
   };
 
   //  Complete (pending or inProgress → completed)
   const openCompleteModal = (task, tab) => setCompleteModal({ open: true, task, tab, notes: '' });
 
-  const handleCompleteSubmit = () => {
+  const handleCompleteSubmit = async () => {
     const { task, tab, notes } = completeModal;
-    setTasks(prev => ({
-      ...prev,
-      [tab]: prev[tab].filter(t => t.id !== task.id),
-      completed: [
-        { ...task, completedDate: today, notes: notes.trim() || 'Task completed successfully' },
-        ...prev.completed
-      ]
-    }));
-    setCompleteModal({ open: false, task: null, tab: null, notes: '' });
+    try {
+      await assignmentService.updateAssignmentStatus(task.id, 'COMPLETED');
+      setCompleteModal({ open: false, task: null, tab: null, notes: '' });
+      await loadTasks();
+    } catch (error) {
+      setTasksError(error?.message || 'Failed to mark task as completed.');
+      if (tab === 'inProgress' && notes?.trim()) {
+        setTasksError('Task status was not updated; completion notes are not persisted by backend status endpoint.');
+      }
+    }
   };
 
   //  Delete ────────────────────────────────────────────────────────────
   const openDeleteModal = (task, tab) => setDeleteModal({ open: true, task, tab });
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     const { task, tab } = deleteModal;
-    setTasks(prev => ({
-      ...prev,
-      [tab]: prev[tab].filter(t => t.id !== task.id)
-    }));
-    setDeleteModal({ open: false, task: null, tab: null });
+    if (tab === 'completed') {
+      setTasksError('Completed tasks cannot be deleted through backend assignment API.');
+      setDeleteModal({ open: false, task: null, tab: null });
+      return;
+    }
+
+    try {
+      await assignmentService.updateAssignmentStatus(task.id, 'CANCELED');
+      setDeleteModal({ open: false, task: null, tab: null });
+      await loadTasks();
+    } catch (error) {
+      setTasksError(error?.message || 'Failed to cancel task.');
+    }
   };
 
   //  Derived stats ─────────────────────────────────────────────────────
@@ -497,6 +557,7 @@ const TasksFollowups = () => {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tasks &amp; Follow-ups</h1>
           
+          {tasksError && <p className="text-sm text-red-700 mt-1">{tasksError}</p>}
         </div>
         <button
           onClick={openNewTaskModal}

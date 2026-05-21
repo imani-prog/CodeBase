@@ -18,7 +18,7 @@ const Training = () => {
 
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50">
       {/* Hero Section */}
       <section className="">
         <div className="absolute inset-0"></div>

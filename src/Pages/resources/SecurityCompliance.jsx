@@ -1,6 +1,6 @@
 const SecurityCompliance = () => {
   return (
-    <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="text-center px-4 py-8 max-w-2xl mx-auto">
         <h1 className="text-5xl md:text-7xl font-extrabold text-blue-800 mb-6 font-serif">
           Coming Soon

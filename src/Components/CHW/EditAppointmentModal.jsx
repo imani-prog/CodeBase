@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   X, Calendar, Clock, MapPin, Phone, Video, User, FileText,
-  AlertCircle, CheckCircle2, Edit3, Search
+  AlertCircle, CheckCircle2, Edit3, Search, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 const SAMPLE_PATIENTS = [
@@ -15,6 +15,77 @@ const SAMPLE_PATIENTS = [
 
 const DURATION_OPTIONS = ['15 min', '30 min', '45 min', '60 min', '90 min'];
 const TYPE_OPTIONS = ['In-Person', 'Video Call', 'Phone Call', 'Home Visit'];
+
+const UI_TO_API_TYPE = {
+  'In-Person': 'CONSULTATION',
+  'Video Call': 'TELEMEDICINE',
+  'Phone Call': 'TELEHEALTH',
+  'Home Visit': 'HOME_VISIT',
+};
+
+const API_TO_UI_TYPE = {
+  CONSULTATION: 'In-Person',
+  FOLLOW_UP: 'In-Person',
+  HOME_VISIT: 'Home Visit',
+  SURGERY: 'In-Person',
+  LAB_TEST: 'In-Person',
+  IMAGING: 'In-Person',
+  VACCINATION: 'In-Person',
+  TELEHEALTH: 'Phone Call',
+  TELEMEDICINE: 'Video Call',
+  OTHER: 'In-Person',
+  CLINIC_VISIT: 'In-Person',
+};
+
+function mapUiTypeToApiType(uiType) {
+  return UI_TO_API_TYPE[uiType] || 'OTHER';
+}
+
+function mapApiTypeToUiType(apiType) {
+  const key = String(apiType || '').trim().toUpperCase();
+  if (!key) return 'In-Person';
+  return API_TO_UI_TYPE[key] || 'In-Person';
+}
+
+function parseDurationMinutes(durationText) {
+  const match = String(durationText || '').match(/(\d+)/);
+  if (!match) return 30;
+  const parsed = Number(match[1]);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 30;
+}
+
+function formatDateInput(value) {
+  const parsed = Date.parse(value || '');
+  if (Number.isNaN(parsed)) return '';
+  return new Date(parsed).toISOString().slice(0, 10);
+}
+
+function formatTimeInput(value) {
+  const parsed = Date.parse(value || '');
+  if (Number.isNaN(parsed)) return '';
+  const date = new Date(parsed);
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function durationLabelFromIso(startValue, endValue) {
+  const start = Date.parse(startValue || '');
+  const end = Date.parse(endValue || '');
+  if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return '30 min';
+  const minutes = Math.round((end - start) / (60 * 1000));
+  return `${minutes} min`;
+}
+
+function buildScheduledTimes(date, time, duration) {
+  const start = new Date(`${date}T${time}:00`);
+  if (Number.isNaN(start.getTime())) {
+    throw new Error('Invalid date/time');
+  }
+  const end = new Date(start.getTime() + parseDurationMinutes(duration) * 60 * 1000);
+  return {
+    scheduledStart: start.toISOString(),
+    scheduledEnd: end.toISOString(),
+  };
+}
 
 const typeIcon = (type) => {
   switch (type) {
@@ -38,7 +109,7 @@ const FieldError = ({ msg }) =>
     </p>
   ) : null;
 
-const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients = SAMPLE_PATIENTS }) => {
+const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients = SAMPLE_PATIENTS, isPatientsLoading = false }) => {
   const empty = {
     patientId: '',
     date: '',
@@ -56,34 +127,42 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
   const [isSaving, setIsSaving] = useState(false);
   const [patientSearch, setPatientSearch] = useState('');
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
+  const [showAllPatients, setShowAllPatients] = useState(false);
   const [saveError, setSaveError] = useState('');
+
+  const normalizedPatients = patients.map((p) => ({
+    id: String(p?.id ?? '').trim(),
+    name: String(p?.name ?? '').trim() || String(p?.id ?? ''),
+  })).filter((p) => p.id);
 
   // Populate form when appointment changes
   useEffect(() => {
     if (appointment) {
-      const patient = patients.find((p) => p.id === appointment.patientId);
+      const patient = normalizedPatients.find((p) => String(p.id) === String(appointment.patientId));
+      const sourceStart = appointment.scheduledStart || appointment.startAt || appointment.scheduledAt || '';
+      const sourceEnd = appointment.scheduledEnd || appointment.endAt || '';
       setForm({
-        patientId: appointment.patientId || '',
-        date: appointment.date || '',
-        time: appointment.time || '',
-        duration: appointment.duration || '30 min',
-        type: appointment.type || 'In-Person',
+        patientId: appointment.patientId === undefined || appointment.patientId === null ? '' : String(appointment.patientId),
+        date: appointment.date || formatDateInput(sourceStart),
+        time: appointment.time || formatTimeInput(sourceStart),
+        duration: appointment.duration || durationLabelFromIso(sourceStart, sourceEnd),
+        type: mapApiTypeToUiType(appointment.type || appointment.appointmentType),
         location: appointment.location || '',
         reason: appointment.reason || '',
         notes: appointment.notes || '',
-        sendReminder: true,
+        sendReminder: Boolean(appointment.reminderSent),
       });
       setPatientSearch(patient ? patient.name : appointment.patientName || '');
     }
-  }, [appointment, patients]);
+  }, [appointment, normalizedPatients]);
 
-  const filteredPatients = patients.filter(
-    (p) =>
-      p.name.toLowerCase().includes(patientSearch.toLowerCase()) ||
-      p.id.toLowerCase().includes(patientSearch.toLowerCase())
-  );
+  const searchQuery = patientSearch.trim().toLowerCase();
+  const filteredPatients = normalizedPatients.filter((p) => {
+    if (!searchQuery) return showAllPatients;
+    return p.name.toLowerCase().includes(searchQuery) || p.id.toLowerCase().includes(searchQuery);
+  });
 
-  const selectedPatient = patients.find((p) => p.id === form.patientId);
+  const selectedPatient = normalizedPatients.find((p) => String(p.id) === String(form.patientId));
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -92,10 +171,16 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
   };
 
   const selectPatient = (patient) => {
-    setForm((prev) => ({ ...prev, patientId: patient.id }));
+    setForm((prev) => ({ ...prev, patientId: String(patient.id) }));
     setPatientSearch(patient.name);
     setShowPatientDropdown(false);
+    setShowAllPatients(false);
     if (errors.patientId) setErrors((prev) => ({ ...prev, patientId: '' }));
+  };
+
+  const togglePatientDropdown = () => {
+    setShowPatientDropdown((open) => !open);
+    setShowAllPatients((show) => !show);
   };
 
   const validate = () => {
@@ -114,9 +199,31 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
     if (isSaving || !validate()) return;
     setSaveError('');
     setIsSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
     try {
-      onSave?.({ ...appointment, ...form, patientName: selectedPatient?.name || appointment?.patientName });
+      const patientId = Number(form.patientId);
+      if (!Number.isFinite(patientId)) {
+        throw new Error('Please select a valid patient.');
+      }
+
+      const { scheduledStart, scheduledEnd } = buildScheduledTimes(form.date, form.time, form.duration);
+
+      await onSave?.({
+        id: appointment.id,
+        patientId,
+        scheduledStart,
+        scheduledEnd,
+        type: mapUiTypeToApiType(form.type),
+        reason: form.reason.trim(),
+        location: form.location.trim(),
+        notes: form.notes.trim(),
+        reminderSent: Boolean(form.sendReminder),
+        providerRole: appointment.providerRole,
+        providerId: appointment.providerId,
+        doctorId: appointment.doctorId,
+        chwId: appointment.chwId,
+        hospitalId: appointment.hospitalId,
+        patientName: selectedPatient?.name || appointment?.patientName,
+      });
       handleClose();
     } catch {
       setSaveError('Something went wrong updating the appointment. Please try again.');
@@ -129,6 +236,7 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
     setErrors({});
     setSaveError('');
     setShowPatientDropdown(false);
+    setShowAllPatients(false);
     onClose?.();
   };
 
@@ -187,13 +295,21 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
                     onChange={(e) => {
                       setPatientSearch(e.target.value);
                       setShowPatientDropdown(true);
+                      setShowAllPatients(false);
                       if (!e.target.value) setForm((p) => ({ ...p, patientId: '' }));
                     }}
-                    onFocus={() => setShowPatientDropdown(true)}
-                    className={`w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent transition-all ${
+                    className={`w-full pl-9 pr-10 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent transition-all ${
                       errors.patientId ? 'border-red-400' : 'border-gray-300'
                     }`}
                   />
+                  <button
+                    type="button"
+                    onClick={togglePatientDropdown}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700"
+                    aria-label="Toggle patient dropdown"
+                  >
+                    {showPatientDropdown ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
                 </div>
                 {showPatientDropdown && filteredPatients.length > 0 && (
                   <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
@@ -210,6 +326,16 @@ const EditAppointmentModal = ({ isOpen, onClose, onSave, appointment, patients =
                         <span className="text-xs text-gray-400">{p.id}</span>
                       </button>
                     ))}
+                  </div>
+                )}
+                {showPatientDropdown && isPatientsLoading && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg p-3 text-sm text-gray-500">
+                    Loading patients from backend...
+                  </div>
+                )}
+                {showPatientDropdown && !isPatientsLoading && filteredPatients.length === 0 && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg p-3 text-sm text-gray-500">
+                    No patients found.
                   </div>
                 )}
                 <FieldError msg={errors.patientId} />

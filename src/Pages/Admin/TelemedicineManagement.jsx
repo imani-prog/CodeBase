@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { 
   Video, 
   Users, 
@@ -74,7 +74,9 @@ import EditDoctorModal from '../../Components/Admin/EditDoctorModal';
 import ViewHistorySessionModal from '../../Components/Admin/ViewHistorySessionModal';
 import ViewPrescriptionModal from '../../Components/Admin/ViewPrescriptionModal';
 import DownloadReportModal from '../../Components/Admin/DownloadReportModal';
-
+import { telemedicineService } from '../../Services/domain/telemedicineService.js';
+import JitsiCallModal from '../../Components/JitsiCallModal';
+import { patientApi } from '../../API/endpoints/patientApi.js';
 
 const TelemedicineManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -88,8 +90,6 @@ const TelemedicineManagement = () => {
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [showTerminateModal, setShowTerminateModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
-  const [pausedSessionIds, setPausedSessionIds] = useState(new Set());
-  const [terminatedSessionIds, setTerminatedSessionIds] = useState(new Set());
   // Doctor modal states
   const [showViewDoctorModal, setShowViewDoctorModal] = useState(false);
   const [showMessageDoctorModal, setShowMessageDoctorModal] = useState(false);
@@ -101,6 +101,35 @@ const TelemedicineManagement = () => {
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [showDownloadReportModal, setShowDownloadReportModal] = useState(false);
   const [selectedHistorySession, setSelectedHistorySession] = useState(null);
+
+  const [showJitsiCall, setShowJitsiCall] = useState(false);
+  const [jitsiSession, setJitsiSession]   = useState(null);
+  const [joiningSession, setJoiningSession] = useState(false);
+
+  const handleJoinLiveSession = async (session) => {
+    if (!session?.backendId || !session?.patientId || session?.patientId === 'N/A') {
+      window.alert('Please select a valid patient-linked session before joining.');
+      return;
+    }
+
+    setJoiningSession(true);
+    try {
+      if (session.status === 'scheduled') {
+        await telemedicineService.startSession(session.backendId);
+        setReloadToken((prev) => prev + 1);
+      } else if (session.status === 'paused') {
+        await telemedicineService.resumeSession(session.backendId);
+        setReloadToken((prev) => prev + 1);
+      }
+
+      setJitsiSession(session);
+      setShowJitsiCall(true);
+    } catch (error) {
+      window.alert(error?.message || 'Failed to start the session.');
+    } finally {
+      setJoiningSession(false);
+    }
+  };
 
   // Platform settings state
   const [platformSettings, setPlatformSettings] = useState({
@@ -147,6 +176,32 @@ const TelemedicineManagement = () => {
 
   const [settingsSaved, setSettingsSaved] = useState(false);
 
+
+const formatDateOnly = (dateString) => {
+  if (!dateString) return '—';
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-KE', {
+    year: 'numeric', month: 'short', day: 'numeric',
+  });
+};
+
+
+const formatIfDate = (value) => {
+  if (!value || typeof value !== 'string') return value;
+  return value.replace(
+    /\d{4}-\d{2}-\d{2}T[\d:.Z+%-]+/g,
+    (match) => {
+      const d = new Date(match);
+      if (isNaN(d.getTime())) return match;
+      return d.toLocaleString('en-KE', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true,
+      });
+    }
+  );
+};
+
   const handleSettingChange = (key, value) => {
     setPlatformSettings(prev => ({
       ...prev,
@@ -162,216 +217,468 @@ const TelemedicineManagement = () => {
     setTimeout(() => setSettingsSaved(false), 3000);
   };
 
-  // Sample telemedicine data
-  const platformOverview = {
-    totalSessions: 1247,
-    activeSessions: 23,
-    totalDoctors: 45,
-    onlineDoctors: 18,
-    totalRevenue: 432500,
-    monthlyGrowth: 18.5,
-    avgSessionDuration: 28.5,
-    patientSatisfaction: 4.6
-  };
+  const [platformOverview, setPlatformOverview] = useState({
+    totalSessions: 0,
+    activeSessions: 0,
+    totalDoctors: 0,
+    onlineDoctors: 0,
+    totalRevenue: 0,
+    monthlyGrowth: 0,
+    avgSessionDuration: 0,
+    patientSatisfaction: 0,
+  });
+  const [activeSessions, setActiveSessions] = useState([]);
+  const [onlineDoctors, setOnlineDoctors] = useState([]);
+  const [sessionHistory, setSessionHistory] = useState([]);
+  const [revenueData, setRevenueData] = useState({
+    daily: 0,
+    weekly: 0,
+    monthly: 0,
+    bySpecialty: [],
+  });
+  const [usageDistribution, setUsageDistribution] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [dataError, setDataError] = useState('');
+  const [reloadToken, setReloadToken] = useState(0);
+  const [patients, setPatients] = useState([]);
+  const [patientsLoading, setPatientsLoading] = useState(false);
+  const [patientsError, setPatientsError] = useState('');
 
-  const activeSessions = [
-    {
-      id: 'TM-001',
-      patient: 'Mary Wanjiku',
-      patientId: 'PAT-12345',
-      doctor: 'Dr. Sarah Mitchell',
-      doctorId: 'DOC-001',
-      specialty: 'General Medicine',
-      startTime: '2024-10-12T10:30:00',
-      duration: 18,
-      platform: 'Video Call',
-      status: 'active',
-      sessionType: 'consultation',
-      priority: 'normal',
-      symptoms: ['Headache', 'Fatigue'],
-      cost: 500
-    },
-    {
-      id: 'TM-002',
-      patient: 'John Kiprotich',
-      patientId: 'PAT-12346',
-      doctor: 'Dr. James Mwangi',
-      doctorId: 'DOC-002',
-      specialty: 'Cardiology',
-      startTime: '2024-10-12T11:15:00',
-      duration: 25,
-      platform: 'Video Call',
-      status: 'active',
-      sessionType: 'follow-up',
-      priority: 'high',
-      symptoms: ['Chest Pain', 'Shortness of Breath'],
-      cost: 800
-    },
-    {
-      id: 'TM-003',
-      patient: 'Grace Achieng',
-      patientId: 'PAT-12347',
-      doctor: 'Dr. Linda Chen',
-      doctorId: 'DOC-003',
-      specialty: 'Pediatrics',
-      startTime: '2024-10-12T09:45:00',
-      duration: 35,
-      platform: 'Audio Call',
-      status: 'active',
-      sessionType: 'consultation',
-      priority: 'normal',
-      symptoms: ['Fever', 'Cough'],
-      cost: 400
-    },
-    {
-      id: 'TM-004',
-      patient: 'Peter Njoroge',
-      patientId: 'PAT-12348',
-      doctor: 'Dr. Peter Njoroge',
-      doctorId: 'DOC-004',
-      specialty: 'Dermatology',
-      startTime: '2024-10-12T12:00:00',
-      duration: 20,
-      platform: 'Messaging',
-      status: 'active',
-      sessionType: 'follow-up',
-      priority: 'medium',
-      symptoms: ['Rash', 'Itching'],
-      cost: 600
+  const firstNonEmpty = useCallback((...values) => {
+    for (const value of values) {
+      if (value === undefined || value === null) continue;
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        const lowered = trimmed.toLowerCase();
+        if (trimmed === '' || lowered === 'null' || lowered === 'undefined' || lowered === 'n/a' || lowered === 'na') {
+          continue;
+        }
+      }
+      return value;
     }
-  ];
+    return null;
+  }, []);
 
-  const [onlineDoctors, setOnlineDoctors] = useState([
-    {
-      id: 'DOC-001',
-      name: 'Dr. Sarah Mitchell',
-      photo: '/src/assets/Timothy Imani.jpeg',
-      specialty: 'General Medicine',
-      experience: 8,
-      rating: 4.8,
-      sessionsToday: 6,
-      totalSessions: 234,
-      currentStatus: 'available',
-      nextAppointment: '2024-10-12T14:30:00',
-      avgSessionDuration: 25,
-      earnings: 15600,
-      languages: ['English', 'Swahili'],
-      location: 'Nairobi'
-    },
-    {
-      id: 'DOC-002',
-      name: 'Dr. James Mwangi',
-      photo: '/src/assets/Joseph Otieno.jpeg',
-      specialty: 'Cardiology',
-      experience: 12,
-      rating: 4.9,
-      sessionsToday: 4,
-      totalSessions: 189,
-      currentStatus: 'busy',
-      nextAppointment: '2024-10-12T12:00:00',
-      avgSessionDuration: 35,
-      earnings: 28400,
-      languages: ['English', 'Swahili', 'Kikuyu'],
-      location: 'Kisumu'
-    },
-    {
-      id: 'DOC-003',
-      name: 'Dr. Linda Chen',
-      photo: '/src/assets/Grace Achieng.jpeg',
-      specialty: 'Pediatrics',
-      experience: 6,
-      rating: 4.7,
-      sessionsToday: 8,
-      totalSessions: 156,
-      currentStatus: 'available',
-      nextAppointment: '2024-10-12T15:00:00',
-      avgSessionDuration: 20,
-      earnings: 12800,
-      languages: ['English', 'Mandarin'],
-      location: 'Mombasa'
-    },
-    {
-      id: 'DOC-004',
-      name: 'Dr. Peter Njoroge',
-      photo: '/src/assets/PeterNjoroge.jpeg',
-      specialty: 'Dermatology',
-      experience: 10,
-      rating: 4.6,
-      sessionsToday: 3,
-      totalSessions: 198,
-      currentStatus: 'offline',
-      nextAppointment: '2024-10-13T09:00:00',
-      avgSessionDuration: 30,
-      earnings: 22100,
-      languages: ['English', 'Swahili'],
-      location: 'Eldoret'
+  const toNumber = useCallback((value, fallback = 0) => {
+    if (typeof value === 'string') {
+      const cleaned = value.replace(/[^0-9.-]/g, '');
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : fallback;
     }
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+  }, []);
+
+  const toArray = useCallback((value) => (Array.isArray(value) ? value : []), []);
+
+  const normalizePagedContent = useCallback((payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.content)) return payload.content;
+    if (Array.isArray(payload?.result)) return payload.result;
+    if (Array.isArray(payload?.items)) return payload.items;
+    if (Array.isArray(payload?.data)) return payload.data;
+    return [];
+  }, []);
+
+  const extractListPayload = useCallback((payload, keys = []) => {
+    const direct = normalizePagedContent(payload);
+    if (direct.length > 0) return direct;
+
+    for (const key of keys) {
+      const nested = normalizePagedContent(payload?.[key]);
+      if (nested.length > 0) return nested;
+
+      const nestedData = normalizePagedContent(payload?.data?.[key]);
+      if (nestedData.length > 0) return nestedData;
+    }
+
+    return [];
+  }, [normalizePagedContent]);
+
+  const parseBackendId = useCallback((value) => {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (value === undefined || value === null) return null;
+    const text = String(value);
+    const digits = text.match(/\d+/g);
+    if (!digits) {
+      const asNumber = Number(text);
+      return Number.isFinite(asNumber) ? asNumber : null;
+    }
+    const parsed = Number(digits.join(''));
+    return Number.isFinite(parsed) ? parsed : null;
+  }, []);
+
+  const normalizePlatform = useCallback((value) => {
+    const key = String(value || '').toUpperCase();
+    if (key.includes('VIDEO')) return 'Video Call';
+    if (key.includes('AUDIO')) return 'Audio Call';
+    if (key.includes('MESSAGE')) return 'Messaging';
+    return 'Video Call';
+  }, []);
+
+  const normalizeSessionStatus = useCallback((value) => {
+    const key = String(value || '').toUpperCase();
+    if (key === 'ACTIVE') return 'active';
+    if (key === 'PAUSED') return 'paused';
+    if (key === 'COMPLETED') return 'completed';
+    if (key === 'TERMINATED') return 'terminated';
+    if (key === 'CANCELLED' || key === 'CANCELED') return 'cancelled';
+    if (key === 'SCHEDULED') return 'scheduled';
+    return 'active';
+  }, []);
+
+  const normalizePriority = useCallback((value) => String(value || 'normal').toLowerCase(), []);
+
+  const mapSessionRow = useCallback((row = {}) => {
+    const patient = row.patient || {};
+    const doctor = row.doctor || {};
+    const startTime = firstNonEmpty(row.startTime, row.scheduledStart, row.scheduledAt, row.createdAt);
+    const endTime = firstNonEmpty(row.endTime, row.scheduledEnd);
+    const durationFromRange = (() => {
+      const start = Date.parse(startTime || '');
+      const end = Date.parse(endTime || '');
+      if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return null;
+      return Math.round((end - start) / (1000 * 60));
+    })();
+
+    const backendId = parseBackendId(firstNonEmpty(row.id, row.sessionPk));
+    const sessionId = firstNonEmpty(row.sessionId, row.sessionCode, backendId ? `TM-${backendId}` : null);
+    const displayId = sessionId ?? 'TM-N/A';
+
+    return {
+      id: String(displayId),
+      sessionId: sessionId ?? null,
+      backendId,
+      patient: String(firstNonEmpty(row.patientName, patient.fullName, patient.name, 'Unknown Patient')),
+      patientId: String(firstNonEmpty(row.patientId, patient.id, patient.patientId, 'N/A')),
+      doctor: String(firstNonEmpty(row.doctorName, doctor.fullName, doctor.name, 'Assigned Doctor')),
+      doctorId: String(firstNonEmpty(row.doctorId, doctor.id, 'N/A')),
+      specialty: String(firstNonEmpty(row.specialty, row.doctorSpecialty, doctor.specialty, 'General Medicine')),
+      startTime,
+      duration: toNumber(firstNonEmpty(row.duration, row.durationMinutes, durationFromRange), 0),
+      platform: normalizePlatform(firstNonEmpty(row.platform, row.platformType)),
+      status: normalizeSessionStatus(row.status),
+      sessionType: String(firstNonEmpty(row.sessionType, row.type, 'consultation')).toLowerCase(),
+      priority: normalizePriority(firstNonEmpty(row.priority, row.urgency)),
+      symptoms: Array.isArray(row.symptoms)
+        ? row.symptoms
+        : String(firstNonEmpty(row.symptoms, '')).split(',').map((item) => item.trim()).filter(Boolean),
+      cost: toNumber(firstNonEmpty(row.cost, row.amount, row.sessionFee), 0),
+      diagnosis: firstNonEmpty(row.diagnosis, null),
+      prescription: firstNonEmpty(row.prescription, row.doctorNotes, null),
+      rating: firstNonEmpty(row.rating, null),
+      followUpRequired: Boolean(firstNonEmpty(row.followUpRequired, false)),
+      date: startTime ? formatDateOnly(startTime) : '—',
+      meetingLink: firstNonEmpty(row.meetingLink, row.meetingUrl, null),
+    
+    };
+  }, [
+    firstNonEmpty,
+    toNumber,
+    parseBackendId,
+    normalizePlatform,
+    normalizeSessionStatus,
+    normalizePriority,
   ]);
 
-  const sessionHistory = [
-    {
-      id: 'TM-H001',
-      patient: 'Susan Mwangi',
-      doctor: 'Dr. Sarah Mitchell',
-      date: '2024-10-12',
-      duration: 22,
-      status: 'completed',
-      rating: 5,
-      cost: 500,
-      diagnosis: 'Mild Hypertension',
-      followUpRequired: true,
-      prescription: 'Prescribed medication and lifestyle changes'
-    },
-    {
-      id: 'TM-H002',
-      patient: 'Michael Ochieng',
-      doctor: 'Dr. James Mwangi',
-      date: '2024-10-12',
-      duration: 18,
-      status: 'completed',
-      rating: 4,
-      cost: 800,
-      diagnosis: 'Chest Pain - Non-cardiac',
-      followUpRequired: false,
-      prescription: 'Pain relief medication'
-    },
-    {
-      id: 'TM-H003',
-      patient: 'Alice Njeri',
-      doctor: 'Dr. Linda Chen',
-      date: '2024-10-11',
-      duration: 0,
-      status: 'cancelled',
-      rating: null,
-      cost: 0,
-      diagnosis: null,
-      followUpRequired: false,
-      prescription: null
+  
+  const mapDoctorRow = useCallback((row = {}) => ({
+    id: String(firstNonEmpty(row.id, row.doctorId, 'N/A')),
+    backendId: parseBackendId(firstNonEmpty(row.doctorId, row.id)),
+    name: String(firstNonEmpty(row.name, row.doctorName, 'Unknown Doctor')),
+    photo: String(firstNonEmpty(row.photo, row.avatarUrl, '/src/assets/Timothy Imani.jpeg')),
+    specialty: String(firstNonEmpty(row.specialty, 'General Medicine')),
+    experience: toNumber(firstNonEmpty(row.experience, row.yearsOfExperience), 0),
+    rating: toNumber(firstNonEmpty(row.rating, row.averageRating), 0),
+    sessionsToday: toNumber(firstNonEmpty(row.sessionsToday, row.todaySessions), 0),
+    totalSessions: toNumber(firstNonEmpty(row.totalSessions, row.completedSessions), 0),
+    currentStatus: String(firstNonEmpty(row.currentStatus, row.status, 'offline')).toLowerCase(),
+    nextAppointment: firstNonEmpty(row.nextAppointment, row.nextSessionAt, null),
+    avgSessionDuration: toNumber(firstNonEmpty(row.avgSessionDuration, row.averageSessionDuration), 0),
+    earnings: toNumber(firstNonEmpty(row.earnings, row.totalEarnings), 0),
+    languages: Array.isArray(row.languages)
+      ? row.languages
+      : String(firstNonEmpty(row.languages, 'English')).split(',').map((item) => item.trim()).filter(Boolean),
+    location: String(firstNonEmpty(row.location, row.city, 'Nairobi')),
+  }), [firstNonEmpty, parseBackendId, toNumber]);
+
+  const mapPatientRow = useCallback((row = {}) => {
+    const name = String(firstNonEmpty(
+      row.fullName,
+      row.name,
+      [row.firstName, row.middleName, row.lastName].filter(Boolean).join(' '),
+      'Unknown Patient'
+    ));
+    const id = String(firstNonEmpty(row.id, row.patientId, row.patient_id, ''));
+
+    return {
+      id,
+      patientId: String(firstNonEmpty(row.patientId, row.patient_id, row.id, '')),
+      name,
+      email: String(firstNonEmpty(row.email, row.patientEmail, '')),
+      phone: String(firstNonEmpty(row.phone, row.patientPhone, '')),
+    };
+  }, [firstNonEmpty]);
+
+  const mapHistoryRow = useCallback((row = {}) => {
+    const mapped = mapSessionRow(row);
+    return {
+      ...mapped,
+      id: String(firstNonEmpty(row.sessionId, mapped.id, row.id)),
+      status: normalizeSessionStatus(firstNonEmpty(row.status, mapped.status)),
+      date: String(firstNonEmpty(row.date, mapped.date, '')),
+    };
+  }, [mapSessionRow, firstNonEmpty, normalizeSessionStatus]);
+
+  const mapRecentActivityRow = useCallback((row = {}, index = 0) => {
+    const title = String(firstNonEmpty(row.title, row.type, row.activityType, 'Activity'));
+    const description = String(
+      firstNonEmpty(
+        row.subtitle,
+        row.description,
+        row.message,
+        row.summary,
+        row.details,
+        row.activity,
+        row.note,
+        row.event,
+        'No details available'
+      )
+    );
+    const ts = firstNonEmpty(row.activityAt, row.timestamp, row.createdAt, row.time);
+    const precomputedTimeAgo = firstNonEmpty(row.timeAgo, row.relativeTime);
+    const timeAgo = (() => {
+      if (precomputedTimeAgo) return String(precomputedTimeAgo);
+      const t = Date.parse(ts || '');
+      if (Number.isNaN(t)) return '';
+      const deltaMins = Math.max(0, Math.floor((Date.now() - t) / (1000 * 60)));
+      if (deltaMins < 1) return 'Just now';
+      if (deltaMins < 60) return `${deltaMins} min ago`;
+      const hours = Math.floor(deltaMins / 60);
+      if (hours < 24) return `${hours} hr ago`;
+      const days = Math.floor(hours / 24);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    })();
+
+    return {
+      id: String(firstNonEmpty(row.id, row.activityAt, index)),
+      title,
+      description,
+      timeAgo,
+    };
+  }, [firstNonEmpty]);
+
+  const usageListFromStats = useCallback((statsObj = {}) => {
+    const entries = [
+      { key: 'videoCall', label: 'Video Call' },
+      { key: 'audioCall', label: 'Audio Call' },
+      { key: 'messaging', label: 'Messaging' },
+    ];
+
+    return entries.map(({ key, label }) => ({
+      key,
+      label,
+      sessions: toNumber(statsObj?.[key]?.sessions, 0),
+      percentage: toNumber(statsObj?.[key]?.percentage, 0),
+      avgDuration: toNumber(statsObj?.[key]?.avgDuration, 0),
+    }));
+  }, [toNumber]);
+
+  const usageListFromSessions = useCallback((sessions = []) => {
+    const buckets = {
+      'Video Call': { key: 'videoCall', label: 'Video Call', sessions: 0, totalDuration: 0 },
+      'Audio Call': { key: 'audioCall', label: 'Audio Call', sessions: 0, totalDuration: 0 },
+      Messaging: { key: 'messaging', label: 'Messaging', sessions: 0, totalDuration: 0 },
+    };
+
+    for (const session of sessions) {
+      const label = normalizePlatform(session?.platform);
+      const bucket = buckets[label] || buckets['Video Call'];
+      bucket.sessions += 1;
+      bucket.totalDuration += toNumber(session?.duration, 0);
     }
-  ];
 
-  const revenueData = {
-    daily: 15400,
-    weekly: 89600,
-    monthly: 432500,
-    bySpecialty: [
-      { specialty: 'General Medicine', revenue: 125000, sessions: 342, avgCost: 365 },
-      { specialty: 'Cardiology', revenue: 98000, sessions: 134, avgCost: 731 },
-      { specialty: 'Pediatrics', revenue: 76000, sessions: 195, avgCost: 390 },
-      { specialty: 'Dermatology', revenue: 65000, sessions: 98, avgCost: 663 },
-      { specialty: 'Psychiatry', revenue: 68500, sessions: 112, avgCost: 612 }
-    ]
-  };
+    const total = sessions.length;
+    return Object.values(buckets).map((item) => ({
+      key: item.key,
+      label: item.label,
+      sessions: item.sessions,
+      percentage: total > 0 ? Number(((item.sessions / total) * 100).toFixed(1)) : 0,
+      avgDuration: item.sessions > 0 ? Math.round(item.totalDuration / item.sessions) : 0,
+    }));
+  }, [normalizePlatform, toNumber]);
 
-  const platformStats = {
-    videoCall: { sessions: 856, percentage: 68.7, avgDuration: 32 },
-    audioCall: { sessions: 284, percentage: 22.8, avgDuration: 18 },
-    messaging: { sessions: 107, percentage: 8.5, avgDuration: 45 }
-  };
+  const filteredActiveSessions = useMemo(() => {
+    return activeSessions.filter((session) => {
+      if (sessionFilter === 'all') return true;
+      if (sessionFilter === 'video') return session.platform === 'Video Call';
+      if (sessionFilter === 'audio') return session.platform === 'Audio Call';
+      if (sessionFilter === 'high-priority') return session.priority === 'high';
+      return true;
+    });
+  }, [activeSessions, sessionFilter]);
+
+  useEffect(() => {
+    const loadTelemedicineData = async () => {
+      setDataLoading(true);
+      setDataError('');
+
+      try {
+        const [
+          overviewPayload,
+          sessionsPayload,
+          revenuePayload,
+          platformStatsPayload,
+          usagePayload,
+          activityPayload,
+          doctorsPayload,
+          historyPayload,
+        ] = await Promise.all([
+          telemedicineService.getPlatformOverview(),
+          telemedicineService.listSessions({ page: 0, size: 200 }),
+          telemedicineService.getRevenueData({ period: 'monthly' }),
+          telemedicineService.getPlatformStats(),
+          telemedicineService.getUsageDistribution(),
+          telemedicineService.getRecentActivity({ limit: 10 }),
+          telemedicineService.getOnlineDoctors(),
+          telemedicineService.getSessionHistory({ period: selectedPeriod }),
+          
+        ]);
+// Inside your useEffect, after the Promise.all resolves
+console.log('RAW historyPayload:', JSON.stringify(historyPayload, null, 2));
+console.log('EXTRACTED history rows:', extractListPayload(historyPayload, ['history', 'sessionHistory']));
+
+        setPlatformOverview({
+          totalSessions: toNumber(firstNonEmpty(overviewPayload?.totalSessions, overviewPayload?.sessionsTotal), 0),
+          activeSessions: toNumber(firstNonEmpty(overviewPayload?.activeSessions, overviewPayload?.currentActiveSessions), 0),
+          totalDoctors: toNumber(firstNonEmpty(overviewPayload?.totalDoctors, overviewPayload?.doctorsTotal), 0),
+          onlineDoctors: toNumber(firstNonEmpty(overviewPayload?.onlineDoctors, overviewPayload?.doctorsOnline), 0),
+          totalRevenue: toNumber(firstNonEmpty(overviewPayload?.totalRevenue, overviewPayload?.monthlyRevenue), 0),
+          monthlyGrowth: toNumber(firstNonEmpty(overviewPayload?.monthlyGrowth, overviewPayload?.growthRate), 0),
+          avgSessionDuration: toNumber(firstNonEmpty(overviewPayload?.avgSessionDuration, overviewPayload?.averageSessionDuration), 0),
+          patientSatisfaction: toNumber(firstNonEmpty(overviewPayload?.patientSatisfaction, overviewPayload?.satisfactionRating), 0),
+        });
+
+        const mappedSessions = normalizePagedContent(sessionsPayload)
+          .map(mapSessionRow)
+          .filter((session) => ['active', 'paused', 'scheduled'].includes(session.status));
+        setActiveSessions(mappedSessions);
+
+        setRevenueData({
+          daily: toNumber(firstNonEmpty(revenuePayload?.daily, revenuePayload?.dailyRevenue), 0),
+          weekly: toNumber(firstNonEmpty(revenuePayload?.weekly, revenuePayload?.weeklyRevenue), 0),
+          monthly: toNumber(firstNonEmpty(revenuePayload?.monthly, revenuePayload?.monthlyRevenue), 0),
+          bySpecialty: toArray(firstNonEmpty(revenuePayload?.bySpecialty, revenuePayload?.specialtyRevenue)).map((item) => ({
+            specialty: String(firstNonEmpty(item.specialty, item.name, 'Unknown Specialty')),
+            revenue: toNumber(firstNonEmpty(item.revenue, item.totalRevenue), 0),
+            sessions: toNumber(firstNonEmpty(item.sessions, item.totalSessions), 0),
+            avgCost: toNumber(firstNonEmpty(item.avgCost, item.averageCost), 0),
+          })),
+        });
+
+        const mappedPlatformStats = {
+          videoCall: {
+            sessions: toNumber(firstNonEmpty(platformStatsPayload?.videoCall?.sessions, platformStatsPayload?.videoCallSessions), 0),
+            percentage: toNumber(firstNonEmpty(platformStatsPayload?.videoCall?.percentage, platformStatsPayload?.videoCallPercentage), 0),
+            avgDuration: toNumber(firstNonEmpty(platformStatsPayload?.videoCall?.avgDuration, platformStatsPayload?.videoCallAvgDuration), 0),
+          },
+          audioCall: {
+            sessions: toNumber(firstNonEmpty(platformStatsPayload?.audioCall?.sessions, platformStatsPayload?.audioCallSessions), 0),
+            percentage: toNumber(firstNonEmpty(platformStatsPayload?.audioCall?.percentage, platformStatsPayload?.audioCallPercentage), 0),
+            avgDuration: toNumber(firstNonEmpty(platformStatsPayload?.audioCall?.avgDuration, platformStatsPayload?.audioCallAvgDuration), 0),
+          },
+          messaging: {
+            sessions: toNumber(firstNonEmpty(platformStatsPayload?.messaging?.sessions, platformStatsPayload?.messagingSessions), 0),
+            percentage: toNumber(firstNonEmpty(platformStatsPayload?.messaging?.percentage, platformStatsPayload?.messagingPercentage), 0),
+            avgDuration: toNumber(firstNonEmpty(platformStatsPayload?.messaging?.avgDuration, platformStatsPayload?.messagingAvgDuration), 0),
+          },
+        };
+
+        const usageRows = extractListPayload(usagePayload, ['usageDistribution', 'platformUsageDistribution', 'platformUsage', 'distribution']);
+        const mappedUsage = usageRows.map((item, index) => {
+          const label = normalizePlatform(firstNonEmpty(item.platform, item.platformType, item.name));
+          const key = label === 'Video Call' ? 'videoCall' : label === 'Audio Call' ? 'audioCall' : 'messaging';
+          return {
+            key: String(firstNonEmpty(item.key, key, index)),
+            label,
+            sessions: toNumber(firstNonEmpty(item.sessions, item.totalSessions, item.count), 0),
+            percentage: toNumber(firstNonEmpty(item.percentage, item.ratio, item.percent), 0),
+            avgDuration: toNumber(firstNonEmpty(item.avgDuration, item.averageDuration, item.avgSessionDuration), 0),
+          };
+        });
+
+        const usageFromStats = usageListFromStats(mappedPlatformStats);
+        const usageFromSessions = usageListFromSessions(mappedSessions);
+        const usageHasValues = mappedUsage.some((item) => item.sessions > 0 || item.percentage > 0);
+        const statsHasValues = usageFromStats.some((item) => item.sessions > 0 || item.percentage > 0);
+        const sessionsHasValues = usageFromSessions.some((item) => item.sessions > 0 || item.percentage > 0);
+
+        if (usageHasValues) {
+          setUsageDistribution(mappedUsage);
+        } else if (statsHasValues) {
+          setUsageDistribution(usageFromStats);
+        } else if (sessionsHasValues) {
+          setUsageDistribution(usageFromSessions);
+        } else {
+          setUsageDistribution(usageFromStats);
+        }
+
+        setRecentActivities(
+          extractListPayload(activityPayload, ['recentActivities', 'recentActivity', 'activities'])
+            .map(mapRecentActivityRow)
+        );
+        setOnlineDoctors(extractListPayload(doctorsPayload, ['doctors', 'onlineDoctors']).map(mapDoctorRow));
+        const historyStatuses = ['completed', 'terminated', 'cancelled'];
+        const mappedHistory = normalizePagedContent(sessionsPayload)
+          .map(mapHistoryRow)
+          .filter(session => historyStatuses.includes(session.status));
+        setSessionHistory(mappedHistory);
+      } catch (error) {
+        setDataError(error?.message || 'Failed to load telemedicine data from backend.');
+      } finally {
+        setDataLoading(false);
+      }
+    };
+
+    loadTelemedicineData();
+  }, [
+    selectedPeriod,
+    reloadToken,
+    firstNonEmpty,
+    toNumber,
+    toArray,
+    normalizePagedContent,
+    normalizePlatform,
+    mapSessionRow,
+    mapDoctorRow,
+    mapHistoryRow,
+    mapRecentActivityRow,
+    extractListPayload,
+    usageListFromStats,
+    usageListFromSessions,
+  ]);
+
+  useEffect(() => {
+    const loadPatients = async () => {
+      setPatientsLoading(true);
+      setPatientsError('');
+      try {
+        const payload = await patientApi.list({ page: 0, size: 200, sort: 'createdAt,desc' });
+        const rows = normalizePagedContent(payload);
+        setPatients(rows.map(mapPatientRow).filter((p) => p.id));
+      } catch (error) {
+        setPatientsError(error?.message || 'Failed to load patients.');
+      } finally {
+        setPatientsLoading(false);
+      }
+    };
+
+    loadPatients();
+  }, [mapPatientRow, normalizePagedContent]);
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: Monitor },
-    { id: 'active-sessions', label: 'Active Sessions', icon: Video },
+    { id: 'overview', label: 'Overview & Active Sessions', icon: Monitor },
     { id: 'doctors', label: 'Online Doctors', icon: UserCheck },
     { id: 'session-history', label: 'Session History', icon: Calendar },
     { id: 'revenue', label: 'Revenue Analytics', icon: DollarSign },
@@ -443,10 +750,68 @@ const TelemedicineManagement = () => {
     setShowScheduleModal(true);
   };
 
-  const handleScheduleSessionSubmit = (sessionData) => {
-    console.log('Scheduling new session:', sessionData);
-    // Implement session scheduling logic with backend API
-    alert(`Session scheduled for ${sessionData.patientName} with ${sessionData.doctorName} on ${sessionData.date} at ${sessionData.time}`);
+  const handleScheduleSessionSubmit = async (sessionData) => {
+    const platformMap = {
+      video: 'VIDEO_CALL',
+      audio: 'AUDIO_CALL',
+      messaging: 'MESSAGING',
+    };
+
+    const sessionTypeMap = {
+      consultation: 'CONSULTATION',
+      'follow-up': 'FOLLOW_UP',
+      emergency: 'EMERGENCY',
+      prescription: 'PRESCRIPTION_RENEWAL',
+      'test-review': 'TEST_RESULT_REVIEW',
+    };
+
+    const parseId = (value) => {
+      if (value === undefined || value === null || value === '') return null;
+      const direct = Number(value);
+      if (Number.isFinite(direct)) return direct;
+      const digits = String(value).match(/\d+/g);
+      if (!digits) return null;
+      const parsed = Number(digits.join(''));
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+
+    const start = new Date(`${sessionData.date}T${sessionData.time}:00`);
+    const durationMins = Number(sessionData.duration) || 30;
+    const end = new Date(start.getTime() + durationMins * 60 * 1000);
+
+    const parsedPatientId = parseId(sessionData.patientId);
+    if (!parsedPatientId) {
+      window.alert('Please select a valid patient for this session.');
+      return;
+    }
+
+    const selectedPatient = patients.find((patient) => String(patient.id) === String(sessionData.patientId));
+
+    const payload = {
+      patientId: parsedPatientId,
+      patientName: sessionData.patientName || selectedPatient?.name,
+      doctorId: parseId(sessionData.doctorId),
+      doctorName: sessionData.doctorName,
+      sessionType: sessionTypeMap[sessionData.sessionType] || String(sessionData.sessionType || '').toUpperCase(),
+      platform: platformMap[sessionData.platform] || 'VIDEO_CALL',
+      priority: String(sessionData.priority || 'NORMAL').toUpperCase(),
+      startTime: Number.isNaN(start.getTime()) ? null : start.toISOString(),
+      endTime: Number.isNaN(end.getTime()) ? null : end.toISOString(),
+      duration: durationMins,
+      symptoms: String(sessionData.symptoms || '')
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+      doctorNotes: sessionData.notes || '',
+      notes: sessionData.notes || '',
+    };
+
+    try {
+      await telemedicineService.createSession(payload);
+      setReloadToken((prev) => prev + 1);
+    } catch (error) {
+      window.alert(error?.message || 'Failed to schedule session');
+    }
   };
 
   const handleExportReports = () => {
@@ -455,7 +820,7 @@ const TelemedicineManagement = () => {
 
   const handleExportReportsSubmit = (reportData) => {
     console.log('Exporting report:', reportData);
-    // Implement export logic
+    
     alert('Report exported successfully!');
   };
 
@@ -473,17 +838,30 @@ const TelemedicineManagement = () => {
     setShowPauseModal(true);
   };
 
-  const handlePauseConfirm = ({ sessionId, reason }) => {
-    console.log('Pausing session:', sessionId, 'Reason:', reason);
-    setPausedSessionIds(prev => new Set([...prev, sessionId]));
+  const handlePauseConfirm = async ({ sessionId, reason }) => {
+    const target = activeSessions.find((session) => session.id === sessionId || session.backendId === sessionId);
+    const backendId = target?.backendId;
+    if (!backendId) return;
+
+    try {
+      await telemedicineService.pauseSession(backendId);
+      setReloadToken((prev) => prev + 1);
+    } catch (error) {
+      window.alert(error?.message || reason || 'Failed to pause session');
+    }
   };
 
-  const handleResumeSession = (sessionId) => {
-    setPausedSessionIds(prev => {
-      const next = new Set(prev);
-      next.delete(sessionId);
-      return next;
-    });
+  const handleResumeSession = async (sessionId) => {
+    const target = activeSessions.find((session) => session.id === sessionId || session.backendId === sessionId);
+    const backendId = target?.backendId;
+    if (!backendId) return;
+
+    try {
+      await telemedicineService.resumeSession(backendId);
+      setReloadToken((prev) => prev + 1);
+    } catch (error) {
+      window.alert(error?.message || 'Failed to resume session');
+    }
   };
 
   const handleTerminateSession = (session) => {
@@ -491,15 +869,17 @@ const TelemedicineManagement = () => {
     setShowTerminateModal(true);
   };
 
-  const handleTerminateConfirm = ({ sessionId, reason }) => {
-    console.log('Terminating session:', sessionId, 'Reason:', reason);
-    setTerminatedSessionIds(prev => new Set([...prev, sessionId]));
-    // also remove from paused if it was paused
-    setPausedSessionIds(prev => {
-      const next = new Set(prev);
-      next.delete(sessionId);
-      return next;
-    });
+  const handleTerminateConfirm = async ({ sessionId, reason }) => {
+    const target = activeSessions.find((session) => session.id === sessionId || session.backendId === sessionId);
+    const backendId = target?.backendId;
+    if (!backendId) return;
+
+    try {
+      await telemedicineService.terminateSession(backendId, { reason: reason || 'Terminated by admin' });
+      setReloadToken((prev) => prev + 1);
+    } catch (error) {
+      window.alert(error?.message || 'Failed to terminate session');
+    }
   };
 
   const handleViewDoctor = (doctor) => { setSelectedDoctor(doctor); setShowViewDoctorModal(true); };
@@ -615,65 +995,52 @@ const TelemedicineManagement = () => {
         <div className="bg-white border border-gray-200 p-4">
           <h3 className="text-base font-semibold mb-3">Platform Usage Distribution</h3>
           <div className="space-y-3">
-            {Object.entries(platformStats).map(([platform, stats]) => (
-              <div key={platform} className="flex items-center justify-between">
+            {usageDistribution.map((item) => (
+              <div key={item.key} className="flex items-center justify-between">
                 <div className="flex items-center">
-                  {platform === 'videoCall' && <Video className="w-4 h-4 text-blue-600 mr-2" />}
-                  {platform === 'audioCall' && <Phone className="w-4 h-4 text-blue-600 mr-2" />}
-                  {platform === 'messaging' && <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />}
+                  {item.label === 'Video Call' && <Video className="w-4 h-4 text-blue-600 mr-2" />}
+                  {item.label === 'Audio Call' && <Phone className="w-4 h-4 text-blue-600 mr-2" />}
+                  {item.label === 'Messaging' && <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />}
                   <div>
-                    <p className="text-sm font-medium text-gray-900 capitalize">
-                      {platform.replace('Call', ' Call')}
-                    </p>
-                    <p className="text-xs text-gray-600">{stats.sessions} sessions</p>
+                    <p className="text-sm font-medium text-gray-900">{item.label}</p>
+                    <p className="text-xs text-gray-600">{item.sessions} sessions</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">{stats.percentage}%</p>
-                  <p className="text-xs text-gray-600">{formatDuration(stats.avgDuration)} avg</p>
+                  <p className="text-sm font-semibold text-gray-900">{item.percentage}%</p>
+                  <p className="text-xs text-gray-600">{formatDuration(item.avgDuration)} avg</p>
                 </div>
               </div>
             ))}
+            {usageDistribution.length === 0 && (
+              <p className="text-sm text-gray-500">No platform usage data available.</p>
+            )}
           </div>
         </div>
-
-        <div className="bg-white border border-gray-200 p-4">
-          <h3 className="text-base font-semibold mb-3">Recent Activity</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-2.5">
-              <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-blue-600 mr-2" />
-                <div>
-                  <p className="text-sm font-medium ">Session Completed</p>
-                  <p className="text-xs text-gray-600">Dr. Sarah Mitchell - Mary Wanjiku</p>
-                </div>
+            <div className="bg-white border border-gray-200 p-4">
+              <h3 className="text-base font-semibold mb-3">Recent Activity</h3>
+              <div className="space-y-3">
+                {recentActivities.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between p-2.5">
+                    <div className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-blue-600 mr-2" />
+                      <div>
+                        <p className="text-sm font-medium">{item.title}</p>
+                        <p className="text-xs text-gray-600">{formatIfDate(item.description)}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-500">{formatIfDate(item.timeAgo)}</span>
+                  </div>
+                ))}
+                {recentActivities.length === 0 && (
+                  <p className="text-sm text-gray-500">No recent activity available.</p>
+                )}
               </div>
-              <span className="text-xs text-gray-500">2 min ago</span>
             </div>
-            <div className="flex items-center justify-between p-2.5 ">
-              <div className="flex items-center">
-                <UserCheck className="w-4 h-4 text-blue-600 mr-2" />
-                <div>
-                  <p className="text-sm font-medium ">Doctor Joined</p>
-                  <p className="text-xs text-gray-600">Dr. James Mwangi is now online</p>
-                </div>
-              </div>
-              <span className="text-xs text-gray-500">5 min ago</span>
-            </div>
-            <div className="flex items-center justify-between p-2.5">
-              <div className="flex items-center">
-                <Calendar className="w-4 h-4 text-blue-600 mr-2" />
-                <div>
-                  <p className="text-sm font-medium ">Session Scheduled</p>
-                  <p className="text-xs text-gray-600">New appointment for 2:30 PM</p>
-                </div>
-              </div>
-              <span className="text-xs text-gray-500">8 min ago</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
+
+    
   );
 
   const renderActiveSessions = () => (
@@ -719,15 +1086,10 @@ const TelemedicineManagement = () => {
           </thead>
 
           <tbody>
-            {activeSessions.filter((session) => {
-              if (sessionFilter === 'all') return true;
-              if (sessionFilter === 'video') return session.platform === 'Video Call';
-              if (sessionFilter === 'audio') return session.platform === 'Audio Call';
-              if (sessionFilter === 'high-priority') return session.priority === 'high';
-              return true;
-            }).map((session, index) => {
-              const isPaused = pausedSessionIds.has(session.id);
-              const isEnded = terminatedSessionIds.has(session.id);
+            {filteredActiveSessions.map((session, index) => {
+              const isPaused = session.status === 'paused';
+              const isEnded = ['terminated', 'completed', 'cancelled'].includes(session.status);
+              const canJoin = !isEnded && Boolean(session.backendId) && session.patientId && session.patientId !== 'N/A';
               return (
                 <tr
                   key={session.id}
@@ -765,7 +1127,7 @@ const TelemedicineManagement = () => {
                     {isEnded ? (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 text-red-700 text-xs font-semibold">
                         <Square className="w-3 h-3" />
-                        Ended
+                        {session.status}
                       </span>
                     ) : isPaused ? (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 text-blue-700 text-xs font-semibold">
@@ -797,10 +1159,21 @@ const TelemedicineManagement = () => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
+                      {canJoin && (
+                        <button
+                          onClick={() => handleJoinLiveSession(session)}
+                          className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+                          title="Join live call"
+                          disabled={joiningSession}
+                        >
+                          <Video className="w-4 h-4" />
+                        </button>
+                      )}
+
                       {!isEnded && (
                         isPaused ? (
                           <button
-                            onClick={() => handleResumeSession(session.id)}
+                            onClick={() => handleResumeSession(session.backendId || session.id)}
                             className="p-1.5 text-green-600 hover:bg-green-50 rounded"
                             title="Resume Session"
                           >
@@ -833,6 +1206,14 @@ const TelemedicineManagement = () => {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+
+  const renderOverviewAndActiveSessions = () => (
+    <div className="space-y-6">
+      {renderOverview()}
+      {renderActiveSessions()}
+      
     </div>
   );
 
@@ -897,15 +1278,15 @@ const TelemedicineManagement = () => {
                 <td className="px-3 py-2.5">
                   <div className="flex items-center">
                     <div className="relative flex-shrink-0">
-                      <img
+                      {/* <img
                         src={doctor.photo}
                         alt={doctor.name}
                         className="w-8 h-8 rounded-full object-cover"
-                      />
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
+                      /> */}
+                      {/* <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
                         doctor.currentStatus === 'available' ? 'bg-green-500' :
                         doctor.currentStatus === 'busy' ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}></div>
+                      }`}></div> */}
                     </div>
                     <div className="ml-2">
                       <span className="font-semibold text-sm">{doctor.name}</span>
@@ -1144,7 +1525,7 @@ const TelemedicineManagement = () => {
                     <td className="px-4 py-3 text-center ">{formatCurrency(specialty.avgCost)}</td>
                     <td className="px-4 py-3 text-right font-semibold ">{formatCurrency(specialty.revenue)}</td>
                     <td className="px-4 py-3 text-right font-semibold ">
-                      {((specialty.revenue / revenueData.monthly) * 100).toFixed(1)}%
+                      {revenueData.monthly > 0 ? ((specialty.revenue / revenueData.monthly) * 100).toFixed(1) : '0.0'}%
                     </td>
                   </tr>
                 ))}
@@ -1630,8 +2011,22 @@ const TelemedicineManagement = () => {
 
           {/* Tab Content */}
           <div className="min-h-[560px] [&_table]:text-sm [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:py-2.5 [&_th]:px-3 [&_td]:py-2.5 [&_td]:px-3">
-            {activeTab === 'overview' && renderOverview()}
-            {activeTab === 'active-sessions' && renderActiveSessions()}
+            {dataError && (
+              <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 text-sm text-red-700">
+                {dataError}
+              </div>
+            )}
+            {dataLoading && (
+              <div className="mb-3 px-3 py-2 bg-blue-50 border border-blue-200 text-sm text-blue-700">
+                Loading telemedicine data from backend...
+              </div>
+            )}
+            {patientsError && (
+              <div className="mb-3 px-3 py-2 bg-yellow-50 border border-yellow-200 text-sm text-yellow-700">
+                {patientsError}
+              </div>
+            )}
+            {activeTab === 'overview' && renderOverviewAndActiveSessions()}
             {activeTab === 'doctors' && renderOnlineDoctors()}
             {activeTab === 'session-history' && renderSessionHistory()}
             {activeTab === 'revenue' && renderRevenue()}
@@ -1645,6 +2040,9 @@ const TelemedicineManagement = () => {
         isOpen={showScheduleModal}
         onClose={() => setShowScheduleModal(false)}
         onSchedule={handleScheduleSessionSubmit}
+        patients={patients}
+        doctors={onlineDoctors}
+        patientsLoading={patientsLoading}
       />
 
       <ExportReportsModal
@@ -1660,9 +2058,9 @@ const TelemedicineManagement = () => {
         session={selectedSession}
         sessionStatus={
           selectedSession
-            ? terminatedSessionIds.has(selectedSession.id)
+            ? ['terminated', 'completed', 'cancelled'].includes(selectedSession.status)
               ? 'ended'
-              : pausedSessionIds.has(selectedSession.id)
+              : selectedSession.status === 'paused'
               ? 'paused'
               : 'live'
             : 'live'
@@ -1719,6 +2117,21 @@ const TelemedicineManagement = () => {
         isOpen={showDownloadReportModal}
         onClose={() => { setShowDownloadReportModal(false); setSelectedHistorySession(null); }}
         session={selectedHistorySession}
+      />
+
+      <JitsiCallModal
+        isOpen={showJitsiCall}
+        onClose={() => {
+          setShowJitsiCall(false);
+          setJitsiSession(null);
+        }}
+        roomName={jitsiSession?.sessionId ?? jitsiSession?.id}
+        userInfo={{ displayName: 'Doctor / Admin' }}
+        title={
+          jitsiSession
+            ? `${jitsiSession.patient} · ${jitsiSession.doctor}`
+            : ''
+        }
       />
     </div>
   );

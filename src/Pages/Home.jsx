@@ -5,6 +5,8 @@ import HomepageImg from "../assets/Homepage.png";
 import MediLinkLogo from "../assets/mediLink.png";
 import MedilinkHomePageSlider from "../assets/TechnologyHome.jpg";
 import EventGamified from "../Components/EventGamified.jsx";
+import Mission from "./about/Mission.jsx";
+import AboutMediLink from "./about/AboutMediLink.jsx";
 
 
 
@@ -26,13 +28,13 @@ const Home = () => {
 
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-sans bg-blue-50 overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50 overflow-x-hidden">
       
       
 
 
       <main className="flex flex-col items-center w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 max-w-[1600px] mx-auto">
-        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] mb-8 sm:mb-12 md:mb-16 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-blue-200 bg-blue-950 text-white">
+        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] mb-8 sm:mb-12 md:mb-16  sm:rounded-3xl overflow-hidden shadow-2xl border border-blue-200 bg-blue-950 text-white">
           {/* Background Blobs */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             <div className="absolute -top-16 -left-16 w-64 h-64 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
@@ -104,26 +106,10 @@ const Home = () => {
 
 
       {/* Mission & Vision - Enhanced Cards */}
-      <section className="mb-6 sm:mb-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-        <div className="mb-3 sm:mb-5 w-full text-left">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif text-blue-800 mb-4 sm:mb-6 px-2">Our Mission</h2>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed px-2">
-            To revolutionize healthcare access in Africa by connecting communities, clinics, and caregivers through a smart digital platform that simplifies access to quality, affordable, and timely medical services.
-          </p>
-        </div>
-        
-        <div className="mb-3 sm:mb-5 w-full text-left relative">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200 to-transparent rounded-full blur-2xl opacity-50"></div>
-          <div className="relative z-10">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-blue-800 mb-4 sm:mb-6 px-2">Our Vision</h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed px-2">
-              A healthy and empowered Africa where every citizen can access quality care, anytime, anywhere.
-            </p>
-          </div>
-        </div>
-      </section>
+     
+      <Mission compact />
+      <AboutMediLink compact />
 
-       
         {/* How MediLink Works - Step by Step Guide */}
         <section className="mb-6 sm:mb-8 w-full p-3 sm:p-4">
           <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8">
@@ -132,24 +118,24 @@ const Home = () => {
               <div className="mb-4 text-left md:text-left">
                 <h4 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 font-serif mb-2 sm:mb-3 px-2">How MediLink Works</h4>
                 <p className="text-sm sm:text-base md:text-lg text-blue-700 max-w-md mb-3 sm:mb-4 px-2">
-                  MediLink makes healthcare easy and accessible. Here's how it works:
+                  Simple steps to get care:
                 </p>
                   <ol className="list-none space-y-2 sm:space-y-3 px-2">
                   <li className="flex items-start">
                     <span className="text-blue-400 mr-2 sm:mr-3 mt-1 flex-shrink-0 text-sm sm:text-base">✓</span>
-                    <span className="text-xs sm:text-sm md:text-base">Create your account or log in to access personalized healthcare services and support.</span>
+                    <span className="text-xs sm:text-sm md:text-base">Create an account to access care.</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-blue-400 mr-2 sm:mr-3 mt-1 flex-shrink-0 text-sm sm:text-base">✓</span>
-                    <span className="text-xs sm:text-sm md:text-base">Browse available clinics, services, and health workers in your area or online.</span>
+                    <span className="text-xs sm:text-sm md:text-base">Browse clinics, services, and CHWs.</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-blue-400 mr-2 sm:mr-3 mt-1 flex-shrink-0 text-sm sm:text-base">✓</span>
-                    <span className="text-xs sm:text-sm md:text-base">Reach out to community health workers, doctors, or support staff for guidance and care.</span>
+                    <span className="text-xs sm:text-sm md:text-base">Connect with providers for guidance.</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-blue-400 mr-2 sm:mr-3 mt-1 flex-shrink-0 text-sm sm:text-base">✓</span>
-                    <span className="text-xs sm:text-sm md:text-base">Receive timely medical attention, advice, and ongoing support for your health needs.</span>
+                    <span className="text-xs sm:text-sm md:text-base">Get timely care and follow-up.</span>
                   </li>
                 </ol>
               </div>
@@ -179,7 +165,7 @@ const Home = () => {
               Ready to Get Started?
             </h4>
             <p className="text-sm sm:text-base md:text-lg lg:text-xl px-2">
-              Join thousands who are already experiencing better healthcare
+              Join thousands getting better care.
             </p>
           </div>
           
@@ -240,7 +226,6 @@ const Home = () => {
                 <blockquote className="italic text-sm sm:text-base md:text-lg leading-relaxed">
                   <span className="text-blue-800 font-semibold">Jeremiah 33:6 (NIV)</span>
                   <br />
-                  <br />
                   "Nevertheless, I will bring health and healing to it; I will heal my people and will let them enjoy abundant peace and security."
                 </blockquote>
               </div>
@@ -284,11 +269,8 @@ const Home = () => {
                 <p className="font-bold text-sm sm:text-base md:text-lg leading-relaxed mb-1">
                   Healthcare for Everyone
                 </p>
-                <p className="text-xs sm:text-sm md:text-base leading-relaxed mb-1">
-                  We provide quality healthcare for all, connecting communities, health workers, and facilities so everyone gets care quickly and easily.
-                </p>
                 <p className="text-xs sm:text-sm md:text-base leading-relaxed">
-                  Health is a right. We help make it accessible to every Kenyan.
+                  We connect communities, health workers, and facilities so care is fast and accessible for every Kenyan.
                 </p>
               </div>
             </div>

@@ -4,7 +4,7 @@ const ClinicCallToAction = () => {
   return (
     <section className="mt-3 sm:mt-4 md:mt-5 w-full relative overflow-hidden mb-0">
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-50"></div>
+      <div className="absolute inset-0 bg-gray-50"></div>
       
       {/* Main Content Container */}
       <div className="relative p-4 sm:p-6 md:p-8 text-center">
