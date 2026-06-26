@@ -1,0 +1,6 @@
+dist
+.git
+.gitignore
+Dockerfile.dev
+README.md
+*.log
