@@ -31,7 +31,7 @@ const Home = () => {
     <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50 overflow-x-hidden">
       
       <main className="flex flex-col items-center w-full max-w-none">
-        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] mb-8 sm:mb-12 md:mb-16 overflow-hidden bg-blue-950 text-white">
+        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] mb-0 overflow-hidden bg-blue-950 text-white">
           {/* Background Blobs */}
       
 
