@@ -30,16 +30,10 @@ const Home = () => {
   return (
     <div className="min-h-screen w-full flex flex-col font-sans bg-gray-50 overflow-x-hidden">
       
-      
-
-
-      <main className="flex flex-col items-center w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 max-w-[1600px] mx-auto">
-        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] mb-8 sm:mb-12 md:mb-16  sm:rounded-3xl overflow-hidden shadow-2xl border border-blue-200 bg-blue-950 text-white">
+      <main className="flex flex-col items-center w-full max-w-none">
+        <section className="relative w-full aspect-[4/3] md:aspect-[16/9] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] mb-0 overflow-hidden bg-blue-950 text-white">
           {/* Background Blobs */}
-          <div className="absolute inset-0 z-0 pointer-events-none">
-            <div className="absolute -top-16 -left-16 w-64 h-64 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-            <div className="absolute bottom-10 right-10 w-72 h-72 bg-blue-600 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-          </div>
+      
 
           {/* Image Slider */}
           <div className="absolute inset-0 z-0 transition-opacity duration-700">
